@@ -9,6 +9,7 @@ I've included below in categories what needs to be done and some basic ideas on 
    * subtype of the image for example if MRI ADC/DWI/T2 etc.  (need to construct enum for this)
    * type of the voxel data (for example Float32)
    * Date of saving
+   * Acquisition time
    * Patient ID if present
    * current device - (CPU, GPU)
    * Study UID
