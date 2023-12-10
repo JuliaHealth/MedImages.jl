@@ -88,66 +88,6 @@ using CoordinateTransformations,Images
 using NIfTI,LinearAlgebra,DICOM
 
 
-function Rocket.__process_channeled_message(instance::AsyncSchedulerInstance{D}, message::AsyncSchedulerDataMessage{D}, actor) where D
-   # print("oooooooooooo")
-   on_next!(actor, message.data)
-end
-
-
-Pkg.instantiate()
-
-#add ProgressMeter StaticArrays BSON Distributed Flux Hyperopt Colors Plots Distributions Clustering IrrationalConstants ParallelStencil HDF5
-
-#directory where we want to store our HDF5 that we will use
-pathToHDF5="/root/data/smallDataSet.hdf5"
-# data_dir = "/home/data/Task09_Spleen/"
-data_dir = "/root/data_decathlon/Task09_Spleen"
-fid = h5open(pathToHDF5, "w")
-
-
-
-dicom_path="/workspaces/MedEye3d.jl/docs/src/ScalarVolume_0"
-
-# Read the DICOM file
-dicom_data = DICOM.dcmdir_parse(dicom_path)
-
-# Extract the image data
-image_data = dicom_data["PixelData"]
-
-# Extract the spatial metadata
-spacing = (dicom_data["PixelSpacing"][1], dicom_data["PixelSpacing"][2], dicom_data["SliceThickness"])
-origin = (dicom_data["ImagePositionPatient"][1], dicom_data["ImagePositionPatient"][2], dicom_data["ImagePositionPatient"][3])
-direction = (dicom_data["ImageOrientationPatient"][1:3], dicom_data["ImageOrientationPatient"][4:6])
-
-
-
-
-# Channel{T=Any}(func::Function, size=0; taskref=nothing, spawn=false)
-# Base.Channel(size=0; taskref=nothing, spawn=false)
-
-
-# Base.Channel{Char}(1, spawn=true)
-
-
-
-
-
-#representing number that is the patient id in this dataset
-patentNum = 3
-patienGroupName=string(patentNum)
-z=7# how big is the area from which we collect data to construct probability distributions
-klusterNumb = 5# number of clusters - number of probability distributions we will use
-#directory of folder with files in this directory all of the image files should be in subfolder volumes 0-49 and labels labels if one ill use lines below
-
-train_labels = map(fileEntry-> joinpath(data_dir,"labelsTr",fileEntry),readdir(joinpath(data_dir,"labelsTr"); sort=true))
-train_images = map(fileEntry-> joinpath(data_dir,"imagesTr",fileEntry),readdir(joinpath(data_dir,"imagesTr"); sort=true))
-
-
-#zipping so we will have tuples with image and label names
-zipped= collect(zip(train_images,train_labels))
-zipped=map(tupl -> (replace(tupl[1], "._" => ""), replace(tupl[2], "._" => "")),zipped)
-tupl=zipped[patentNum]
-
 
 
 
