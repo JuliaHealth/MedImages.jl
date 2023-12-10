@@ -40,7 +40,7 @@ I've included below in categories what needs to be done and some basic ideas on 
   
 Point 3 is the trickiest one to do as there are a lot of corner cases
     
-
+to look for https://github.com/haberdashPI/MetaArrays.jl
 
 ## References
 1)https://www.nature.com/articles/sdata201644
