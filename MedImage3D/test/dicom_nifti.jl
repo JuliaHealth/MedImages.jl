@@ -13,7 +13,7 @@ describing image properties such as intensity or density for each point
 
 4) check is spacing data is preserved
 """
-function test_pixel_array(path_nifti_from_dicom,path_nifti)
+function test_image_equality(path_nifti_from_dicom,path_nifti)
 
     # Load the image from path
     nifti_img = niread(path_nifti)
