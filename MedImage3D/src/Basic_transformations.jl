@@ -28,13 +28,24 @@ end#crop_mi
 
 
 """
-given a MedImage object translation value and axis in witch to translate the image return translated image
+given a MedImage object translation value (translate_by) and axis (translate_in_axis) in witch to translate the image return translated image
 """
-function crop_mi(im::MedImage, crop_beg::Tuple{Int64, Int64, Int64},crop_end::Tuple{Int64, Int64, Int64}  )::MedImage
+function translate_mi(im::MedImage, translate_by::Int64 ,translate_in_axis::Int64  )::MedImage
 
 
 
 end#crop_mi    
+
+
+"""
+given a MedImage object and a Tuple that contains the scaling values for each axis (x,y,z in order)
+return the scaled MedImage object 
+"""
+function scale_mi(im::MedImage, scale::Tuple{Float64, Float64, Float64} )::MedImage
+
+
+
+end#scale_mi    
 
 
 
