@@ -14,3 +14,6 @@ struct MedImage
     patient_id::String
 end
 
+
+@enum Interpolator nearest_neighbour=0 linear=2 b_spline=3
+
