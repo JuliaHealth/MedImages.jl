@@ -1,8 +1,6 @@
 using NIfTI,LinearAlgebra,DICOM
 TODO import     load_image,save_image from Load_and_save.jl
  
-
-
 """
 given a path to a dicom file and a path to a nifti file,
 will load them and check weather :
