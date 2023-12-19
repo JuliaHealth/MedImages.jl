@@ -1,6 +1,9 @@
-using NIfTI,LinearAlgebra,DICOM
-TODO import     load_image,save_image from Load_and_save.jl
- 
+
+using NIfTI,LinearAlgebra,DICOM,Test
+# import ..Load_and_save
+
+
+# TODO: continue with the rest of the code
 """
 given a path to a dicom file and a path to a nifti file,
 will load them and check weather :
@@ -15,7 +18,6 @@ describing image properties such as intensity or density for each point
 """
 function test_image_equality(path_dicom,path_nifti)
 
-    path_nifti_from_dicom=" " TODO - define
     dicom_im=load_image(path_dicom)
     save_image(dicom_im,path_nifti_from_dicom)
 
@@ -32,12 +34,12 @@ function test_image_equality(path_dicom,path_nifti)
     @test nifti_img.header.qoffset_z ≈ nifti_dicom_img.header.qoffset_z atol=0.001
 
     #check if the direction data is preserved
-    @test nifti_img.header.srow_x ≈ nifti_dicom_img.header.srow_x atol=0.001
-    @test nifti_img.header.srow_y ≈ nifti_dicom_img.header.srow_y atol=0.001
-    @test nifti_img.header.srow_z ≈ nifti_dicom_img.header.srow_z atol=0.001
+    @test collect(nifti_img.header.srow_x) ≈ collect(nifti_dicom_img.header.srow_x) atol=0.001
+    @test collect(nifti_img.header.srow_y) ≈ collect(nifti_dicom_img.header.srow_y) atol=0.001
+    @test collect(nifti_img.header.srow_z) ≈ collect(nifti_dicom_img.header.srow_z) atol=0.001
 
     #check if the spacing data is preserved
-    @test nifti_img.header.pixdim ≈ nifti_dicom_img.header.pixdim atol=0.001
+    @test collect(nifti_img.header.pixdim) ≈ collect(nifti_dicom_img.header.pixdim) atol=0.001
 
 
     ######## check additionally weather nifti loading is working also
@@ -55,12 +57,15 @@ function test_image_equality(path_dicom,path_nifti)
     @test nifti_img.header.qoffset_z ≈ nifti_dicom_img.header.qoffset_z atol=0.001
 
     #check if the direction data is preserved
-    @test nifti_img.header.srow_x ≈ nifti_dicom_img.header.srow_x atol=0.001
-    @test nifti_img.header.srow_y ≈ nifti_dicom_img.header.srow_y atol=0.001
-    @test nifti_img.header.srow_z ≈ nifti_dicom_img.header.srow_z atol=0.001
+    @test collect(nifti_img.header.srow_x) ≈ collect(nifti_dicom_img.header.srow_x) atol=0.001
+    @test collect(nifti_img.header.srow_y) ≈ collect(nifti_dicom_img.header.srow_y) atol=0.001
+    @test collect(nifti_img.header.srow_z) ≈ collect(nifti_dicom_img.header.srow_z) atol=0.001
 
     #check if the spacing data is preserved
-    @test nifti_img.header.pixdim ≈ nifti_dicom_img.header.pixdim atol=0.001
+    @test collect(nifti_img.header.pixdim) ≈ collect(nifti_dicom_img.header.pixdim) atol=0.001
 
 
 end    
+
+# p="/workspaces/MedImage.jl/MedImage3D/test_data/volume-0.nii.gz"
+# test_image_equality(p,p)
