@@ -15,5 +15,7 @@ struct MedImage
 end
 
 
+
+
 @enum Interpolator nearest_neighbour=0 linear=2 b_spline=3
 
