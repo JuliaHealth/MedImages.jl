@@ -18,6 +18,7 @@ struct MedImage
     patient_id::String
 end
 
+
 #constructor function for MedImage
 function MedImage(MedImage_struct_attributes::Dict{String,Any})
     return MedImage(
@@ -30,5 +31,6 @@ function MedImage(MedImage_struct_attributes::Dict{String,Any})
         get(MedImage_struct_attributes,"patient_id","")      
     )
 end
+
 @enum Interpolator nearest_neighbour=0 linear=2 b_spline=3
 
