@@ -8,7 +8,7 @@ given a MedImage object and a Tuple that contains the rotation values for each a
 we are setting Interpolator by using Interpolator enum
 return the rotated MedImage object 
 """
-function rotate_mi(im::MedImage, rotate_by::Tuple{Float64, Float64, Float64},Interpolator::Interpolator cro)::MedImage
+function rotate_mi(im::MedImage, rotate_by::Tuple{Float64, Float64, Float64},Interpolator::Interpolator)::MedImage
 
 
 
