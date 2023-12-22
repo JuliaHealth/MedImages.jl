@@ -1,12 +1,19 @@
+using Pkg
+Pkg.add(["Dictionaries"])
+using Dictionaries
+
+
+
+
+
+
+
 """
 Here we define necessary data structures for the project.
 Main data structure is a MedImage object which is a 3D image with some metadata.
 
 !!!! Currently implemented as Struct but will be better to use as metadata arrays
 """
-using Pkg
-Pkg.add(["Dictionaries"])
-using Dictionaries
 
 #following struct can be expanded with all the relevant meta data mentioned within the readme.md of MedImage.jl
 struct MedImage
