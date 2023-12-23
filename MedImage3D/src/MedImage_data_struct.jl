@@ -1,11 +1,19 @@
+using Pkg
+Pkg.add(["Dictionaries"])
+using Dictionaries
+
+
+
+
+
+
+
 """
 Here we define necessary data structures for the project.
 Main data structure is a MedImage object which is a 3D image with some metadata.
 
 !!!! Currently implemented as Struct but will be better to use as metadata arrays
 """
-
-
 
 #following struct can be expanded with all the relevant meta data mentioned within the readme.md of MedImage.jl
 struct MedImage
@@ -20,7 +28,7 @@ end
 
 
 #constructor function for MedImage
-function MedImage(MedImage_struct_attributes::Dict{String,Any})
+function MedImage(MedImage_struct_attributes::Dictionaries.Dictionary{String,Any})
     return MedImage(
         get(MedImage_struct_attributes,"pixel_array",[]),
         get(MedImage_struct_attributes,"direction",[]),
