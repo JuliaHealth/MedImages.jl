@@ -112,6 +112,7 @@ img.header.orientation
 # Get the direction
 direction = img.orientation
 
+
 # Get the origin
 origin = img.header.qoffset_x, img.header.qoffset_y, img.header.qoffset_z
 
@@ -318,7 +319,7 @@ using LinearAlgebra
 
 function get_dir_nifti(path)
     nii = niread(path)
-    affine =  NIfTI.get_sform(nii.header)
+    affine =  NIfTI.get_sform(nii.header) # not a function in NIfTI
     direction = normalize(affine)
     return tuple(direction...)
 end
