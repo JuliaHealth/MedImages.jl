@@ -8,7 +8,7 @@ given a MedImage object and a Tuple that contains the rotation values for each a
 we are setting Interpolator by using Interpolator enum
 return the rotated MedImage object 
 """
-function rotate_mi(im::MedImage, rotate_by::Tuple{Float64, Float64, Float64},Interpolator::Interpolator cro)::MedImage
+function rotate_mi(im::Array{MedImage}, rotate_by::Tuple{Float64, Float64, Float64},Interpolator::Interpolator cro)::Array{MedImage}
 
 
 
@@ -22,7 +22,7 @@ from the begining of each axis (crop_beg) and from the end of each axis (crop_en
 we are setting Interpolator by using Interpolator enum
 return the cropped MedImage object 
 """
-function crop_mi(im::MedImage, crop_beg::Tuple{Int64, Int64, Int64},crop_end::Tuple{Int64, Int64, Int64} ,Interpolator::Interpolator  )::MedImage
+function crop_mi(im::Array{MedImage}, crop_beg::Tuple{Int64, Int64, Int64},crop_end::Tuple{Int64, Int64, Int64} ,Interpolator::Interpolator  )::Array{MedImage}
 
 
 
@@ -34,7 +34,7 @@ given a MedImage object translation value (translate_by) and axis (translate_in_
 we are setting Interpolator by using Interpolator enum
 return the translated MedImage object
 """
-function translate_mi(im::MedImage, translate_by::Int64 ,translate_in_axis::Int64 ,Interpolator::Interpolator  )::MedImage
+function translate_mi(im::Array{MedImage}, translate_by::Int64 ,translate_in_axis::Int64 ,Interpolator::Interpolator  )::Array{MedImage}
 
 
 
@@ -46,7 +46,7 @@ given a MedImage object and a Tuple that contains the scaling values for each ax
 we are setting Interpolator by using Interpolator enum
 return the scaled MedImage object 
 """
-function scale_mi(im::MedImage, scale::Tuple{Float64, Float64, Float64},Interpolator::Interpolator )::MedImage
+function scale_mi(im::Array{MedImage}, scale::Tuple{Float64, Float64, Float64},Interpolator::Interpolator )::Array{MedImage}
 
 
 

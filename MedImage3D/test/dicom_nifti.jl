@@ -69,3 +69,5 @@ end
 
 # p="/workspaces/MedImage.jl/MedImage3D/test_data/volume-0.nii.gz"
 # test_image_equality(p,p)
+
+# dcm_data_array = dcmdir_parse("/workspaces/MedImage.jl/MedImage3D/test_data/ScalarVolume_0")
