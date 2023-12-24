@@ -17,7 +17,7 @@ then it will load the image and return a MedImage object with the image data and
 """
 function load_image(path::String)::Array{MedImage}
 
-function handle_single_medimage_object_from_dicom(dicom_data_array, sub_values, path, list_of_dicom_files)
+function handle_single_medimage_object_from_dicom(dicom_data_array, sub_values, path, list_of_dicom_files, pixel_data_array)
   # we are retreiving data from the first dicom files, since all the other files have same Series ID, so spatial meta data wont change
   append!(sub_values, [
     dicom_data_array[1][tag"PixelData"],
@@ -28,6 +28,12 @@ function handle_single_medimage_object_from_dicom(dicom_data_array, sub_values, 
     joinpath(path, list_of_dicom_files[1]),
     dicom_data_array[1][tag"PatientID"]
   ])
+    
+  #appending pixel data arrays from dicom files of same ID
+  
+  for dicom_data in dicom_data_array
+    append!(pixel_data_array,[dicom_data[tag"PixelData"]])
+  end
 end
 
 function handle_multiple_medimage_objects_from_dicom(dicom_data_array,values,sub_values,path,list_of_dicom_files,dicom_tag_series_instance_uid_tuples, pixel_data_array)
@@ -50,12 +56,15 @@ function handle_multiple_medimage_objects_from_dicom(dicom_data_array,values,sub
     ]) 
     push!(values,sub_values)
   end
+
+
+  
 end
 
 
 
 
-function load_image(path::String)::Union{MedImage, Vector{MedImage}}
+function load_image(path::String)::Vector{MedImage}
 
   #check if the path is a folder or a file
   properties = ["pixel_array", "direction", "spacing", "orientation", "origin", "date_of_saving", "patient_id"]
@@ -121,17 +130,12 @@ function load_image(path::String)::Union{MedImage, Vector{MedImage}}
     push!(values,sub_values)
   end
   
-  if length(values) == 1
-    MedImage_struct_attributes = Dictionaries.Dictionary(properties, values[1])
-  return MedImage(MedImage_struct_attributes)
-  else
-    medimage_object_array = []
-    for value_array in values
+  medimage_object_array = []   
+  for value_array in values
       MedImage_struct_attributes = Dictionaries.Dictionary(properties,value_array)
       push!(medimage_object_array, MedImage(MedImage_struct_attributes))
-    end
-    return medimage_object_array
   end
+  return medimage_object_array
 end#load_image
 
 """
