@@ -15,12 +15,16 @@ given a path to a Nifti file or a dicom folder return a MedImage object
 first it needs to recognise weather it works with a dicom folder or a nifti file
 then it will load the image and return a MedImage object with the image data and the metadata
 """
-function load_image(path::String)::Array{MedImage}
 
-function handle_single_medimage_object_from_dicom(dicom_data_array, sub_values, path, list_of_dicom_files, pixel_data_array)
+#we would need to load the medimage objects with the stacked pixel data arrays after conversion from 2d to 3D
+function stack_pixel_data_arrays(pixel_data_array)
+  nothing
+end
+
+function handle_single_medimage_object_from_dicom(dicom_data_array,values, sub_values, path, list_of_dicom_files, stacked_pixel_data_array)
   # we are retreiving data from the first dicom files, since all the other files have same Series ID, so spatial meta data wont change
   append!(sub_values, [
-    dicom_data_array[1][tag"PixelData"],
+    stacked_pixel_data_array[1],
     dicom_data_array[1][tag"ImageOrientationPatient"],
     dicom_data_array[1][tag"PixelSpacing"],
     dicom_data_array[1][tag"ImagePositionPatient"],
@@ -28,37 +32,30 @@ function handle_single_medimage_object_from_dicom(dicom_data_array, sub_values, 
     joinpath(path, list_of_dicom_files[1]),
     dicom_data_array[1][tag"PatientID"]
   ])
-    
-  #appending pixel data arrays from dicom files of same ID
-  
-  for dicom_data in dicom_data_array
-    append!(pixel_data_array,[dicom_data[tag"PixelData"]])
-  end
+  push!(values, sub_values)
 end
 
-function handle_multiple_medimage_objects_from_dicom(dicom_data_array,values,sub_values,path,list_of_dicom_files,dicom_tag_series_instance_uid_tuples, pixel_data_array)
-  list_of_unique_series_id_tag = Set(tuple[3] for tuple in dicom_tag_series_instance_uid_tuples) 
-  for series_id in list_of_unique_series_id_tag
+function handle_multiple_medimage_objects_from_dicom(dicom_data_array, values, sub_values, path, list_of_dicom_files, dicom_tag_series_instance_uid_tuples, stacked_pixel_data_array)
+  list_of_unique_series_id_tag = Set(tuple[3] for tuple in dicom_tag_series_instance_uid_tuples)
+  for (index, series_id) in enumerate(list_of_unique_series_id_tag)
     selected_tuple = ()
     for tuple in dicom_tag_series_instance_uid_tuples
       if tuple[3] == series_id
         selected_tuple = tuple
+        break
       end
     end
-    append!(sub_values,[
-      pixel_data_array,
+    append!(sub_values, [
+      stacked_pixel_data_array[index],
       dicom_data_array[selected_tuple[1]][tag"ImageOrientationPatient"],
       dicom_data_array[selected_tuple[1]][tag"PixelSpacing"],
       dicom_data_array[selected_tuple[1]][tag"ImagePositionPatient"],
       dicom_data_array[selected_tuple[1]][tag"ImagePositionPatient"],
-      joinpath(path,list_of_dicom_files[selected_tuple[1]]),
+      joinpath(path, list_of_dicom_files[selected_tuple[1]]),
       dicom_data_array[selected_tuple[1]][tag"PatientID"]
-    ]) 
-    push!(values,sub_values)
+    ])
+    push!(values, sub_values)
   end
-
-
-  
 end
 
 
@@ -68,8 +65,8 @@ function load_image(path::String)::Vector{MedImage}
 
   #check if the path is a folder or a file
   properties = ["pixel_array", "direction", "spacing", "orientation", "origin", "date_of_saving", "patient_id"]
-  values = Vector{Any}()
-  sub_values = Vector{Any}()
+  values = []
+  sub_values = []
 
   if isdir(path)
     #load the dicom folder
@@ -90,10 +87,26 @@ function load_image(path::String)::Vector{MedImage}
 
 
     if length(list_of_unique_dicom_series_id_tag) == 1
-      handle_single_medimage_object_from_dicom(dicom_data_array, sub_values, path, list_of_dicom_files)
-      push!(values,sub_values)
+      unique_series_id_dicom_pixel_data_array = []
+      for dicom_data in dicom_data_array
+        if dicom_data[tag"SeriesInstanceUID"] == list_of_unique_dicom_series_id_tag[1]
+          push!(unique_series_id_dicom_pixel_data_array, [dicom_data[tag"PixelData"]])
+        end
+      end
+      push!(dicom_pixel_data_array, unique_series_id_dicom_pixel_data_array)
+      handle_single_medimage_object_from_dicom(dicom_data_array, values,sub_values, path, list_of_dicom_files, dicom_pixel_data_array)
+
     else
-      handle_multiple_medimage_objects_from_dicom(dicom_data_array,values,sub_values,path,list_of_dicom_files,dicom_tag_series_instance_uid_tuples,dicom_pixel_data_array)
+      for unique_series_id in list_of_unique_dicom_series_id_tag
+        unique_series_id_dicom_pixel_data_array = []
+        for dicom_data in dicom_data_array
+          if dicom_data[tag"SeriesInstanceUID"] == unique_series_id
+            push!(unique_series_id_dicom_pixel_data_array, [dicom_data[tag"PixelData"]])
+          end
+        end
+        push!(dicom_pixel_data_array, unique_series_id_dicom_pixel_data_array)
+      end
+      handle_multiple_medimage_objects_from_dicom(dicom_data_array, values, sub_values, path, list_of_dicom_files, dicom_tag_series_instance_uid_tuples, dicom_pixel_data_array)
     end
     #tags refernce from below
     #https://github.com/JuliaHealth/DICOM.jl/blob/master/src/dcm_dict.jl
@@ -119,7 +132,7 @@ function load_image(path::String)::Vector{MedImage}
     nifti_image = NIfTI.niread(path)
     header = nifti_image.header
 
-    
+
     append!(sub_values, [nifti_image.raw,
       (header.srow_x[1:3], header.srow_y[1:3], header.srow_z[1:3]),
       header.pixdim[2:4],
@@ -127,13 +140,13 @@ function load_image(path::String)::Vector{MedImage}
       (header.qoffset_x, header.qoffset_y, header.qoffset_z),
       path,
       ""])
-    push!(values,sub_values)
+    push!(values, sub_values)
   end
-  
-  medimage_object_array = []   
+
+  medimage_object_array = []
   for value_array in values
-      MedImage_struct_attributes = Dictionaries.Dictionary(properties,value_array)
-      push!(medimage_object_array, MedImage(MedImage_struct_attributes))
+    MedImage_struct_attributes = Dictionaries.Dictionary(properties, value_array)
+    push!(medimage_object_array, MedImage(MedImage_struct_attributes))
   end
   return medimage_object_array
 end#load_image
@@ -144,7 +157,11 @@ given a MedImage objects and a path to a nifti file save the MedImage object int
 """
 
 function save_image(im::Array{MedImage}, path::String)
-  
+  nothing
 end#save_image
 
 
+array = load_image("../test_data/ScalarVolume_0")
+for ob in array
+  println(length(ob.pixel_array))
+end
