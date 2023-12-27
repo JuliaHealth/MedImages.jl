@@ -1,0 +1,38 @@
+---LOAD_AND_SAVE.JL---
+Creation of MedImage objects from the MedImage struct, with the help of dicom and nift datasets, with attributes such as pixel_data, image orientation , image direction, pixel spacing and patient ID.
+DIcom files with unique Instance Uid's need separate medical image object.
+Dicom files with unique Instance UId's have their 2d pixel array data stacked from a list of files within the current directory, that share the same series Instance UID;
+Standardisation of the function is set in such a way that the load function returns a vector of MedImage objects.
+Stacking of 2d pixel data arrays into 3d pixel data arrays.
+Saving function for implementation of functionality to write to multiple nifti files from an array of MedImage objects and save them.
+Reduction in the passing of global variables so casually within functions that tend to tinker with them.
+
+
+Dicom pixel data array consists up of each individual dicom file pixel data matrix of size (512 x 512) 
+
+
+
+
+
+
+
+
+
+
+
+---BASIc_TRANSFORMATIONS.JL---
+implementing functionality for the defined functions with the help of interpolator enum
+functions for the implementation of Rotation, Cropping , Translation and Scaling. 
+
+
+
+
+
+
+
+
+
+
+
+
+

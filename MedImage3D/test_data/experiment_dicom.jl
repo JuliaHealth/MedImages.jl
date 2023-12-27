@@ -18,16 +18,21 @@ dicom_data_array = DICOM.dcmdir_parse(path_to_dicom_directory)
 ##one way of doing that
 
 dicom_files_tuples_series_id = []
-list_of_unique_series_id = []
+unique_series_id = dicom_data_array[1][tag"SeriesInstanceUID"]
 dicom_pixel_data_array = []
 
+
 for (index, dicom_data_file) in enumerate(dicom_data_array)
-  push!(dicom_files_tuples_series_id, (index, dicom_data_file[tag"SeriesInstanceUID"]))
+  #push!(dicom_files_tuples_series_id, (index, dicom_data_file[tag"SeriesInstanceUID"]))
+  if dicom_data_file[tag"SeriesInstanceUID"]  == unique_series_id 
   push!(dicom_pixel_data_array, dicom_data_file[tag"PixelData"])
+end
 end
 
 
-println(list_of_unique_series_id)
+size_of_matrix = size(dicom_pixel_data_array[1])
+println(dicom_pixel_data_array[1][1:10])
+println(size_of_matrix)
 
 
 
