@@ -18,9 +18,7 @@ Main data structure is a MedImage object which is a 3D image with some metadata.
 #following struct can be expanded with all the relevant meta data mentioned within the readme.md of MedImage.jl
 struct MedImage
     pixel_array
-    direction
     spacing
-    orientation
     origin
     date_of_saving::String
     patient_id::String
