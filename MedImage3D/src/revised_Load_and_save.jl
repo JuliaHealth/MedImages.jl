@@ -17,7 +17,6 @@ helper function for dicom #2
 returns an array of pixel data for unique ids within dicom files
 """
 function get_pixel_data(dicom_data_array)
-  print("ddddd dicom_data_array $(length(dicom_data_array)))")
   if length(dicom_data_array) == 1
     #in case e have 2D image
     return only(dicom_data_array).PixelData
