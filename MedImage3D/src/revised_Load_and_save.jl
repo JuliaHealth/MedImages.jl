@@ -28,7 +28,7 @@ function get_pixel_data(dicom_data_array)
 end
 
 
-function load_image(path::String)#::Array{MedImage}
+function load_image(path::String)::Array{MedImage}
   if isdir(path)
     dicom_data_array= DICOM.dcmdir_parse(path)
     return unique_series_id_within_dicom_files(dicom_data_array)|>
