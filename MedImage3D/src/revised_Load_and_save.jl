@@ -61,29 +61,5 @@ end
 
 
 
-# array_of_objects = load_image("../test_data/ScalarVolume_0")
-array_of_objects = load_image("/workspaces/MedImage.jl/MedImage3D/test_data/volume-0.nii.gz")
+array_of_objects = load_image("../test_data/ScalarVolume_0")
 println(length(array_of_objects[1].pixel_array))
-
-
-# dicom_data_array = DICOM.dcmdir_parse("/workspaces/MedImage.jl/MedImage3D/test_data/ScalarVolume_0")
-# med_images=unique_series_id_within_dicom_files(dicom_data_array)|>
-# series_ids->map(series_id->filter(dcm -> dcm.SeriesInstanceUID == series_id, dicom_data_array),series_ids)|> #now we have series of dicom files with the same series id
-# dcom_data_loc->map(dcom_data_loc-> MedImage(get_pixel_data(dcom_data_loc),
-#                         dcom_data_loc[1].ImageOrientationPatient,
-#                         dcom_data_loc[1].PixelSpacing,
-#                         dcom_data_loc[1].ImagePositionPatient,
-#                         dcom_data_loc[1].ImagePositionPatient,
-#                         " ",#dcom_data_loc[1].StudyCompletionDate
-#                         dcom_data_loc[1].PatientID),dcom_data_loc)
-
-
-# print(med_images[1].patient_id)
-
-# # print(series_id)
-# # aa=unique_series_id_pixel_data_array(series_id,dicom_data_array)
-# # println(size(aa))
-
-
-
-
