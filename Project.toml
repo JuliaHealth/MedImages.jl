@@ -2,3 +2,7 @@ name = "MedImage3D"
 uuid = "fbff095b-7891-4fc4-b5e5-3cd99b9dd225"
 authors = ["Jakub Mitura <jakub.mitura@gmail.com>"]
 version = "0.1.0"
+
+[deps]
+MedEye3d = "48a1af7b-3279-4eeb-8f2b-7ca229bb51b1"
+PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
