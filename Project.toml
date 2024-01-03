@@ -6,6 +6,7 @@ version = "0.1.0"
 [deps]
 ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 DICOM = "a26e6606-dd52-5f6a-a97f-4f611373d757"
+Dictionaries = "85a47980-9c8c-11e8-2b9f-f7ca1fa99fb4"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MedEye3d = "48a1af7b-3279-4eeb-8f2b-7ca229bb51b1"
 NIfTI = "a3a9e032-41b5-5fc4-967a-a6b7a19844d3"
