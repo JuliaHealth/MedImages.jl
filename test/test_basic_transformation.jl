@@ -1,4 +1,10 @@
-using .dicom_nifti
+"""
+some issues that may occur and also why python rotation implementation is so clumsy here 
+is described in https://stackoverflow.com/questions/56171643/simpleitk-rotation-of-volumetric-data-e-g-mri
+we have separate python function fro z rotation and rotations in other planes
+"""
+
+# using .dicom_nifti
 
 using NIfTI,LinearAlgebra,DICOM
 using PythonCall
@@ -23,10 +29,59 @@ import MedEye3d.StructsManag.getThreeDims
 # CondaPkg.add("numpy")
 # CondaPkg.add_pip("simpleitk", version="")
 
-
 sitk = pyimport("SimpleITK")
 np = pyimport("numpy")
 
+# python implementation taken from https://stackoverflow.com/questions/56171643/simpleitk-rotation-of-volumetric-data-e-g-mri
+
+function matrix_from_axis_angle(a)
+    """ Compute rotation matrix from axis-angle.
+    This is called exponential map or Rodrigues' formula.
+    Parameters
+    ----------
+    a : array-like, shape (4,)
+        Axis of rotation and rotation angle: (x, y, z, angle)
+    Returns
+    -------
+    R : array-like, shape (3, 3)
+        Rotation matrix
+    """
+    ux, uy, uz, theta = a
+    c = np.cos(theta)
+    s = np.sin(theta)
+    ci = 1.0 - c
+    R = np.array([[ci * ux * ux + c,
+                   ci * ux * uy - uz * s,
+                   ci * ux * uz + uy * s],
+                  [ci * uy * ux + uz * s,
+                   ci * uy * uy + c,
+                   ci * uy * uz - ux * s],
+                  [ci * uz * ux - uy * s,
+                   ci * uz * uy + ux * s,
+                   ci * uz * uz + c],
+                  ])
+
+    # This is equivalent to
+    # R = (np.eye(3) * np.cos(theta) +
+    #      (1.0 - np.cos(theta)) * a[:3, np.newaxis].dot(a[np.newaxis, :3]) +
+    #      cross_product_matrix(a[:3]) * np.sin(theta))
+
+    return R
+end #matrix_from_axis_angle
+
+function resample(image, transform)
+    """
+    This function resamples (updates) an image using a specified transform
+    :param image: The sitk image we are trying to transform
+    :param transform: An sitk transform (ex. resizing, rotation, etc.
+    :return: The transformed sitk image
+    """
+    reference_image = image
+    interpolator = sitk.sitkLinear
+    default_value = 0
+    return sitk.Resample(image, reference_image, transform,
+                         interpolator, default_value)
+end#resample
 
 function get_center(img)
     """
@@ -37,30 +92,50 @@ function get_center(img)
     , Py(pyconvert(Int,np.ceil(depth/2)))))
 end #get_center
 
+# function get_center(img)
+#     """
+#     This function returns the physical center point of a 3d sitk image
+#     :param img: The sitk image we are trying to find the center of
+#     :return: The physical center point of the image
+#     """
+#     width, height, depth = img.GetSize()
+#     return img.TransformIndexToPhysicalPoint((int(np.ceil(width/2)),
+#                                               int(np.ceil(height/2)),
+#                                               int(np.ceil(depth/2))))
+#     end #get_center
 
-function rotation3d(image, theta_x, theta_y, theta_z)
+function rotation3d(image, theta_z)
     """
-    from python to test
+    This function rotates an image across each of the x, y, z axes by theta_x, theta_y, and theta_z degrees
+    respectively
+    :param image: An sitk MRI image
+    :param theta_x: The amount of degrees the user wants the image rotated around the x axis
+    :param theta_y: The amount of degrees the user wants the image rotated around the y axis
+    :param theta_z: The amount of degrees the user wants the image rotated around the z axis
+    :param show: Boolean, whether or not the user wants to see the result of the rotation
+    :return: The rotated image
     """
-    theta_x = np.deg2rad(theta_x)
-    theta_y = np.deg2rad(theta_y)
     theta_z = np.deg2rad(theta_z)
-    euler_transform = sitk.Euler3DTransform(get_center(image), theta_x, theta_y, theta_z, (0, 0, 0))
+    euler_transform = sitk.Euler3DTransform()
+    print(euler_transform.GetMatrix())
     image_center = get_center(image)
     euler_transform.SetCenter(image_center)
-    euler_transform.SetRotation(theta_x, theta_y, theta_z)
-    resampled_image = sitk.Resample(image, euler_transform)
+
+    direction = image.GetDirection()
+    axis_angle = (direction[2], direction[5], direction[8], theta_z)
+    np_rot_mat = matrix_from_axis_angle(axis_angle)
+    euler_transform.SetMatrix([np_rot_mat[0][0],np_rot_mat[0][1],np_rot_mat[0][2]
+                                ,np_rot_mat[1][0],np_rot_mat[1][1],np_rot_mat[1][2] 
+                                ,np_rot_mat[2][0],np_rot_mat[2][1],np_rot_mat[2][2] ])
+    resampled_image = resample(image, euler_transform)
     return resampled_image
 end #rotation3d
-
 
 imagePath="/workspaces/MedImage.jl/test_data/volume-0.nii.gz"
 image = sitk.ReadImage(imagePath)
 
-
-
-rotated=rotation3d(image, 90, 0, 0)
-unrotated=rotation3d(rotated, 270, 0, 0)
+rotated=rotation3d(image, 90)
+unrotated=rotation3d(rotated, 270)
 
 
 
@@ -91,7 +166,7 @@ end#getPixelsAndSpacing
 
 
 rotated_arr,rotated_spacing=getPixelsAndSpacing(rotated)
-orig_arr,orig_spacing=getPixelsAndSpacing(rotated)
+orig_arr,orig_spacing=getPixelsAndSpacing(image)
 unrotated_arr,unrotated_spacing=getPixelsAndSpacing(unrotated)
 
 rotated_arr=Float32.(rotated_arr)
@@ -127,7 +202,7 @@ supplLines=map(x->  textLinesFromStrings(["sub  Line 1 in $(x)", "sub  Line 2 in
 
 import MedEye3d.StructsManag.getThreeDims
 
-tupleVect = [("rot",orig_arr) ,("inrot",orig_arr),("manualModif",zeros(UInt8,size(unrotated_arr))) ]
+tupleVect = [("rot",orig_arr) ,("inrot",unrotated_arr),("manualModif",zeros(UInt8,size(unrotated_arr))) ]
 # tupleVect = [("rot",unrotated_arr) ,("inrot",rotated_arr),("manualModif",zeros(UInt8,size(unrotated_arr))) ]
 slicesDat= getThreeDims(tupleVect )
 
