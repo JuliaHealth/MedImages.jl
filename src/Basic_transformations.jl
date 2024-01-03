@@ -1,3 +1,4 @@
+include("./MedImage_data_struct.jl")
 """
 module implementing basic transformations on 3D images 
 like translation, rotation, scaling, and cropping both input and output are MedImage objects
@@ -8,9 +9,9 @@ given a MedImage object and a Tuple that contains the rotation values for each a
 we are setting Interpolator by using Interpolator enum
 return the rotated MedImage object 
 """
-function rotate_mi(im::Array{MedImage}, rotate_by::Tuple{Float64, Float64, Float64},Interpolator::Interpolator cro)::Array{MedImage}
+function rotate_mi(im::Array{MedImage}, rotate_by::Tuple{Float64,Float64,Float64}, Interpolator::Interpolator)::Array{MedImage}
 
-
+  nothing
 
 end#rotate_mi    
 
@@ -22,9 +23,9 @@ from the begining of each axis (crop_beg) and from the end of each axis (crop_en
 we are setting Interpolator by using Interpolator enum
 return the cropped MedImage object 
 """
-function crop_mi(im::Array{MedImage}, crop_beg::Tuple{Int64, Int64, Int64},crop_end::Tuple{Int64, Int64, Int64} ,Interpolator::Interpolator  )::Array{MedImage}
+function crop_mi(im::Array{MedImage}, crop_beg::Tuple{Int64,Int64,Int64}, crop_end::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator)::Array{MedImage}
 
-
+  nothing
 
 end#crop_mi    
 
@@ -34,9 +35,9 @@ given a MedImage object translation value (translate_by) and axis (translate_in_
 we are setting Interpolator by using Interpolator enum
 return the translated MedImage object
 """
-function translate_mi(im::Array{MedImage}, translate_by::Int64 ,translate_in_axis::Int64 ,Interpolator::Interpolator  )::Array{MedImage}
+function translate_mi(im::Array{MedImage}, translate_by::Int64, translate_in_axis::Int64, Interpolator::Interpolator)::Array{MedImage}
 
-
+  nothing
 
 end#crop_mi    
 
@@ -46,9 +47,9 @@ given a MedImage object and a Tuple that contains the scaling values for each ax
 we are setting Interpolator by using Interpolator enum
 return the scaled MedImage object 
 """
-function scale_mi(im::Array{MedImage}, scale::Tuple{Float64, Float64, Float64},Interpolator::Interpolator )::Array{MedImage}
+function scale_mi(im::Array{MedImage}, scale::Tuple{Float64,Float64,Float64}, Interpolator::Interpolator)::Array{MedImage}
 
-
+  nothing
 
 end#scale_mi    
 

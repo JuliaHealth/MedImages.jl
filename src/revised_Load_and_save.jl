@@ -32,32 +32,35 @@ function load_image(path::String)::Array{MedImage}
     dicom_data_array= DICOM.dcmdir_parse(path)
     return unique_series_id_within_dicom_files(dicom_data_array)|>
     series_ids->map(series_id->filter(dcm -> dcm.SeriesInstanceUID == series_id, dicom_data_array),series_ids)|> #now we have series of dicom files with the same series id
-    dcom_data_locs->map(dcom_data_loc-> MedImage(get_pixel_data(dcom_data_loc),
+    dcom_data_locs->map(dcom_data_loc-> MedImage([get_pixel_data(dcom_data_loc),
                             dcom_data_loc[1].PixelSpacing,
                             dcom_data_loc[1].ImageOrientationPatient,
                             dcom_data_loc[1].ImagePositionPatient,
                             " ",#dcom_data_loc[1].StudyCompletionDate
-                            dcom_data_loc[1].PatientID),dcom_data_locs)
+      dcom_data_loc[1].PatientID]),dcom_data_locs)
   else
     nifti_image = NIfTI.niread(path)
     nifti_image_header = nifti_image.header
-    return [MedImage(nifti_image.raw
+    return [MedImage([nifti_image.raw
     ,nifti_image_header.pixdim[2:4]
     ,(nifti_image_header.srow_x[1:3],nifti_image_header.srow_y[1:3],nifti_image_header.srow_z[1:3])
     ,(nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z)
     ," "
-    ," ")]
+      ," "])]
     
   end
 end
 
 
 function save_image(im::Array{MedImage},path::String)
-nothing
+"""
+Creating nifti volumes or each medimage object 
+NIfTI.NIVolume() NIfTI.niwrite()
+"""
 end
 
 
 
-array_of_objects = load_image("../test_data/ScalarVolume_0")
+#array_of_objects = load_image("../test_data/ScalarVolume_0")
 # array_of_objects = load_image("/workspaces/MedImage.jl/MedImage3D/test_data/volume-0.nii.gz")
-println(length(array_of_objects[1].pixel_array))
+#println(length(array_of_objects[1].pixel_array))
