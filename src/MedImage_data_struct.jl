@@ -26,7 +26,7 @@ end
 
 
 #constructor function for MedImage
-function MedImage(MedImage_struct_attributes::Dictionaries.Dictionary{String,Any})
+function MedImage(MedImage_struct_attributes::Dictionaries.Dictionary{String,Any})::MedImage
     return MedImage(
         get(MedImage_struct_attributes,"pixel_array",[]),
         get(MedImage_struct_attributes,"direction",[]),
@@ -36,6 +36,10 @@ function MedImage(MedImage_struct_attributes::Dictionaries.Dictionary{String,Any
         get(MedImage_struct_attributes,"date_of_saving",""),
         get(MedImage_struct_attributes,"patient_id","")      
     )
+end
+
+function MedImage(value_data_array::Array{Any})::MedImage
+  return MedImage(value_data_array...)
 end
 
 @enum Interpolator nearest_neighbour=0 linear=2 b_spline=3
