@@ -27,13 +27,11 @@ struct MedImage
   origin
   date_of_saving::String
   patient_id::String
-
   #other data for nifti header
   descrip::NTuple{80,UInt8}
   sizeof_hdr::Int32
   pixdim::NTuple{8, Float32}
   vox_offset::Float32
-
   #spatial metadata for nifti header
   qform_code::Int16
   sform_code::Int16
@@ -66,7 +64,7 @@ function MedImage(MedImage_struct_attributes::Dictionaries.Dictionary{String,Any
     get(MedImage_struct_attributes,"qform_code"),
     get(MedImage_struct_attributes,"sform_code"),
     get(MedImage_struct_attributes,"quatern_b"),
-    get(MedImage_struct_attributes,"quatern_c")
+    get(MedImage_struct_attributes,"quatern_c"),
     get(MedImage_struct_attributes,"quatern_d"),
     get(MedImage_struct_attributes,"qoffset_x",),
     get(MedImage_struct_attributes,"qoffset_y",),

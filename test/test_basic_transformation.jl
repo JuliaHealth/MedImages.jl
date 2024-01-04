@@ -82,20 +82,28 @@ function get_center(img)
 end #get_center
 
 
-function rotation3d(image, theta_z)
+function rotation3d(image, axis, theta)
+
     """
     This function rotates an image across each of the x, y, z axes by theta_x, theta_y, and theta_z degrees
     respectively
     :return: The rotated image
     """
-    theta_z = np.deg2rad(theta_z)
+    theta = np.deg2rad(theta)
     euler_transform = sitk.Euler3DTransform()
     print(euler_transform.GetMatrix())
     image_center = get_center(image)
     euler_transform.SetCenter(image_center)
 
     direction = image.GetDirection()
-    axis_angle = (direction[2], direction[5], direction[8], theta_z)
+
+    if(axis==3)
+        axis_angle = (direction[2], direction[5], direction[8], theta)
+    elseif (axis==2)
+        axis_angle = (direction[1], direction[4], direction[7], theta)
+    elseif (axis==1)
+        axis_angle = (direction[0], direction[3], direction[6], theta)
+    end    
     np_rot_mat = matrix_from_axis_angle(axis_angle)
     euler_transform.SetMatrix([np_rot_mat[0][0],np_rot_mat[0][1],np_rot_mat[0][2]
                                 ,np_rot_mat[1][0],np_rot_mat[1][1],np_rot_mat[1][2] 
@@ -107,8 +115,8 @@ end #rotation3d
 imagePath="/workspaces/MedImage.jl/test_data/volume-0.nii.gz"
 image = sitk.ReadImage(imagePath)
 
-rotated=rotation3d(image, 90)
-unrotated=rotation3d(rotated, 270)
+rotated=rotation3d(image,2, 30)
+unrotated=rotation3d(rotated, 1,270)
 
 
 
@@ -121,7 +129,7 @@ rotated_arr=Float32.(rotated_arr)
 orig_arr=Float32.(orig_arr)
 unrotated_arr=Float32.(unrotated_arr)
 
-disp_images(orig_arr,rotated_arr,orig_spacing)
+disp_images(orig_arr,rotated_arr,(1.0,1.0,1.0))
 
 
 """
