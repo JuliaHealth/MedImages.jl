@@ -6,9 +6,16 @@ Standardisation of the function is set in such a way that the load function retu
 Stacking of 2d pixel data arrays into 3d pixel data arrays.
 Saving function for implementation of functionality to write to multiple nifti files from an array of MedImage objects and save them.
 Reduction in the passing of global variables so casually within functions that tend to tinker with them.
-
-
+Creation of NifTi Volumes for individual MedImage objects and populating those volumes with pixel_data and other data from the nifti header. Members are : header , raw , extensions
+Saving the prepared NiFti Volumes within gzipped (gnu zipped) or non gzipped NIfTI files using NIfTI.jl
+Starting with Basic Transformations.jl to implement cropping, scaling, transforming, translation and rotation with the  help of the interpolator enum for medical imaging pixel data arrays.
 Dicom pixel data array consists up of each individual dicom file pixel data matrix of size (512 x 512) 
+
+
+For Creation and Saving of NIfTI Files
+new_vol = NifTI.NIVolume() and NIfTi.niwrite("file.nii.gz", nifti_vol)
+NIfTI Volumes needs to be passed with a header, raw and extensions (affine matrix).
+NIfTI Volumes needs to be transposed before being written to the nifti file. (transposing the volume array as [pixel X row X col X slice])
 
 
 
