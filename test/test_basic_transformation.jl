@@ -116,9 +116,7 @@ imagePath="/workspaces/MedImage.jl/test_data/volume-0.nii.gz"
 image = sitk.ReadImage(imagePath)
 
 rotated=rotation3d(image,2, 30)
-unrotated=rotation3d(rotated, 1,270)
-
-
+unrotated=rotation3d(rotated, 2,-30)
 
 
 rotated_arr,rotated_spacing=getPixelsAndSpacing(rotated)
@@ -129,7 +127,7 @@ rotated_arr=Float32.(rotated_arr)
 orig_arr=Float32.(orig_arr)
 unrotated_arr=Float32.(unrotated_arr)
 
-disp_images(orig_arr,rotated_arr,(1.0,1.0,1.0))
+disp_images(orig_arr,unrotated_arr,(1.0,1.0,1.0))
 
 
 """

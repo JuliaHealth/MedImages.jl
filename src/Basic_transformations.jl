@@ -5,11 +5,12 @@ like translation, rotation, scaling, and cropping both input and output are MedI
 """
 
 """
-given a MedImage object and a Tuple that contains the rotation values for each axis (x,y,z in order)
+given a MedImage object will rotate it by angle (angle) around axis (rotate_axis)
+the center of rotation is set to be center of the image
 we are setting Interpolator by using Interpolator enum
 return the rotated MedImage object 
 """
-function rotate_mi(im::Array{MedImage}, rotate_by::Tuple{Float64,Float64,Float64}, Interpolator::Interpolator)::Array{MedImage}
+function rotate_mi(im::Array{MedImage}, rotate_axis::Int64,angle::Float64, Interpolator::Interpolator)::Array{MedImage}
 
   nothing
 
