@@ -2,10 +2,15 @@
 some issues that may occur and also why python rotation implementation is so clumsy here 
 is described in https://stackoverflow.com/questions/56171643/simpleitk-rotation-of-volumetric-data-e-g-mri
 we have separate python function fro z rotation and rotations in other planes
+
+Also transformations are nicely shown on couple first slides of 
+https://www.cs.cornell.edu/courses/cs4620/2010fa/lectures/03transforms3d.pdf
+
 """
 
 include("../src/MedImage_data_struct.jl")
 include("./test_visualize.jl")
+include("./dicom_nifti.jl")
 
 # using .dicom_nifti
 
@@ -91,7 +96,6 @@ function rotation3d(image, axis, theta)
     """
     theta = np.deg2rad(theta)
     euler_transform = sitk.Euler3DTransform()
-    print(euler_transform.GetMatrix())
     image_center = get_center(image)
     euler_transform.SetCenter(image_center)
 
@@ -112,75 +116,171 @@ function rotation3d(image, axis, theta)
     return resampled_image
 end #rotation3d
 
-imagePath="/workspaces/MedImage.jl/test_data/volume-0.nii.gz"
-image = sitk.ReadImage(imagePath)
-
-rotated=rotation3d(image,2, 30)
-unrotated=rotation3d(rotated, 2,-30)
 
 
-rotated_arr,rotated_spacing=getPixelsAndSpacing(rotated)
-orig_arr,orig_spacing=getPixelsAndSpacing(image)
-unrotated_arr,unrotated_spacing=getPixelsAndSpacing(unrotated)
+function test_single_rotation(medIm::MedImage,sitk_image, axis::Int, theta::Float64)
+    """
+    test if the rotation of the image lead to correct change in the pixel array
+    and the metadata the operation will be tasted against Python simple itk function
+    
+    """
+    #sitk implementation
+    rotated=rotation3d(sitk_image,axis, theta)
+    
+    #our Julia implementation
+    medIm=rotate_mi([medIm],axis,theta,linear)[0]
 
-rotated_arr=Float32.(rotated_arr)
-orig_arr=Float32.(orig_arr)
-unrotated_arr=Float32.(unrotated_arr)
+    test_object_equality(medIm,rotated)
 
-disp_images(orig_arr,unrotated_arr,(1.0,1.0,1.0))
-
+end #test_single_rotation   
 
 """
-test if the rotation of the image lead to correct change in the pixel array
-and the metadata the operation will be tasted against Python simple itk function
+testing rotations against Python simple itk function
 
 """
 function test_rotation(path_nifti)
     
-    # Load the image from path
-    med_im=load_image(path_nifti)
-    sitk.ReadImage(path_nifti)
- 
-
-    #series of values to rotate the image by
+    #we test rotations of diffrent exes and of diffrent angles
     
-    TODO()
-    rotation_vals=[[]]
-    #rotate the image
-
-
-    #save both images into nifti files to temporary folder
-    
-
-    test_image_equality(path_a,path_b)
-
+    for ax in [1,2,3]
+        for theta in [30,60,90,180,270,360,400]
+            #purposfully reloading each time to avoid issues with pixel 
+            #arry mutation
+            med_im=load_image(path_nifti)
+            sitk_image=sitk.ReadImage(path_nifti)
+            test_single_rotation(med_im,sitk_image, ax, theta)
+        end#for    
+    end#for
 
 end
 
-"""
-test if the cropping of the image lead to correct change in the pixel array
-and the metadata the operation will be tasted against Python simple itk function
+
+
+################################################# cropping tests
 
 """
-function test_crop(path_nifti)
+crop image using simple itk function and return the cropped image 
+both beginning and size are tuples of 3 elements (x,y,z)
+in case of begining it will mean first voxel and size how big will be the chunk to extract
+
+"""
+
+function sitk_crop(sitk_image,beginning,size)
+    extract = sitk.ExtractImageFilter()
+    extract.SetSize([size[1],size[2],size[3]])
+    extract.SetIndex([beginning[1],beginning[2],beginning[3]])
+    extracted_image = extract.Execute(sitk_image)
+    return extracted_image
+end#sitk_crop
+
+
+function test_single_crop(medIm::MedImage,sitk_image, begining, size)
+    #sitk implementation
+    cropped=sitk_crop(sitk_image,begining, size)
     
-    # Load the image from path
-    med_im=load_image(path_nifti)
-    sitk.ReadImage(path_nifti)
+    #our Julia implementation
+    medIm=crop_mi([medIm],begining,size,linear)[0]
+
+    test_object_equality(medIm,cropped)
+
+end #test_single_rotation   
 
 
-    
-    TODO()
+function test_crops(path_nifti)    
+    """
+    test if the cropping of the image lead to correct change in the pixel array
+    and the metadata the operation will be tasted against Python simple itk function
 
+    """   
+    for begining in [(10,11,13),(15,17,19)]
+        for size in [(10,11,13),(15,17,19),(30,31,32)]
+            medIm=load_image(path_nifti)
+            sitk_image=sitk.ReadImage(path_nifti)
+            test_single_crop(medIm::MedImage,sitk_image, begining, size)
+        end#for    
+    end#for
 
-    #save both images into nifti files to temporary folder
-    
+end
+######################### padding tests
+"""
+pad image using simple itk function and return the cropped image 
+both beginning and end pad are tuples of 3 elements (x,y,z)
+in case of begining it will mean first voxel and size how big will be the chunk to extract
 
-    test_image_equality(path_a,path_b)
+"""
 
+function sitk_pad(sitk_image,pad_beg,pad_end,pad_val)
+    extract = sitk.ConstantPadImageFilter()
+    extract.SetConstant(pad_val)
+    extract.SetPadLowerBound(pad_beg)
+    extract.SetPadUpperBound(pad_end)     
+    extracted_image = extract.Execute(sitk_image)
+    return extracted_image
+end#sitk_crop
+
+function test_pads(path_nifti)    
+    """
+    test if the padding of the image lead to correct change in the pixel array
+    and the metadata the operation will be tasted against Python simple itk function
+
+    """   
+    for pad_beg in [(10,11,13),(15,17,19)]
+        for pad_end in [(10,11,13),(15,17,19),(30,31,32)]
+            for pad_val in [0.0,111.5]
+                medIm=load_image(path_nifti)
+                sitk_image=sitk.ReadImage(path_nifti)
+                sitk_pad(medIm::MedImage,sitk_image, pad_beg, pad_end,pad_val)
+            end#for    
+        end#for    
+    end#for
 
 end
 
+
+
+####################### translation tests
+
+
+
+# imagePath="/workspaces/MedImage.jl/test_data/volume-0.nii.gz"
+# image = sitk.ReadImage(imagePath)
+
+
+# cropped=sitk_pad(image,(10,15,17),(20,22,23),1.0)
+
+# cropped.GetOrigin()
+# image.GetOrigin()
+
+# orig_arr,orig_spacing=getPixelsAndSpacing(image)
+# cropped_arr,cropped_spacing=getPixelsAndSpacing(cropped)
+# size(orig_arr)
+# size(cropped_arr)
+# rotated=rotation3d(image,2, 30)
+# unrotated=rotation3d(rotated, 2,-30)
+
+# rotated.GetOrigin()
+# image.GetOrigin()
+
+# rotated.GetDirection()
+# image.GetDirection()
+# rotated_arr,rotated_spacing=getPixelsAndSpacing(rotated)
+# orig_arr,orig_spacing=getPixelsAndSpacing(image)
+# unrotated_arr,unrotated_spacing=getPixelsAndSpacing(unrotated)
+
+# rotated_arr=Float32.(rotated_arr)
+# orig_arr=Float32.(orig_arr)
+# unrotated_arr=Float32.(unrotated_arr)
+
+
+
+
+
+
+
+
+dimension = 2        
+offset = [2]*dimension # use a Python trick to create the offset list based on the dimension
+translation = sitk.TranslationTransform(dimension, offset)
 
 """
 test if the translation of the image lead to correct change in the pixel array
@@ -205,7 +305,7 @@ function test_translate(path_nifti)
 
 
 end
-
+################################################# scaling tests
 
 """
 test if the scaling of the image lead to correct change in the pixel array
