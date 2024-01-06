@@ -23,8 +23,8 @@ struct MedImage
   #some important attributes related to medical imaging 
   direction
   spacing
-  orientation
   origin
+
   date_of_saving::String
   patient_id::String
   #other data for nifti header
@@ -53,7 +53,6 @@ function MedImage(MedImage_struct_attributes::Dictionaries.Dictionary{String,Any
     get(MedImage_struct_attributes, "pixel_array", []),
     get(MedImage_struct_attributes, "direction", []),
     get(MedImage_struct_attributes, "spacing", []),
-    get(MedImage_struct_attributes, "orientation", []),
     get(MedImage_struct_attributes, "origin", []),
     get(MedImage_struct_attributes, "date_of_saving", ""),
     get(MedImage_struct_attributes, "patient_id", ""),
