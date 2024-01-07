@@ -79,5 +79,12 @@ function MedImage(value_data_array::Array{Any})::MedImage
   return MedImage(value_data_array...)
 end
 
+"""
+Definitions of basic interpolators
+"""
 @enum Interpolator nearest_neighbour = 0 linear = 2 b_spline = 3
 
+"""
+Indicating do we want to chenge underlying pixel array spatial metadata or both
+"""
+@enum Mode_mi pixel_array = 0 spat_metadata = 2 all = 3
