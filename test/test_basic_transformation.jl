@@ -196,7 +196,7 @@ function test_crops(path_nifti)
         for size in [(10,11,13),(15,17,19),(30,31,32)]
             medIm=load_image(path_nifti)
             sitk_image=sitk.ReadImage(path_nifti)
-            test_single_crop(medIm::MedImage,sitk_image, begining, size)
+            test_single_crop(medIm,sitk_image, begining, size)
         end#for    
     end#for
 
@@ -229,7 +229,9 @@ function test_pads(path_nifti)
             for pad_val in [0.0,111.5]
                 medIm=load_image(path_nifti)
                 sitk_image=sitk.ReadImage(path_nifti)
-                sitk_pad(medIm::MedImage,sitk_image, pad_beg, pad_end,pad_val)
+                sitk_padded=sitk_pad(sitk_image, pad_beg, pad_end,pad_val)
+                mi_padded=pad_mi(medIm,pad_beg,pad_end,pad_val,linear)
+                test_object_equality(mi_padded,sitk_padded)
             end#for    
         end#for    
     end#for
@@ -239,6 +241,101 @@ end
 
 
 ####################### translation tests
+
+
+
+"""
+reference sitk translate function
+"""
+function sitk_translate(image,translate_by,translate_in_axis)
+    translatee=[0,0,0]
+    translatee[translate_in_axis]=translate_by
+    transform=sitk.TranslationTransform(3,translatee )
+    reference_image = image 
+    extracted_image=sitk.Resample(image, reference_image, transform,
+    sitk.sitkLinear, 0.0)
+    
+    return extracted_image
+end#sitk_translate
+
+
+
+
+"""
+test if the translation of the image lead to correct change in the pixel array
+and the metadata the operation will be tasted against Python simple itk function
+
+"""
+function test_translate(path_nifti)
+    
+    # Load the image from path
+
+    for t_val in [1,10,16]
+        for axis in [1,2,3]
+            medIm=load_image(path_nifti)
+            sitk_image=sitk.ReadImage(path_nifti)
+            sitk_trnanslated=sitk_translate(sitk_image,t_val, axis-1)
+            medIm=translate_mi(medIm,t_val, axis,linear)
+            test_object_equality(medIm,sitk_trnanslated)
+        end#for    
+    end#for
+
+    
+
+end
+################################################# scaling tests
+
+
+
+
+"""
+test if the scaling of the image lead to correct change in the pixel array
+and the metadata the operation will be tasted against Python simple itk function
+
+"""
+function test_scale(path_nifti)
+    
+    # Load the image from path
+    med_im=load_image(path_nifti)
+    sitk.ReadImage(path_nifti)
+
+
+    
+    TODO()
+
+
+    #save both images into nifti files to temporary folder
+    
+
+    test_image_equality(path_a,path_b)
+
+
+end
+
+
+
+
+
+# imagePath="/workspaces/MedImage.jl/test_data/volume-0.nii.gz"
+# image = sitk.ReadImage(imagePath)
+# cropped=sitk_translate(image,5,1)
+
+# cropped.GetOrigin()
+# image.GetOrigin()
+
+# orig_arr,orig_spacing=getPixelsAndSpacing(image)
+# cropped_arr,cropped_spacing=getPixelsAndSpacing(cropped)
+# size(orig_arr)
+# size(cropped_arr)
+
+# disp_images(orig_arr,cropped_arr,(1.0,1.0,1.0))
+
+
+
+
+
+
+
 
 
 
@@ -271,62 +368,3 @@ end
 # orig_arr=Float32.(orig_arr)
 # unrotated_arr=Float32.(unrotated_arr)
 
-
-
-
-
-
-
-
-dimension = 2        
-offset = [2]*dimension # use a Python trick to create the offset list based on the dimension
-translation = sitk.TranslationTransform(dimension, offset)
-
-"""
-test if the translation of the image lead to correct change in the pixel array
-and the metadata the operation will be tasted against Python simple itk function
-
-"""
-function test_translate(path_nifti)
-    
-    # Load the image from path
-    med_im=load_image(path_nifti)
-    sitk.ReadImage(path_nifti)
-
-
-    
-    TODO()
-
-
-    #save both images into nifti files to temporary folder
-    
-
-    test_image_equality(path_a,path_b)
-
-
-end
-################################################# scaling tests
-
-"""
-test if the scaling of the image lead to correct change in the pixel array
-and the metadata the operation will be tasted against Python simple itk function
-
-"""
-function test_scale(path_nifti)
-    
-    # Load the image from path
-    med_im=load_image(path_nifti)
-    sitk.ReadImage(path_nifti)
-
-
-    
-    TODO()
-
-
-    #save both images into nifti files to temporary folder
-    
-
-    test_image_equality(path_a,path_b)
-
-
-end
