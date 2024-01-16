@@ -2,12 +2,6 @@ using Pkg
 Pkg.add(["Dictionaries"])
 using Dictionaries
 
-
-
-
-
-
-
 """
 Here we define necessary data structures for the project.
 Main data structure is a MedImage object which is a 3D image with some metadata.
@@ -15,70 +9,59 @@ Main data structure is a MedImage object which is a 3D image with some metadata.
 !!!! Currently implemented as Struct but will be better to use as metadata arrays
 """
 
+
+
+
+"""
+Defining image type enum
+"""
+@enum Image_type begin
+MRI
+PET
+CT
+end
+
+
+"""
+Defining subimage type enum
+"""
+@enum Image_subtype begin
+subtypes
+end
+
+
+"""
+Definition for standardised MedImage Struct
+"""
 #following struct can be expanded with all the relevant meta data mentioned within the readme.md of MedImage.jl
+#struct for now, will switch to MetaArrays when it has GPU support 
 struct MedImage
-  #pixel array data for nifti volume
-  pixel_array #stores an array of (512 x 512 x 3)-> 3dimensional pixel data arrays
-  
-  #some important attributes related to medical imaging 
-  direction
-  spacing
-  origin
-
-  date_of_saving::String
-  patient_id::String
-  #other data for nifti header
-  descrip::NTuple{80,UInt8}
-  sizeof_hdr::Int32
-  pixdim::NTuple{8, Float32}
-  vox_offset::Float32
-  #spatial metadata for nifti header
-  qform_code::Int16
-  sform_code::Int16
-  quatern_b::Float32
-  quatern_c::Float32
-  quatern_d::Float32
-  qoffset_x::Float32
-  qoffset_y::Float32
-  qoffset_z::Float32
-  srow_x::NTuple{4, Float32}
-  srow_y::NTuple{4, Float32}
-  srow_z::NTuple{4, Float32}
+  voxel_data ::Array{Any}#mutlidimensional array (512,512,3)
+  spatial_metadata ::Dictionaries.Dict #object with properties for spacing, offset from spacing,orientation, origin, direction
+  image_type :: Image_type#enum defining the type of the image
+  image_subtype :: Image_subtype #enum defining the subtype of the image
+  voxel_datatype #type of the voxel data stored
+  date_of_saving #date of saving of the relevant imaging data file
+  acquistion_time #time at which the data acquisition for the image took place
+  patient_id #the id of the patient in the data file
+  current_device :: String# CPU or GPU , preferrably GPU
+  study_uid
+  patient_uid
+  series_uid 
+  study_description
+  legacy_file_name :: String#original file name
+  display_data #color values for the data such as RGB or gray
+  clinical_data :: Dictionary.Dict#dictionary with age , gender data of the patient
+  is_contrast_administered::Bool #bool, any substance for visibility enhancement given during imaging procedure?
+  additional_metadata::Dictionaries.Dict #dictionary for any other relevant metadata from individual data file
 end
-
-
 #constructor function for MedImage
-function MedImage(MedImage_struct_attributes::Dictionaries.Dictionary{String,Any})::MedImage
-  return MedImage(
-    get(MedImage_struct_attributes, "pixel_array", []),
-    get(MedImage_struct_attributes, "direction", []),
-    get(MedImage_struct_attributes, "spacing", []),
-    get(MedImage_struct_attributes, "origin", []),
-    get(MedImage_struct_attributes, "date_of_saving", ""),
-    get(MedImage_struct_attributes, "patient_id", ""),
-    get(MedImage_struct_attributes,"descrip",()),
-    get(MedImage_struct_attributes,"sizeof_hdr"),
-    get(MedImage_struct_attributes,"pixdim"),
-    get(MedImage_struct_attributes,"vox_offset"),
-    get(MedImage_struct_attributes,"qform_code"),
-    get(MedImage_struct_attributes,"sform_code"),
-    get(MedImage_struct_attributes,"quatern_b"),
-    get(MedImage_struct_attributes,"quatern_c"),
-    get(MedImage_struct_attributes,"quatern_d"),
-    get(MedImage_struct_attributes,"qoffset_x",),
-    get(MedImage_struct_attributes,"qoffset_y",),
-    get(MedImage_struct_attributes,"qoffset_z"),
-    get(MedImage_struct_attributes,"srow_x"),
-    get(MedImage_struct_attributes,"srow_y"),
-    get(MedImage_struct_attributes,"srow_z")
+function MedImage(MedImage_struct_attribute_values::Array{Any})::MedImage
+  return MedImage(MedImage_struct_attribute_values...)
+end
+
+
   
-  )
-end
-
-function MedImage(value_data_array::Array{Any})::MedImage
-  return MedImage(value_data_array...)
-end
-
 """
 Definitions of basic interpolators
 """
