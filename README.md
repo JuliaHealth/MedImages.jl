@@ -7,7 +7,7 @@ This project was created to standardize data handling of 3D and 4D medical imagi
 I've included below in categories what needs to be done and some basic ideas on How to approach it. I will post it for consultations with the community and then process to create test cases where Python SimpleItk (or other) methods will be treated as a reference.
 1. Designing data structure - requirements (need to explicitly specify the most important and the rest will be just in an additional dictionary)
    * hold voxel data as a multidimensional array
-   * keep spatial metadata - origin, offset from origin,direction, spacing
+   * keep spatial metadata - origin, orientation, spacing
    * type of the image - label/CT/MRI/PET (need to construct enum for this) - frequently will be needed to be supplied manually
    * subtype of the image for example if MRI ADC/DWI/T2 etc.  (need to construct enum for this)
    * type of the voxel data (for example Float32)
