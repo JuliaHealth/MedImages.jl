@@ -16,9 +16,9 @@ Main data structure is a MedImage object which is a 3D image with some metadata.
 Defining image type enum
 """
 @enum Image_type begin
-MRI
-PET
-CT
+  MRI
+  PET
+  CT
 end
 
 
@@ -26,7 +26,7 @@ end
 Defining subimage type enum
 """
 @enum Image_subtype begin
-subtypes
+  subtypes
 end
 
 
@@ -36,24 +36,24 @@ Definition for standardised MedImage Struct
 #following struct can be expanded with all the relevant meta data mentioned within the readme.md of MedImage.jl
 #struct for now, will switch to MetaArrays when it has GPU support 
 struct MedImage
-  voxel_data ::Array{Any}#mutlidimensional array (512,512,3)
-  spatial_metadata ::Dictionaries.Dict #object with properties for spacing, offset from spacing,orientation, origin, direction
-  image_type :: Image_type#enum defining the type of the image
-  image_subtype :: Image_subtype #enum defining the subtype of the image
+  voxel_data::Array{Any}#mutlidimensional array (512,512,3)
+  spatial_metadata::Dictionaries.Dictionary #dictionary with properties for spacing, offset from spacing,orientation, origin, direction
+  image_type::Image_type#enum defining the type of the image
+  image_subtype::Image_subtype #enum defining the subtype of the image
   voxel_datatype #type of the voxel data stored
   date_of_saving #date of saving of the relevant imaging data file
   acquistion_time #time at which the data acquisition for the image took place
   patient_id #the id of the patient in the data file
-  current_device :: String# CPU or GPU , preferrably GPU
+  current_device::String# CPU or GPU , preferrably GPU
   study_uid
   patient_uid
-  series_uid 
+  series_uid
   study_description
-  legacy_file_name :: String#original file name
+  legacy_file_name::String#original file name
   display_data #color values for the data such as RGB or gray
-  clinical_data :: Dictionary.Dict#dictionary with age , gender data of the patient
+  clinical_data::Dictionary.Dict#dictionary with age , gender data of the patient
   is_contrast_administered::Bool #bool, any substance for visibility enhancement given during imaging procedure?
-  additional_metadata::Dictionaries.Dict #dictionary for any other relevant metadata from individual data file
+  metadata::Dictionaries.Dictionary #dictionary for any other relevant metadata from individual data file
 end
 #constructor function for MedImage
 function MedImage(MedImage_struct_attribute_values::Array{Any})::MedImage
@@ -61,7 +61,7 @@ function MedImage(MedImage_struct_attribute_values::Array{Any})::MedImage
 end
 
 
-  
+
 """
 Definitions of basic interpolators
 """
