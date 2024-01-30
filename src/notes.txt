@@ -19,12 +19,197 @@ NIfTI Volumes needs to be transposed before being written to the nifti file. (tr
 
 
 
+important stuff for nifti files:(from ITK source c++)
+  mat44 nifti_quatern_to_mat44( float qb, float qc, float qd,
+                              float qx, float qy, float qz,
+                              float dx, float dy, float dz, float qfac )
+{
+   mat44 R ;
+   double a,b=qb,c=qc,d=qd , xd,yd,zd ;
+
+   /* last row is always [ 0 0 0 1 ] */
+
+   R.m[3][0]=R.m[3][1]=R.m[3][2] = 0.0f ; R.m[3][3]= 1.0f ;
+
+   /* compute a parameter from b,c,d */
+
+   a = 1.0l - (b*b + c*c + d*d) ;
+   if( a < 1.e-7l ){                   /* special case */
+     a = 1.0l / sqrt(b*b+c*c+d*d) ;
+     b *= a ; c *= a ; d *= a ;        /* normalize (b,c,d) vector */
+     a = 0.0l ;                        /* a = 0 ==> 180 degree rotation */
+   } else{
+     a = sqrt(a) ;                     /* angle = 2*arccos(a) */
+   }
+
+   /* load rotation matrix, including scaling factors for voxel sizes */
+
+   xd = (dx > 0.0) ? dx : 1.0l ;       /* make sure are positive */
+   yd = (dy > 0.0) ? dy : 1.0l ;
+   zd = (dz > 0.0) ? dz : 1.0l ;
+
+   if( qfac < 0.0 ) zd = -zd ;         /* left handedness? */
+
+   R.m[0][0] = (float)( (a*a+b*b-c*c-d*d) * xd) ;
+   R.m[0][1] = 2.0l * (b*c-a*d        ) * yd ;
+   R.m[0][2] = 2.0l * (b*d+a*c        ) * zd ;
+   R.m[1][0] = 2.0l * (b*c+a*d        ) * xd ;
+   R.m[1][1] = (float)( (a*a+c*c-b*b-d*d) * yd) ;
+   R.m[1][2] = 2.0l * (c*d-a*b        ) * zd ;
+   R.m[2][0] = 2.0l * (b*d-a*c        ) * xd ;
+   R.m[2][1] = 2.0l * (c*d+a*b        ) * yd ;
+   R.m[2][2] = (float)( (a*a+d*d-c*c-b*b) * zd) ;
+
+   /* load offsets */
+
+   R.m[0][3] = qx ; R.m[1][3] = qy ; R.m[2][3] = qz ;
+
+   return R ;
+}
 
 
 
 
 
+  nim->dx = nim->pixdim[1] = nhdr.pixdim[1] ;
+  nim->dy = nim->pixdim[2] = nhdr.pixdim[2] ;
+  nim->dz = nim->pixdim[3] = nhdr.pixdim[3] ;
+  nim->dt = nim->pixdim[4] = nhdr.pixdim[4] ;
+  nim->du = nim->pixdim[5] = nhdr.pixdim[5] ;
+  nim->dv = nim->pixdim[6] = nhdr.pixdim[6] ;
+  nim->dw = nim->pixdim[7] = nhdr.pixdim[7] ;
+q_fac = (nifti_header.pixdim[0] < 0.0f) ? -1.0f : 1.0f 
+qform_matrix/qto_xyz = nifti_quatern_to_mat44(nifti_header.quatern_b, nifti_header.quatern_c, nifti_header.quatern_d,
+                        nifti_header.qoffset_x, nifti_header.qoffset_y, nifti_header.qoffset_z,
+                        dx,                     dy,                     dz,                    qfac,
+                        0.0,                      0.0,                       0.0,                     1.0)
 
+
+
+
+
+/***************************************************************
+ * nifti_image_read
+ ***************************************************************/
+/*! \brief Read a nifti header and optionally the data, creating a nifti_image.
+
+        - The data buffer will be byteswapped if necessary.
+        - The data buffer will not be scaled.
+        - The data buffer is allocated with calloc().
+
+    \param hname filename of the nifti dataset
+    \param read_data Flag, true=read data blob, false=don't read blob.
+    \return A pointer to the nifti_image data structure.
+
+    \sa nifti_image_free, nifti_free_extensions, nifti_image_read_bricks
+*/
+nifti_image *nifti_image_read( const char *hname , int read_data )
+{
+   struct nifti_1_header  nhdr ;
+   nifti_image           *nim ;
+   znzFile                fp ;
+   int                    rv, ii , filesize, remaining;
+   char                   fname[] = { "nifti_image_read" };
+   char                  *hfile=NULL;
+
+   if( g_opts.debug > 1 ){
+      fprintf(stderr,"-d image_read from '%s', read_data = %d",hname,read_data);
+#ifdef HAVE_ZLIB
+      fprintf(stderr,", HAVE_ZLIB = 1\n");
+#else
+      fprintf(stderr,", HAVE_ZLIB = 0\n");
+#endif
+   }
+
+   /**- determine filename to use for header */
+   hfile = nifti_findhdrname(hname);
+   if( hfile == NULL ){
+      if(g_opts.debug > 0)
+         LNI_FERR(fname,"failed to find header file for", hname);
+      return NULL;  /* check return */
+   } else if( g_opts.debug > 1 )
+      fprintf(stderr,"-d %s: found header filename '%s'\n",fname,hfile);
+
+   if( nifti_is_gzfile(hfile) ) filesize = -1;  /* unknown */
+   else                         filesize = nifti_get_filesize(hfile);
+
+   fp = znzopen(hfile, "rb", nifti_is_gzfile(hfile));
+   if( znz_isnull(fp) ){
+      if( g_opts.debug > 0 ) LNI_FERR(fname,"failed to open header file",hfile);
+      free(hfile);
+      return NULL;
+   }
+
+   rv = has_ascii_header( fp );
+   if( rv < 0 ){
+      if( g_opts.debug > 0 ) LNI_FERR(fname,"short header read",hfile);
+      znzclose( fp );
+      free(hfile);
+      return NULL;
+   }
+   else if ( rv == 1 ){ /* process special file type */
+      nim = nifti_read_ascii_image( fp, hfile, filesize, read_data );
+      znzclose(fp);
+      free(hfile);
+      return nim;
+   }
+
+   /* else, just process normally */
+
+   /**- read binary header */
+
+   ii = (int)znzread( &nhdr , 1 , sizeof(nhdr) , fp ) ;       /* read the thing */
+
+   /* keep file open so we can check for exts. after nifti_convert_nhdr2nim() */
+
+   if( ii < (int) sizeof(nhdr) ){
+      if( g_opts.debug > 0 ){
+         LNI_FERR(fname,"bad binary header read for file", hfile);
+         fprintf(stderr,"  - read %d of %d bytes\n",ii, (int)sizeof(nhdr));
+      }
+      znzclose(fp) ;
+      free(hfile);
+      return NULL;
+   }
+
+   /* create output image struct and set it up */
+
+   /**- convert all nhdr fields to nifti_image fields */
+   nim = nifti_convert_nhdr2nim(nhdr,hfile);
+
+   if( nim == NULL ){
+      znzclose( fp ) ;                                   /* close the file */
+      if( g_opts.debug > 0 )
+         LNI_FERR(fname,"cannot create nifti image from header",hfile);
+      free(hfile); /* had to save this for debug message */
+      return NULL;
+   }
+
+   if( g_opts.debug > 3 ){
+      fprintf(stderr,"+d nifti_image_read(), have nifti image:\n");
+      if( g_opts.debug > 2 ) nifti_image_infodump(nim);
+   }
+
+   /**- check for extensions (any errors here means no extensions) */
+   if( NIFTI_ONEFILE(nhdr) ) remaining = nim->iname_offset - sizeof(nhdr);
+   else                      remaining = filesize - sizeof(nhdr);
+
+   (void)nifti_read_extensions(nim, fp, remaining);
+
+   znzclose( fp ) ;                                      /* close the file */
+   free(hfile);
+
+   /**- read the data if desired, then bug out */
+   if( read_data ){
+      if( nifti_image_load( nim ) < 0 ){
+         nifti_image_free(nim);          /* take ball, go home. */
+         return NULL;
+      }
+   }
+   else nim->data = NULL ;
+
+   return nim ;
+}
 
 
 ---BASIc_TRANSFORMATIONS.JL---
@@ -33,7 +218,23 @@ functions for the implementation of Rotation, Cropping , Translation and Scaling
 
 
 
+------Loading Reference Data-----------------------
+as to data that I propose get 2 random datasets from https://drive.google.com/drive/folders/1HqEgzS8BV2c7xYNrZdEAnrHk7osJJ--2 and  for example this as it has pet/ct data https://wiki.cancerimagingarchive.net/display/Public/RIDER+Lung+PET-CT plus https://wiki.cancerimagingarchive.net/pages/viewpage.action?pageId=23691656 as it is multimodal MRI
+[5:35 PM] choose some random cases from each and open in slicer, just drag and drop
+[5:35 PM] then open data view (you switch options between diffrent views at the top menu)
+[5:36 PM] default menu is called Welcome to slicer and it is located to the right of modules
+[5:36 PM] in data view you will see open cases
+[5:37 PM] then click either write to file -  and format nii gz
+[5:37 PM] or export to dicom
+[5:37 PM] dataset should cover most of the typical cases
 
+
+
+
+
+8:36
+Even more comprehensive dataset best suted for this purpose is in dicom2 nifti
+[5:39 PM] https://github.com/icometrix/dicom2nifti/tree/main/tests/data
 
 
 

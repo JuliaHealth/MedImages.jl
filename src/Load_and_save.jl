@@ -75,7 +75,24 @@ function formulate_sto_xyz(srow_values)
   return hcat(srow_values...) #horizontal concatenation 
 end
 
-
+"""
+helper function for nifti #4
+returns a string version for the specified intent code from nifti
+"""
+function string_intent(intent)
+  string_intent_dict = Dictionaries.Dictionary(filter(value -> value != 1, [0:24..., 1001:1011...]), #excluding codes from 2001:2005
+    ["NIFTI_INTENT_NONE", "NIFTI_INTENT_CORREL", "NIFTI_INTENT_TTEST",
+      "NIFTI_INTENT_FTEST", "NIFTI_INTENT_ZSCORE", "NIFTI_INTENT_CHISQ", "NIFTI_INTENT_BETA", "NIFTI_INTENT_BINOM", "NIFTI_INTENT_GAMMA", "NIFTI_INTENT_POISSON",
+      "NIFTI_INTENT_NORMAL", "NIFTI_INTENT_FTEST_NONC", "NIFTI_INTENT_CHISQ_NONC", "NIFTI_INTENT_LOGISTIC", "NIFTI_INTENT_LAPLACE", "NIFTI_INTENT_UNIFORM",
+      "NIFTI_INTENT_TTEST_NONC", "NIFTI_INTENT_WEIBULL", "NIFTI_INTENT_CHI", "NIFTI_INTENT_INVGAUSS", "NIFTI_INTENT_EXTVAL", "NIFTI_INTENT_PVAL", "NIFTI_INTENT_LOGPVAL",
+      "NIFTI_INTENT_LOG10PVAL", "NIFTI_INTENT_ESTIMATE", "NIFTI_INTENT_LABEL", "NIFTI_INTENT_NEURONAME", "NIFTI_INTENT_GENMATRIX", "NIFTI_INTENT_SYMMATRIX", "NIFTI_INTENT_DISPVECT",
+      "NIFTI_INTENT_VECTOR", "NIFTI_INTENT_POINTSET", "NIFTI_INTENT_TRIANGLE", "NIFTI_INTENT_QUATERNION", "NIFTI_INTENT_DIMLESS"])
+  if intent in keys(string_intent_dict)
+    return string_intent_dict[intent]
+  else
+    return "UNKNOWN_INTENT"
+  end
+end
 
 
 
@@ -148,6 +165,33 @@ function load_image(path::String)::Array{MedImage}
     metadata = Dictionaries.Dictionary(metadata_keys, metadata_values)
 
 
+
+    #Nifti Files stores data in what coordinate system?
+    #1. qform_code = 0 and sform_code = 0
+    #2. qform_code = 1 and sform_code = 0
+    #3. qform_code = 0 and sform_code = 1
+    #4. qform_code = 1 and sform_code = 1
+    #5. qform_code = 2 and sform_code = 0
+    #6. qform_code = 0 and sform_code = 2
+    #7. qform_code = 2 and sform_code = 1
+    #8. qform_code = 1 and sform_code = 2
+    #9. qform_code = 2 and sform_code = 2
+    #10. qform_code = 3 and sform_code = 0
+    #11. qform_code = 0 and sform_code = 3
+    #12. qform_code = 3 and sform_code = 1
+    #13. qform_code = 1 and sform_code = 3
+    #14. qform_code = 3 and sform_code = 2
+    #15. qform_code = 2 and sform_code = 3
+    #16. qform_code = 3 and sform_code = 3
+    #17. qform_code = 4 and sform_code = 0
+    #18. qform_code = 0 and sform_code = 4
+    #19. qform_code = 4 and sform_code = 1
+    #20. qform_code = 1 and sform_code = 4
+    #21. qform_code = 4 and sform_code = 2
+    #22. qform_code = 2 and sform_code = 4
+    #23. qform_code = 4 and sform_code = 3
+    #24. qform_code = 3 and sform_code = 4
+    #25. qform_code = 4 and sform_code = 4
 
 
 
