@@ -20,7 +20,51 @@ NIfTI Volumes needs to be transposed before being written to the nifti file. (tr
 
 
 important stuff for nifti files:(from ITK source c++)
-  mat44 nifti_quatern_to_mat44( float qb, float qc, float qd,
+
+Nifti Image IO process in ITK
+void
+NiftiImageIO::PrintSelf(std::ostream & os, Indent indent) const
+{
+  Superclass::PrintSelf(os, indent);
+
+  os << indent << "NiftiImageHolder: " << *(m_NiftiImageHolder).get() << std::endl;
+  os << indent << "NiftiImage: " << m_NiftiImage << std::endl;
+  os << indent << "RescaleSlope: " << m_RescaleSlope << std::endl;
+  os << indent << "RescaleIntercept: " << m_RescaleIntercept << std::endl;
+  os << indent << "ConvertRAS: " << (m_ConvertRAS ? "On" : "Off") << std::endl;
+  os << indent << "ConvertRASVectors: " << (m_ConvertRASVectors ? "On" : "Off") << std::endl; #intent coode for general vector nifti
+  os << indent << "ConvertRASDisplacementVectors: " << (m_ConvertRASDisplacementVectors ? "On" : "Off") << std::endl; #intent code for displacement vector nifti
+  os << indent << "OnDiskComponentType: " << m_OnDiskComponentType << std::endl;
+  os << indent << "LegacyAnalyze75Mode: " << m_LegacyAnalyze75Mode << std::endl; #not needed for our purposes
+  os << indent << "SFORM permissive: " << (m_SFORM_Permissive ? "On" : "Off") << std::endl; #sform is orthogonal or not 
+  
+}
+
+^above is the stuff that takes places for handling image IO from nifti files in ITK.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+mat44 nifti_quatern_to_mat44( float qb, float qc, float qd,
                               float qx, float qy, float qz,
                               float dx, float dy, float dz, float qfac )
 {
