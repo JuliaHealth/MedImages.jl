@@ -1,7 +1,7 @@
 using Pkg
 Pkg.add(["Dictionaries"])
 using Dictionaries
-
+include("./Nifti_image_struct.jl")
 """
 Here we define necessary data structures for the project.
 Main data structure is a MedImage object which is a 3D image with some metadata.
@@ -59,6 +59,11 @@ end
 function MedImage(MedImage_struct_attribute_values::Array{Any})::MedImage
   return MedImage(MedImage_struct_attribute_values...)
 end
+
+
+
+
+
 
 
 
