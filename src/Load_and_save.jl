@@ -75,11 +75,37 @@ function calculate_qfac(pixdim)
   return (pixdim[1] < 0.0) ? -1.0 : 1.0
 end
 
+
+
+"""
+helper function for nifti
+calculates inverse of a 4x4 matrix 
+"""
+function calculate_inverse_44_matrix(input_matrix)
+  """
+  INPUT MATRIX Is 
+  [r11 r12 r13 v1]
+  [r21 r22 r23 v2]
+  [r31 r32 r33 v3]
+  [0    0   0   0]
+  """
+  r11, r12, r13 = input_matrix[1][1], input_matrix[1][2], input_matrix[1][3]
+  r21, r22, r23 = input_matrix[2][1], input_matrix[2][2], input_matrix[2][3]
+  r31, r32, r33 = input_matrix[3][1], input_matrix[3][2], input_matrix[3][3]
+  v1, v2, v3 = input_matrix[1][4], input_matrix[2][4], input_matrix[3][4]
+  det = r11 * r22 * r33 - r11 * r32 * r23 - r21 * r12 * r33 + r21 * r32 * r13 + r31 * r12 * r23 - r31 * r22 * r13 #determinant
+  if det != 0.0
+    det = 1.0 / det
+  end
+  inverse_44_matrix = [det*(r22*r33-r32*r23) det*(-r12*r33+r32*r13) det*(r12*r23-r22*r13) det*(-r12*r23*v3+r12*v2*r33+r22*r13*v3-r22*v1*r33-r32*r13*v2+r32*v1*r23); det*(-r21*r33+r31*r23) det*(r11*r33-r31*r13) det*(-r11*r23+r21*r13) det*(r11*r23*v3-r11*v2*r33-r21*r13*v3+r21*v1*r33+r31*r13*v2-r31*v1*r23); det*(r21*r32-r31*r22) det*(-r11*r32+r31*r12) det*(r11*r22-r21*r12) det*(-r11*r22*v3+r11*r32*v2+r21*r12*v3-r21*r32*v1-r31*r12*v2+r31*r22*v1); 0.0 0.0 0.0 1.0]
+  return inverse_44_matrix
+end
+
 """
 helper function for nifti 
 create a qform matrix from the quaterns 
 """
-function formulate_qform_matrix(quatern_b, quatern_c, quatern_d, qoffset_x, qoffset_y, qoffset_z, dx, dy, dz, qfac) # a 4x4 matrix 
+function formulate_qto_xyz(quatern_b, quatern_c, quatern_d, qoffset_x, qoffset_y, qoffset_z, dx, dy, dz, qfac) # a 4x4 matrix 
 
   #dealing with only nifti files 
   #NOTE QFORM_CODE should not <= 0, which will mean we then would have to use grid spacings in order to compute the transformation matrix
@@ -107,31 +133,42 @@ function formulate_qform_matrix(quatern_b, quatern_c, quatern_d, qoffset_x, qoff
   #loading rotation matrix, including scaling factor for voxel sizes 
   #dx , dy and dz are pixdim[2], pixdim[3] and pixdim[4] respectivelyd
   xd = (dx > 0.0) ? dx : 1.0
-  yd = (dx > 0.0) ? dx : 1.0
-  zd = (dx > 0.0) ? dx : 1.0
+  yd = (dy > 0.0) ? dy : 1.0
+  zd = (dz > 0.0) ? dz : 1.0
   if qfac < 0.0
     zd = -zd #left handedness?
   end
   #last row is always 0 0 0 1
-  #3X3 Rotation Matrix below
-  qform_transformation_matrix = [(a^2+b^2-c^2-d^2)*xd 2.0*(b*c-a*d)*yd 2.0*(b*d+a*c)*zd qx
-    2.0*(b*c+a*d)*xd (a*a+c*c-b*b-d*d)*yd 2.0*(c*d-a*b)*zd qy
-    2.0*(b*d-a*c)*xd 2.0*(c*d+a*b)*yd (a*a+d*d-c*c-b*b)*zd qz
-    0.0 0.0 0.0 1.0]
+  #the first 3X3 matrix in the below 4x4 matrix is Rotation Matrix 
+  qform_transformation_matrix = [(a^2+b^2-c^2-d^2)*xd 2.0*(b*c-a*d)*yd 2.0*(b*d+a*c)*zd qx; 2.0*(b*c+a*d)*xd (a*a+c*c-b*b-d*d)*yd 2.0*(c*d-a*b)*zd qy; 2.0*(b*d-a*c)*xd 2.0*(c*d+a*b)*yd (a*a+d*d-c*c-b*b)*zd qz; 0.0 0.0 0.0 1.0]
   return qform_transformation_matrix
 
 end
 
+function formulate_qto_ijk(qto_xyz)
+  inverse_qform_transformation_matrix = calculate_inverse_44_matrix(qto_xyz)
+  return inverse_qform_transformation_matrix
+end
+
+
 """
-helper function for nifti #4
-returns a matrix for srow_x, srow_y and srow_z
+helper function for nifti 
+returns a 4x4 matrix for srow_x, srow_y and srow_z
 """
-function formulate_sto_xyz(srow_values) #this is wrrong , we need to formulate an sform matrix 
-  return hcat(srow_values...) #horizontal concatenation 
+function formulate_sto_xyz(srow_x, srow_y, srow_z)
+  #earlier i used : hcat((srow_x,srow_y,srow_z)...) for concatenation along the horizontal 
+  sform_transformation_matrix = [srow_x[1] srow_x[2] srow_x[3] srow_x[4]; srow_y[1] srow_y[2] srow_y[3] srow_y[4]; srow_z[1] srow_z[2] srow_z[3] srow_z[4]; 0.0 0.0 0.0 1.0]
+  return sform_transformation_matrix
+  #horizontal concatenation 
+end
+
+function formulate_sto_ijk(sto_xyz)
+  inverse_sform_transformation_matrix = calculate_inverse_44_matrix(sto_xyz)
+  return inverse_sform_transformation_matrix
 end
 
 """
-helper function for nifti #5
+helper function for nifti 
 returns a string version for the specified intent code from nifti
 """
 function string_intent(intent)
@@ -149,7 +186,37 @@ function string_intent(intent)
   end
 end
 
+"""
+helper function for nifti
+creates a data dictionary for header data can be used to create a new NIfTI.NIfTI1Header when saving to a file
+"""
+function formulate_header_data_dict(nifti_image_header::NIfTI.NIfTI1Header)::Dictionaries.Dictionary
 
+  #below in the auxfile[1] and description[1] are the actual values for the field, followed by the string representation of them
+  #for qform_code and sform_code , their string representations of separate feilds such as qform_code_name and sform_code_name
+
+  header_data_keys = ["nifti_type", "dim_info", "dim", "nifti_intent", "nifti_intent_code", "datatype", "bitpix", "slice_start", "pixdim", "vox_offset", "scl_slope", "scl_inter", "slice_end", "slice_code",
+    "xyzt_units", "cal_max", "cal_min", "slice_duration", "toffset", "descrip", "aux_file", "qform_code", "qform_code_name", "sform_code", "sform_code_name", "quatern_b", "quatern_c", "quatern_d",
+    "qoffset_x", "qoffset_y", "qoffset_z", "srow_x", "srow_y", "srow_z", "intent_name"]
+  header_data_values = ["one", nifti_image_header.dim_info, nifti_image_header.dim, (nifti_image_header.intent_p1, nifti_image_header.intent_p2, nifti_image_header.intent_p3), nifti_image_header.intent_code,
+    nifti_image_header.datatype, nifti_image_header.bitpix, nifti_image_header.slice_start, nifti_image_header.pixdim, nifti_image_header.vox_offset, nifti_image_header.scl_slope,
+    nifti_image_header.scl_inter, nifti_image_header.slice_end, nifti_image_header.slice_code, nifti_image_header.xyzt_units, nifti_image_header.cal_max, nifti_image_header.cal_min,
+    nifti_image_header.slice_duration, nifti_image_header.toffset, (nifti_image_header.descrip, formulate_string(nifti_image_header.descrip)), (nifti_image_header.aux_file, formulate_string(nifti_image_header.aux_file)),
+    nifti_image_header.qform_code, formulate_xform_string(nifti_image_header.qform_code), nifti_image_header.sform_code, formulate_xform_string(nifti_image_header.sform_code),
+    nifti_image_header.quatern_b, nifti_image_header.quatern_c, nifti_image_header.quatern_d, nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z,
+    nifti_image_header.srow_x, nifti_image_header.srow_y, nifti_image_header.srow_z, nifti_image_header.intent_name]
+
+  header_data_dict = Dictionaries.Dictionary(header_data_keys, header_data_values)
+  return header_data_dict
+end
+
+"""
+helper function for nifti
+creates a nifti_image struct which basically encapsulates all the necessary data, contains voxel data 
+"""
+function formulate_nifti_image_struct(nifti_image::NIfTI.NIVolume)::Nifti_image
+
+end
 
 
 function load_image(path::String)::Array{MedImage}
@@ -206,25 +273,14 @@ function load_image(path::String)::Array{MedImage}
     #17 contrast administration boolean
     is_contrast_administered = false
     #18 metadata dictionary from nifti header
-    metadata_keys = ["nifti_type", "dim_info", "dim", "nifti_intent", "nifti_intent_code", "datatype", "bitpix", "slice_start", "pixdim", "vox_offset", "scl_slope", "scl_inter", "slice_end", "slice_code",
-      "xyzt_units", "cal_max", "cal_min", "slice_duration", "toffset", "descrip", "aux_file", "qform_code", "qform_code_name", "qfac", "qform_qto_xyz", "sform_code", "sform_code_name", "quatern_b", "quatern_c", "quatern_d",
-      "qoffset_x", "qoffset_y", "qoffset_z", "srow_x", "srow_y", "srow_z", "sto_xyz_matrix", "intent_name"]
-    metadata_values = ["one", nifti_image_header.dim_info, nifti_image_header.dim, (nifti_image_header.intent_p1, nifti_image_header.intent_p2, nifti_image_header.intent_p3), nifti_image_header.intent_code,
-      nifti_image_header.datatype, nifti_image_header.bitpix, nifti_image_header.slice_start, nifti_image_header.pixdim, nifti_image_header.vox_offset, nifti_image_header.scl_slope,
-      nifti_image_header.scl_inter, nifti_image_header.slice_end, nifti_image_header.slice_code, nifti_image_header.xyzt_units, nifti_image_header.cal_max, nifti_image_header.cal_min,
-      nifti_image_header.slice_duration, nifti_image_header.toffset, (nifti_image_header.descrip, formulate_string(nifti_image_header.descrip)), (nifti_image_header.aux_file, formulate_string(nifti_image_header.aux_file)),
-      nifti_image_header.qform_code, formulate_xform_string(nifti_image_header.qform_code), calculate_qfac(nifti_image_header.pixdim),
-      formulate_qform_matrix(nifti_image_header.quatern_b, nifti_image_header.quatern_c, nifti_image_header.quatern_d, nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z, nifti_image_header.pixdim[2], nifti_image_header.pixdim[3], nifti_image_header.pixdim[4], calculate_qfac(nifti_image_header.pixdim)),
-      nifti_image_header.sform_code, formulate_xform_string(nifti_image_header.sform_code),
-      nifti_image_header.quatern_b, nifti_image_header.quatern_c, nifti_image_header.quatern_d, nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z,
-      nifti_image_header.srow_x, nifti_image_header.srow_y, nifti_image_header.srow_z, formulate_sto_xyz((nifti_image_header.srow_x, nifti_image_header.srow_y, nifti_image_header.srow_z)), nifti_image_header.intent_name]
 
+    metadata_keys = ["header_data_dict", "nifti_image_struct"]
+    metadata_values = [formulate_header_data_dict(nifti_image_header), formulate_nifti_image_struct(nifti_image)]
     metadata = Dictionaries.Dictionary(metadata_keys, metadata_values)
 
 
-
-    return [MedImage([voxel_data, spatial_metadata, image_type, image_subtype, voxel_datatype])]
-    return [MedImage([nifti_image.raw, nifti_image_header.pixdim[2:4], (nifti_image_header.srow_x[1:3], nifti_image_header.srow_y[1:3], nifti_image_header.srow_z[1:3]), (nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z), " ", " "])]
+    return [MedImage([voxel_data, spatial_metadata, image_type, image_subtype, voxel_datatype, date_of_saving, acquisition_time, patient_id, current_device, study_uid, patient_uid, series_uid, study_description, legacy_file_name, display_data, clinical_data, is_contrast_administered, metadata])]
+    #return [MedImage([nifti_image.raw, nifti_image_header.pixdim[2:4], (nifti_image_header.srow_x[1:3], nifti_image_header.srow_y[1:3], nifti_image_header.srow_z[1:3]), (nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z), " ", " "])]
 
   end
 end

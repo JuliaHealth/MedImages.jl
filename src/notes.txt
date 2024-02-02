@@ -174,7 +174,7 @@ nifti_image *nifti_image_read( const char *hname , int read_data )
    } else if( g_opts.debug > 1 )
       fprintf(stderr,"-d %s: found header filename '%s'\n",fname,hfile);
 
-   if( nifti_is_gzfile(hfile) ) filesize = -1;  /* unknown */
+   if( nifti_is_gzfile(hfile) ) filesize = -1;  /* unknown */ # gzipped nifti file
    else                         filesize = nifti_get_filesize(hfile);
 
    fp = znzopen(hfile, "rb", nifti_is_gzfile(hfile));
