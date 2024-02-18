@@ -289,4 +289,8 @@ Interpolations.jl
 Dierckx.jl for 1d and 2d spline interpolations
 
 
+GPU ACCELERATION (CUDA INFORMATION FOR RELEVANT GPUS)
+https://en.wikipedia.org/wiki/CUDA
+
+
 
