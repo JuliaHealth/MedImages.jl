@@ -79,11 +79,11 @@ end
 
 """
 helper function for nifti
-calculates inverse of a 4x4 matrix 
+calculates inverse of a 4x4 matrix
 """
 function calculate_inverse_44_matrix(input_matrix)
   """
-  INPUT MATRIX Is 
+  INPUT MATRIX Is
   [r11 r12 r13 v1]
   [r21 r22 r23 v2]
   [r31 r32 r33 v3]
@@ -102,12 +102,12 @@ function calculate_inverse_44_matrix(input_matrix)
 end
 
 """
-helper function for nifti 
-create a qform matrix from the quaterns 
+helper function for nifti
+create a qform matrix from the quaterns
 """
-function formulate_qto_xyz(quatern_b, quatern_c, quatern_d, qoffset_x, qoffset_y, qoffset_z, dx, dy, dz, qfac) # a 4x4 matrix 
+function formulate_qto_xyz(quatern_b, quatern_c, quatern_d, qoffset_x, qoffset_y, qoffset_z, dx, dy, dz, qfac) # a 4x4 matrix
 
-  #dealing with only nifti files 
+  #dealing with only nifti files
   #NOTE QFORM_CODE should not <= 0, which will mean we then would have to use grid spacings in order to compute the transformation matrix
   #using quaterns for qform_code > 0
   #quatern_to_mat4x4(quatern_b,quatern_c,quatern_d,
@@ -120,7 +120,7 @@ function formulate_qto_xyz(quatern_b, quatern_c, quatern_d, qoffset_x, qoffset_y
   qx, qy, qz = qoffset_x, qoffset_y, qoffset_z
   #calculating a paramter from the given quaterns
   a = 1.0 - (b^2 + c^2 + d^2)
-  if a < 1.e-7 #special case 
+  if a < 1.e-7 #special case
     a = 1.0 / sqrt(b^2 + c^2 + d^2)
     b *= a #normalizing b,c,d vector
     c *= a
@@ -130,7 +130,7 @@ function formulate_qto_xyz(quatern_b, quatern_c, quatern_d, qoffset_x, qoffset_y
     a = sqrt(a)
   end
 
-  #loading rotation matrix, including scaling factor for voxel sizes 
+  #loading rotation matrix, including scaling factor for voxel sizes
   #dx , dy and dz are pixdim[2], pixdim[3] and pixdim[4] respectivelyd
   xd = (dx > 0.0) ? dx : 1.0
   yd = (dy > 0.0) ? dy : 1.0
@@ -139,7 +139,7 @@ function formulate_qto_xyz(quatern_b, quatern_c, quatern_d, qoffset_x, qoffset_y
     zd = -zd #left handedness?
   end
   #last row is always 0 0 0 1
-  #the first 3X3 matrix in the below 4x4 matrix is Rotation Matrix 
+  #the first 3X3 matrix in the below 4x4 matrix is Rotation Matrix
   qform_transformation_matrix = [(a^2+b^2-c^2-d^2)*xd 2.0*(b*c-a*d)*yd 2.0*(b*d+a*c)*zd qx; 2.0*(b*c+a*d)*xd (a*a+c*c-b*b-d*d)*yd 2.0*(c*d-a*b)*zd qy; 2.0*(b*d-a*c)*xd 2.0*(c*d+a*b)*yd (a*a+d*d-c*c-b*b)*zd qz; 0.0 0.0 0.0 1.0]
   return qform_transformation_matrix
 
@@ -152,14 +152,14 @@ end
 
 
 """
-helper function for nifti 
+helper function for nifti
 returns a 4x4 matrix for srow_x, srow_y and srow_z
 """
 function formulate_sto_xyz(srow_x, srow_y, srow_z)
-  #earlier i used : hcat((srow_x,srow_y,srow_z)...) for concatenation along the horizontal 
+  #earlier i used : hcat((srow_x,srow_y,srow_z)...) for concatenation along the horizontal
   sform_transformation_matrix = [srow_x[1] srow_x[2] srow_x[3] srow_x[4]; srow_y[1] srow_y[2] srow_y[3] srow_y[4]; srow_z[1] srow_z[2] srow_z[3] srow_z[4]; 0.0 0.0 0.0 1.0]
   return sform_transformation_matrix
-  #horizontal concatenation 
+  #horizontal concatenation
 end
 
 function formulate_sto_ijk(sto_xyz)
@@ -168,7 +168,7 @@ function formulate_sto_ijk(sto_xyz)
 end
 
 """
-helper function for nifti 
+helper function for nifti
 returns a string version for the specified intent code from nifti
 """
 function string_intent(intent)
@@ -212,7 +212,7 @@ end
 
 """
 helper function for nifti
-creates a nifti_image struct which basically encapsulates all the necessary data, contains voxel data 
+creates a nifti_image struct which basically encapsulates all the necessary data, contains voxel data
 """
 function formulate_nifti_image_struct(nifti_image::NIfTI.NIVolume)::Nifti_image
 
@@ -236,21 +236,24 @@ function load_image(path::String)::Array{MedImage}
 
 
     #1 voxel data from the nifti image
-    voxel_data = nifti_image.raw
+    voxel_data = nifti_image.raw #this data is in image coordinates (conversion to world coordinates )
 
+    origin = nothing
+    spacing = nothing
+    orientation = nothing
     #2 data for the fields within the MedImage struct
-    spatial_metadata_keys = ["origin", "orientation", "spacing", "direction"]
+    spatial_metadata_keys = ["origin", "spacing", "orientation"]
     spatial_metadata_values = []
     spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
     #3 Image type
     image_type = nothing #set to MRI/PET/CT
     #4 Image subtype
     image_subtype = nothing #set to subtypes
-    #5 voxel datatype 
+    #5 voxel datatype
     voxel_datatype = nothing
-    #6 date of saving 
+    #6 date of saving
     date_of_saving = Dates.format(Dates.now(), "yyyy-mm-dd")
-    #7 acquisition time 
+    #7 acquisition time
     acquisition_time = Dates.format(Dates.now(), "HH:MM:SS")
     #8 patient ID
     patient_id = nothing
@@ -279,21 +282,29 @@ function load_image(path::String)::Array{MedImage}
     metadata = Dictionaries.Dictionary(metadata_keys, metadata_values)
 
 
-    return [MedImage([voxel_data, spatial_metadata, image_type, image_subtype, voxel_datatype, date_of_saving, acquisition_time, patient_id, current_device, study_uid, patient_uid, series_uid, study_description, legacy_file_name, display_data, clinical_data, is_contrast_administered, metadata])]
+    return [MedImage([voxel_data, origin, spacing ,orientation, spatial_metadata, image_type, image_subtype, voxel_datatype, date_of_saving, acquisition_time, patient_id, current_device, study_uid, patient_uid, series_uid, study_description, legacy_file_name, display_data, clinical_data, is_contrast_administered, metadata])]
     #return [MedImage([nifti_image.raw, nifti_image_header.pixdim[2:4], (nifti_image_header.srow_x[1:3], nifti_image_header.srow_y[1:3], nifti_image_header.srow_z[1:3]), (nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z), " ", " "])]
 
+
   end
+
 end
+
 
 
 function save_image(im::Array{MedImage}, path::String)
   """
-  Creating nifti volumes or each medimage object 
+  Creating nifti volumes or each medimage object
   NIfTI.NIVolume() NIfTI.niwrite()
   """
 end
 
 
+"""
+NOTES:
+conversion and storage n-dimensional voxel data within world-coordinate system (doenst change the RAS system)
+for testing purposes within test_data the volume-0.nii.gz constitutes a 3-D nifti volume , whereas the filtered_func_data.nii.gz constitutes up of a 4D nifti volume (4th dimension is time, 3d stuff still applicable)
+"""
 
 #array_of_objects = load_image("../test_data/ScalarVolume_0")
 # array_of_objects = load_image("/workspaces/MedImage.jl/MedImage3D/test_data/volume-0.nii.gz")
