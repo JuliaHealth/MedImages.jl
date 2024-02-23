@@ -1,5 +1,5 @@
 using Pkg
-Pkg.add(["DICOM", "NIfTI", "Dictionaries", "Dates"])
+# Pkg.add(["DICOM", "NIfTI", "Dictionaries", "Dates"])
 using DICOM, NIfTI, Dictionaries, Dates
 include("./MedImage_data_struct.jl")
 
@@ -239,9 +239,12 @@ function load_image(path::String)::Array{MedImage}
     voxel_data = nifti_image.raw
 
     #2 data for the fields within the MedImage struct
-    spatial_metadata_keys = ["origin", "orientation", "spacing", "direction"]
-    spatial_metadata_values = []
-    spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
+    # spatial_metadata_keys = ["origin", "spacing", "direction"]
+    # spatial_metadata_values = []
+    # spatial_metadata = Dictionary(spatial_metadata_keys, spatial_metadata_values)
+    spacing=nothing
+    direction=nothing
+    origin=nothing
     #3 Image type
     image_type = nothing #set to MRI/PET/CT
     #4 Image subtype
@@ -276,10 +279,9 @@ function load_image(path::String)::Array{MedImage}
 
     metadata_keys = ["header_data_dict", "nifti_image_struct"]
     metadata_values = [formulate_header_data_dict(nifti_image_header), formulate_nifti_image_struct(nifti_image)]
-    metadata = Dictionaries.Dictionary(metadata_keys, metadata_values)
+    metadata = Dictionary(metadata_keys, metadata_values)
 
-
-    return [MedImage([voxel_data, spatial_metadata, image_type, image_subtype, voxel_datatype, date_of_saving, acquisition_time, patient_id, current_device, study_uid, patient_uid, series_uid, study_description, legacy_file_name, display_data, clinical_data, is_contrast_administered, metadata])]
+    return [MedImage([voxel_data, spacing,direction,origin, image_type, image_subtype, voxel_datatype, date_of_saving, acquisition_time, patient_id, current_device, study_uid, patient_uid, series_uid, study_description, legacy_file_name, display_data, clinical_data, is_contrast_administered, metadata])]
     #return [MedImage([nifti_image.raw, nifti_image_header.pixdim[2:4], (nifti_image_header.srow_x[1:3], nifti_image_header.srow_y[1:3], nifti_image_header.srow_z[1:3]), (nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z), " ", " "])]
 
   end
