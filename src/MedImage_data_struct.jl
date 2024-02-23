@@ -37,7 +37,9 @@ Definition for standardised MedImage Struct
 #struct for now, will switch to MetaArrays when it has GPU support 
 struct MedImage
   voxel_data::Array{Any}#mutlidimensional array (512,512,3)
-  spatial_metadata::Dictionaries.Dictionary #dictionary with properties for spacing, offset from spacing,orientation, origin, direction
+  spacing 
+  orientation
+  origin
   image_type::Image_type#enum defining the type of the image
   image_subtype::Image_subtype #enum defining the subtype of the image
   voxel_datatype #type of the voxel data stored
@@ -51,9 +53,9 @@ struct MedImage
   study_description
   legacy_file_name::String#original file name
   display_data #color values for the data such as RGB or gray
-  clinical_data::Dictionary.Dict#dictionary with age , gender data of the patient
+  clinical_data::Dict#dictionary with age , gender data of the patient
   is_contrast_administered::Bool #bool, any substance for visibility enhancement given during imaging procedure?
-  metadata::Dictionaries.Dictionary #dictionary for any other relevant metadata from individual data file
+  metadata::Dict #dictionary for any other relevant metadata from individual data file
 end
 #constructor function for MedImage
 function MedImage(MedImage_struct_attribute_values::Array{Any})::MedImage
@@ -75,4 +77,5 @@ Definitions of basic interpolators
 """
 Indicating do we want to change underlying pixel array spatial metadata or both
 """
-@enum Mode_mi pixel_array = 0 spat_metadata = 2 all = 3
+@enum Mode_mi pixel_array_mode = 0 spat_metadata_mode = 2 all_mode = 3
+
