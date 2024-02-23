@@ -2,8 +2,6 @@
 # n stuff and a few of d stuff might be for Analyze files
 using NIfTI
 
-
-
 struct Nifti_image
   ndim
   #dimension of grid array begin
@@ -16,7 +14,7 @@ struct Nifti_image
   nw
   #dimension of grid array end
 
-  dim::Array{Any}
+  dim
   nvox
   #nbyper #bytes per voxel dont reall need that 
   datatype #type of data in voxels
@@ -31,7 +29,7 @@ struct Nifti_image
   dw
   #grid spacing end
 
-  pixdim::Array{Any}
+  pixdim
 
   scl_slope #scaling parameter : slope
   scl_inter #scaling parameter : intercept
@@ -78,6 +76,8 @@ struct Nifti_image
   intent_p2
   intent_p3
   intent_name::String #optional description of intent data 
+
+  #fname for saving the file name of the nii file
 
   descrip::String #optional text to describe dataset
   aux_file::String #auxiliary filename
