@@ -27,7 +27,6 @@ sitk = pyimport("SimpleITK")
 np = pyimport("numpy")
 
 # python implementation taken from https://stackoverflow.com/questions/56171643/simpleitk-rotation-of-volumetric-data-e-g-mri
-
 function matrix_from_axis_angle(a)
     """ Compute rotation matrix from axis-angle.
     This is called exponential map or Rodrigues' formula.
@@ -118,7 +117,7 @@ end #rotation3d
 
 
 
-function test_single_rotation(medIm::MedImage,sitk_image, axis::Int, theta::Float64)
+function test_single_rotation(medIm::MedImage,sitk_image, axis::Int, theta::Float64,dummy_run=false)
     """
     test if the rotation of the image lead to correct change in the pixel array
     and the metadata the operation will be tasted against Python simple itk function
@@ -127,6 +126,9 @@ function test_single_rotation(medIm::MedImage,sitk_image, axis::Int, theta::Floa
     #sitk implementation
     rotated=rotation3d(sitk_image,axis, theta)
     
+    if(dummy_run)
+        return
+    end
     #our Julia implementation
     medIm=rotate_mi([medIm],axis,theta,linear)[0]
 
@@ -138,22 +140,30 @@ end #test_single_rotation
 testing rotations against Python simple itk function
 
 """
-function test_rotation(path_nifti)
+function test_rotation(path_nifti,dummy_run=false)
     
     #we test rotations of diffrent exes and of diffrent angles
-    
+    mode= pixel_array_mode
     for ax in [1,2,3]
         for theta in [30,60,90,180,270,360,400]
             #purposfully reloading each time to avoid issues with pixel 
-            #arry mutation
-            med_im=load_image(path_nifti)
+            #array mutation
+            
+            #load image only in real run
+            med_im=ifelse(dummy_run,load_image(path_nifti),[])
+
             sitk_image=sitk.ReadImage(path_nifti)
-            test_single_rotation(med_im,sitk_image, ax, theta)
+            test_single_rotation(med_im,sitk_image, ax, theta,dummy_run)
         end#for    
     end#for
+    mode = Mode_mi.metadata
+
 
 end
 
+imagePath="/workspaces/MedImage.jl/test_data/volume-0.nii.gz"
+test_rotation(imagePath,true)
+# image = sitk.ReadImage(imagePath)
 
 
 ################################################# cropping tests
