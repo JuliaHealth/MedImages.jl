@@ -38,7 +38,7 @@ Definition for standardised MedImage Struct
 struct MedImage
   voxel_data::Array{Any}#mutlidimensional array (512,512,3)
   spacing 
-  orientation
+  direction
   origin
   image_type::Image_type#enum defining the type of the image
   image_subtype::Image_subtype #enum defining the subtype of the image
