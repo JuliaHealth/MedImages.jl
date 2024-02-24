@@ -1,0 +1,57 @@
+UNDERSTANDING THE FUNCTION 
+ReadImageInformation from ITK source (nifti files)
+-- image_FTYPe = is_nifti_file()? / analyzie file 
+-- handling analyze stuff (we have a nifti file )
+--reading a nifti file nifti_image_read(file_name) (nifti_image struct with a lot of values) =  (m+_NiftiImage)
+--dumping nifti header
+-- if nifti_image intent code correlates with 
+   NIFTI_INTENT_DISPVECT
+   NIFTI_INTENT_VECTOR
+   NIFTI_INTENT_SYMMATRIX
+   -- if nifti_image_header.dim[4] (c++ indexing) > 1
+      SetNumberOfDimensions(4)
+   -- else if nifti_image_header.dim[3] > 1
+      SetNumberOfDimensions(3)
+   -- else if nifti_image_header.dim[2] > 1
+      SetNumberOfDimensions(2)
+   -- else SetNumberofDimensions(1)
+
+-- else if nifti_intent code is NIFTI_INTENT_GENMATRIX (no support added yet in ITK)
+-- else : (simple scalar image)
+   SetNumberOfDimensions(nifti_image_header.dim[0])
+    unsigned int realdim;
+    for (realdim = this->m_NiftiImage->dim[0]; this->m_NiftiImage->dim[realdim] == 1 && realdim > 3; realdim--)
+    {
+    }
+    this->SetNumberOfDimensions(realdim);
+    this->SetNumberOfComponents(1);
+
+-- if : set number of components for if nifti_intent vector, dispvector and symmatrix to 
+   SetNumberOfComponents(nifti_image_header.dim[5]) 
+-- else if  nifti_intent genmatrix
+   Not yet implemented in ITK yet 
+
+-- dealing with setting pixeltype and component type based on the datatype of the voxels
+-- dealing with converting RAS within NIFTI_INTENT_SYMMATRIX, NIFTI_INTENT_DISPVECT and NIFTI_INTENT_VECTOR
+-- setting up  rescale slope => scl_slope , plus setting it to 1 after checking with double precision
+
+                              
+
+
+
+
+TO FIND OUT : 
+SetNumberOfDimensions
+SetNumberOfComponents
+
+
+
+
+
+
+
+
+IMPORTANT REFERENCES TO UNDERSTAND THE ITK SOURCE : 
+MACROS AND TERMS 
+https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/xyzt_units.html
+http://users.bmap.ucla.edu/~mchamber/npl/nifti_8h.html
