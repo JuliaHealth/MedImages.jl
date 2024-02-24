@@ -63,6 +63,7 @@ struct Nifti_image
   qto_xyz #qform transform (i,j,k) to (x,y,z)
   qto_ijk #qform transform (x,y,z) to (i,j,k)
 
+  #only if sform_code > 0
   sto_xyz #sform transform (i,j,k) to (x,y,z)
   sto_ijk #sform transform (x,y,z) to (i,j,k)
 

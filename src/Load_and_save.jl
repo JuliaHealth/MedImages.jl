@@ -409,7 +409,7 @@ end
 """
 testing the above written function with an example file
 """
-medimage_instance_array = load_image("/home/hurtbadly/Desktop/julia_stuff/MedImage.jl/test_data/volume-0.nii.gz")
+medimage_instance_array = load_image("/home/hurtbadly/Desktop/julia_stuff/MedImage.jl/test_data/filtered_func_data.nii.gz")
 medimage_instance = medimage_instance_array[1]
 println(typeof(medimage_instance.voxel_data))
 
