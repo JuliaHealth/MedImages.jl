@@ -2,6 +2,15 @@
 # n stuff and a few of d stuff might be for Analyze files
 using NIfTI
 
+
+
+struct Nifti_image_io
+  #number_of_dimensions
+  rescale_slope
+  rescale_intercept
+  must_rescale
+end
+
 struct Nifti_image
   ndim
   #dimension of grid array begin
@@ -87,6 +96,9 @@ struct Nifti_image
 
   num_ext #number of extensions in ext list 
   ext_list #
+
+  nifti_image_io_information
+
 end
 
 function Nifti_image(nifti_image_field_values::Array{Any})::Nifti_image
