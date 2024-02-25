@@ -225,6 +225,15 @@ function formulate_header_data_dict(nifti_image_header::NIfTI.NIfTI1Header)::Dic
   return header_data_dict
 end
 
+
+function formulate_must_rescale(scl_slope, scl_intercept)
+
+  #checking to rescale voxels with double precision (usage of Float64)
+  rescale_slope,rescale_intercept  = convert(Float64, scl_slope), convert(Float64,scl_intercept)
+  return abs(rescale_slope) > eps(Float64) && (abs(rescale_slope - 1.0) > eps(Float64) || abs(rescale_intercept) > eps(Float64))
+end
+
+
 """
 helper function for nifti
 creates a nifti_image struct which basically encapsulates all the necessary data, contains voxel data
@@ -319,15 +328,29 @@ function formulate_nifti_image_struct(nifti_image::NIfTI.NIVolume)::Nifti_image
   ext_list = nothing
 
 
+  #instantiating nifti image io struct
+
+  nifti_image_io_information = Nifti_image_io(scl_slope, scl_inter, formulate_must_rescale(scl_slope,scl_inter)) 
+
   nifti_image_struct_instance = Nifti_image([ndim, nx, ny, nz, nt, nu, nv, nw, dim, nvox, datatype,
     dx, dy, dz, dt, du, dv, dw, pixdim, scl_slope, scl_inter,
     cal_min, cal_max, qform_code, sform_code, freq_dim, phase_dim, slice_dim,
     slice_code, slice_start, slice_end, slice_duration, quatern_b, quatern_c,
     quatern_d, qoffset_x, qoffset_y, qoffset_z, qfac, qto_xyz, qto_ijk, sto_xyz, sto_ijk,
         toffset, xyz_units, time_units, nifti_type, intent_code, intent_p1, intent_p2, intent_p3, intent_name,
-        descrip, aux_file,data , num_ext, ext_list])
+        descrip, aux_file,data , num_ext, ext_list, nifti_image_io_information])
   return nifti_image_struct_instance
 end
+
+
+
+
+
+
+
+
+
+
 
 
 function load_image(path::String)::Array{MedImage}
@@ -342,6 +365,12 @@ function load_image(path::String)::Array{MedImage}
         " ",#dcom_data_loc[1].StudyCompletionDate
         dcom_data_loc[1].PatientID]), dcom_data_locs)
   else
+
+  
+    
+
+
+
     nifti_image = NIfTI.niread(path)
     nifti_image_header = nifti_image.header
 
