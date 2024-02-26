@@ -91,10 +91,10 @@ function calculate_inverse_44_matrix(input_matrix)
   [r31 r32 r33 v3]
   [0    0   0   0]
   """
-  r11, r12, r13 = input_matrix[1,1], input_matrix[1,2], input_matrix[1,3]
-  r21, r22, r23 = input_matrix[2,1], input_matrix[2,2], input_matrix[2,3]
-  r31, r32, r33 = input_matrix[3,1], input_matrix[3,2], input_matrix[3,3]
-  v1, v2, v3 = input_matrix[1,4], input_matrix[2,4], input_matrix[3,4]
+  r11, r12, r13 = input_matrix[1, 1], input_matrix[1, 2], input_matrix[1, 3]
+  r21, r22, r23 = input_matrix[2, 1], input_matrix[2, 2], input_matrix[2, 3]
+  r31, r32, r33 = input_matrix[3, 1], input_matrix[3, 2], input_matrix[3, 3]
+  v1, v2, v3 = input_matrix[1, 4], input_matrix[2, 4], input_matrix[3, 4]
   det = r11 * r22 * r33 - r11 * r32 * r23 - r21 * r12 * r33 + r21 * r32 * r13 + r31 * r12 * r23 - r31 * r22 * r13 #determinant
   if det != 0.0
     det = 1.0 / det
@@ -229,8 +229,58 @@ end
 function formulate_must_rescale(scl_slope, scl_intercept)
 
   #checking to rescale voxels with double precision (usage of Float64)
-  rescale_slope,rescale_intercept  = convert(Float64, scl_slope), convert(Float64,scl_intercept)
+  rescale_slope, rescale_intercept = convert(Float64, scl_slope), convert(Float64, scl_intercept)
   return abs(rescale_slope) > eps(Float64) && (abs(rescale_slope - 1.0) > eps(Float64) || abs(rescale_intercept) > eps(Float64))
+end
+
+
+
+
+
+
+"""
+
+stuff for additional information
+"""
+
+function string_for_xyzt_units_space_code(space_code)
+  code_dict = Dictionaries.Dictionary([1, 2, 3], ["NIFTI_UNITS_METER", "NIFTI_UNITS_MM", "NIFTI_UNITS_MICRON"])
+  return code_dict[space_code]
+end
+
+function string_for_xyzt_units_time_code(time_code)
+  code_dict = Dictionaries.Dictionary([8, 16, 24], ["NIFTI_UNITS_SEC", "NIFTI_UNITS_MSEC", "NIFTI_UNITS_USEC"])
+  return code_dict[time_code]
+end
+
+function get_pixel_type(datatype)
+  pixel_type_dict = Dictionaries.Dictionary([2, 4, 8], ["SCALAR", "SCALAR", "SCALAR"])
+  if datatype in keys(pixel_type_dict)
+    return pixel_type_dict[datatype]
+  end
+end
+
+
+
+"""
+helper function for nifti
+calculating spacing scale from xyzt_units to space
+"""
+function formulate_spacing_scale_for_xyzt_space(xyzt_to_space)
+  spacing_scale = 1.0
+  spacing_scale_dict = Dictionaries.Dictionary(["NIFTI_UNITS_METER", "NIFTI_UNITS_MM", "NIFTI_UNITS_MICRON"], [1e3, 1e0, 1e-3])
+  spacing_scale = spacing_scale_dict[xyzt_to_space]
+  return spacing_scale
+end
+
+"""
+helper function for nifti 
+"""
+function formulate_timing_scale_for_xyzt_time(xyzt_to_time)
+  timing_scale = 1.0
+  timing_scale_dict = Dictionaries.Dictionary(["NIFTI_UNITS_SEC", "NIFTI_UNITS_MSEC", "NIFTI_UNITS_USEC"], [1.0, 1e-3, 1e-6])
+  timing_scale = timing_scale_dict[xyzt_to_time]
+  return timing_scale
 end
 
 
@@ -280,9 +330,9 @@ function formulate_nifti_image_struct(nifti_image::NIfTI.NIVolume)::Nifti_image
   qform_code = nifti_image_header.qform_code
   sform_code = nifti_image_header.sform_code
 
-  freq_dim = nifti_image_header.dim_info & 0x03 #or NIfTI.freqdim(dim_info)
-  phase_dim = (nifti_image_header.dim_info >> 0x02) & 0x03 #or NIfTI.phasedim(dim_info)
-  slice_dim = nifti_image_header.dim_info >> 0x04 #or NIfTI.slicedim(dim_info)
+  freq_dim = Int(nifti_image_header.dim_info & 0x03) #or NIfTI.freqdim(dim_info)
+  phase_dim = Int((nifti_image_header.dim_info >> 0x02) & 0x03) #or NIfTI.phasedim(dim_info)
+  slice_dim = Int(nifti_image_header.dim_info >> 0x04) #or NIfTI.slicedim(dim_info)
 
   slice_code = nifti_image_header.slice_code
   slice_start = nifti_image_header.slice_start
@@ -303,13 +353,13 @@ function formulate_nifti_image_struct(nifti_image::NIfTI.NIVolume)::Nifti_image
   qto_ijk = calculate_inverse_44_matrix(qto_xyz)
 
 
-  sto_xyz = formulate_sto_xyz(nifti_image_header.srow_x, nifti_image_header.srow_y, nifti_image_header.srow_z) 
+  sto_xyz = formulate_sto_xyz(nifti_image_header.srow_x, nifti_image_header.srow_y, nifti_image_header.srow_z)
   #println(sto_xyz)
   sto_ijk = calculate_inverse_44_matrix(sto_xyz)
 
   toffset = nifti_image_header.toffset
-  xyz_units = nifti_image_header.xyzt_units & 0x07
-  time_units = nifti_image_header.xyzt_units & 0x38
+  xyz_units = Int(nifti_image_header.xyzt_units & 0x07)
+  time_units = Int(nifti_image_header.xyzt_units & 0x38)
   nifti_type = "one"
 
   intent_code = nifti_image_header.intent_code
@@ -320,7 +370,7 @@ function formulate_nifti_image_struct(nifti_image::NIfTI.NIVolume)::Nifti_image
 
   descrip = formulate_string(nifti_image_header.descrip)
   aux_file = formulate_string(nifti_image_header.aux_file)
-  
+
   #conversion to world coordinates (then  storing the data)
   data = nothing
 
@@ -330,15 +380,16 @@ function formulate_nifti_image_struct(nifti_image::NIfTI.NIVolume)::Nifti_image
 
   #instantiating nifti image io struct
 
-  nifti_image_io_information = Nifti_image_io(scl_slope, scl_inter, formulate_must_rescale(scl_slope,scl_inter)) 
+  nifti_image_io_scl_slope = abs(convert(Float64, scl_slope)) < eps(Float64) ? 1.0f0 : scl_slope
+  nifti_image_io_information = Nifti_image_io(scl_slope, scl_inter, formulate_must_rescale(scl_slope, scl_inter))
 
   nifti_image_struct_instance = Nifti_image([ndim, nx, ny, nz, nt, nu, nv, nw, dim, nvox, datatype,
     dx, dy, dz, dt, du, dv, dw, pixdim, scl_slope, scl_inter,
     cal_min, cal_max, qform_code, sform_code, freq_dim, phase_dim, slice_dim,
     slice_code, slice_start, slice_end, slice_duration, quatern_b, quatern_c,
     quatern_d, qoffset_x, qoffset_y, qoffset_z, qfac, qto_xyz, qto_ijk, sto_xyz, sto_ijk,
-        toffset, xyz_units, time_units, nifti_type, intent_code, intent_p1, intent_p2, intent_p3, intent_name,
-        descrip, aux_file,data , num_ext, ext_list, nifti_image_io_information])
+    toffset, xyz_units, time_units, nifti_type, intent_code, intent_p1, intent_p2, intent_p3, intent_name,
+    descrip, aux_file, data, num_ext, ext_list, nifti_image_io_information])
   return nifti_image_struct_instance
 end
 
@@ -366,8 +417,8 @@ function load_image(path::String)::Array{MedImage}
         dcom_data_loc[1].PatientID]), dcom_data_locs)
   else
 
-  
-    
+
+
 
 
 
@@ -382,9 +433,9 @@ function load_image(path::String)::Array{MedImage}
     spacing = nothing
     direction = nothing #direction cosines for oreintation
     #2 data for the fields within the MedImage struct
-  
+
     spatial_metadata_keys = ["origin", "spacing", "orientation"]
-    spatial_metadata_values = [nothing , nothing , nothing]
+    spatial_metadata_values = [nothing, nothing, nothing]
     spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
 
     #3 Image type
