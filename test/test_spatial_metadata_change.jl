@@ -5,7 +5,7 @@ using .dicom_nifti
 """
 test if the resample_to_spacing of the image lead to correct change in the pixel array
 and the metadata the operation will be tasted against Python simple itk function
-
+we nned to check the nearest neuhnbor interpolation and b spline interpolation
 """
 function test_resample_to_spacing(path_nifti)
     
@@ -32,7 +32,7 @@ end
 """
 test if the resample_to_spacing of the image lead to correct change in the pixel array
 and the metadata the operation will be tasted against Python simple itk function
-
+We need to check can it change between RAS and LPS orientationas those are most common
 """
 function test_change_orientation(path_nifti)
     
