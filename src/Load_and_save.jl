@@ -2,7 +2,7 @@ using Pkg
 # Pkg.add(["DICOM", "NIfTI", "Dictionaries", "Dates"])
 using DICOM, NIfTI, Dictionaries, Dates
 include("./MedImage_data_struct.jl")
-
+include("./Nifti_image_struct.jl")
 
 
 
@@ -82,6 +82,8 @@ helper function for nifti
 calculates inverse of a 4x4 matrix
 """
 function calculate_inverse_44_matrix(input_matrix)
+
+  print(input_matrix)
   """
   INPUT MATRIX Is
   [r11 r12 r13 v1]
@@ -89,10 +91,10 @@ function calculate_inverse_44_matrix(input_matrix)
   [r31 r32 r33 v3]
   [0    0   0   0]
   """
-  r11, r12, r13 = input_matrix[1][1], input_matrix[1][2], input_matrix[1][3]
-  r21, r22, r23 = input_matrix[2][1], input_matrix[2][2], input_matrix[2][3]
-  r31, r32, r33 = input_matrix[3][1], input_matrix[3][2], input_matrix[3][3]
-  v1, v2, v3 = input_matrix[1][4], input_matrix[2][4], input_matrix[3][4]
+  r11, r12, r13 = input_matrix[1, 1], input_matrix[1, 2], input_matrix[1, 3]
+  r21, r22, r23 = input_matrix[2, 1], input_matrix[2, 2], input_matrix[2, 3]
+  r31, r32, r33 = input_matrix[3, 1], input_matrix[3, 2], input_matrix[3, 3]
+  v1, v2, v3 = input_matrix[1, 4], input_matrix[2, 4], input_matrix[3, 4]
   det = r11 * r22 * r33 - r11 * r32 * r23 - r21 * r12 * r33 + r21 * r32 * r13 + r31 * r12 * r23 - r31 * r22 * r13 #determinant
   if det != 0.0
     det = 1.0 / det
@@ -116,8 +118,21 @@ function formulate_qto_xyz(quatern_b, quatern_c, quatern_d, qoffset_x, qoffset_y
   #                0,0,0,1)
   #
 
+  """
+  if qform_code < 0 
+
+  qto_xyz 
+
+  [dx 0.0 0.0 0.0]
+  [0.0 dy 0.0 0.0]
+  [0.0 0.0 dz 0.0]
+  [0.0 0.0 0.0 1.0]
+
+  """
+
   b, c, d = quatern_b, quatern_c, quatern_d
   qx, qy, qz = qoffset_x, qoffset_y, qoffset_z
+
   #calculating a paramter from the given quaterns
   a = 1.0 - (b^2 + c^2 + d^2)
   if a < 1.e-7 #special case
@@ -198,7 +213,7 @@ function formulate_header_data_dict(nifti_image_header::NIfTI.NIfTI1Header)::Dic
   header_data_keys = ["nifti_type", "dim_info", "dim", "nifti_intent", "nifti_intent_code", "datatype", "bitpix", "slice_start", "pixdim", "vox_offset", "scl_slope", "scl_inter", "slice_end", "slice_code",
     "xyzt_units", "cal_max", "cal_min", "slice_duration", "toffset", "descrip", "aux_file", "qform_code", "qform_code_name", "sform_code", "sform_code_name", "quatern_b", "quatern_c", "quatern_d",
     "qoffset_x", "qoffset_y", "qoffset_z", "srow_x", "srow_y", "srow_z", "intent_name"]
-  header_data_values = ["one", nifti_image_header.dim_info, nifti_image_header.dim, (nifti_image_header.intent_p1, nifti_image_header.intent_p2, nifti_image_header.intent_p3), nifti_image_header.intent_code,
+  header_data_values = ["one", nifti_image_header.dim_info, nifti_image_header.dim, (nifti_image_header.intent_p1, nifti_image_header.intent_p2, nifti_image_header.intent_p3), (nifti_image_header.intent_code, string_intent(nifti_image_header.intent_code)),
     nifti_image_header.datatype, nifti_image_header.bitpix, nifti_image_header.slice_start, nifti_image_header.pixdim, nifti_image_header.vox_offset, nifti_image_header.scl_slope,
     nifti_image_header.scl_inter, nifti_image_header.slice_end, nifti_image_header.slice_code, nifti_image_header.xyzt_units, nifti_image_header.cal_max, nifti_image_header.cal_min,
     nifti_image_header.slice_duration, nifti_image_header.toffset, (nifti_image_header.descrip, formulate_string(nifti_image_header.descrip)), (nifti_image_header.aux_file, formulate_string(nifti_image_header.aux_file)),
@@ -210,13 +225,183 @@ function formulate_header_data_dict(nifti_image_header::NIfTI.NIfTI1Header)::Dic
   return header_data_dict
 end
 
+
+function formulate_must_rescale(scl_slope, scl_intercept)
+
+  #checking to rescale voxels with double precision (usage of Float64)
+  rescale_slope, rescale_intercept = convert(Float64, scl_slope), convert(Float64, scl_intercept)
+  return abs(rescale_slope) > eps(Float64) && (abs(rescale_slope - 1.0) > eps(Float64) || abs(rescale_intercept) > eps(Float64))
+end
+
+
+
+
+
+
+"""
+
+stuff for additional information
+"""
+
+function string_for_xyzt_units_space_code(space_code)
+  code_dict = Dictionaries.Dictionary([1, 2, 3], ["NIFTI_UNITS_METER", "NIFTI_UNITS_MM", "NIFTI_UNITS_MICRON"])
+  return code_dict[space_code]
+end
+
+function string_for_xyzt_units_time_code(time_code)
+  code_dict = Dictionaries.Dictionary([8, 16, 24], ["NIFTI_UNITS_SEC", "NIFTI_UNITS_MSEC", "NIFTI_UNITS_USEC"])
+  return code_dict[time_code]
+end
+
+function get_pixel_type(datatype)
+  pixel_type_dict = Dictionaries.Dictionary([2, 4, 8], ["SCALAR", "SCALAR", "SCALAR"])
+  if datatype in keys(pixel_type_dict)
+    return pixel_type_dict[datatype]
+  end
+end
+
+
+
+"""
+helper function for nifti
+calculating spacing scale from xyzt_units to space
+"""
+function formulate_spacing_scale_for_xyzt_space(xyzt_to_space)
+  spacing_scale = 1.0
+  spacing_scale_dict = Dictionaries.Dictionary(["NIFTI_UNITS_METER", "NIFTI_UNITS_MM", "NIFTI_UNITS_MICRON"], [1e3, 1e0, 1e-3])
+  spacing_scale = spacing_scale_dict[xyzt_to_space]
+  return spacing_scale
+end
+
+"""
+helper function for nifti 
+"""
+function formulate_timing_scale_for_xyzt_time(xyzt_to_time)
+  timing_scale = 1.0
+  timing_scale_dict = Dictionaries.Dictionary(["NIFTI_UNITS_SEC", "NIFTI_UNITS_MSEC", "NIFTI_UNITS_USEC"], [1.0, 1e-3, 1e-6])
+  timing_scale = timing_scale_dict[xyzt_to_time]
+  return timing_scale
+end
+
+
 """
 helper function for nifti
 creates a nifti_image struct which basically encapsulates all the necessary data, contains voxel data
 """
 function formulate_nifti_image_struct(nifti_image::NIfTI.NIVolume)::Nifti_image
+  nifti_image_header = nifti_image.header
 
+  #set dimensions of data array 
+  ndim = nifti_image_header.dim[1]
+  nx = nifti_image_header.dim[2]
+  ny = nifti_image_header.dim[3]
+  nz = nifti_image_header.dim[4]
+  nt = nifti_image_header.dim[5]
+  nu = nifti_image_header.dim[6]
+  nv = nifti_image_header.dim[7]
+  nw = nifti_image_header.dim[8]
+
+  dim = nifti_image_header.dim
+
+  nvox = 1
+  for n_index in 2:nifti_image_header.dim[1]
+    nvox *= nifti_image_header.dim[n_index]
+  end
+
+  datatype = nifti_image_header.datatype
+
+  #set grid spacing 
+  dx = nifti_image_header.pixdim[2]
+  dy = nifti_image_header.pixdim[3]
+  dz = nifti_image_header.pixdim[4]
+  dt = nifti_image_header.pixdim[5]
+  du = nifti_image_header.pixdim[6]
+  dv = nifti_image_header.pixdim[7]
+  dw = nifti_image_header.pixdim[8]
+
+  pixdim = nifti_image_header.pixdim
+
+  scl_slope = nifti_image_header.scl_slope
+  scl_inter = nifti_image_header.scl_inter
+
+  cal_min = nifti_image_header.cal_min
+  cal_max = nifti_image_header.cal_max
+
+  qform_code = nifti_image_header.qform_code
+  sform_code = nifti_image_header.sform_code
+
+  freq_dim = Int(nifti_image_header.dim_info & 0x03) #or NIfTI.freqdim(dim_info)
+  phase_dim = Int((nifti_image_header.dim_info >> 0x02) & 0x03) #or NIfTI.phasedim(dim_info)
+  slice_dim = Int(nifti_image_header.dim_info >> 0x04) #or NIfTI.slicedim(dim_info)
+
+  slice_code = nifti_image_header.slice_code
+  slice_start = nifti_image_header.slice_start
+  slice_end = nifti_image_header.slice_end
+  slice_duration = nifti_image_header.slice_duration
+
+  quatern_b = nifti_image_header.quatern_b
+  quatern_c = nifti_image_header.quatern_c
+  quatern_d = nifti_image_header.quatern_d
+  qoffset_x = nifti_image_header.qoffset_x
+  qoffset_y = nifti_image_header.qoffset_y
+  qoffset_z = nifti_image_header.qoffset_z
+  qfac = calculate_qfac(pixdim)
+
+  qto_xyz = formulate_qto_xyz(quatern_b, quatern_c, quatern_d, qoffset_x, qoffset_y, qoffset_z, dx, dy, dz, qfac)
+  #println(qto_xyz)
+  println(qto_xyz[2][1])
+  qto_ijk = calculate_inverse_44_matrix(qto_xyz)
+
+
+  sto_xyz = formulate_sto_xyz(nifti_image_header.srow_x, nifti_image_header.srow_y, nifti_image_header.srow_z)
+  #println(sto_xyz)
+  sto_ijk = calculate_inverse_44_matrix(sto_xyz)
+
+  toffset = nifti_image_header.toffset
+  xyz_units = Int(nifti_image_header.xyzt_units & 0x07)
+  time_units = Int(nifti_image_header.xyzt_units & 0x38)
+  nifti_type = "one"
+
+  intent_code = nifti_image_header.intent_code
+  intent_p1 = nifti_image_header.intent_p1
+  intent_p2 = nifti_image_header.intent_p2
+  intent_p3 = nifti_image_header.intent_p3
+  intent_name = string_intent(intent_code)
+
+  descrip = formulate_string(nifti_image_header.descrip)
+  aux_file = formulate_string(nifti_image_header.aux_file)
+
+  #conversion to world coordinates (then  storing the data)
+  data = nothing
+
+  num_ext = nothing
+  ext_list = nothing
+
+
+  #instantiating nifti image io struct
+
+  nifti_image_io_scl_slope = abs(convert(Float64, scl_slope)) < eps(Float64) ? 1.0f0 : scl_slope
+  nifti_image_io_information = Nifti_image_io(scl_slope, scl_inter, formulate_must_rescale(scl_slope, scl_inter))
+
+  nifti_image_struct_instance = Nifti_image([ndim, nx, ny, nz, nt, nu, nv, nw, dim, nvox, datatype,
+    dx, dy, dz, dt, du, dv, dw, pixdim, scl_slope, scl_inter,
+    cal_min, cal_max, qform_code, sform_code, freq_dim, phase_dim, slice_dim,
+    slice_code, slice_start, slice_end, slice_duration, quatern_b, quatern_c,
+    quatern_d, qoffset_x, qoffset_y, qoffset_z, qfac, qto_xyz, qto_ijk, sto_xyz, sto_ijk,
+    toffset, xyz_units, time_units, nifti_type, intent_code, intent_p1, intent_p2, intent_p3, intent_name,
+    descrip, aux_file, data, num_ext, ext_list, nifti_image_io_information])
+  return nifti_image_struct_instance
 end
+
+
+
+
+
+
+
+
+
+
 
 
 function load_image(path::String)::Array{MedImage}
@@ -231,6 +416,12 @@ function load_image(path::String)::Array{MedImage}
         " ",#dcom_data_loc[1].StudyCompletionDate
         dcom_data_loc[1].PatientID]), dcom_data_locs)
   else
+
+
+
+
+
+
     nifti_image = NIfTI.niread(path)
     nifti_image_header = nifti_image.header
 
@@ -240,17 +431,17 @@ function load_image(path::String)::Array{MedImage}
 
     origin = nothing
     spacing = nothing
-    orientation = nothing
+    direction = nothing #direction cosines for oreintation
     #2 data for the fields within the MedImage struct
 
     spatial_metadata_keys = ["origin", "spacing", "orientation"]
-    spatial_metadata_values = []
+    spatial_metadata_values = [nothing, nothing, nothing]
     spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
 
     #3 Image type
-    image_type = nothing #set to MRI/PET/CT
+    image_type = Image_type(1) #set to MRI/PET/CT
     #4 Image subtype
-    image_subtype = nothing #set to subtypes
+    image_subtype = Image_subtype(0) #set to subtypes
     #5 voxel datatype
     voxel_datatype = nothing
     #6 date of saving
@@ -260,7 +451,7 @@ function load_image(path::String)::Array{MedImage}
     #8 patient ID
     patient_id = nothing
     #9 current device cpu or gpu
-    current_device = nothing
+    current_device = ""
     #10 study uid
     study_uid = nothing
     #11 patient uid
@@ -274,18 +465,18 @@ function load_image(path::String)::Array{MedImage}
     #15 display data : RGB or gray
     display_data = nothing
     #16 clinical data
-    clinical_data = nothing
+    clinical_data = Dictionaries.Dictionary()
     #17 contrast administration boolean
     is_contrast_administered = false
     #18 metadata dictionary from nifti header
 
     metadata_keys = ["header_data_dict", "nifti_image_struct"]
     metadata_values = [formulate_header_data_dict(nifti_image_header), formulate_nifti_image_struct(nifti_image)]
-    metadata = Dictionary(metadata_keys, metadata_values)
+    metadata = Dictionaries.Dictionary(metadata_keys, metadata_values)
 
 
 
-    return [MedImage([voxel_data, origin, spacing ,orientation, spatial_metadata, image_type, image_subtype, voxel_datatype, date_of_saving, acquisition_time, patient_id, current_device, study_uid, patient_uid, series_uid, study_description, legacy_file_name, display_data, clinical_data, is_contrast_administered, metadata])]
+    return [MedImage([voxel_data, origin, spacing, direction, spatial_metadata, image_type, image_subtype, voxel_datatype, date_of_saving, acquisition_time, patient_id, current_device, study_uid, patient_uid, series_uid, study_description, legacy_file_name, display_data, clinical_data, is_contrast_administered, metadata])]
 
     #return [MedImage([nifti_image.raw, nifti_image_header.pixdim[2:4], (nifti_image_header.srow_x[1:3], nifti_image_header.srow_y[1:3], nifti_image_header.srow_z[1:3]), (nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z), " ", " "])]
 
@@ -293,6 +484,14 @@ function load_image(path::String)::Array{MedImage}
   end
 
 end
+
+
+"""
+testing the above written function with an example file
+"""
+medimage_instance_array = load_image("/home/hurtbadly/Desktop/julia_stuff/MedImage.jl/test_data/filtered_func_data.nii.gz")
+medimage_instance = medimage_instance_array[1]
+println(typeof(medimage_instance.voxel_data))
 
 
 

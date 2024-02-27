@@ -40,7 +40,7 @@ struct MedImage
 
   origin
   spacing
-  orientation
+  direction #direction cosines for orientation
   spatial_metadata::Dictionaries.Dictionary #dictionary with properties for spacing, offset from spacing,orientation, origin, direction
 
   image_type::Image_type#enum defining the type of the image
@@ -57,7 +57,7 @@ struct MedImage
   legacy_file_name::String#original file name
   display_data #color values for the data such as RGB or gray
   clinical_data::Dictionary#dictionary with age , gender data of the patient
-  is_contrast_administered::Dictionary #bool, any substance for visibility enhancement given during imaging procedure?
+  is_contrast_administered::Bool #bool, any substance for visibility enhancement given during imaging procedure?
   metadata::Dictionary #dictionary for any other relevant metadata from individual data file
 end
 #constructor function for MedImage

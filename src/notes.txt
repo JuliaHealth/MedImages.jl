@@ -292,5 +292,43 @@ Dierckx.jl for 1d and 2d spline interpolations
 GPU ACCELERATION (CUDA INFORMATION FOR RELEVANT GPUS)
 https://en.wikipedia.org/wiki/CUDA
 
+TODO : 
+
+Parse the functions 
+
+Read
+ReadImageInformation
+SetImageIOOrientationFromNifti
+SetNiftiOrientationFromImageIO
+WriteImage
+
+
+
+for nifti files to understand final load 
+further
+load the raw voxel data using world coordinates (and understand if the spatial metadata needs to be in world coordinates)
+Make sure that all the data is in RAS coordinate system (defaulting to nifti file coordinate system)
+
+
+Parse the functionality for DCMTK (from dicom toolkitn in ITK)
+and concatenate raw data from multiple files with same series_uid, concatenate it along the 3rd dimension (dealing with 3d nifti files)
+load dicom file data into the MedImage struct 
+convert to world coordinates (the data ) and convert the data from dicom orientation to RAS orientation (nifti orientation) , make sure to adapt spatial metadata accordingly
+
+
+finally work on implementingg a mechanism to write new nifti volumes from a medimage struct (regardless of it being loaded from a nifti file or a dicom file)
+ write NIfti volumes to a nifti file and save the file to the local directory with arbitrary names, either zipped (compressed) or un compressed using NifTI.jl
+
+
+--------------------------------------------------------------------------
+When load_and_save.jl is done or finished, go ahead with work, implementing basic_transformations.jl for loaded voxel_data
+
+
+
+
+
+
+
+
 
 
