@@ -4,6 +4,13 @@ using NIfTI
 
 
 
+struct Nifti_image_io
+  #number_of_dimensions
+  rescale_slope
+  rescale_intercept
+  must_rescale
+end
+
 struct Nifti_image
   ndim
   #dimension of grid array begin
@@ -16,7 +23,7 @@ struct Nifti_image
   nw
   #dimension of grid array end
 
-  dim::Array{Any}
+  dim
   nvox
   #nbyper #bytes per voxel dont reall need that 
   datatype #type of data in voxels
@@ -31,7 +38,7 @@ struct Nifti_image
   dw
   #grid spacing end
 
-  pixdim::Array{Any}
+  pixdim
 
   scl_slope #scaling parameter : slope
   scl_inter #scaling parameter : intercept
@@ -65,6 +72,7 @@ struct Nifti_image
   qto_xyz #qform transform (i,j,k) to (x,y,z)
   qto_ijk #qform transform (x,y,z) to (i,j,k)
 
+  #only if sform_code > 0
   sto_xyz #sform transform (i,j,k) to (x,y,z)
   sto_ijk #sform transform (x,y,z) to (i,j,k)
 
@@ -79,6 +87,8 @@ struct Nifti_image
   intent_p3
   intent_name::String #optional description of intent data 
 
+  #fname for saving the file name of the nii file
+
   descrip::String #optional text to describe dataset
   aux_file::String #auxiliary filename
 
@@ -86,6 +96,9 @@ struct Nifti_image
 
   num_ext #number of extensions in ext list 
   ext_list #
+
+  nifti_image_io_information
+
 end
 
 function Nifti_image(nifti_image_field_values::Array{Any})::Nifti_image
