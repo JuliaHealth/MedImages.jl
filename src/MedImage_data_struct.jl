@@ -81,4 +81,3 @@ Definitions of basic interpolators
 Indicating do we want to change underlying pixel array spatial metadata or both
 """
 @enum Mode_mi pixel_array_mode = 0 spat_metadata_mode = 2 all_mode = 3
-

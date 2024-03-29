@@ -1,2 +1,4 @@
 .CondaPkg/
 test_data/debug/
+src/test_rotacji/
+src/test_rotacji.nii.gz
