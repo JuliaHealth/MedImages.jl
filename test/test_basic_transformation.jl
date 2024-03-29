@@ -84,8 +84,7 @@ function get_center(img)
     from python to test
     """
     width, height, depth = img.GetSize()
-    return img.TransformIndexToPhysicalPoint((Py(pyconvert(Int,np.ceil(width/2))), Py(pyconvert(Int,np.ceil(height/2)))
-    , Py(pyconvert(Int,np.ceil(depth/2)))))
+    return img.TransformIndexToPhysicalPoint(np.ceil(width/2), np.ceil(height/2), np.ceil(depth/2))
 end #get_center
 
 
