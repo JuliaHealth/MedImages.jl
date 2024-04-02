@@ -2,7 +2,7 @@ using PyCall, Pkg
 
 sitk = pyimport_conda("SimpleITK", "simpleitk")
 np = pyimport("numpy")
-  
+
 """
 get_spatial_metadata(image_path::String)::MedImage
 
@@ -77,10 +77,7 @@ function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
         old_image.clinical_data, 
         old_image.is_contrast_administered, 
         old_image.metadata)
-  end
-  
 
-  #=
 image_3D=get_spatial_metadata("C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz")
 image_path_3D = "C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz"
 image_test_3D = sitk.ReadImage(image_path_3D)
@@ -91,4 +88,4 @@ print(image.GetOrigin())
 print(image.GetSpacing())
 print(image.GetDirection())
 
-=#
+
