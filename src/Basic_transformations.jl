@@ -12,6 +12,7 @@ It modifies both pixel array and not metadata
 we are setting Interpolator by using Interpolator enum
 return the rotated MedImage object 
 """
+
 function computeIndexToPhysicalPointMatrices_Julia(im::MedImage)::Matrix{Float64}
   VImageDimension = length(im.spacing)
     spacing_vector = collect(im.spacing)
@@ -60,14 +61,19 @@ function get_real_center_Julia(im::MedImage)::Tuple{Vararg{Float64}}
 end
 
 
-function Rodrigues_rotation_matrix(im::MedImage, axis::String, angle::Float64)::Matrix{Float64}
-  im_direction = im.direction
+function Rodrigues_rotation_matrix(image::MedImage, axis::String, angle::Float64)::Matrix{Float64}
+  #=
+  Rotarion matrix using Rodrigues' rotation formula
+  !"As it currently stands, it only supports 3D!
+  =#
+  img_direction = image.direction
   axis_angle = if axis == "X"
-    (im_direction[9], im_direction[6], im_direction[3])
+    (img_direction[9], img_direction[6], img_direction[3])
   elseif axis == "Y"
-      (im_direction[8], im_direction[5], im_direction[2])
+      (img_direction[8], img_direction[5], img_direction[2])
   elseif axis == "Z"
-      (im_direction[7], im_direction[4], im_direction[1])
+      (img_direction[7], img_direction[4], img_direction[1])
+
   end
   ux, uy, uz= axis_angle
   theta = deg2rad(angle)
@@ -96,7 +102,9 @@ end
 
 
 
-function rotation_and_resample(image::MedImage, axis::String, angle::Float64, cropp::Bool=true)::MedImage
+function rotation_and_resample(image::MedImage, axis::String, angle::Float64, crop::Bool=true)::MedImage
+  # Compute the rotation matrix
+
   R = Rodrigues_rotation_matrix(image, axis, angle)
   v_center = collect(get_voxel_center_Julia(image.voxel_data))
   img = convert(Array{Float64, 3}, image.voxel_data)
@@ -105,21 +113,18 @@ function rotation_and_resample(image::MedImage, axis::String, angle::Float64, cr
   transkation_center = Translation(-v_center...)
   combined_transformation = translation ∘ rotation_transformation ∘ transkation_center
   resampled_image = collect(warp(img, combined_transformation, Interpolations.Linear()))
-  if cropp
-    resampled_image =crop_image_around_center(resampled_image, size(img), map(x -> round(Int, x), get_voxel_center_Julia(resampled_image)))
-  end
+  if crop
+    new_center = get_voxel_center_Julia(resampled_image)
+    resampled_image =crop_image_around_center(resampled_image, size(img), map(x -> round(Int, x), new_center))
   image = update_voxel_data(image, resampled_image)
+  end
+
   return image
 end
 
 
 
 
-#= Example of usage
-image_3D=get_spatial_metadata("C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz")
-test = rotation_and_resample(image_3D, "X", 45.0)
-create_nii_from_medimage(test, "C:\\MedImage\\MedImage.jl\\src\\test_rotacji\\nowy")
-=#
 
 """
 given a MedImage object and a Tuples that contains the location of the begining of the crop (crop_beg) and the size of the crop (crop_size) crops image
@@ -179,9 +184,9 @@ end#scale_mi
 
 
 #=
-Testry i stare funkcje
+Testa i old functions
 
-Stare funkcjie
+old functions:
 -----------------TransformIndexToPhysicalPoint--------------------------------------------------
 # prostsze podejście - zwraca wyłacznie dla 3D - błędnie wylicza y
 function transformIndexToPhysicalPoint_Julia_v1(im::MedImage, index::Tuple{Int, Int, Int})::Tuple{Float64, Float64, Float64}
@@ -226,7 +231,7 @@ end
 
 
 Testry
------------------Testy PhysicalPoint 3 i 4 D--------------------------------------------------
+-----------------Test PhysicalPoint 3 i 4 D--------------------------------------------------
 
 function test_4D_To_PhysicalPoint(image_path::String)
   image_test1 = sitk.ReadImage(image_path)
