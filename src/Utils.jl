@@ -2,17 +2,7 @@ using PyCall, Pkg
 
 sitk = pyimport_conda("SimpleITK", "simpleitk")
 np = pyimport("numpy")
-struct MedImage_test
-    origin::Tuple{Float64, Float64, Float64}
-    spacing::Tuple{Float64, Float64, Float64}
-    direction::NTuple{9, Float64}  # Dla uproszczenia, używamy NTuple z 9 elementami typu Float64
-end
-  
-function MedImage_test(origin, spacing, direction)
-    return MedImage_test(origin, spacing, direction)
-end
-  
-  
+ 
 
 """
  get_spatial_metadata(image_path::String)::MedImage
@@ -41,22 +31,8 @@ function get_spatial_metadata(image_path::String)::MedImage
     return med_image
 end
 
-#=
-image_3D=get_spatial_metadata("C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz")
-image_path_3D = "C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz"
-image_test_3D = sitk.ReadImage(image_path_3D)
-image_4D=get_spatial_metadata("C:\\MedImage\\MedImage.jl\\test_data\\filtered_func_data.nii.gz")
-image_path_4D = "C:\\MedImage\\MedImage.jl\\test_data\\filtered_func_data.nii.gz"
-image_test_4D = sitk.ReadImage(image_path_4D)
-print(image.GetOrigin())
-print(image.GetSpacing())
-print(image.GetDirection())
-
-=#
-
-
 """
-    create_nii_from_medimage(med_image::MedImage, file_path::String)
+create_nii_from_medimage(med_image::MedImage, file_path::String)
 
 Create a .nii.gz file from a MedImage object and save it to the given file path.
 """
@@ -102,4 +78,20 @@ function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
         old_image.is_contrast_administered, 
         old_image.metadata)
   end
+
+
+
+#=
+image_3D=get_spatial_metadata("C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz")
+image_path_3D = "C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz"
+image_test_3D = sitk.ReadImage(image_path_3D)
+image_4D=get_spatial_metadata("C:\\MedImage\\MedImage.jl\\test_data\\filtered_func_data.nii.gz")
+image_path_4D = "C:\\MedImage\\MedImage.jl\\test_data\\filtered_func_data.nii.gz"
+image_test_4D = sitk.ReadImage(image_path_4D)
+print(image.GetOrigin())
+print(image.GetSpacing())
+print(image.GetDirection())
+
+=#
+
   
