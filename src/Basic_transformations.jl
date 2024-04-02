@@ -1,5 +1,5 @@
 include("MedImage_data_struct.jl")
-using ImageTransformations, CoordinateTransformations, Interpolations, StaticArrays, LinearAlgebra, Rotations
+using ImageTransformations, CoordinateTransformations, Interpolations, StaticArrays, LinearAlgebra, Rotations, Dictionaries
 """
 module implementing basic transformations on 3D images 
 like translation, rotation, scaling, and cropping both input and output are MedImage objects
@@ -14,9 +14,6 @@ return the rotated MedImage object
 """
 
 function computeIndexToPhysicalPointMatrices_Julia(im::MedImage)::Matrix{Float64}
-  #=
-  Zastanowić się czy potrzebuję physicalPointToIndex inv() jest kosztowna obliczeniowo
-  =#
   VImageDimension = length(im.spacing)
     spacing_vector = collect(im.spacing)
     if any(spacing_vector .== 0.0)
@@ -39,9 +36,6 @@ end
 
 
 function transformIndexToPhysicalPoint_Julia(im::MedImage, index::Tuple{Vararg{Int}})::Tuple{Vararg{Float64}}
-  #=
-  Do poprawy przyjmuje indexToPhysicalPoint a funkcja computeIndexToPhysicalPointMatrices_Julia zwraca 2 macierze
-  =#
   indexToPhysicalPoint = computeIndexToPhysicalPointMatrices_Julia(im)
   VImageDimension = length(index)
   point = zeros(Float64, VImageDimension)
@@ -79,6 +73,7 @@ function Rodrigues_rotation_matrix(image::MedImage, axis::String, angle::Float64
       (img_direction[8], img_direction[5], img_direction[2])
   elseif axis == "Z"
       (img_direction[7], img_direction[4], img_direction[1])
+
   end
   ux, uy, uz= axis_angle
   theta = deg2rad(angle)
@@ -109,6 +104,7 @@ end
 
 function rotation_and_resample(image::MedImage, axis::String, angle::Float64, crop::Bool=true)::MedImage
   # Compute the rotation matrix
+
   R = Rodrigues_rotation_matrix(image, axis, angle)
   v_center = collect(get_voxel_center_Julia(image.voxel_data))
   img = convert(Array{Float64, 3}, image.voxel_data)
@@ -122,17 +118,13 @@ function rotation_and_resample(image::MedImage, axis::String, angle::Float64, cr
     resampled_image =crop_image_around_center(resampled_image, size(img), map(x -> round(Int, x), new_center))
   image = update_voxel_data(image, resampled_image)
   end
+
   return image
 end
 
 
 
-#=
-How to use the functions
-image_3D=get_spatial_metadata("C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz")
-rotation_and_resample(image_3D, "X", 45.0)
-create_nii_from_medimage(test, "C:\\MedImage\\MedImage.jl\\src\\test_rotacji\\test")
-=#
+
 
 """
 given a MedImage object and a Tuples that contains the location of the begining of the crop (crop_beg) and the size of the crop (crop_size) crops image
