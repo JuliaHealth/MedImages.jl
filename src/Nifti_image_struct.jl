@@ -104,13 +104,3 @@ end
 function Nifti_image(nifti_image_field_values::Array{Any})::Nifti_image
   return Nifti_image(nifti_image_field_values...)
 end
-
-
-
-
-
-
-
-
-
-

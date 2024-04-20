@@ -36,7 +36,7 @@ Definition for standardised MedImage Struct
 #following struct can be expanded with all the relevant meta data mentioned within the readme.md of MedImage.jl
 #struct for now, will switch to MetaArrays when it has GPU support
 struct MedImage
-  voxel_data::Array{Any}#mutlidimensional array (512,512,3)
+  voxel_data #mutlidimensional array (512,512,3)
 
   origin
   spacing
