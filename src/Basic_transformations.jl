@@ -61,20 +61,21 @@ function get_real_center_Julia(im::MedImage)::Tuple{Vararg{Float64}}
 end
 
 
-function Rodrigues_rotation_matrix(image::MedImage, axis::String, angle::Float64)::Matrix{Float64}
+function Rodrigues_rotation_matrix(image::MedImage, axis::Int, angle::Float64)::Matrix{Float64}
   #=
   Rotarion matrix using Rodrigues' rotation formula
   !"As it currently stands, it only supports 3D!
   =#
   img_direction = image.direction
-  axis_angle = if axis == "X"
+  axis_angle = if axis == 3
     (img_direction[9], img_direction[6], img_direction[3])
-  elseif axis == "Y"
+  elseif axis == 2
       (img_direction[8], img_direction[5], img_direction[2])
-  elseif axis == "Z"
+  elseif axis == 1
       (img_direction[7], img_direction[4], img_direction[1])
 
   end
+
   ux, uy, uz= axis_angle
   theta = deg2rad(angle)
   c = cos(theta)
@@ -100,9 +101,34 @@ function crop_image_around_center(image::Array{T, 3}, new_dims::Tuple{Int, Int, 
   return cropped_image
 end
 
+function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
+  
+      return MedImage(
+          new_voxel_data, 
+          old_image.origin, 
+          old_image.spacing, 
+          old_image.direction, 
+          old_image.spatial_metadata, 
+          old_image.image_type, 
+          old_image.image_subtype, 
+          old_image.voxel_datatype, 
+          old_image.date_of_saving, 
+          old_image.acquistion_time, 
+          old_image.patient_id, 
+          old_image.current_device, 
+          old_image.study_uid, 
+          old_image.patient_uid, 
+          old_image.series_uid, 
+          old_image.study_description, 
+          old_image.legacy_file_name, 
+          old_image.display_data, 
+          old_image.clinical_data, 
+          old_image.is_contrast_administered, 
+          old_image.metadata)
 
+end
 
-function rotation_and_resample(image::MedImage, axis::String, angle::Float64, crop::Bool=true)::MedImage
+function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator, crop::Bool=true)::MedImage
   # Compute the rotation matrix
 
   R = Rodrigues_rotation_matrix(image, axis, angle)
