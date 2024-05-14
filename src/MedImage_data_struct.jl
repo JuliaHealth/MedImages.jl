@@ -37,12 +37,10 @@ Definition for standardised MedImage Struct
 #struct for now, will switch to MetaArrays when it has GPU support
 struct MedImage
   voxel_data #mutlidimensional array (512,512,3)
-
   origin
   spacing
   direction #direction cosines for orientation
   spatial_metadata::Dictionaries.Dictionary #dictionary with properties for spacing, offset from spacing,orientation, origin, direction
-
   image_type::Image_type#enum defining the type of the image
   image_subtype::Image_subtype #enum defining the subtype of the image
   voxel_datatype #type of the voxel data stored
@@ -60,6 +58,8 @@ struct MedImage
   is_contrast_administered::Bool #bool, any substance for visibility enhancement given during imaging procedure?
   metadata::Dictionary #dictionary for any other relevant metadata from individual data file
 end
+
+
 #constructor function for MedImage
 function MedImage(MedImage_struct_attribute_values::Array{Any})::MedImage
   return MedImage(MedImage_struct_attribute_values...)

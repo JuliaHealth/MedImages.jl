@@ -8,17 +8,18 @@ https://www.cs.cornell.edu/courses/cs4620/2010fa/lectures/03transforms3d.pdf
 
 """
 
-
 # include("../src/MedImage_data_struct.jl")
 include("../src/Load_and_save.jl")
-include("./test_visualize.jl")
+include("../src/Basic_transformations.jl")
+# include("./test_visualize.jl")
 include("./dicom_nifti.jl")
 
 # using .dicom_nifti
 
 using NIfTI,LinearAlgebra,DICOM
-using PythonCall
 
+
+# sitk = pyimport_conda("SimpleITK","simpleITK")
 
 # using CondaPkg
 # CondaPkg.add("simpleitk")
@@ -27,6 +28,18 @@ using PythonCall
 
 sitk = pyimport("SimpleITK")
 np = pyimport("numpy")
+
+
+function load_image(path)
+    """
+    load image from path
+    """
+    # test_image_equality(p,p)
+
+    medimage_instance_array = load_images(path)
+    medimage_instance = medimage_instance_array[1]
+    return medimage_instance
+end#load_image
 
 
 # python implementation taken from https://stackoverflow.com/questions/56171643/simpleitk-rotation-of-volumetric-data-e-g-mri
@@ -43,10 +56,10 @@ function matrix_from_axis_angle(a)
         Rotation matrix
     """
     ux, uy, uz, theta = a
-    c = np.cos(theta)
-    s = np.sin(theta)
+    c = cos(theta)
+    s = sin(theta)
     ci = 1.0 - c
-    R = np.array([[ci * ux * ux + c,
+    R = [[ci * ux * ux + c,
                    ci * ux * uy - uz * s,
                    ci * ux * uz + uy * s],
                   [ci * uy * ux + uz * s,
@@ -55,7 +68,7 @@ function matrix_from_axis_angle(a)
                   [ci * uz * ux - uy * s,
                    ci * uz * uy + ux * s,
                    ci * uz * uz + c],
-                  ])
+                  ]
 
     # This is equivalent to
     # R = (np.eye(3) * np.cos(theta) +
@@ -84,7 +97,9 @@ function get_center(img)
     from python to test
     """
     width, height, depth = img.GetSize()
-    return img.TransformIndexToPhysicalPoint(np.ceil(width/2), np.ceil(height/2), np.ceil(depth/2))
+    centt=(Int(ceil(width/2)), Int(ceil(height/2)), Int(ceil(depth/2)))
+    # return img.TransformIndexToPhysicalPoint((np.ceil(width/2), np.ceil(height/2), np.ceil(depth/2)))
+    return img.TransformIndexToPhysicalPoint(centt)
 end #get_center
 
 
@@ -103,16 +118,28 @@ function rotation3d(image, axis, theta)
     direction = image.GetDirection()
 
     if(axis==3)
-        axis_angle = (direction[2], direction[5], direction[8], theta)
+        axis_angle = (direction[3], direction[6], direction[9], theta)
     elseif (axis==2)
-        axis_angle = (direction[1], direction[4], direction[7], theta)
+        axis_angle = (direction[2], direction[5], direction[8], theta)
     elseif (axis==1)
-        axis_angle = (direction[0], direction[3], direction[6], theta)
+        axis_angle = (direction[1], direction[4], direction[7], theta)
     end    
     np_rot_mat = matrix_from_axis_angle(axis_angle)
-    euler_transform.SetMatrix([np_rot_mat[0][0],np_rot_mat[0][1],np_rot_mat[0][2]
-                                ,np_rot_mat[1][0],np_rot_mat[1][1],np_rot_mat[1][2] 
-                                ,np_rot_mat[2][0],np_rot_mat[2][1],np_rot_mat[2][2] ])
+    euler_transform.SetMatrix([np_rot_mat[1][1],np_rot_mat[1][2],np_rot_mat[1][3]
+                                ,np_rot_mat[2][1],np_rot_mat[2][2],np_rot_mat[2][3] 
+                                ,np_rot_mat[3][1],np_rot_mat[3][2],np_rot_mat[3][3] ])
+
+    # if(axis==3)
+    #     axis_angle = (direction[2], direction[5], direction[8], theta)
+    # elseif (axis==2)
+    #     axis_angle = (direction[1], direction[4], direction[7], theta)
+    # elseif (axis==1)
+    #     axis_angle = (direction[0], direction[3], direction[6], theta)
+    # end    
+    # np_rot_mat = matrix_from_axis_angle(axis_angle)
+    # euler_transform.SetMatrix([np_rot_mat[0][0],np_rot_mat[0][1],np_rot_mat[0][2]
+    #                             ,np_rot_mat[1][0],np_rot_mat[1][1],np_rot_mat[1][2] 
+    #                             ,np_rot_mat[2][0],np_rot_mat[2][1],np_rot_mat[2][2] ])
     resampled_image = resample(image, euler_transform)
     return resampled_image
 end #rotation3d
@@ -159,7 +186,7 @@ function test_single_rotation(medIm,sitk_image, axis::Int, theta::Float64,debug_
     end
     
     #our Julia implementation
-    medIm=rotate_mi([medIm],axis,theta,linear)[0]
+    medIm=rotate_mi(medIm,axis,theta,linear)
     test_object_equality(medIm,rotated)
 
 
@@ -194,6 +221,20 @@ function test_rotation(path_nifti,debug_folder_path,dummy_run=false)
 
 
 end
+
+
+debug_folder="/home/jakubmitura/projects/MedImage.jl/test_data/debug"
+p="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
+test_rotation(p,debug_folder,false)
+
+
+a=ones(3ghy,3,3)
+# test_image_equality(p,p)
+
+# medimage_instance_array = load_image("/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz")
+# medimage_instance = medimage_instance_array[1]
+
+# test_object_equality(medimage_instance,sitk.ReadImage(p))
 
 
 # image = sitk.ReadImage(imagePath)
