@@ -99,7 +99,7 @@ function crop_image_around_center(image::Array{T, 3}, new_dims::Tuple{Int, Int, 
   start_x = max(1, center[3] - new_dims[3] ÷ 2)
   end_x = min(size(image, 3), start_x + new_dims[3] - 1)
   cropped_image = image[start_z:end_z, start_y:end_y, start_x:end_x]
-  print(" \n ccccrrrrrrrrrr orig $(size(image)) cropped_image $(size(cropped_image)) start_z $(start_z) end_z $(end_z) start_y $(start_y) end_y $(end_y) start_x $(start_x) end_x $(end_x) \n")
+  # print(" \n ccccrrrrrrrrrr orig $(size(image)) cropped_image $(size(cropped_image)) start_z $(start_z) end_z $(end_z) start_y $(start_y) end_y $(end_y) start_x $(start_x) end_x $(end_x) \n")
 
   return cropped_image
 end
@@ -130,6 +130,9 @@ function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
           old_image.metadata)
 
 end
+
+
+
 
 function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator, crop::Bool=true)::MedImage
   # Compute the rotation matrix
@@ -170,7 +173,8 @@ function crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tu
     cropped_origin = im.origin .+ (im.spacing .* crop_beg)
 
     # Create a new MedImage with the cropped voxel_data and adjusted origin
-    cropped_im = MedImage(cropped_voxel_data, cropped_origin, im.spacing, im.direction)
+    cropped_im = update_voxel_and_spatial_data(im, cropped_voxel_data
+    ,cropped_origin,im.spacing,im.direction)
 
     return cropped_im
 
@@ -197,8 +201,8 @@ function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{
     padded_origin = im.origin .- (im.spacing .* pad_beg)
 
     # Create a new MedImage with the padded voxel_data and adjusted origin
-    padded_im = MedImage(padded_voxel_data, padded_origin, im.spacing, im.direction)
-
+    padded_im = update_voxel_and_spatial_data(im, padded_voxel_data
+    ,padded_origin,im.spacing,im.direction)
     return padded_im
 end#pad_mi    
 
@@ -220,7 +224,8 @@ function translate_mi(im::MedImage, translate_by::Int64, translate_in_axis::Int6
     translated_origin[translate_in_axis] += translate_by * im.spacing[translate_in_axis]
 
     # Create a new MedImage with the translated origin and the original voxel_data
-    translated_im = MedImage(im.voxel_data, translated_origin, im.spacing, im.direction)
+    translated_im = update_voxel_and_spatial_data(im, im.voxel_data
+    ,translated_origin,im.spacing,im.direction)
 
     return translated_im
 
@@ -249,7 +254,8 @@ function scale_mi(im::MedImage, scale::Tuple{Float64,Float64,Float64}, Interpola
     new_data = imresize(im.voxel_data, scale, method=interp_method)
 
     # Create a new MedImage with the scaled data and the same spatial metadata
-    new_im = MedImage(new_data, im.origin, im.spacing, im.direction)
+    new_im = update_voxel_and_spatial_data(im, new_data
+    ,translated_origin,im.spacing,im.direction)
 
     return new_im
 

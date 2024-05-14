@@ -704,6 +704,64 @@ medimage.metadata["header_data_dict"]["intent_name"],
 end
 
 
+
+#**************************************************
+
+function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
+  
+  return MedImage(
+      new_voxel_data, 
+      old_image.origin, 
+      old_image.spacing, 
+      old_image.direction, 
+      old_image.spatial_metadata, 
+      old_image.image_type, 
+      old_image.image_subtype, 
+      old_image.voxel_datatype, 
+      old_image.date_of_saving, 
+      old_image.acquistion_time, 
+      old_image.patient_id, 
+      old_image.current_device, 
+      old_image.study_uid, 
+      old_image.patient_uid, 
+      old_image.series_uid, 
+      old_image.study_description, 
+      old_image.legacy_file_name, 
+      old_image.display_data, 
+      old_image.clinical_data, 
+      old_image.is_contrast_administered, 
+      old_image.metadata)
+
+end
+
+function update_voxel_and_spatial_data(old_image::MedImage, new_voxel_data::AbstractArray
+  ,new_origin,new_spacing,new_direction)
+  
+  return MedImage(
+      new_voxel_data, 
+      new_origin, 
+      new_spacing, 
+      new_direction, 
+      old_image.spatial_metadata, 
+      old_image.image_type, 
+      old_image.image_subtype, 
+      old_image.voxel_datatype, 
+      old_image.date_of_saving, 
+      old_image.acquistion_time, 
+      old_image.patient_id, 
+      old_image.current_device, 
+      old_image.study_uid, 
+      old_image.patient_uid, 
+      old_image.series_uid, 
+      old_image.study_description, 
+      old_image.legacy_file_name, 
+      old_image.display_data, 
+      old_image.clinical_data, 
+      old_image.is_contrast_administered, 
+      old_image.metadata)
+
+end
+
 """
 NOTES:
 conversion and storage n-dimensional voxel data within world-coordinate system (doesnt change the RAS system)
