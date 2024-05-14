@@ -7,8 +7,21 @@ It require multiple steps some idea of implementation is below
 2) we should define a grid on the basis of locations of the voxels in the fixed image and interpolate voxels from the moving image to the grid using for example GridInterpolations
    in order to achieve it we need to use spatial metadata to get the correct locations of the voxels in the fixed and moving images
 """
-function resample_to_image(im_fixed::Array{MedImage}, im_moving::Array{MedImage}, Interpolator::Interpolator)::Array{MedImage}
+function resample_to_image(im_fixed::MedImage, im_moving::MedImage, Interpolator::Interpolator)::MedImage
 
-  nothing
+    # Check if the origin of the moving image is in the fixed image
+    if im_fixed.origin != im_moving.origin
+        return zeros(size(im_fixed.voxel_data))
+    end
+
+    # Define a grid based on the locations of the voxels in the fixed image
+    grid = Grid(im_fixed.origin:im_fixed.spacing:im_fixed.direction)
+
+    # Interpolate voxels from the moving image to the grid
+    interpolated_data = interpolate(grid, im_moving.voxel_data, interpolator)
+
+    # Create a new MedImage with the interpolated data and the same spatial metadata as the fixed image
+    return MedImage(interpolated_data, im_fixed.origin, im_fixed.spacing, im_fixed.direction)
+
 
 end#scale_mi    

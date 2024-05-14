@@ -12,7 +12,24 @@ We will have two images as the inputs one would be translated and have diffrent 
 function test_resample_to_target(path_nifti)
     
 
+    # Load SimpleITK
+    sitk = pyimport_conda("SimpleITK", "simpleitk")
 
+    # Create some test MedImage objects
+    im_fixed = MedImage(...)
+    im_moving = MedImage(...)
+
+    # Resample the image using the Julia implementation
+    resampled_julia = resample_to_image(im_fixed, im_moving, Interpolator.linear)
+
+    # Resample the image using SimpleITK
+    resampler = sitk.ResampleImageFilter()
+    resampler.SetInterpolator(sitk.sitkLinear)
+    resampled_sitk = resampler.Execute(im_moving)
+
+    # Compare the two images
+    assert resampled_julia == resampled_sitk
+    
     # Load the image from path
     med_im=load_image(path_nifti)
     sitk.ReadImage(path_nifti)
