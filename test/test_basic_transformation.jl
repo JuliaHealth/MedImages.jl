@@ -104,7 +104,6 @@ end #get_center
 
 
 function rotation3d(image, axis, theta)
-
     """
     This function rotates an image across each of the x, y, z axes by theta_x, theta_y, and theta_z degrees
     respectively
@@ -228,16 +227,6 @@ p="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
 test_rotation(p,debug_folder,false)
 
 
-a=ones(3ghy,3,3)
-# test_image_equality(p,p)
-
-# medimage_instance_array = load_image("/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz")
-# medimage_instance = medimage_instance_array[1]
-
-# test_object_equality(medimage_instance,sitk.ReadImage(p))
-
-
-# image = sitk.ReadImage(imagePath)
 
 
 ################################################# cropping tests
