@@ -1,5 +1,7 @@
 include("MedImage_data_struct.jl")
 using ImageTransformations, CoordinateTransformations, Interpolations, StaticArrays, LinearAlgebra, Rotations, Dictionaries
+using LinearAlgebra
+
 """
 module implementing basic transformations on 3D images 
 like translation, rotation, scaling, and cropping both input and output are MedImage objects
@@ -96,8 +98,9 @@ function crop_image_around_center(image::Array{T, 3}, new_dims::Tuple{Int, Int, 
 
   start_x = max(1, center[3] - new_dims[3] ÷ 2)
   end_x = min(size(image, 3), start_x + new_dims[3] - 1)
-
   cropped_image = image[start_z:end_z, start_y:end_y, start_x:end_x]
+  print(" \n ccccrrrrrrrrrr orig $(size(image)) cropped_image $(size(cropped_image)) start_z $(start_z) end_z $(end_z) start_y $(start_y) end_y $(end_y) start_x $(start_x) end_x $(end_x) \n")
+
   return cropped_image
 end
 
@@ -158,9 +161,18 @@ It modifies both pixel array and metadata
 we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used)
 return the cropped MedImage object 
 """
-function crop_mi(im::Array{MedImage}, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator)::Array{MedImage}
+function crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator)::MedImage
 
-  nothing
+    # Create a view of the original voxel_data array with the specified crop
+    cropped_voxel_data = @view im.voxel_data[crop_beg[1]:(crop_beg[1]+crop_size[1]-1), crop_beg[2]:(crop_beg[2]+crop_size[2]-1), crop_beg[3]:(crop_beg[3]+crop_size[3]-1)]
+
+    # Adjust the origin according to the crop beginning coordinates
+    cropped_origin = im.origin .+ (im.spacing .* crop_beg)
+
+    # Create a new MedImage with the cropped voxel_data and adjusted origin
+    cropped_im = MedImage(cropped_voxel_data, cropped_origin, im.spacing, im.direction)
+
+    return cropped_im
 
 end#crop_mi    
 
@@ -172,10 +184,22 @@ It modifies both pixel array and metadata
 we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used)
 return the cropped MedImage object 
 """
-function pad_mi(im::Array{MedImage}, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64},pad_val, Interpolator::Interpolator)::Array{MedImage}
+function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64},pad_val, Interpolator::Interpolator)::MedImage
 
-  nothing
+    # Create padding arrays for the beginning and end of each axis
+    pad_beg_array = fill(pad_val, (pad_beg[1], im.voxel_data.size[2], im.voxel_data.size[3]))
+    pad_end_array = fill(pad_val, (pad_end[1], im.voxel_data.size[2], im.voxel_data.size[3]))
 
+    # Concatenate the padding arrays with the original voxel_data array
+    padded_voxel_data = cat(pad_beg_array, im.voxel_data, pad_end_array, dims=1)
+
+    # Adjust the origin according to the padding beginning coordinates
+    padded_origin = im.origin .- (im.spacing .* pad_beg)
+
+    # Create a new MedImage with the padded voxel_data and adjusted origin
+    padded_im = MedImage(padded_voxel_data, padded_origin, im.spacing, im.direction)
+
+    return padded_im
 end#pad_mi    
 
 
@@ -187,9 +211,18 @@ It is diffrent from pad by the fact that it changes only the metadata of the ima
 we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used)
 return the translated MedImage object
 """
-function translate_mi(im::Array{MedImage}, translate_by::Int64, translate_in_axis::Int64, Interpolator::Interpolator)::Array{MedImage}
+function translate_mi(im::MedImage, translate_by::Int64, translate_in_axis::Int64, Interpolator::Interpolator)::MedImage
 
-  nothing
+    # Create a copy of the origin
+    translated_origin = copy(im.origin)
+
+    # Modify the origin according to the translation value and axis
+    translated_origin[translate_in_axis] += translate_by * im.spacing[translate_in_axis]
+
+    # Create a new MedImage with the translated origin and the original voxel_data
+    translated_im = MedImage(im.voxel_data, translated_origin, im.spacing, im.direction)
+
+    return translated_im
 
 end#crop_mi    
 
@@ -200,9 +233,25 @@ given a MedImage object and a Tuple that contains the scaling values for each ax
 we are setting Interpolator by using Interpolator enum
 return the scaled MedImage object 
 """
-function scale_mi(im::Array{MedImage}, scale::Tuple{Float64,Float64,Float64}, Interpolator::Interpolator)::Array{MedImage}
+function scale_mi(im::MedImage, scale::Tuple{Float64,Float64,Float64}, Interpolator::Interpolator)::MedImage
 
-  nothing
+    # Determine the interpolation method
+    interp_method = nothing
+    if interpolator == nearest_neighbour
+        interp_method = Nearest
+    elseif interpolator == linear
+        interp_method = BSpline(Linear())
+    elseif interpolator == b_spline
+        interp_method = BSpline(Cubic(Flat(OnGrid())))
+    end
+
+    # Scale the image
+    new_data = imresize(im.voxel_data, scale, method=interp_method)
+
+    # Create a new MedImage with the scaled data and the same spatial metadata
+    new_im = MedImage(new_data, im.origin, im.spacing, im.direction)
+
+    return new_im
 
 end#scale_mi    
 

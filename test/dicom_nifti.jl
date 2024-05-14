@@ -129,12 +129,12 @@ end
 
 
 
-p="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
-# test_image_equality(p,p)
+# p="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
+# # test_image_equality(p,p)
 
-medimage_instance_array = load_images("/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz")
-medimage_instance = medimage_instance_array[1]
+# medimage_instance_array = load_images("/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz")
+# medimage_instance = medimage_instance_array[1]
 
-test_object_equality(medimage_instance,sitk.ReadImage(p))
+# test_object_equality(medimage_instance,sitk.ReadImage(p))
 
 # dcm_data_array = dcmdir_parse("/workspaces/MedImage.jl/MedImage3D/test_data/ScalarVolume_0")

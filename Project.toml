@@ -4,9 +4,11 @@ authors = ["Jakub Mitura <jakub.mitura@gmail.com>"]
 version = "0.1.0"
 
 [deps]
+BinaryBuilder = "12aac903-9f7c-5d81-afc2-d9565ea332ae"
 ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 Conda = "8f4d0f93-b110-5947-807f-2305c1781a2d"
 CoordinateTransformations = "150eb455-5306-5404-9cee-2592286d6298"
+Cxx = "a0b5b9ef-44b7-5148-a2d1-f6db19f3c3d2"
 DICOM = "a26e6606-dd52-5f6a-a97f-4f611373d757"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Dictionaries = "85a47980-9c8c-11e8-2b9f-f7ca1fa99fb4"
