@@ -28,7 +28,8 @@ function resample_to_spacing(im::Array{MedImage}, new_spacing::Tuple{Float64,Flo
   end
 
   # Create the new MedImage object
-  new_im = MedImage(new_voxel_data, im.origin, new_spacing, im.direction)
+  new_im =update_voxel_and_spatial_data(im, new_voxel_data
+  ,im.origin,im.spacing,im.direction)
 
   return new_im
 end#resample_to_spacing
@@ -45,7 +46,6 @@ function change_orientation(im::MedImage, new_orientation::String)::MedImage
         "RSP" => [1 0 0; 0 -1 0; 0 0 -1],
         "LAI" => [-1 0 0; 0 0 -1; 0 1 0],
         "RAI" => [1 0 0; 0 0 -1; 0 1 0]
-        # Add more orientations as needed
     )
 
     # Check if the new orientation is valid
@@ -57,7 +57,8 @@ function change_orientation(im::MedImage, new_orientation::String)::MedImage
     new_direction = orientation_dict[new_orientation]
 
     # Create a new MedImage with the new direction and the same voxel data, origin, and spacing
-    new_im = MedImage(im.voxel_data, im.origin, im.spacing, new_direction)
+    new_im = update_voxel_and_spatial_data(im, im.voxel_data
+    ,im.origin,im.spacing,new_direction)
 
     return new_im
   end#change_orientation
