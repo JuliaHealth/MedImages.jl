@@ -54,3 +54,15 @@ function test_change_orientation(path_nifti)
 
 
 end
+
+
+
+
+  
+  
+  # debug_folder="/home/jakubmitura/projects/MedImage.jl/test_data/debug"
+  # p="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
+  
+  im_fixed=load_image("/home/jakubmitura/projects/MedImage.jl/test_data/pet_data/pat_2_sudy_0_2022-09-16_Standardized_Uptake_Value_body_weight.nii.gz")
+  im_moving=load_image("/home/jakubmitura/projects/MedImage.jl/test_data/pet_data/pat_2_sudy_1_2023-07-12_Standardized_Uptake_Value_body_weight.nii.gz")
+  resample_to_image(im_fixed, im_moving,linear)

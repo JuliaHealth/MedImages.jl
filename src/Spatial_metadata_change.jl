@@ -63,5 +63,3 @@ function change_orientation(im::MedImage, new_orientation::String)::MedImage
     return new_im
   end#change_orientation
 
-
-
