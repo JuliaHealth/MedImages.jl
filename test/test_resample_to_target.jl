@@ -9,7 +9,7 @@ We will have two images as the inputs one would be translated and have diffrent 
     both images are from the same root image (just artificially translated and resampled) so after resampling
     to target they should basically give exactly the same image
 """
-function test_resample_to_target(path_nifti)
+function test_resample_to_target(path_nifti_fixed,path_nifti_moving)
     
 
     # Load SimpleITK
@@ -28,8 +28,8 @@ function test_resample_to_target(path_nifti)
     resampled_sitk = resampler.Execute(im_moving)
 
     # Compare the two images
-    assert resampled_julia == resampled_sitk
-    
+    test_object_equality(medIm,sitk_trnanslated)
+
     # Load the image from path
     med_im=load_image(path_nifti)
     sitk.ReadImage(path_nifti)

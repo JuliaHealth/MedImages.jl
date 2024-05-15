@@ -762,6 +762,18 @@ function update_voxel_and_spatial_data(old_image::MedImage, new_voxel_data::Abst
 
 end
 
+function load_image(path)
+  """
+  load image from path
+  """
+  # test_image_equality(p,p)
+
+  medimage_instance_array = load_images(path)
+  medimage_instance = medimage_instance_array[1]
+  return medimage_instance
+end#load_image
+
+
 """
 NOTES:
 conversion and storage n-dimensional voxel data within world-coordinate system (doesnt change the RAS system)
