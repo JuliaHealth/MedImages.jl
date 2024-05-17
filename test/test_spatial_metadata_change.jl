@@ -15,7 +15,7 @@ function sitk_resample(path_nifti, targetSpac)
     orig_spacing=image.GetSpacing()
     new_size = Tuple{Int64, Int64, Int64}([Int64(ceil(origSize[1]*(orig_spacing[1]/targetSpac[1]))),
     Int64(ceil(origSize[2]*(orig_spacing[2]/targetSpac[2]))),
-    Int64(ceil(origSize[3]*(orig_spacing[3]/targetSpac[3]) ))  ]  )
+    Int64(ceil(origSize[3]*(orig_spacing[3]/targetSpac[3])))  ]  )
 
     resample = sitk.ResampleImageFilter()
     resample.SetOutputSpacing(targetSpac)
@@ -57,7 +57,7 @@ OnCell() - give interpolation in the center of the voxel
 function test_resample_to_spacing(path_nifti)
     
 
-    for spac in [(1.0,1.0,1.0),(2.0,3.0,4.0),(5.0,0.9,0.7)]        # Load SimpleITK
+    for spac in [(1.0,2.0,1.1),(2.0,3.0,4.0),(5.0,0.9,0.7)]        # Load SimpleITK
         # Load the image from path
         med_im=load_image(path_nifti)
         # sitk.ReadImage(path_nifti)
@@ -100,7 +100,7 @@ end
 # sitk = pyimport_conda("SimpleITK", "simpleitk")
 
 path_nifti="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
-spac=(6.3,4.1,1.1)
+spac=(6.3,4.1,0.5)
 # Load the image from path
 med_im=load_image(path_nifti)
 # sitk.ReadImage(path_nifti)
