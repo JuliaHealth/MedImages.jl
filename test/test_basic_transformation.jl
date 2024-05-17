@@ -35,7 +35,6 @@ function load_image(path)
     load image from path
     """
     # test_image_equality(p,p)
-
     medimage_instance_array = load_images(path)
     medimage_instance = medimage_instance_array[1]
     return medimage_instance

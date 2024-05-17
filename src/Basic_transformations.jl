@@ -238,15 +238,15 @@ given a MedImage object and a Tuple that contains the scaling values for each ax
 we are setting Interpolator by using Interpolator enum
 return the scaled MedImage object 
 """
-function scale_mi(im::MedImage, scale::Tuple{Float64,Float64,Float64}, Interpolator::Interpolator)::MedImage
+function scale_mi(im::MedImage, scale::Tuple{Float64,Float64,Float64}, Interpolator_enum::Interpolator)::MedImage
 
     # Determine the interpolation method
     interp_method = nothing
-    if interpolator == nearest_neighbour
+    if interpolator == Nearest_neighbour_en
         interp_method = Nearest
-    elseif interpolator == linear
+    elseif interpolator == Linear_en
         interp_method = BSpline(Linear())
-    elseif interpolator == b_spline
+    elseif interpolator == B_spline_en
         interp_method = BSpline(Cubic(Flat(OnGrid())))
     end
 

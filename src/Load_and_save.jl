@@ -503,7 +503,7 @@ function load_images(path::String)::Array{MedImage}
     #1 voxel data from the nifti image
     voxel_data = nifti_image.raw #this data is in image coordinates (conversion to world coordinates )
 
-    voxel_data = permutedims(voxel_data, (3, 2, 1))
+    # voxel_data = permutedims(voxel_data, (3, 2, 1))
 
   """
 
@@ -565,14 +565,17 @@ function load_images(path::String)::Array{MedImage}
     itk_nifti_image = sitk.ReadImage(path)
     origin = itk_nifti_image.GetOrigin()
     # origin = set_origin_for_nifti_file(sform_qform_similar, nifti_image_struct.sto_xyz)
-    spacing = set_spacing_for_nifti_files([nifti_image_struct.dx, nifti_image_struct.dy,nifti_image_struct.dz])
+    spacing = itk_nifti_image.GetSpacing()  #set_spacing_for_nifti_files([nifti_image_struct.dx, nifti_image_struct.dy,nifti_image_struct.dz])
+    # spacing=(spacing[3],spacing[2],spacing[1])
     direction = set_direction_for_nifti_file(path,header_data_dict["qform_code_name"], header_data_dict["sform_code_name"], sform_qform_similar)
-
+    voxel_arr=sitk.GetArrayFromImage(itk_nifti_image)
+    voxel_arr=permutedims(voxel_arr,(3,2,1))
+    print(" sssssss  $(spacing)  voxel_arr $(size(voxel_arr))")
     spatial_metadata_keys = ["origin","spacing","direction"]
     spatial_metadata_values=  [origin,spacing,direction]
     spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys,spatial_metadata_values)
 
-    return [MedImage([sitk.GetArrayFromImage(itk_nifti_image), origin, spacing, direction, spatial_metadata, image_type, image_subtype, voxel_datatype, date_of_saving, acquisition_time, patient_id, current_device, study_uid, patient_uid, series_uid, study_description, legacy_file_name, display_data, clinical_data, is_contrast_administered, metadata])]
+    return [MedImage([voxel_arr, origin, spacing, direction, spatial_metadata, image_type, image_subtype, voxel_datatype, date_of_saving, acquisition_time, patient_id, current_device, study_uid, patient_uid, series_uid, study_description, legacy_file_name, display_data, clinical_data, is_contrast_administered, metadata])]
 
     #return [MedImage([nifti_image.raw, nifti_image_header.pixdim[2:4], (nifti_image_header.srow_x[1:3], nifti_image_header.srow_y[1:3], nifti_image_header.srow_z[1:3]), (nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z), " ", " "])]
 
@@ -595,112 +598,129 @@ end
 # println("origin")
 # println(medimage_instance.origin)
 
-function save_image(im::Vector{MedImage}, path::String)
-  """
-  Creating nifti volumes or each medimage object
-  NIfTI.NIVolume() NIfTI.niwrite()
-  """
-  for medimage in im
+# function save_image(im::MedImage, path::String)
+#   """
+#   Creating nifti volumes or each medimage object
+#   NIfTI.NIVolume() NIfTI.niwrite()
+#   """
+#   for medimage in im
 
-  #new nifti header construction
-  #providing default values for somes fields based on the NIfTI1Header struct defintion, spatial metadata fields are populated from medimage objects, which are changed upon any transformation.
-  """
-  struct NIfTI1Header
-  sizeof_hdr     :: Int32
-  data_type      :: NTuple{10, UInt8}
-  db_name        :: NTuple{18, UInt8}
-  extents        :: Int32
-  session_error  :: Int16
-  regular        :: Int8
+#   #new nifti header construction
+#   #providing default values for somes fields based on the NIfTI1Header struct defintion, spatial metadata fields are populated from medimage objects, which are changed upon any transformation.
+#   """
+#   struct NIfTI1Header
+#   sizeof_hdr     :: Int32
+#   data_type      :: NTuple{10, UInt8}
+#   db_name        :: NTuple{18, UInt8}
+#   extents        :: Int32
+#   session_error  :: Int16
+#   regular        :: Int8
 
-  dim_info       :: Int8
-  dim            :: NTuple{8, Int16}
-  intent_p1      :: Float32
-  intent_p2      :: Float32
-  intent_p3      :: Float32
-  intent_code    :: Int16
-  datatype       :: Int16
-  bitpix         :: Int16
-  slice_start    :: Int16
-  pixdim         :: NTuple{8, Float32}
-  vox_offset     :: Float32
-  scl_slope      :: Float32
-  scl_inter      :: Float32
-  slice_end      :: Int16
-  slice_code     :: Int8
-  xyzt_units     :: Int8
-  cal_max        :: Float32
-  cal_min        :: Float32
-  slice_duration :: Float32
-  toffset        :: Float32
-  glmax          :: Int32
-  glmin          :: Int32
-  descrip        :: NTuple{80, UInt8}
-  aux_file       :: NTuple{24, UInt8}
-  qform_code     :: Int16
-  sform_code     :: Int16
-  quatern_b      :: Float32
-  quatern_c      :: Float32
-  quatern_d      :: Float32
-  qoffset_x      :: Float32
-  qoffset_y      :: Float32
-  qoffset_z      :: Float32
-  srow_x         :: NTuple{4, Float32}
-  srow_y         :: NTuple{4, Float32}
-  srow_z         :: NTuple{4, Float32}
-  intent_name    :: NTuple{16, UInt8}
-  magic          :: NTuple{4, UInt8}
-  end
-  """
-  nifti_file_header = NIfTI.NIfTI1Header(348,
-                                        (0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)                                         ,
-                                         (0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-                                         0,
-                                          0,
-                                         114,
-                                          medimage.metadata["header_data_dict"]["dim_info"],
-                                         medimage.metadata["header_data_dict"]["dim"],
-                                         medimage.metadata["header_data_dict"]["nifti_intent"][1],
-                                         medimage.metadata["header_data_dict"]["nifti_intent"][2] ,
-                                         medimage.metadata["header_data_dict"]["nifti_intent"][3],
-                                         medimage.metadata["header_data_dict"]["nifti_intent_code"][1],
-                                         medimage.metadata["header_data_dict"]["datatype"],
-                                         medimage.metadata["header_data_dict"]["bitpix"],
-medimage.metadata["header_data_dict"]["slice_start"],
- medimage.metadata["header_data_dict"]["pixdim"],
- medimage.metadata["header_data_dict"]["vox_offset"],
- medimage.metadata["header_data_dict"]["scl_slope"],
- medimage.metadata["header_data_dict"]["scl_inter"],
-medimage.metadata["header_data_dict"]["slice_end"],
- medimage.metadata["header_data_dict"]["slice_code"],
- medimage.metadata["header_data_dict"]["xyzt_units"],
- medimage.metadata["header_data_dict"]["cal_max"],
- medimage.metadata["header_data_dict"]["cal_min"],
- medimage.metadata["header_data_dict"]["slice_duration"],
- medimage.metadata["header_data_dict"]["toffset"],
- 255,
- 0,
- medimage.metadata["header_data_dict"]["descrip"][1],
- medimage.metadata["header_data_dict"]["aux_file"][1],
- medimage.metadata["header_data_dict"]["qform_code"],
- medimage.metadata["header_data_dict"]["sform_code"],
- medimage.metadata["header_data_dict"]["quatern_b"],
- medimage.metadata["header_data_dict"]["quatern_c"],
- medimage.metadata["header_data_dict"]["quatern_d"],
- medimage.metadata["header_data_dict"]["qoffset_x"],
- medimage.metadata["header_data_dict"]["qoffset_y"],
- medimage.metadata["header_data_dict"]["qoffset_z"],
- medimage.metadata["header_data_dict"]["srow_x"],
- medimage.metadata["header_data_dict"]["srow_y"],
- medimage.metadata["header_data_dict"]["srow_z"],
-medimage.metadata["header_data_dict"]["intent_name"],
-(0x6e, 0x2b, 0x31, 0x00))
-  nifti_file_data = medimage.voxel_data
-  nifti_file_volume = NIfTI.NIVolume(nifti_file_header, nifti_file_data)
-  NIfTI.niwrite("output_nifti_file.nii.gz",nifti_file_volume)
+#   dim_info       :: Int8
+#   dim            :: NTuple{8, Int16}
+#   intent_p1      :: Float32
+#   intent_p2      :: Float32
+#   intent_p3      :: Float32
+#   intent_code    :: Int16
+#   datatype       :: Int16
+#   bitpix         :: Int16
+#   slice_start    :: Int16
+#   pixdim         :: NTuple{8, Float32}
+#   vox_offset     :: Float32
+#   scl_slope      :: Float32
+#   scl_inter      :: Float32
+#   slice_end      :: Int16
+#   slice_code     :: Int8
+#   xyzt_units     :: Int8
+#   cal_max        :: Float32
+#   cal_min        :: Float32
+#   slice_duration :: Float32
+#   toffset        :: Float32
+#   glmax          :: Int32
+#   glmin          :: Int32
+#   descrip        :: NTuple{80, UInt8}
+#   aux_file       :: NTuple{24, UInt8}
+#   qform_code     :: Int16
+#   sform_code     :: Int16
+#   quatern_b      :: Float32
+#   quatern_c      :: Float32
+#   quatern_d      :: Float32
+#   qoffset_x      :: Float32
+#   qoffset_y      :: Float32
+#   qoffset_z      :: Float32
+#   srow_x         :: NTuple{4, Float32}
+#   srow_y         :: NTuple{4, Float32}
+#   srow_z         :: NTuple{4, Float32}
+#   intent_name    :: NTuple{16, UInt8}
+#   magic          :: NTuple{4, UInt8}
+#   end
+#   """
+#   nifti_file_header = NIfTI.NIfTI1Header(348,
+#                                         (0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)                                         ,
+#                                          (0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
+#                                          0,
+#                                           0,
+#                                          114,
+#                                           medimage.metadata["header_data_dict"]["dim_info"],
+#                                          medimage.metadata["header_data_dict"]["dim"],
+#                                          medimage.metadata["header_data_dict"]["nifti_intent"][1],
+#                                          medimage.metadata["header_data_dict"]["nifti_intent"][2] ,
+#                                          medimage.metadata["header_data_dict"]["nifti_intent"][3],
+#                                          medimage.metadata["header_data_dict"]["nifti_intent_code"][1],
+#                                          medimage.metadata["header_data_dict"]["datatype"],
+#                                          medimage.metadata["header_data_dict"]["bitpix"],
+# medimage.metadata["header_data_dict"]["slice_start"],
+#  medimage.metadata["header_data_dict"]["pixdim"],
+#  medimage.metadata["header_data_dict"]["vox_offset"],
+#  medimage.metadata["header_data_dict"]["scl_slope"],
+#  medimage.metadata["header_data_dict"]["scl_inter"],
+# medimage.metadata["header_data_dict"]["slice_end"],
+#  medimage.metadata["header_data_dict"]["slice_code"],
+#  medimage.metadata["header_data_dict"]["xyzt_units"],
+#  medimage.metadata["header_data_dict"]["cal_max"],
+#  medimage.metadata["header_data_dict"]["cal_min"],
+#  medimage.metadata["header_data_dict"]["slice_duration"],
+#  medimage.metadata["header_data_dict"]["toffset"],
+#  255,
+#  0,
+#  medimage.metadata["header_data_dict"]["descrip"][1],
+#  medimage.metadata["header_data_dict"]["aux_file"][1],
+#  medimage.metadata["header_data_dict"]["qform_code"],
+#  medimage.metadata["header_data_dict"]["sform_code"],
+#  medimage.metadata["header_data_dict"]["quatern_b"],
+#  medimage.metadata["header_data_dict"]["quatern_c"],
+#  medimage.metadata["header_data_dict"]["quatern_d"],
+#  medimage.metadata["header_data_dict"]["qoffset_x"],
+#  medimage.metadata["header_data_dict"]["qoffset_y"],
+#  medimage.metadata["header_data_dict"]["qoffset_z"],
+#  medimage.metadata["header_data_dict"]["srow_x"],
+#  medimage.metadata["header_data_dict"]["srow_y"],
+#  medimage.metadata["header_data_dict"]["srow_z"],
+# medimage.metadata["header_data_dict"]["intent_name"],
+# (0x6e, 0x2b, 0x31, 0x00))
+#   nifti_file_data =permutedims(medimage.voxel_data,(3,2,1))
+#   nifti_file_volume = NIfTI.NIVolume(nifti_file_header, nifti_file_data)
+#   NIfTI.niwrite("output_nifti_file.nii.gz",nifti_file_volume)
   
-  end
+#   end
 
+# end
+
+
+function create_nii_from_medimage(med_image::MedImage, file_path::String)
+  # Convert voxel_data to a numpy array (Assuming voxel_data is stored in Julia array format)
+  voxel_data_np =med_image.voxel_data
+  voxel_data_np=permutedims(voxel_data_np,(3,2,1))
+  # Create a SimpleITK image from numpy array
+  image_sitk = sitk.GetImageFromArray(voxel_data_np)
+  
+  # Set spatial metadata
+  image_sitk.SetOrigin(med_image.origin)
+  image_sitk.SetSpacing(med_image.spacing)
+  image_sitk.SetDirection(med_image.direction)
+  
+  # Save the image as .nii.gz
+  sitk.WriteImage(image_sitk, file_path* ".nii.gz")
 end
 
 

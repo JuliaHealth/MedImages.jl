@@ -75,7 +75,7 @@ end
 """
 Definitions of basic interpolators
 """
-@enum Interpolator nearest_neighbour = 0 linear = 2 b_spline = 3
+@enum Interpolator_enum Nearest_neighbour_en = 0 Linear_en = 2 B_spline_en = 3
 
 """
 Indicating do we want to change underlying pixel array spatial metadata or both
