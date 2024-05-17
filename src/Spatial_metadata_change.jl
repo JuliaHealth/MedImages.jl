@@ -43,7 +43,6 @@ function resample_to_spacing(im::MedImage
 
     for i in 1:(new_size[1]), j in 1:(new_size[2]), k in 1:(new_size[3])
 
-
         i_1= max((((i-1) * new_spacing[1])+1),1)
         j_1= max((((j-1) * new_spacing[2])+1),1)
         k_1= max((((k-1) * new_spacing[3])+1),1)
