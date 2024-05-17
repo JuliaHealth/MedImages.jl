@@ -94,19 +94,19 @@ end
 
 
   
-  
-# test_resample_to_spacing("/home/jakubmitura/projects/MedImage.jl/test_data/pet_data/pat_2_sudy_0_2022-09-16_Standardized_Uptake_Value_body_weight.nii.gz")
+path_nifti="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
+
+test_resample_to_spacing(path_nifti)
 
 # sitk = pyimport_conda("SimpleITK", "simpleitk")
 
-path_nifti="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
-spac=(6.3,4.1,0.5)
-# Load the image from path
-med_im=load_image(path_nifti)
-# sitk.ReadImage(path_nifti)
-sitk_image=sitk_resample(path_nifti,spac)
-med_im=resample_to_spacing(med_im,spac,B_spline_en)
-test_object_equality(med_im,sitk_image)
+# spac=(6.3,4.1,0.5)
+# # Load the image from path
+# med_im=load_image(path_nifti)
+# # sitk.ReadImage(path_nifti)
+# sitk_image=sitk_resample(path_nifti,spac)
+# med_im=resample_to_spacing(med_im,spac,B_spline_en)
+# test_object_equality(med_im,sitk_image)
 
-sitk.WriteImage(sitk_image,"/home/jakubmitura/projects/MedImage.jl/test_data/volume-0_resampled_sitk.nii.gz")
-create_nii_from_medimage(med_im,"/home/jakubmitura/projects/MedImage.jl/test_data/volume-0_resampled_medimage.nii.gz")
+# sitk.WriteImage(sitk_image,"/home/jakubmitura/projects/MedImage.jl/test_data/volume-0_resampled_sitk.nii.gz")
+# create_nii_from_medimage(med_im,"/home/jakubmitura/projects/MedImage.jl/test_data/volume-0_resampled_medimage.nii.gz")
