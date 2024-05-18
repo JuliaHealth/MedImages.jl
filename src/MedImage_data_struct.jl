@@ -40,7 +40,7 @@ struct MedImage
   origin
   spacing
   direction #direction cosines for orientation
-  spatial_metadata::Dictionaries.Dictionary #dictionary with properties for spacing, offset from spacing,orientation, origin, direction
+  # spatial_metadata::Dictionaries.Dictionary #dictionary with properties for spacing, offset from spacing,orientation, origin, direction
   image_type::Image_type#enum defining the type of the image
   image_subtype::Image_subtype #enum defining the subtype of the image
   voxel_datatype #type of the voxel data stored

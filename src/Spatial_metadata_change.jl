@@ -1,4 +1,5 @@
 include("./MedImage_data_struct.jl")
+include("./Utils.jl")
 include("./Load_and_save.jl")
 
 using Interpolations
@@ -25,39 +26,17 @@ function resample_to_spacing(im::MedImage
     old_spacing = im.spacing
     old_size = size(im.voxel_data)
     new_size = Tuple{Int,Int,Int}(ceil.((old_size .* old_spacing) ./ new_spacing))
+    points_to_interpolate = get_base_indicies_arr(new_size)
 
-    if interpolator_enum == Nearest_neighbour_en
-    itp = interpolate(im.voxel_data, BSpline(Constant()))
-    elseif interpolator_enum == Linear_en
-        itp = interpolate(im.voxel_data, BSpline(Linear()))
-    elseif interpolator_enum == B_spline_en
-        itp = interpolate(im.voxel_data, BSpline(Cubic(Line(OnGrid()))))
-    end
-    #we indicate on each axis the spacing from area we are samplingA
-    A_x1 = 1:old_spacing[1]:(old_size[1]+old_spacing[1]*old_size[1])
-    A_x2 = 1:old_spacing[2]:(old_size[2]+old_spacing[2]*old_size[2])
-    A_x3 = 1:old_spacing[3]:(old_size[3]+old_spacing[3]*old_size[3])
-    itp = scale(itp, A_x1, A_x2,A_x3)
-    # Create the new voxel data
-    new_voxel_data = Array{eltype(im.voxel_data)}(undef, new_size)
+    points_to_interpolate=points_to_interpolate.-1
+    points_to_interpolate=points_to_interpolate.*new_spacing
+    points_to_interpolate=points_to_interpolate.+1
 
-    for i in 1:(new_size[1]), j in 1:(new_size[2]), k in 1:(new_size[3])
+    # print("\n ppppp $(points_to_interpolate) \n ")
 
-        i_1= max((((i-1) * new_spacing[1])+1),1)
-        j_1= max((((j-1) * new_spacing[2])+1),1)
-        k_1= max((((k-1) * new_spacing[3])+1),1)
-        if((i==1))
-            i_1=1#i*new_spacing[1]
-        end        
-        if((j==1))
-            j_1=1#j*new_spacing[1]
-        end        
-        if((k==1))
-            k_1=1
-        end                
-        
-        new_voxel_data[i,j,k] = itp(i_1, j_1,k_1)
-    end
+    interpolated_points=interpolate_my(points_to_interpolate,im.voxel_data,old_spacing,interpolator_enum,true)
+
+    new_voxel_data=reshape(interpolated_points,(new_size[1],new_size[2],new_size[3]))
     # new_spacing=(new_spacing[3],new_spacing[2],new_spacing[1])
     # Create the new MedImage object
     new_im =update_voxel_and_spatial_data(im, new_voxel_data
@@ -95,8 +74,8 @@ function change_orientation(im::MedImage, new_orientation::String)::MedImage
     return new_im
   end#change_orientation
 
-# im_fixed=load_image("/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz")
-# imm_res=resample_to_spacing(im_fixed, (1.0,2.0,3.0),Linear_en)
+im_fixed=load_image("/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz")
+imm_res=resample_to_spacing(im_fixed, (1.0,2.0,3.0),Linear_en)
 
 # sitk = pyimport_conda("SimpleITK","simpleITK")
 # # function create_nii_from_medimage(med_image::MedImage, file_path::String)
@@ -116,14 +95,14 @@ function change_orientation(im::MedImage, new_orientation::String)::MedImage
 # # end
 
 
-# voxel_arr=permutedims(imm_res.voxel_data,(3,2,1))
-# image_sitk = sitk.GetImageFromArray(voxel_arr)
+voxel_arr=permutedims(imm_res.voxel_data,(3,2,1))
+image_sitk = sitk.GetImageFromArray(voxel_arr)
 
-# image_sitk.SetOrigin(imm_res.origin)
-# image_sitk.SetSpacing(imm_res.spacing)
-# image_sitk.SetDirection(imm_res.direction)
-# sitk.WriteImage(image_sitk, "/home/jakubmitura/projects/MedImage.jl/test_data/debug/out.resampled.nii.gz")
-# # create_nii_from_medimage(imm_res,"/home/jakubmitura/projects/MedImage.jl/test_data/debug/out.resampled.nii.gz")
+image_sitk.SetOrigin(imm_res.origin)
+image_sitk.SetSpacing(imm_res.spacing)
+image_sitk.SetDirection(imm_res.direction)
+sitk.WriteImage(image_sitk, "/home/jakubmitura/projects/MedImage.jl/test_data/debug/resampled_sitk.nii.gz")
+create_nii_from_medimage(imm_res,"/home/jakubmitura/projects/MedImage.jl/test_data/debug/resampled_medimage.nii.gz")
 
-# size(imm_res.voxel_data)
-# # range(1, stop=5, length=100,step=0.1)
+size(imm_res.voxel_data)
+# range(1, stop=5, length=100,step=0.1)

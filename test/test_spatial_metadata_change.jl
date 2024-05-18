@@ -1,4 +1,4 @@
-using NIfTI,LinearAlgebra,DICOM
+using NIfTI, LinearAlgebra, DICOM
 include("../src/Load_and_save.jl")
 # include("../src/Basic_transformations.jl")
 # include("./test_visualize.jl")
@@ -10,12 +10,12 @@ include("../src/Spatial_metadata_change.jl")
 
 function sitk_resample(path_nifti, targetSpac)
 
-    image=sitk.ReadImage(path_nifti)
-    origSize= image.GetSize()
-    orig_spacing=image.GetSpacing()
-    new_size = Tuple{Int64, Int64, Int64}([Int64(ceil(origSize[1]*(orig_spacing[1]/targetSpac[1]))),
-    Int64(ceil(origSize[2]*(orig_spacing[2]/targetSpac[2]))),
-    Int64(ceil(origSize[3]*(orig_spacing[3]/targetSpac[3])))  ]  )
+    image = sitk.ReadImage(path_nifti)
+    origSize = image.GetSize()
+    orig_spacing = image.GetSpacing()
+    new_size = Tuple{Int64,Int64,Int64}([Int64(ceil(origSize[1] * (orig_spacing[1] / targetSpac[1]))),
+        Int64(ceil(origSize[2] * (orig_spacing[2] / targetSpac[2]))),
+        Int64(ceil(origSize[3] * (orig_spacing[3] / targetSpac[3])))])
 
     resample = sitk.ResampleImageFilter()
     resample.SetOutputSpacing(targetSpac)
@@ -25,9 +25,9 @@ function sitk_resample(path_nifti, targetSpac)
     resample.SetDefaultPixelValue(image.GetPixelIDValue())
     resample.SetInterpolator(sitk.sitkBSpline)
     resample.SetSize(new_size)
-    res= resample.Execute(image)
+    res = resample.Execute(image)
     return res
-    
+
 end
 
 
@@ -47,7 +47,7 @@ function change_image_orientation(path_nifti, orientation)
     # Write the oriented image back to the file
     # sitk.WriteImage(oriented_image, path_nifti)
 
-end    
+end
 """
 test if the resample_to_spacing of the image lead to correct change in the pixel array
 and the metadata the operation will be tasted against Python simple itk function
@@ -55,17 +55,17 @@ we nned to check the nearest neuhnbor interpolation and b spline interpolation
 OnCell() - give interpolation in the center of the voxel
 """
 function test_resample_to_spacing(path_nifti)
-    
 
-    for spac in [(1.0,2.0,1.1),(2.0,3.0,4.0),(5.0,0.9,0.7)]        # Load SimpleITK
+
+    for spac in [(1.0, 2.0, 1.1), (2.0, 3.0, 4.0), (5.0, 0.9, 0.7)]        # Load SimpleITK
         # Load the image from path
-        med_im=load_image(path_nifti)
+        med_im = load_image(path_nifti)
         # sitk.ReadImage(path_nifti)
-        sitk_image=sitk_resample(path_nifti,spac)
-        med_im=resample_to_spacing(med_im,spac,B_spline_en)
-        test_object_equality(med_im,sitk_image)
+        sitk_image = sitk_resample(path_nifti, spac)
+        med_im = resample_to_spacing(med_im, spac, B_spline_en)
+        test_object_equality(med_im, sitk_image)
 
-    end    
+    end
 
 end
 
@@ -77,15 +77,15 @@ We need to check can it change between RAS and LPS orientationas those are most 
 """
 function test_change_orientation(path_nifti)
 
-    for dir in ["RAS","LPS","LAS","RSP", "LAI","RAI"]        # Load SimpleITK
+    for dir in ["RAS", "LPS", "LAS", "RSP", "LAI", "RAI"]        # Load SimpleITK
         # Load the image from path
-        med_im=load_image(path_nifti)
+        med_im = load_image(path_nifti)
         # sitk.ReadImage(path_nifti)
-        sitk_image=sitk_resample(path_nifti,spac)
-        med_im=change_orientation(med_im,spac,B_spline_en)
-        test_object_equality(med_im,sitk_image)
+        sitk_image = sitk_resample(path_nifti, spac)
+        med_im = change_orientation(med_im, spac, B_spline_en)
+        test_object_equality(med_im, sitk_image)
 
-    end    
+    end
 
 
 end
@@ -93,8 +93,8 @@ end
 
 
 
-  
-path_nifti="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
+
+path_nifti = "/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
 
 test_resample_to_spacing(path_nifti)
 

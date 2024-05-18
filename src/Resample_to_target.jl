@@ -3,15 +3,6 @@ include("./Load_and_save.jl")
 using Interpolations
 
 
-function get_base_indicies_arr(dims)    
-  indices = CartesianIndices(dims)
-  # indices=collect.(Tuple.(collect(indices)))
-  indices=Tuple.(collect(indices))
-  indices=collect(Iterators.flatten(indices))
-  indices=reshape(indices,(3,dims[1]*dims[2]*dims[3]))
-  indices=permutedims(indices,(1,2))
-  return indices
-end#get_base_indicies_arr
 
 
 """
