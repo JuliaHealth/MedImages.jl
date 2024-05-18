@@ -1,34 +1,73 @@
 using  Pkg
 
+"""
+return array of cartesian indices for given dimensions in a form of array
+"""
+function get_base_indicies_arr(dims)    
+    indices = CartesianIndices(dims)
+    # indices=collect.(Tuple.(collect(indices)))
+    indices=Tuple.(collect(indices))
+    indices=collect(Iterators.flatten(indices))
+    indices=reshape(indices,(3,dims[1]*dims[2]*dims[3]))
+    indices=permutedims(indices,(1,2))
+    return indices
+  end#get_base_indicies_arr
+  
+"""
+interpolate the point in the given space
+keep_begining_same - will keep unmodified first layer of each axis - usefull when changing spacing
+"""
+function interpolate_point(point,itp, keep_begining_same=false)
+    i=point[1]
+    j=point[2]
+    k=point[3]
 
-
+    i_1= max(i,1)
+    j_1= max(j,1)
+    k_1= max(k,1)
+    if(keep_begining_same)
+        if((i==1))
+            i_1=1
+        end        
+        if((j==1))
+            j_1=1
+        end        
+        if((k==1))
+            k_1=1
+        end                
+    end
+    return itp(i_1, j_1,k_1)
+    
+end#interpolate_point    
 
 """
 perform the interpolation of the set of points in a given space
 input_array - array we will use to find interpolated val
+input_array_spacing - spacing associated with array from which we will perform interpolation
+Interpolator_enum - enum value defining the type of interpolation
 """
-function interpolate_my(input_array,input_array_spacing,Interpolator_enum)
+function interpolate_my(points_to_interpolate,input_array,input_array_spacing,interpolator_enum,keep_begining_same)
 
+    old_size=size(input_array)
     if interpolator_enum == Nearest_neighbour_en
-        itp = interpolate(im.voxel_data, BSpline(Constant()))
+        itp = interpolate(input_array, BSpline(Constant()))
     elseif interpolator_enum == Linear_en
-        itp = interpolate(im.voxel_data, BSpline(Linear()))
+        itp = interpolate(input_array, BSpline(Linear()))
     elseif interpolator_enum == B_spline_en
-        itp = interpolate(im.voxel_data, BSpline(Cubic(Line(OnGrid()))))
+        itp = interpolate(input_array, BSpline(Cubic(Line(OnGrid()))))
     end
     #we indicate on each axis the spacing from area we are samplingA
-    A_x1 = 1:old_spacing[1]:(old_size[1]+old_spacing[1]*old_size[1])
-    A_x2 = 1:old_spacing[2]:(old_size[2]+old_spacing[2]*old_size[2])
-    A_x3 = 1:old_spacing[3]:(old_size[3]+old_spacing[3]*old_size[3])
+    A_x1 = 1:input_array_spacing[1]:(old_size[1]+input_array_spacing[1]*old_size[1])
+    A_x2 = 1:input_array_spacing[2]:(old_size[2]+input_array_spacing[2]*old_size[2])
+    A_x3 = 1:input_array_spacing[3]:(old_size[3]+input_array_spacing[3]*old_size[3])
     itp = scale(itp, A_x1, A_x2,A_x3)
     # Create the new voxel data
-    new_voxel_data = Array{eltype(im.voxel_data)}(undef, new_size)
-
-    for i in 1:(new_size[1]), j in 1:(new_size[2]), k in 1:(new_size[3])
-        new_voxel_data[i,j,k] = itp(i * new_spacing[1], j * new_spacing[2], k * new_spacing[3])
-    end
 
 
+    res=collect(range(1,size(points_to_interpolate)[2]))
+    res=map(el->interpolate_point( points_to_interpolate[:,el],itp,keep_begining_same),res)
+
+    return res
 end#interpolate_my
 # sitk = pyimport_conda("SimpleITK", "simpleitk")
 # np = pyimport("numpy")
