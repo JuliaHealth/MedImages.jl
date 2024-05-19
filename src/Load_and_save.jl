@@ -575,7 +575,7 @@ function load_images(path::String)::Array{MedImage}
     spatial_metadata_values=  [origin,spacing,direction]
     spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys,spatial_metadata_values)
 
-    return [MedImage([voxel_arr, origin, spacing, direction, spatial_metadata, image_type, image_subtype, voxel_datatype, date_of_saving, acquisition_time, patient_id, current_device, study_uid, patient_uid, series_uid, study_description, legacy_file_name, display_data, clinical_data, is_contrast_administered, metadata])]
+    return [MedImage([voxel_arr, origin, spacing, direction, image_type, image_subtype, voxel_datatype, date_of_saving, acquisition_time, patient_id, current_device, study_uid, patient_uid, series_uid, study_description, legacy_file_name, display_data, clinical_data, is_contrast_administered, metadata])]
 
     #return [MedImage([nifti_image.raw, nifti_image_header.pixdim[2:4], (nifti_image_header.srow_x[1:3], nifti_image_header.srow_y[1:3], nifti_image_header.srow_z[1:3]), (nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z), " ", " "])]
 
@@ -734,7 +734,7 @@ function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
       old_image.origin, 
       old_image.spacing, 
       old_image.direction, 
-      old_image.spatial_metadata, 
+      # old_image.spatial_metadata, 
       old_image.image_type, 
       old_image.image_subtype, 
       old_image.voxel_datatype, 
@@ -762,7 +762,7 @@ function update_voxel_and_spatial_data(old_image::MedImage, new_voxel_data::Abst
       new_origin, 
       new_spacing, 
       new_direction, 
-      old_image.spatial_metadata, 
+      # old_image.spatial_metadata, 
       old_image.image_type, 
       old_image.image_subtype, 
       old_image.voxel_datatype, 

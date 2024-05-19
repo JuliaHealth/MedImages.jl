@@ -48,15 +48,20 @@ end#resample_to_spacing
 """
 given a MedImage object and desired orientation encoded as 3 letter string (like RAS or LPS) return the MedImage object with the new orientation
 """
+
+
+
 function change_orientation(im::MedImage, new_orientation::String)::MedImage
     # Create a dictionary to map orientation strings to direction cosines
+    
+
     orientation_dict = Dict(
-        "RAS" => [1 0 0; 0 1 0; 0 0 1],
-        "LPS" => [-1 0 0; 0 -1 0; 0 0 -1],
-        "LAS" => [-1 0 0; 0 1 0; 0 0 1],
-        "RSP" => [1 0 0; 0 -1 0; 0 0 -1],
-        "LAI" => [-1 0 0; 0 0 -1; 0 1 0],
-        "RAI" => [1 0 0; 0 0 -1; 0 1 0]
+        "RAS" => [-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0],
+        "LPS" => [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+        "LAS" => [1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0],
+        "RSP" => [-1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0],
+        "LAI" => [1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0],
+        "RAI" => [-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0]
     )
 
     # Check if the new orientation is valid
