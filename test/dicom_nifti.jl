@@ -78,14 +78,14 @@ function test_object_equality(medIm::MedImage,sitk_image)
     print("\n mmmmmmmmm $(maximum(vv)) $(maximum(arr))  \n")
     print("vvvox arrr $(isapprox(arr ,vox; rtol =0.1)) \n ")
 
-    @test isapprox(arr ,vox; rtol =0.1)
     # @test isapprox(arr[sx:end-sx,sy:end-sy,sz:end-sz]
     # ,medIm.voxel_data[sx:end-sx,sy:end-sy,sz:end-sz]; atol =0.1)
 
     @test isapprox(collect(spacing), collect(Tuple{Float64,Float64,Float64}(medIm.spacing)); atol=0.1)
     # @test isapprox(spacing
     # ,medIm.spacing; atol =0.1)
-
+    print("\n dirrr sitk $(collect(sitk_image.GetDirection())) medim $(collect(medIm.direction)) \n")
+    
     @test isapprox(collect(sitk_image.GetDirection())
     ,collect(medIm.direction); atol =0.1)
     
@@ -95,6 +95,9 @@ function test_object_equality(medIm::MedImage,sitk_image)
     @test isapprox(collect(sitk_image.GetSpacing())
     ,collect(medIm.spacing); atol =0.1)
         
+
+    @test isapprox(arr ,vox; rtol =0.1)
+
 
 end#test_image_equality
 
