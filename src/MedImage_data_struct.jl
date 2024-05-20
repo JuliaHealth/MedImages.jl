@@ -81,3 +81,75 @@ Definitions of basic interpolators
 Indicating do we want to change underlying pixel array spatial metadata or both
 """
 @enum Mode_mi pixel_array_mode = 0 spat_metadata_mode = 2 all_mode = 3
+
+
+################## orientation
+"""
+enums based on https://github.com/InsightSoftwareConsortium/ITK/blob/311b7060ef39e371f3cd209ec135284ff5fde735/Modules/Core/Common/include/itkSpatialOrientation.h#L88
+"""
+@enum CoordinateTerms begin
+    ITK_COORDINATE_UNKNOWN = 0
+    ITK_COORDINATE_Right = 2
+    ITK_COORDINATE_Left = 3
+    ITK_COORDINATE_Posterior = 4
+    ITK_COORDINATE_Anterior = 5
+    ITK_COORDINATE_Inferior = 8
+    ITK_COORDINATE_Superior = 9
+end
+
+@enum CoordinateMajornessTerms begin
+    PrimaryMinor = 0
+    SecondaryMinor = 8
+    TertiaryMinor = 16
+end
+
+@enum Orientation_code begin
+    ORIENTATION_RIP
+    ORIENTATION_LIP
+    ORIENTATION_RSP
+    ORIENTATION_LSP
+    ORIENTATION_RIA
+    ORIENTATION_LIA
+    ORIENTATION_RSA
+    ORIENTATION_LSA
+    ORIENTATION_IRP
+    ORIENTATION_ILP
+    ORIENTATION_SRP
+    ORIENTATION_SLP
+    ORIENTATION_IRA
+    ORIENTATION_ILA
+    ORIENTATION_SRA
+    ORIENTATION_SLA
+    ORIENTATION_RPI
+    ORIENTATION_LPI
+    ORIENTATION_RAI
+    ORIENTATION_LAI
+    ORIENTATION_RPS
+    ORIENTATION_LPS
+    ORIENTATION_RAS
+    ORIENTATION_LAS
+    ORIENTATION_PRI
+    ORIENTATION_PLI
+    ORIENTATION_ARI
+    ORIENTATION_ALI
+    ORIENTATION_PRS
+    ORIENTATION_PLS
+    ORIENTATION_ARS
+    ORIENTATION_ALS
+    ORIENTATION_IPR
+    ORIENTATION_SPR
+    ORIENTATION_IAR
+    ORIENTATION_SAR
+    ORIENTATION_IPL
+    ORIENTATION_SPL
+    ORIENTATION_IAL
+    ORIENTATION_SAL
+    ORIENTATION_PIR
+    ORIENTATION_PSR
+    ORIENTATION_AIR 
+    ORIENTATION_ASR
+    ORIENTATION_PIL
+    ORIENTATION_PSL
+    ORIENTATION_AIL 
+    ORIENTATION_ASL
+end
