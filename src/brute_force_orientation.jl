@@ -64,7 +64,7 @@ function change_image_orientation(path_nifti, orientation)
     # Read the image
     image = sitk.ReadImage(path_nifti)
     
-    print("oroginal orientation $(image.GetDirection()) origin $(image.GetOrigin()) size $(image.GetSize())  \n")
+    # print("oroginal orientation $(image.GetDirection()) origin $(image.GetOrigin()) size $(image.GetSize())  \n")
     # Create a DICOMOrientImageFilter
     orient_filter = sitk.DICOMOrientImageFilter()
 
@@ -130,39 +130,73 @@ function establish_orginn_transformation(sitk_image1,sitk_image2,sitk_image1_arr
 
     sizzz=[(spacing1[1]*(sizz[3]-1)),(spacing1[2]*(sizz[2]-1)),(spacing1[3]*(sizz[1]-1))   ]
 
-    opts=[origin1[3]-sizzz[3]
-    ,origin1[2]-sizzz[2]
-    ,origin1[1]-sizzz[1]
-    ,origin1[3]+sizzz[3]
-    ,origin1[2]+sizzz[2]
-    ,origin1[1]+sizzz[1]
+    # opts=[origin1[3]-sizzz[3]
+    # ,origin1[2]-sizzz[2]
+    # ,sizzz[2]-origin1[2]
+    # ,origin1[1]-sizzz[1]
+    # ,sizzz[1]-origin1[1]
+    # ,origin1[3]+sizzz[3]
+    # ,origin1[2]+sizzz[2]
+    # ,origin1[1]+sizzz[1]
 
-    ,origin1[1]+sizzz[3]
-    ,origin1[1]-sizzz[3]
-    ,origin1[3]-sizzz[1]
+    # ,origin1[1]+sizzz[3]
+    # ,origin1[1]-sizzz[3]
+    # ,sizzz[3]-origin1[1]
+    # ,origin1[3]-sizzz[1]
+    # ,sizzz[1]-origin1[3]
 
-    ,origin1[3]+sizzz[2]
-    ,origin1[1]+sizzz[2]
+    # ,origin1[3]+sizzz[2]
+    # ,origin1[1]+sizzz[2]
 
-    ,origin1[3]-sizzz[2]
-    ,origin1[1]-sizzz[2]
+    # ,origin1[3]-sizzz[2]
+    # ,sizzz[2]-origin1[3]
+    # ,origin1[1]-sizzz[2]
+    # ,sizzz[2]-origin1[1]
 
-    ,origin1[3]
-    ,origin1[2]
-    ,origin1[1]
-    ]
-    perms=collect(permutations(opts, 3))
-    for i in range(1,length(perms))
-        # print("\n ppppp $(p)  origin2 $(origin2) \n ")
-        p=collect(perms[i])
-        if(isapprox(p,collect(origin2); atol=0.1) )
-            println("Found origin transformation $(i)")
-            return i
-        end    
+    # ,origin1[3]
+    # ,origin1[2]
+    # ,origin1[1]
+    # ]
+    # perms=collect(permutations(opts, 3))
+    # for i in range(1,length(perms))
+    #     # print("\n ppppp $(p)  origin2 $(origin2) \n ")
+    #     p=collect(perms[i])
+    #     if(isapprox(p,collect(origin2); atol=0.1) )
+    #         println("Found origin transformation $(i)")
+    #         return i
+    #     end    
+    # end
+    res=[[],[],[]]
+    for op in ['+','-',' ']
+        for origin_axis in [1,2,3]
+            for sizz_axis in range(1,3)
+                for flip in [1,-1]
+                    loc=0.099123887
+                    # p=copy(origin1)
+                    if(op=='+')
+                        loc=origin1[origin_axis]+sizzz[sizz_axis]
+                    elseif(op=='-')
+                        loc=origin1[origin_axis]-sizzz[sizz_axis]
+                    else
+                        loc=origin1[origin_axis]
+                    end
+                    if((loc*flip)==origin2[origin_axis])
+                        res[origin_axis]=[op,origin_axis,sizz_axis,flip]
+                    end
+                end
+
+            end 
+        end   
     end
-    # print("jjjj $(opts) origin2 $(origin2) ")
+    print("\n rrrrres $(res) \n")
+    # if(isapprox(p,collect(origin2); atol=0.1) )
+    #     println("Found origin transformation $(i)")
+
+    # # print("jjjj $(opts) origin2 $(origin2) ")
     diff=collect(origin1)-collect(origin2)
-    print("\n ooooo origin1 $(origin1) origin2 $(origin2) spacing1 $(spacing1) spacing2 $(spacing2) \n opts $(opts) \n diff $(diff)\n  sizzz $(sizzz) ")
+    # print("\n ooooo origin1 $(origin1) origin2 $(origin2) spacing1 $(spacing1) spacing2 $(spacing2) diff $(diff)  sizzz $(sizzz) \n")
+
+    return res
 end
 
 
