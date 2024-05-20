@@ -78,16 +78,13 @@ We need to check can it change between RAS and LPS orientationas those are most 
 function test_change_orientation(path_nifti)
 
     for orientation in ["RAS", "LPS", "LAS", "RSP", "LAI", "RAI"]        # Load SimpleITK
-        # med_im = load_image(path_nifti)
+        med_im = load_image(path_nifti)
         sitk_image = change_image_orientation(path_nifti, orientation)
-        print(" \n sitk $(orientation)    $(sitk_image.GetDirection())  $(sitk_image.GetOrigin())  \n")
-        # med_im = change_orientation(med_im, orientation)
-        # test_object_equality(med_im, sitk_image)
+        # print(" \n sitk $(orientation)    $(sitk_image.GetDirection())  $(sitk_image.GetOrigin())  \n")
+        med_im = change_orientation(med_im, orientation)
+        test_object_equality(med_im, sitk_image)
     end
 end
-
-
-
 
 
 path_nifti = "/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
