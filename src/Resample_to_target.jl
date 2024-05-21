@@ -2,7 +2,15 @@ include("./MedImage_data_struct.jl")
 include("./Load_and_save.jl")
 using Interpolations
 
+"""
+overwriting this function from Interpolations.jl becouse check_ranges giving error
 
+"""
+function scale(itp::AbstractInterpolation{T,N,IT}, ranges::Vararg{AbstractRange,N}) where {T,N,IT}
+    # overwriting this function becouse check_ranges giving error
+    # check_ranges(itpflag(itp), axes(itp), ranges)
+    ScaledInterpolation{T,N,typeof(itp),IT,typeof(ranges)}(itp, ranges)
+end
 
 
 """

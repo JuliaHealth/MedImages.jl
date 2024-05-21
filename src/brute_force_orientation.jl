@@ -5,6 +5,7 @@ include("./Load_and_save.jl")
 
 using Interpolations
 using Combinatorics
+using JLD
 
 orientation_enum_to_string = Dict(
 ORIENTATION_RIP=>"RIP",
@@ -130,42 +131,6 @@ function establish_orginn_transformation(sitk_image1,sitk_image2,sitk_image1_arr
 
     sizzz=[(spacing1[1]*(sizz[3]-1)),(spacing1[2]*(sizz[2]-1)),(spacing1[3]*(sizz[1]-1))   ]
 
-    # opts=[origin1[3]-sizzz[3]
-    # ,origin1[2]-sizzz[2]
-    # ,sizzz[2]-origin1[2]
-    # ,origin1[1]-sizzz[1]
-    # ,sizzz[1]-origin1[1]
-    # ,origin1[3]+sizzz[3]
-    # ,origin1[2]+sizzz[2]
-    # ,origin1[1]+sizzz[1]
-
-    # ,origin1[1]+sizzz[3]
-    # ,origin1[1]-sizzz[3]
-    # ,sizzz[3]-origin1[1]
-    # ,origin1[3]-sizzz[1]
-    # ,sizzz[1]-origin1[3]
-
-    # ,origin1[3]+sizzz[2]
-    # ,origin1[1]+sizzz[2]
-
-    # ,origin1[3]-sizzz[2]
-    # ,sizzz[2]-origin1[3]
-    # ,origin1[1]-sizzz[2]
-    # ,sizzz[2]-origin1[1]
-
-    # ,origin1[3]
-    # ,origin1[2]
-    # ,origin1[1]
-    # ]
-    # perms=collect(permutations(opts, 3))
-    # for i in range(1,length(perms))
-    #     # print("\n ppppp $(p)  origin2 $(origin2) \n ")
-    #     p=collect(perms[i])
-    #     if(isapprox(p,collect(origin2); atol=0.1) )
-    #         println("Found origin transformation $(i)")
-    #         return i
-    #     end    
-    # end
     res=[[],[],[]]
     for op in ['+','-',' ']
         for origin_axis in [1,2,3]
@@ -225,19 +190,18 @@ end
 
 function brute_force_find_from_sitk(path_nifti)
     opts=[]
-    for value_out in instances(Orientation_code)
-        for value_in in instances(Orientation_code)
+    for value_out in collect(instances(Orientation_code))
+        for value_in in collect(instances(Orientation_code))
             opts=push!(opts,(value_out,value_in))
         end    
     end
 
-
     return map(el-> brute_force_find_from_sitk_single(path_nifti,el[1] ,el[2]),opts)
 end
-
 
 path_nifti = "/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
 
 all_res=brute_force_find_from_sitk(path_nifti)
-all_res
-
+dict_curr=Dict(all_res)
+save("/home/jakubmitura/projects/MedImage.jl/test_data/my_dict.jld", "my_dict", dict_curr)
+# krowa now create a dictionary that will map orientation vector of numbers into orientation enum
