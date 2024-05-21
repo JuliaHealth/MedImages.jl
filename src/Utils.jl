@@ -69,6 +69,49 @@ function interpolate_my(points_to_interpolate,input_array,input_array_spacing,in
 
     return res
 end#interpolate_my
+
+function TransformIndexToPhysicalPoint_julia(index::Tuple{Int,Int,Int}
+    ,origin::Tuple{Float64,Float64,Float64}
+    ,spacing::Tuple{Float64,Float64,Float64})
+    
+    # return origin .+ ((collect(index) .- 1) .* collect(spacing))
+    return collect(collect(origin) .+ ((collect(index) ) .* collect(spacing)))
+end
+
+# path_nifti="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
+# im=sitk.ReadImage(path_nifti)
+# indexx=(2,2,2)
+# function TransformIndexToPhysicalPoint_julia(index::Tuple{Int,Int,Int}
+#     ,origin::Tuple{Float64,Float64,Float64}
+#     ,spacing::Tuple{Float64,Float64,Float64})
+#     # return origin .+ ((collect(index) .- 1) .* collect(spacing))
+#     return collect(collect(origin) .+ ((collect(index) ) .* collect(spacing)))
+# end
+
+# path_nifti="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
+# im=sitk.ReadImage(path_nifti)
+# indexx=(1,1,1)
+# im.TransformIndexToPhysicalPoint(indexx)
+# med_im = load_image(path_nifti)
+# TransformIndexToPhysicalPoint_julia(indexx,med_im.origin,med_im.spacing)
+
+
+# im.GetOrigin()
+# med_im.origin
+
+# (-172.19686889648438, 178.59375, -363.0)
+
+
+# im.TransformIndexToPhysicalPoint(indexx)
+# orient_filter=sitk.DICOMOrientImageFilter()
+# orient_filter.SetDesiredCoordinateOrientation("LAS")
+# oriented_image = orient_filter.Execute(im)
+# oriented_image.TransformIndexToPhysicalPoint(indexx)
+
+# a
+
+
+
 # sitk = pyimport_conda("SimpleITK", "simpleitk")
 # np = pyimport("numpy")
 
