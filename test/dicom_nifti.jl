@@ -3,7 +3,9 @@ using NIfTI,LinearAlgebra,DICOM,Test
 using Pkg
 # Pkg.add(["DICOM", "NIfTI", "Dictionaries", "Dates"])
 using DICOM, NIfTI, Dictionaries, Dates, PyCall
+using Conda
 
+# Conda.add("SimpleITK")
 sitk = pyimport_conda("SimpleITK","simpleITK")
 include("../src/MedImage_data_struct.jl")
 include("../src/Load_and_save.jl")
