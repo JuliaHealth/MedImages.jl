@@ -58,6 +58,8 @@ ORIENTATION_AIL=>"AIL",
 ORIENTATION_ASL=>"ASL")
 
 string_to_orientation_enum = Dict(value => key for (key, value) in orientation_enum_to_string)
+
+
 sitk = pyimport_conda("SimpleITK","simpleITK")
 
 
@@ -215,7 +217,63 @@ dict_curr=Dict(oo)
 
 
 save("/home/jakubmitura/projects/MedImage.jl/test_data/dict_code_to_vector.jld", "dict_code_to_vector", dict_curr)
-loaded_dict = load("/home/jakubmitura/projects/MedImage.jl/test_data/dict_code_to_vector.jld", "dict_code_to_vector")
+loaded_dict = load("/home/jakubmitura/projects/MedImage.jl/test_data/my_dict.jld")
+
+for el in collect(loaded_dict)
+    println(",$(el)")
+end
+
+
+dict_enum_to_number=Dict(
+    ORIENTATION_ASR => (0.0, 0.0, -1.0, -1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+    ,ORIENTATION_AIL => (0.0, 0.0, 1.0, -1.0, 0.0, 0.0, 0.0, -1.0, 0.0)
+    ,ORIENTATION_PSR => (0.0, 0.0, -1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+    ,ORIENTATION_ASL => (0.0, 0.0, 1.0, -1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+    ,ORIENTATION_RAS => (-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0)
+    ,ORIENTATION_AIR => (0.0, 0.0, -1.0, -1.0, 0.0, 0.0, 0.0, -1.0, 0.0)
+    ,ORIENTATION_LIP => (1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -1.0, 0.0)
+    ,ORIENTATION_LAS => (1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0)
+    ,ORIENTATION_SPL => (0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
+    ,ORIENTATION_PLS => (0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+    ,ORIENTATION_ARI => (0.0, -1.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0)
+    ,ORIENTATION_LPI => (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, -1.0)
+    ,ORIENTATION_RAI => (-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0)
+    ,ORIENTATION_IRP => (0.0, -1.0, 0.0, 0.0, 0.0, 1.0, -1.0, 0.0, 0.0)
+    ,ORIENTATION_SRP => (0.0, -1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0)
+    ,ORIENTATION_ALI => (0.0, 1.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0)
+    ,ORIENTATION_PRS => (0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+    ,ORIENTATION_RSP => (-1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0)
+    ,ORIENTATION_PRI => (0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, -1.0)
+    ,ORIENTATION_IRA => (0.0, -1.0, 0.0, 0.0, 0.0, -1.0, -1.0, 0.0, 0.0)
+    ,ORIENTATION_SLA => (0.0, 1.0, 0.0, 0.0, 0.0, -1.0, 1.0, 0.0, 0.0)
+    ,ORIENTATION_IAR => (0.0, 0.0, -1.0, 0.0, -1.0, 0.0, -1.0, 0.0, 0.0)
+    ,ORIENTATION_PIR => (0.0, 0.0, -1.0, 1.0, 0.0, 0.0, 0.0, -1.0, 0.0)
+    ,ORIENTATION_ILP => (0.0, 1.0, 0.0, 0.0, 0.0, 1.0, -1.0, 0.0, 0.0)
+    ,ORIENTATION_ALS => (0.0, 1.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+    ,ORIENTATION_PIL => (0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, -1.0, 0.0)
+    ,ORIENTATION_PSL => (0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+    ,ORIENTATION_RSA => (-1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0)
+    ,ORIENTATION_IPR => (0.0, 0.0, -1.0, 0.0, 1.0, 0.0, -1.0, 0.0, 0.0)
+    ,ORIENTATION_RIP => (-1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -1.0, 0.0)
+    ,ORIENTATION_LAI => (1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0)
+    ,ORIENTATION_PLI => (0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, -1.0)
+    ,ORIENTATION_LSA => (1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0)
+    ,ORIENTATION_SPR => (0.0, 0.0, -1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
+    ,ORIENTATION_IAL => (0.0, 0.0, 1.0, 0.0, -1.0, 0.0, -1.0, 0.0, 0.0)
+    ,ORIENTATION_SAL => (0.0, 0.0, 1.0, 0.0, -1.0, 0.0, 1.0, 0.0, 0.0)
+    ,ORIENTATION_ARS => (0.0, -1.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
+    ,ORIENTATION_LPS => (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+    ,ORIENTATION_LSP => (1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0)
+    ,ORIENTATION_RIA => (-1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, -1.0, 0.0)
+    ,ORIENTATION_ILA => (0.0, 1.0, 0.0, 0.0, 0.0, -1.0, -1.0, 0.0, 0.0)
+    ,ORIENTATION_SRA => (0.0, -1.0, 0.0, 0.0, 0.0, -1.0, 1.0, 0.0, 0.0)
+    ,ORIENTATION_RPS => (-1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+    ,ORIENTATION_SAR => (0.0, 0.0, -1.0, 0.0, -1.0, 0.0, 1.0, 0.0, 0.0)
+    ,ORIENTATION_RPI => (-1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, -1.0)
+    ,ORIENTATION_LIA => (1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, -1.0, 0.0)
+    ,ORIENTATION_IPL => (0.0, 0.0, 1.0, 0.0, 1.0, 0.0, -1.0, 0.0, 0.0)
+    ,ORIENTATION_SLP => (0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0)
+)
 
 # all_res=brute_force_find_from_sitk(path_nifti)
 # dict_curr=Dict(all_res)
