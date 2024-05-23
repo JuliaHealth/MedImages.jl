@@ -199,9 +199,25 @@ function brute_force_find_from_sitk(path_nifti)
     return map(el-> brute_force_find_from_sitk_single(path_nifti,el[1] ,el[2]),opts)
 end
 
+function get_orientations_vectors(path_nifti)
+    opts=[]
+    for orientation in collect(instances(Orientation_code))
+        opts=push!(opts,(orientation,change_image_orientation(path_nifti, orientation_enum_to_string[orientation]).GetDirection()) )
+    end
+    return opts
+end
+
 path_nifti = "/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
 
-all_res=brute_force_find_from_sitk(path_nifti)
-dict_curr=Dict(all_res)
-save("/home/jakubmitura/projects/MedImage.jl/test_data/my_dict.jld", "my_dict", dict_curr)
-# krowa now create a dictionary that will map orientation vector of numbers into orientation enum
+oo=get_orientations_vectors(path_nifti)
+oo
+dict_curr=Dict(oo)
+
+
+save("/home/jakubmitura/projects/MedImage.jl/test_data/dict_code_to_vector.jld", "dict_code_to_vector", dict_curr)
+loaded_dict = load("/home/jakubmitura/projects/MedImage.jl/test_data/dict_code_to_vector.jld", "dict_code_to_vector")
+
+# all_res=brute_force_find_from_sitk(path_nifti)
+# dict_curr=Dict(all_res)
+# save("/home/jakubmitura/projects/MedImage.jl/test_data/my_dict.jld", "my_dict", dict_curr)
+# # krowa now create a dictionary that will map orientation vector of numbers into orientation enum
