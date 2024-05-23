@@ -10,7 +10,6 @@ sitk = pyimport_conda("SimpleITK","simpleITK")
 include("../src/MedImage_data_struct.jl")
 include("../src/Load_and_save.jl")
 
-
 # include("./test_visualize.jl")
 
 # import ..Load_and_save
