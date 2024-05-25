@@ -56,7 +56,7 @@ Definition for standardised MedImage Struct
   image_type::Image_type#enum defining the type of the image
   image_subtype::Image_subtype #enum defining the subtype of the image
   date_of_saving::DateTime = Dates.today()
-  acquisition_time::DateTime = Dates.now()
+  acquistion_time::DateTime = Dates.now()
   patient_id::String #the id of the patient in the data file
   current_device::current_device_enum = CPU_current_device# CPU or GPU , preferrably GPU
   study_uid::String=string(UUIDs.uuid4())#unique identifier for the study
@@ -86,7 +86,7 @@ end
 """
 Definitions of basic interpolators
 """
-@enum Interpolator_enum Nearest_neighbour_en = 0 Linear_en = 2 B_spline_en = 3
+@enum Interpolator_enum Nearest_neighbour_en Linear_en B_spline_en
 
 """
 Indicating do we want to change underlying pixel array spatial metadata or both

@@ -8,6 +8,7 @@ using Accessors
 sitk = pyimport("SimpleITK")
 include("./MedImage_data_struct.jl")
 include("./Nifti_image_struct.jl")
+include("./Utils.jl")
 
 
 
@@ -758,15 +759,6 @@ function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
 
 end
 
-function ensure_tuple(arr)
-  if arr isa Tuple
-      return arr
-  elseif arr isa AbstractArray
-      return tuple(arr...)
-  else
-      error("Input must be a Tuple or an AbstractArray")
-  end
-end
 
 function update_voxel_and_spatial_data(old_image::MedImage, new_voxel_data::AbstractArray
   ,new_origin,new_spacing,new_direction)
