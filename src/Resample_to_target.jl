@@ -2,6 +2,8 @@ include("./MedImage_data_struct.jl")
 include("./Load_and_save.jl")
 include("./Spatial_metadata_change.jl")
 using Interpolations
+using Statistics
+
 
 """
 overwriting this function from Interpolations.jl becouse check_ranges giving error
@@ -22,8 +24,24 @@ It require multiple steps some idea of implementation is below
 2) we should define a grid on the basis of locations of the voxels in the fixed image and interpolate voxels from the moving image to the grid using for example GridInterpolations
 
    """
-   function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator_enum::Interpolator_enum)::MedImage
+   function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator_enum::Interpolator_enum,value_to_extrapolate=Nothing)::MedImage
 
+    if(value_to_extrapolate==Nothing)
+        corners = [
+            im_fixed.voxel_data[1, 1, 1],
+            im_fixed.voxel_data[1, 1, end],
+            im_fixed.voxel_data[1, end, 1],
+            im_fixed.voxel_data[1, end, end],
+            im_fixed.voxel_data[end, 1, 1],
+            im_fixed.voxel_data[end, 1, end],
+            im_fixed.voxel_data[end, end, 1],
+            im_fixed.voxel_data[end, end, end]
+        ]
+
+        value_to_extrapolate=median(corners)
+    end
+
+    
     # get direction from one and set it to other
     im_moving=change_orientation(im_moving,number_to_enum_orientation_dict[im_fixed.direction])
 
@@ -41,44 +59,14 @@ It require multiple steps some idea of implementation is below
     origin_diff=(collect(im_fixed.origin)-collect(im_moving.origin))
     points_to_interpolate=points_to_interpolate.+origin_diff
 
-    #now we need to filter out all points that are outside of the fixed image
-    #so by convention that origin is at 0,0,0 we need to filter out all points that are negative plus all 
-    #points that are bigger than the size of the fixed image
-    
-    
-    # new_size_physical = (new_size .* new_spacing)+origin_diff
-    # points_to_interpolate=points_to_interpolate[findall(x->x[1]>=0 && x[2]>=0 && x[3]>=0 && x[1]<=new_size_physical[1] && x[2]<=new_size_physical[2] && x[3]<=new_size_physical[3],points_to_interpolate)]
-    # if(size(points_to_interpolate)[0]==0)
-    #     return update_voxel_and_spatial_data(im, zeros(new_size) ,im_fixed.origin,new_spacing,im_fixed.direction)
-    # else
 
 
 
 
-    #now issue is that could have points outside of the new new_size_physical; and or new_size_physical can be bigger then old_image
-    #hence we need to establish in new space how big is the are we had points on - so the size of transformed image
-    #then we need to reshape it to this size
-    #then we need to pad to the desired size (size of fixed image)
-
-    # Get the values at the corners
-    corners = [
-        im_fixed.voxel_data[1, 1, 1],
-        im_fixed.voxel_data[1, 1, end],
-        im_fixed.voxel_data[1, end, 1],
-        im_fixed.voxel_data[1, end, end],
-        im_fixed.voxel_data[end, 1, 1],
-        im_fixed.voxel_data[end, 1, end],
-        im_fixed.voxel_data[end, end, 1],
-        im_fixed.voxel_data[end, end, end]
-    ]
-
-
-
-    value_to_extrapolate=median(corners)
     interpolated_points=interpolate_my(points_to_interpolate,im_moving.voxel_data,old_spacing,interpolator_enum,false,value_to_extrapolate)
 
     new_voxel_data=reshape(interpolated_points,(new_size[1],new_size[2],new_size[3]))
-    new_voxel_data=cast_to_array_b_type(new_voxel_data,im.voxel_data)
+    # new_voxel_data=cast_to_array_b_type(new_voxel_data,im_fixed.voxel_data)
 
 
     new_im =update_voxel_and_spatial_data(im_moving, new_voxel_data
@@ -89,16 +77,16 @@ It require multiple steps some idea of implementation is below
 end
 
 
-function load_image(path)
-  """
-  load image from path
-  """
-  # test_image_equality(p,p)
+# function load_image(path)
+#   """
+#   load image from path
+#   """
+#   # test_image_equality(p,p)
 
-  medimage_instance_array = load_images(path)
-  medimage_instance = medimage_instance_array[1]
-  return medimage_instance
-end#load_image
+#   medimage_instance_array = load_images(path)
+#   medimage_instance = medimage_instance_array[1]
+#   return medimage_instance
+# end#load_image
 
 
 
@@ -107,9 +95,9 @@ end#load_image
 
 
 
-im_fixed=load_image("/home/jakubmitura/projects/MedImage.jl/test_data/pet_data/pat_2_sudy_0_2022-09-16_Standardized_Uptake_Value_body_weight.nii.gz")
-im_moving=load_image("/home/jakubmitura/projects/MedImage.jl/test_data/pet_data/pat_2_sudy_1_2023-07-12_Standardized_Uptake_Value_body_weight.nii.gz")
-resample_to_image(im_fixed, im_moving,Linear_en)
+# im_fixed=load_image("/home/jakubmitura/projects/MedImage.jl/test_data/pet_data/pat_2_sudy_0_2022-09-16_Standardized_Uptake_Value_body_weight.nii.gz")
+# im_moving=load_image("/home/jakubmitura/projects/MedImage.jl/test_data/pet_data/pat_2_sudy_1_2023-07-12_Standardized_Uptake_Value_body_weight.nii.gz")
+# resample_to_image(im_fixed, im_moving,Linear_en)
 
 
 
