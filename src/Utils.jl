@@ -20,12 +20,14 @@ function cast_to_array_b_type(a,b)
     # Check if array a and b have the same type
     if eltype(a) != eltype(b)
         # Cast array a to the value type of array b
-        if eltype(b) isa Union{Int8,Int16,Int32, Int64, UInt8,UInt16,UInt32, UInt64}
+        if eltype(b) in [Int8,Int16,Int32, Int64, UInt8,UInt16,UInt32, UInt64]
             # Apply rounding to the array
             a = round.(a)  # Array{Int64,1}
         end
 
         a = convert(Array{eltype(b)}, a)  # Array{Float64,1}
+        return a
+    else
         return a
     end
 end
@@ -34,11 +36,14 @@ end
 interpolate the point in the given space
 keep_begining_same - will keep unmodified first layer of each axis - usefull when changing spacing
 """
-function interpolate_point(point,itp, keep_begining_same=false)
+function interpolate_point(point,itp, keep_begining_same=false,extrapolate_value=0)
 
     i=point[1]
     j=point[2]
     k=point[3]
+    if(i<0 || j<0 || k<0)
+        return extrapolate_value
+    end
 
     i_1= max(i,1)
     j_1= max(j,1)
@@ -65,6 +70,8 @@ input_array_spacing - spacing associated with array from which we will perform i
 Interpolator_enum - enum value defining the type of interpolation
 keep_begining_same - will keep unmodified first layer of each axis - usefull when changing spacing
 extrapolate_value - value to use for extrapolation
+
+IMPORTANT!!! - by convention if index to interpolate is less than 0 we will use extrapolate_value (we work only on positive indicies here)
 """
 function interpolate_my(points_to_interpolate,input_array,input_array_spacing,interpolator_enum,keep_begining_same, extrapolate_value=0)
 
@@ -80,13 +87,15 @@ function interpolate_my(points_to_interpolate,input_array,input_array_spacing,in
     A_x1 = 1:input_array_spacing[1]:(old_size[1]+input_array_spacing[1]*old_size[1])
     A_x2 = 1:input_array_spacing[2]:(old_size[2]+input_array_spacing[2]*old_size[2])
     A_x3 = 1:input_array_spacing[3]:(old_size[3]+input_array_spacing[3]*old_size[3])
+    
     itp=extrapolate(itp, extrapolate_value)   
     itp = scale(itp, A_x1, A_x2,A_x3)
     # Create the new voxel data
+    # print("eeeeeeeeeeeeee $(itp(-1222.0,-1222.0,-1222.0))")
 
 
     res=collect(range(1,size(points_to_interpolate)[2]))
-    res=map(el->interpolate_point( points_to_interpolate[:,el],itp,keep_begining_same),res)
+    res=map(el->interpolate_point( points_to_interpolate[:,el],itp,keep_begining_same,extrapolate_value),res)
 
     return res
 end#interpolate_my

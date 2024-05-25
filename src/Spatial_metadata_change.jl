@@ -39,10 +39,9 @@ function resample_to_spacing(im::MedImage
 
     new_voxel_data=reshape(interpolated_points,(new_size[1],new_size[2],new_size[3]))
     # Check if array a and b have the same type
-    new_voxel_data=cast_to_array_b_type(new_voxel_data,im.voxel_data)
+    # new_voxel_data=cast_to_array_b_type(new_voxel_data,im.voxel_data)
 
-   
-    # new_spacing=(new_spacing[3],new_spacing[2],new_spacing[1])
+  
     # Create the new MedImage object
     new_im =update_voxel_and_spatial_data(im, new_voxel_data
     ,im.origin,new_spacing,im.direction)
@@ -88,18 +87,6 @@ function change_orientation_main(im::MedImage, new_orientation::Orientation_code
         spac_axis,sizz_axis,prim_origin_axis,op_sign=origin_transforms[origin_axis]
         res_origin[origin_axis]= origin1[prim_origin_axis]+((spac[spac_axis]*(sizz[sizz_axis]-1))*op_sign)
         
-        
-        # spac= [spac[p[1]],spac[p[2]],spac[p[3]]]
-        # sizzz=[(spac[1]*(sizz[3]-1)),(spac[2]*(sizz[2]-1)),(spac[3]*(sizz[1]-1))   ]
-
-        # loc=origin1[origin_axis]
-        # if(op=='+')
-        #     loc=origin1[origin_axis]+sizzz[sizz_axis]
-        # elseif(op=='-')
-        #     loc=origin1[origin_axis]-sizzz[sizz_axis]
-        # end
-        
-        # res_origin[origin_axis]=loc*flip
         
     end
 
