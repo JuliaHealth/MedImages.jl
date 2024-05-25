@@ -1,6 +1,7 @@
 include("./MedImage_data_struct.jl")
 include("./Utils.jl")
 include("./Load_and_save.jl")
+include("./orientattion_dicts.jl")
 
 using Interpolations
 
@@ -37,6 +38,10 @@ function resample_to_spacing(im::MedImage
     interpolated_points=interpolate_my(points_to_interpolate,im.voxel_data,old_spacing,interpolator_enum,true)
 
     new_voxel_data=reshape(interpolated_points,(new_size[1],new_size[2],new_size[3]))
+    # Check if array a and b have the same type
+    new_voxel_data=cast_to_array_b_type(new_voxel_data,im.voxel_data)
+
+   
     # new_spacing=(new_spacing[3],new_spacing[2],new_spacing[1])
     # Create the new MedImage object
     new_im =update_voxel_and_spatial_data(im, new_voxel_data
@@ -48,16 +53,6 @@ end#resample_to_spacing
 
 
 
-
-
-
-
-
-
-
-
-
-
 #  te force solution get all direction combinetions put it in sitk and try all possible ways to permute and reverse axis to get the same result as sitk then save the result in json or sth and use; do the same with the origin
 #     Additionally in similar manner save all directions in a form of a vector and associate it with 3 letter codes
 
@@ -65,42 +60,75 @@ end#resample_to_spacing
 """
 given a MedImage object and desired orientation encoded as 3 letter string (like RAS or LPS) return the MedImage object with the new orientation
 """
+
 function change_orientation(im::MedImage, new_orientation::Orientation_code)::MedImage
-    orientation_dict = Dict(
-        "RAS" => [-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0],
-        "LPS" => [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
-        "LAS" => [1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0],
-        "RSP" => [-1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0],
-        "LAI" => [1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0],
-        "RAI" => [-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0]
-    )
+    old_orientation = number_to_enum_orientation_dict[im.direction]
+    reorient_operation=orientation_pair_to_operation_dict[(old_orientation,new_orientation)]
+    return change_orientation_main(im, new_orientation,reorient_operation)
+end#change_orientation
 
-    if !haskey(orientation_dict, new_orientation)
-        error("Invalid orientation: $new_orientation")
+
+
+function change_orientation_main(im::MedImage, new_orientation::Orientation_code,reorient_operation)::MedImage
+    perm=reorient_operation[1]
+    reverse_axes=reorient_operation[2]
+    origin_transforms = reorient_operation[3]
+    spacing_transforms = reorient_operation[4]
+    
+    origin1=copy(collect(im.origin))
+
+    sizz=size(im.voxel_data)
+    spacing1=copy(collect(im.spacing))
+
+    res_origin=[0.0,0.0,0.0]
+
+    for origin_axis in [1,2,3]
+        
+        spac=collect(spacing1)
+        spac_axis,sizz_axis,prim_origin_axis,op_sign=origin_transforms[origin_axis]
+        res_origin[origin_axis]= origin1[prim_origin_axis]+((spac[spac_axis]*(sizz[sizz_axis]-1))*op_sign)
+        
+        
+        # spac= [spac[p[1]],spac[p[2]],spac[p[3]]]
+        # sizzz=[(spac[1]*(sizz[3]-1)),(spac[2]*(sizz[2]-1)),(spac[3]*(sizz[1]-1))   ]
+
+        # loc=origin1[origin_axis]
+        # if(op=='+')
+        #     loc=origin1[origin_axis]+sizzz[sizz_axis]
+        # elseif(op=='-')
+        #     loc=origin1[origin_axis]-sizzz[sizz_axis]
+        # end
+        
+        # res_origin[origin_axis]=loc*flip
+        
     end
 
-    new_direction = orientation_dict[new_orientation]
 
-    # Determine the axes to reverse and permute based on the new direction
-    reverse_axes = findall(x -> x < 0, new_direction)
-    permute_order = sortperm(abs.(new_direction))
+    # first we need to permute the voxel data to match the desired orientation 
+    im_voxel_data=copy(im.voxel_data)
+    if(length(perm)>0)
+        im_voxel_data=permutedims(im_voxel_data,(perm[1],perm[2],perm[3])) 
+    end    
 
-    # Apply the reverse and permute operations to the voxel data
-    new_voxel_data = im.voxel_data
-    for axis in reverse_axes
-        new_voxel_data = reverse(new_voxel_data, dims=axis)
+    if (length(reverse_axes)==1)
+        im_voxel_data=reverse(im_voxel_data;dims=reverse_axes[1])  
+    elseif (length(reverse_axes)>1)
+        im_voxel_data=reverse(im_voxel_data;dims=Tuple(reverse_axes))    
     end
-    new_voxel_data = permutedims(new_voxel_data, permute_order)
 
-    # Update the origin to be consistent with the changed direction
-    new_origin = im.origin[permute_order]
-    for axis in reverse_axes
-        new_origin[axis] = im.origin[axis] + (size(im.voxel_data, axis) - 1) * im.spacing[axis]
-    end
-    # Create a new MedImage with the new direction and the same voxel data, origin, and spacing
-    new_im = update_voxel_and_spatial_data(im, new_voxel_data
-    ,new_origin,im.spacing,new_direction)
 
+    
+    
+
+
+    # now we need to change spacing as needed
+    st=spacing_transforms
+    sp=im.spacing
+    new_spacing=(sp[st[1]],sp[st[2]],sp[st[3]])
+    new_im = update_voxel_and_spatial_data(im, im_voxel_data
+    ,res_origin,new_spacing,orientation_dict_enum_to_number[new_orientation])
+
+    # print("\n res_origin $(res_origin) \n")
     return new_im
   end#change_orientation
 

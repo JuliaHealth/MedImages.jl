@@ -1,7 +1,10 @@
 using Pkg
 # Pkg.add(["DICOM", "NIfTI", "Dictionaries", "Dates"])
 using DICOM, NIfTI, Dictionaries, Dates, PyCall
-sitk = pyimport_conda("SimpleITK","simpleITK")
+using Conda
+# Conda.add("SimpleITK")
+
+sitk = pyimport("SimpleITK")
 include("./MedImage_data_struct.jl")
 include("./Nifti_image_struct.jl")
 
@@ -84,7 +87,7 @@ calculates inverse of a 4x4 matrix
 """
 function calculate_inverse_44_matrix(input_matrix)
 
-  print(input_matrix)
+  # print(input_matrix)
   """
   INPUT MATRIX Is
   [r11 r12 r13 v1]
@@ -570,7 +573,6 @@ function load_images(path::String)::Array{MedImage}
     direction = set_direction_for_nifti_file(path,header_data_dict["qform_code_name"], header_data_dict["sform_code_name"], sform_qform_similar)
     voxel_arr=sitk.GetArrayFromImage(itk_nifti_image)
     voxel_arr=permutedims(voxel_arr,(3,2,1))
-    print(" sssssss  $(spacing)  voxel_arr $(size(voxel_arr))")
     spatial_metadata_keys = ["origin","spacing","direction"]
     spatial_metadata_values=  [origin,spacing,direction]
     spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys,spatial_metadata_values)

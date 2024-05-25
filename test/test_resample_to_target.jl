@@ -1,6 +1,10 @@
 using NIfTI,LinearAlgebra,DICOM
 using .dicom_nifti
-
+include("../src/Load_and_save.jl")
+# include("../src/Basic_transformations.jl")
+# include("./test_visualize.jl")
+include("./dicom_nifti.jl")
+include("../src/Resample_to_target.jl")
 
 """
 test if the resample_to_target of the image lead to correct change in the pixel array
