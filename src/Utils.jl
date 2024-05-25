@@ -108,6 +108,18 @@ function TransformIndexToPhysicalPoint_julia(index::Tuple{Int,Int,Int}
     return collect(collect(origin) .+ ((collect(index) ) .* collect(spacing)))
 end
 
+
+
+function ensure_tuple(arr)
+    if arr isa Tuple
+        return arr
+    elseif arr isa AbstractArray
+        return tuple(arr...)
+    else
+        error("Input must be a Tuple or an AbstractArray")
+    end
+  end
+
 # path_nifti="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
 # im=sitk.ReadImage(path_nifti)
 # indexx=(2,2,2)
