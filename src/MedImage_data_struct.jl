@@ -32,6 +32,7 @@ end
 Defining subimage type enum
 """
 @enum Image_subtype begin
+  CT_subtype
   ADC_subtype
   DWI_subtype
   T1_subtype
@@ -54,9 +55,8 @@ Definition for standardised MedImage Struct
   direction::NTuple{9, Float64} #direction cosines for orientation
   image_type::Image_type#enum defining the type of the image
   image_subtype::Image_subtype #enum defining the subtype of the image
-  voxel_datatype::DataType #type of the voxel data stored
-  date_of_saving = Dates.today()
-  acquisition_time::String = Dates.now()
+  date_of_saving::DateTime = Dates.today()
+  acquisition_time::DateTime = Dates.now()
   patient_id::String #the id of the patient in the data file
   current_device::current_device_enum = CPU_current_device# CPU or GPU , preferrably GPU
   study_uid::String=string(UUIDs.uuid4())#unique identifier for the study
@@ -64,10 +64,10 @@ Definition for standardised MedImage Struct
   series_uid::String=string(UUIDs.uuid4())#unique identifier for the series
   study_description::String=" "
   legacy_file_name::String=" "#original file name
-  display_data::Dictionary=Dict() #color values for the data such as RGB or gray
-  clinical_data::Dictionary=Dict()#dictionary with age , gender data of the patient
+  display_data::Dict{Any, Any}=Dict() #color values for the data such as RGB or gray
+  clinical_data::Dict{Any, Any}=Dict()#dictionary with age , gender data of the patient
   is_contrast_administered::Bool=false #bool, any substance for visibility enhancement given during imaging procedure?
-  metadata::Dictionary=Dict() #dictionary for any other relevant metadata from individual data file
+  metadata::Dict{Any, Any}=Dict() #dictionary for any other relevant metadata from individual data file
 end
 
 

@@ -2,6 +2,7 @@ using Pkg
 # Pkg.add(["DICOM", "NIfTI", "Dictionaries", "Dates"])
 using DICOM, NIfTI, Dictionaries, Dates, PyCall
 using Conda
+using Accessors
 # Conda.add("SimpleITK")
 
 sitk = pyimport("SimpleITK")
@@ -577,10 +578,8 @@ function load_images(path::String)::Array{MedImage}
     spatial_metadata_values=  [origin,spacing,direction]
     spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys,spatial_metadata_values)
 
-    return [MedImage([voxel_arr, origin, spacing, direction
-    , image_type, image_subtype, voxel_datatype, date_of_saving, acquisition_time
-    ,patient_id, current_device, study_uid
-    , patient_uid, series_uid, study_description, legacy_file_name, display_data, clinical_data, is_contrast_administered, metadata])]
+    return [MedImage(voxel_data=voxel_arr, origin= origin, spacing=spacing, direction=direction,patient_id="test_id"
+    , image_type=CT_type, image_subtype=CT_subtype, legacy_file_name=string(legacy_file_name))]
 
     #return [MedImage([nifti_image.raw, nifti_image_header.pixdim[2:4], (nifti_image_header.srow_x[1:3], nifti_image_header.srow_y[1:3], nifti_image_header.srow_z[1:3]), (nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z), " ", " "])]
 
@@ -759,32 +758,30 @@ function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
 
 end
 
+function ensure_tuple(arr)
+  if arr isa Tuple
+      return arr
+  elseif arr isa AbstractArray
+      return tuple(arr...)
+  else
+      error("Input must be a Tuple or an AbstractArray")
+  end
+end
+
 function update_voxel_and_spatial_data(old_image::MedImage, new_voxel_data::AbstractArray
   ,new_origin,new_spacing,new_direction)
-  
-  return MedImage(
-      new_voxel_data, 
-      new_origin, 
-      new_spacing, 
-      new_direction, 
-      # old_image.spatial_metadata, 
-      old_image.image_type, 
-      old_image.image_subtype, 
-      old_image.voxel_datatype, 
-      old_image.date_of_saving, 
-      old_image.acquistion_time, 
-      old_image.patient_id, 
-      old_image.current_device, 
-      old_image.study_uid, 
-      old_image.patient_uid, 
-      old_image.series_uid, 
-      old_image.study_description, 
-      old_image.legacy_file_name, 
-      old_image.display_data, 
-      old_image.clinical_data, 
-      old_image.is_contrast_administered, 
-      old_image.metadata)
 
+  res=@set old_image.voxel_data=new_voxel_data
+  res=@set res.origin=ensure_tuple(new_origin)
+  res=@set res.spacing=ensure_tuple(new_spacing)
+  res=@set res.direction=ensure_tuple(new_direction)
+  # voxel_data=new_voxel_data
+  # origin=new_origin
+  # spacing=new_spacing
+  # direction=new_direction
+
+  # return @pack! old_image = voxel_data, origin, spacing, direction
+  return res
 end
 
 function load_image(path)

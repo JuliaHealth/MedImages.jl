@@ -96,6 +96,7 @@ test_change_orientation(path_nifti)
 
 # sitk = pyimport_conda("SimpleITK", "simpleitk")
 
+
 # spac=(6.3,4.1,0.5)
 # # Load the image from path
 # med_im=load_image(path_nifti)
