@@ -1,5 +1,6 @@
 include("./MedImage_data_struct.jl")
 include("./Load_and_save.jl")
+include("./Spatial_metadata_change.jl")
 using Interpolations
 
 """
@@ -22,44 +23,69 @@ It require multiple steps some idea of implementation is below
 
    """
    function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator_enum::Interpolator_enum)::MedImage
-    # Create interpolation object based on the interpolator type
-    itp = nothing
+
+    # get direction from one and set it to other
+    im_moving=change_orientation(im_moving,number_to_enum_orientation_dict[im_fixed.direction])
+
+    # Calculate the transformation from moving image space to fixed image space
+    old_spacing = im_moving.spacing
+    new_spacing=im_fixed.spacing
+    new_size = size(im_fixed.voxel_data)
+    points_to_interpolate = get_base_indicies_arr(new_size)
+
+    points_to_interpolate=points_to_interpolate.-1
+    points_to_interpolate=points_to_interpolate.*new_spacing
+    points_to_interpolate=points_to_interpolate.+1
+
+    #adding diffrence in origin we act as if moving image has origin 0.0,0.0,0.0 - needed for interpolation
+    origin_diff=(collect(im_fixed.origin)-collect(im_moving.origin))
+    points_to_interpolate=points_to_interpolate.+origin_diff
+
+    #now we need to filter out all points that are outside of the fixed image
+    #so by convention that origin is at 0,0,0 we need to filter out all points that are negative plus all 
+    #points that are bigger than the size of the fixed image
+    
+    
+    # new_size_physical = (new_size .* new_spacing)+origin_diff
+    # points_to_interpolate=points_to_interpolate[findall(x->x[1]>=0 && x[2]>=0 && x[3]>=0 && x[1]<=new_size_physical[1] && x[2]<=new_size_physical[2] && x[3]<=new_size_physical[3],points_to_interpolate)]
+    # if(size(points_to_interpolate)[0]==0)
+    #     return update_voxel_and_spatial_data(im, zeros(new_size) ,im_fixed.origin,new_spacing,im_fixed.direction)
+    # else
 
 
-    check origin of both images as for example in case origin of the moving image is not in the fixed image we need to return zeros
 
-    if interpolator_enum == Nearest_neighbour_en
-        itp = interpolate(im_moving.voxel_data, BSpline(Constant()))
-    elseif interpolator_enum == Linear_en
-        itp = interpolate(im_moving.voxel_data, BSpline(Linear()))
-    elseif interpolator_enum == B_spline_en
-        itp = interpolate(im_moving.voxel_data, BSpline(Cubic(Line(OnGrid()))))
-    end
-    krowa we need to use scaled b spline interpolations from interpolators.jl or gridded ones
 
-    # Create a new voxel_data array for the resampled image
-    new_voxel_data = similar(im_fixed.voxel_data)
+    #now issue is that could have points outside of the new new_size_physical; and or new_size_physical can be bigger then old_image
+    #hence we need to establish in new space how big is the are we had points on - so the size of transformed image
+    #then we need to reshape it to this size
+    #then we need to pad to the desired size (size of fixed image)
 
-    krowa get direction from one and set it to other
-    # Calculate the transformation from fixed image space to moving image space
-    fixed_to_moving = inv(reshape(collect(im_moving.direction), (3, 3))) * collect(im_fixed.spacing ./ im_moving.spacing)
+    # Get the values at the corners
+    corners = [
+        im_fixed.voxel_data[1, 1, 1],
+        im_fixed.voxel_data[1, 1, end],
+        im_fixed.voxel_data[1, end, 1],
+        im_fixed.voxel_data[1, end, end],
+        im_fixed.voxel_data[end, 1, 1],
+        im_fixed.voxel_data[end, 1, end],
+        im_fixed.voxel_data[end, end, 1],
+        im_fixed.voxel_data[end, end, end]
+    ]
 
-    # Create an array of indices
-    indices = get_base_indicies_arr(size(im_fixed.voxel_data)) #CartesianIndices(im_fixed.voxel_data)
 
-    # Transform the index to physical space in the fixed image
-    fixed_physical = im_fixed.origin .+ ((indices .- 1).* collect(im_fixed.spacing))
 
-    # Transform the physical space to index space in the moving image
-    moving_index = ((fixed_physical .- collect(im_moving.origin)) .+ 1).*fixed_to_moving
+    value_to_extrapolate=median(corners)
+    interpolated_points=interpolate_my(points_to_interpolate,im_moving.voxel_data,old_spacing,interpolator_enum,false,value_to_extrapolate)
 
-    # Interpolate the moving image at the transformed index
-    new_voxel_data = itp.(permutedims(moving_index,(1,2)))
+    new_voxel_data=reshape(interpolated_points,(new_size[1],new_size[2],new_size[3]))
+    new_voxel_data=cast_to_array_b_type(new_voxel_data,im.voxel_data)
 
-    # Create a new MedImage with the resampled voxel_data and the same spatial metadata as the fixed image
-    resampled_image = update_voxel_and_spatial_data(im_moving, new_voxel_data, im_fixed.origin, im_fixed.spacing, im_fixed.direction)
 
-    return resampled_image
+    new_im =update_voxel_and_spatial_data(im_moving, new_voxel_data
+    ,im_fixed.origin,new_spacing,im_fixed.direction)
+
+
+    return new_im
 end
 
 

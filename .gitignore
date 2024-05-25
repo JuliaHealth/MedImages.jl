@@ -4,3 +4,4 @@ src/test_rotacji/
 src/test_rotacji.nii.gz
 test_data/pet_data/
 .vscode/settings.json
+test_data/for_resample_target/
