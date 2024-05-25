@@ -1,6 +1,8 @@
-using Pkg
+using Pkg,Dates
 # Pkg.add(["Dictionaries"])
 using Dictionaries
+using Parameters
+using UUIDs
 include("./Nifti_image_struct.jl")
 """
 Here we define necessary data structures for the project.
@@ -16,17 +18,27 @@ Main data structure is a MedImage object which is a 3D image with some metadata.
 Defining image type enum
 """
 @enum Image_type begin
-  MRI
-  PET
-  CT
+  MRI_type
+  PET_type
+  CT_type
 end
 
+@enum current_device_enum begin
+  CPU_current_device
+  GPU_current_device
 
+end
 """
 Defining subimage type enum
 """
 @enum Image_subtype begin
-  subtypes
+  ADC_subtype
+  DWI_subtype
+  T1_subtype
+  T2_subtype
+  FLAIR_subtype
+  FDG_subtype
+  PSMA_subtype
 end
 
 
@@ -35,35 +47,34 @@ Definition for standardised MedImage Struct
 """
 #following struct can be expanded with all the relevant meta data mentioned within the readme.md of MedImage.jl
 #struct for now, will switch to MetaArrays when it has GPU support
-struct MedImage
+@with_kw struct MedImage
   voxel_data #mutlidimensional array (512,512,3)
-  origin
-  spacing
-  direction #direction cosines for orientation
-  # spatial_metadata::Dictionaries.Dictionary #dictionary with properties for spacing, offset from spacing,orientation, origin, direction
+  origin::Tuple{Float64,Float64,Float64}
+  spacing::Tuple{Float64,Float64,Float64}#spacing between the voxels
+  direction::NTuple{9, Float64} #direction cosines for orientation
   image_type::Image_type#enum defining the type of the image
   image_subtype::Image_subtype #enum defining the subtype of the image
-  voxel_datatype #type of the voxel data stored
-  date_of_saving #date of saving of the relevant imaging data file
-  acquistion_time #time at which the data acquisition for the image took place
-  patient_id #the id of the patient in the data file
-  current_device::String# CPU or GPU , preferrably GPU
-  study_uid
-  patient_uid
-  series_uid
-  study_description
-  legacy_file_name::String#original file name
-  display_data #color values for the data such as RGB or gray
-  clinical_data::Dictionary#dictionary with age , gender data of the patient
-  is_contrast_administered::Bool #bool, any substance for visibility enhancement given during imaging procedure?
-  metadata::Dictionary #dictionary for any other relevant metadata from individual data file
+  voxel_datatype::DataType #type of the voxel data stored
+  date_of_saving = Dates.today()
+  acquisition_time::String = Dates.now()
+  patient_id::String #the id of the patient in the data file
+  current_device::current_device_enum = CPU_current_device# CPU or GPU , preferrably GPU
+  study_uid::String=string(UUIDs.uuid4())#unique identifier for the study
+  patient_uid::String=string(UUIDs.uuid4())#unique identifier for the patient
+  series_uid::String=string(UUIDs.uuid4())#unique identifier for the series
+  study_description::String=" "
+  legacy_file_name::String=" "#original file name
+  display_data::Dictionary=Dict() #color values for the data such as RGB or gray
+  clinical_data::Dictionary=Dict()#dictionary with age , gender data of the patient
+  is_contrast_administered::Bool=false #bool, any substance for visibility enhancement given during imaging procedure?
+  metadata::Dictionary=Dict() #dictionary for any other relevant metadata from individual data file
 end
 
 
 #constructor function for MedImage
-function MedImage(MedImage_struct_attribute_values::Array{Any})::MedImage
-  return MedImage(MedImage_struct_attribute_values...)
-end
+# function MedImage(MedImage_struct_attribute_values::Array{Any})::MedImage
+#   return MedImage(MedImage_struct_attribute_values...)
+# end
 
 
 
