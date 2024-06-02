@@ -2,7 +2,7 @@ using Dates
 # Pkg.add(["Dictionaries"])
 using Dictionaries
 using Parameters
-using UUIDs
+# using UUIDs
 include("./Nifti_image_struct.jl")
 """
 Here we define necessary data structures for the project.
