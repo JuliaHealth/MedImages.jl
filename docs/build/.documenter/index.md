@@ -7,7 +7,7 @@
 helper function for nifti returns a 4x4 matrix for srow_x, srow_y and srow_z
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L175-L178)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L175-L178)
 
 </div>
 <br>
@@ -20,7 +20,7 @@ helper function for nifti returns a 4x4 matrix for srow_x, srow_y and srow_z
 return array of cartesian indices for given dimensions in a form of array
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Utils.jl#L3-L5)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Utils.jl#L3-L5)
 
 </div>
 <br>
@@ -33,7 +33,7 @@ return array of cartesian indices for given dimensions in a form of array
 enums based on https://github.com/InsightSoftwareConsortium/ITK/blob/311b7060ef39e371f3cd209ec135284ff5fde735/Modules/Core/Common/include/itkSpatialOrientation.h#L88
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/MedImage_data_struct.jl#L98-L100)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/MedImage_data_struct.jl#L98-L100)
 
 </div>
 <br>
@@ -48,7 +48,7 @@ perform the interpolation of the set of points in a given space input_array - ar
 IMPORTANT!!! - by convention if index to interpolate is less than 0 we will use extrapolate_value (we work only on positive indicies here)
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Utils.jl#L66-L75)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Utils.jl#L66-L75)
 
 </div>
 <br>
@@ -61,7 +61,7 @@ IMPORTANT!!! - by convention if index to interpolate is less than 0 we will use 
 helper function for dicom #1 returns an array of unique SERIES INSTANCE UID within dicom files within a dicom directory
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L18-L21)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L18-L21)
 
 </div>
 <br>
@@ -74,7 +74,7 @@ helper function for dicom #1 returns an array of unique SERIES INSTANCE UID with
 helper function for nifti #2 return relevant xform string names from codes (qform and sform)
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L65-L68)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L65-L68)
 
 </div>
 <br>
@@ -91,7 +91,7 @@ given two MedImage objects and a Interpolator enum value return the moving MedIm
   
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Resample_to_target.jl#L19-L26)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Resample_to_target.jl#L19-L26)
 
 </div>
 <br>
@@ -104,7 +104,7 @@ given two MedImage objects and a Interpolator enum value return the moving MedIm
 helper function for nifti calculates inverse of a 4x4 matrix
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L86-L89)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L86-L89)
 
 </div>
 <br>
@@ -117,7 +117,7 @@ helper function for nifti calculates inverse of a 4x4 matrix
 helper function for nifti #1 return a concatenated string for encoded iterables
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L52-L55)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L52-L55)
 
 </div>
 <br>
@@ -130,7 +130,7 @@ helper function for nifti #1 return a concatenated string for encoded iterables
 interpolate the point in the given space keep_begining_same - will keep unmodified first layer of each axis - usefull when changing spacing
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Utils.jl#L35-L38)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Utils.jl#L35-L38)
 
 </div>
 <br>
@@ -143,7 +143,7 @@ interpolate the point in the given space keep_begining_same - will keep unmodifi
 Definitions of basic interpolators
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/MedImage_data_struct.jl#L86-L88)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/MedImage_data_struct.jl#L86-L88)
 
 </div>
 <br>
@@ -158,7 +158,7 @@ given a MedImage object and a Tuple that contains the scaling values for each ax
 we are setting Interpolator by using Interpolator enum return the scaled MedImage object 
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Basic_transformations.jl#L235-L240)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Basic_transformations.jl#L235-L240)
 
 </div>
 <br>
@@ -171,7 +171,7 @@ we are setting Interpolator by using Interpolator enum return the scaled MedImag
 Indicating do we want to change underlying pixel array spatial metadata or both
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/MedImage_data_struct.jl#L91-L93)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/MedImage_data_struct.jl#L91-L93)
 
 </div>
 <br>
@@ -184,7 +184,7 @@ Indicating do we want to change underlying pixel array spatial metadata or both
 overwriting this function from Interpolations.jl becouse check_ranges giving error
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Resample_to_target.jl#L8-L11)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Resample_to_target.jl#L8-L11)
 
 </div>
 <br>
@@ -197,7 +197,7 @@ overwriting this function from Interpolations.jl becouse check_ranges giving err
 Defining image type enum
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/MedImage_data_struct.jl#L17-L19)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/MedImage_data_struct.jl#L17-L19)
 
 </div>
 <br>
@@ -210,7 +210,7 @@ Defining image type enum
 cast array a to the value type of array b
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Utils.jl#L16-L18)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Utils.jl#L16-L18)
 
 </div>
 <br>
@@ -223,7 +223,7 @@ cast array a to the value type of array b
 Defining subimage type enum
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/MedImage_data_struct.jl#L31-L33)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/MedImage_data_struct.jl#L31-L33)
 
 </div>
 <br>
@@ -236,7 +236,7 @@ Defining subimage type enum
 helper function for nifti returns a string version for the specified intent code from nifti
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L191-L194)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L191-L194)
 
 </div>
 <br>
@@ -249,7 +249,7 @@ helper function for nifti returns a string version for the specified intent code
 helper function for nifti 
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L282-L284)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L282-L284)
 
 </div>
 <br>
@@ -262,7 +262,7 @@ helper function for nifti
 helper function for nifti setting the direction cosines (orientation) for a 3D nifti file
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L459-L462)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L459-L462)
 
 </div>
 <br>
@@ -275,7 +275,7 @@ helper function for nifti setting the direction cosines (orientation) for a 3D n
 helper function for dicom #2 returns an array of pixel data for unique ids within dicom files
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L28-L31)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L28-L31)
 
 </div>
 <br>
@@ -288,7 +288,7 @@ helper function for dicom #2 returns an array of pixel data for unique ids withi
 helper function for nifti setting spacing for 3D nifti filesd(4D nfiti file yet to be added)
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L403-L406)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L403-L406)
 
 </div>
 <br>
@@ -301,7 +301,7 @@ helper function for nifti setting spacing for 3D nifti filesd(4D nfiti file yet 
 helper function for nifti setting the origin for a 3D nifti file
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L470-L473)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L470-L473)
 
 </div>
 <br>
@@ -314,7 +314,7 @@ helper function for nifti setting the origin for a 3D nifti file
 helper function for nifti create a qform matrix from the quaterns
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L112-L115)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L112-L115)
 
 </div>
 <br>
@@ -327,7 +327,7 @@ helper function for nifti create a qform matrix from the quaterns
 helper function for nifti  checking similarity of s_transformation_matrix and q_transformation_matrix
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L424-L427)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L424-L427)
 
 </div>
 <br>
@@ -340,7 +340,7 @@ helper function for nifti  checking similarity of s_transformation_matrix and q_
 given a MedImage object and a Tuples that contains the location of the begining of the crop (crop_beg) and the size of the crop (crop_size) crops image It modifies both pixel array and metadata we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used) return the cropped MedImage object 
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Basic_transformations.jl#L161-L166)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Basic_transformations.jl#L161-L166)
 
 </div>
 <br>
@@ -353,7 +353,7 @@ given a MedImage object and a Tuples that contains the location of the begining 
 helper function nifti return qfac after calculation
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L76-L79)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L76-L79)
 
 </div>
 <br>
@@ -366,7 +366,7 @@ helper function nifti return qfac after calculation
 given a MedImage object translation value (translate_by) and axis (translate_in_axis) in witch to translate the image return translated image It is diffrent from pad by the fact that it changes only the metadata of the image do not influence pixel array we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used) return the translated MedImage object
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Basic_transformations.jl#L212-L217)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Basic_transformations.jl#L212-L217)
 
 </div>
 <br>
@@ -379,7 +379,7 @@ given a MedImage object translation value (translate_by) and axis (translate_in_
 helper function for nifti creates a nifti_image struct which basically encapsulates all the necessary data, contains voxel data
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L293-L296)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L293-L296)
 
 </div>
 <br>
@@ -392,7 +392,7 @@ helper function for nifti creates a nifti_image struct which basically encapsula
 helper function for nifti calculating spacing scale from xyzt_units to space
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L271-L274)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L271-L274)
 
 </div>
 <br>
@@ -405,7 +405,7 @@ helper function for nifti calculating spacing scale from xyzt_units to space
 helper function for nifti creates a data dictionary for header data can be used to create a new NIfTI.NIfTI1Header when saving to a file
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Load_and_save.jl#L210-L213)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Load_and_save.jl#L210-L213)
 
 </div>
 <br>
@@ -418,7 +418,7 @@ helper function for nifti creates a data dictionary for header data can be used 
 given a MedImage object and a Tuples that contains the information on how many voxels to add in each axis (pad_beg) and on the end of the axis (pad_end) we are performing padding by adding voxels with value pad_val It modifies both pixel array and metadata we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used) return the cropped MedImage object 
 
 
-[source](https://github.com/divital-coder/MedImage.jl/blob/185b08bb8afbc110ffa367a54f0681b62f470481/src/Basic_transformations.jl#L184-L190)
+[source](https://github.com/divital-coder/MedImage.jl/blob/7ebaae2762f57b2523d16df63497866d4b8f4fbf/src/Basic_transformations.jl#L184-L190)
 
 </div>
 <br>
