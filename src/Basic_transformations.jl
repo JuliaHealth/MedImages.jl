@@ -134,7 +134,7 @@ end
 
 
 
-function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator, crop::Bool=true)::MedImage
+function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator_enum, crop::Bool=true)::MedImage
   # Compute the rotation matrix
 
   R = Rodrigues_rotation_matrix(image, axis, angle)
@@ -164,7 +164,7 @@ It modifies both pixel array and metadata
 we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used)
 return the cropped MedImage object 
 """
-function crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator)::MedImage
+function crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::MedImage
 
     # Create a view of the original voxel_data array with the specified crop
     cropped_voxel_data = @view im.voxel_data[crop_beg[1]:(crop_beg[1]+crop_size[1]-1), crop_beg[2]:(crop_beg[2]+crop_size[2]-1), crop_beg[3]:(crop_beg[3]+crop_size[3]-1)]
@@ -188,7 +188,7 @@ It modifies both pixel array and metadata
 we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used)
 return the cropped MedImage object 
 """
-function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64},pad_val, Interpolator::Interpolator)::MedImage
+function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64},pad_val, Interpolator::Interpolator_enum)::MedImage
 
     # Create padding arrays for the beginning and end of each axis
     pad_beg_array = fill(pad_val, (pad_beg[1], im.voxel_data.size[2], im.voxel_data.size[3]))
@@ -215,7 +215,7 @@ It is diffrent from pad by the fact that it changes only the metadata of the ima
 we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used)
 return the translated MedImage object
 """
-function translate_mi(im::MedImage, translate_by::Int64, translate_in_axis::Int64, Interpolator::Interpolator)::MedImage
+function translate_mi(im::MedImage, translate_by::Int64, translate_in_axis::Int64, Interpolator::Interpolator_enum)::MedImage
 
     # Create a copy of the origin
     translated_origin = copy(im.origin)
@@ -238,7 +238,7 @@ given a MedImage object and a Tuple that contains the scaling values for each ax
 we are setting Interpolator by using Interpolator enum
 return the scaled MedImage object 
 """
-function scale_mi(im::MedImage, scale::Tuple{Float64,Float64,Float64}, Interpolator_enum::Interpolator)::MedImage
+function scale_mi(im::MedImage, scale::Tuple{Float64,Float64,Float64}, Interpolator::Interpolator_enum)::MedImage
 
     # Determine the interpolation method
     interp_method = nothing

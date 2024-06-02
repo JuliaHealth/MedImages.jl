@@ -4,7 +4,7 @@ using   Dictionaries, Dates, PyCall
 using Conda
 using Accessors
 # Conda.add("SimpleITK")
-
+Conda.add("SimpleITK")
 sitk = pyimport("SimpleITK")
 include("./MedImage_data_struct.jl")
 include("./Nifti_image_struct.jl")
