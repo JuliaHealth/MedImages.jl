@@ -1,8 +1,7 @@
 
-using NIfTI,LinearAlgebra,DICOM,Test
-using Pkg
+using LinearAlgebra,Test
 # Pkg.add(["DICOM", "NIfTI", "Dictionaries", "Dates"])
-using DICOM, NIfTI, Dictionaries, Dates, PyCall
+using  Dictionaries, Dates, PyCall
 using Conda
 
 # Conda.add("SimpleITK")

@@ -1,3 +1,3 @@
-using Pkg
+# using Pkg
 
-Pkg.test("CUDA")
+# Pkg.test("CUDA")

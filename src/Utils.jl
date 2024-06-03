@@ -1,4 +1,3 @@
-using  Pkg
 
 """
 return array of cartesian indices for given dimensions in a form of array

@@ -1,4 +1,4 @@
-using NIfTI,LinearAlgebra,DICOM
+using LinearAlgebra
 include("../src/Load_and_save.jl")
 # include("../src/Basic_transformations.jl")
 # include("./test_visualize.jl")
