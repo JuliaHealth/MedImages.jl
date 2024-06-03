@@ -16,7 +16,7 @@ include("./dicom_nifti.jl")
 
 # using .dicom_nifti
 
-using NIfTI,LinearAlgebra,DICOM
+using LinearAlgebra
 
 
 # sitk = pyimport_conda("SimpleITK","simpleITK")
