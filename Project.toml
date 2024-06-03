@@ -1,4 +1,4 @@
-name = "MedImage"
+name = "MedImages"
 uuid = "fbff095b-7891-4fc4-b5e5-3cd99b9dd225"
 authors = ["Jakub Mitura <jakub.mitura@gmail.com>"]
 version = "0.1.0"
