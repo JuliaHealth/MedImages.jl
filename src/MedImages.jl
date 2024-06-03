@@ -1,4 +1,4 @@
-module MedImage3D
+module MedImages
 include("./Nifti_image_struct.jl")
 include("./MedImage_data_struct.jl")
 include("./Load_and_save.jl")

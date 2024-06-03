@@ -2,8 +2,7 @@
 using Dictionaries, Dates, PyCall
 using Conda
 using Accessors
-# Conda.add("SimpleITK")
-Conda.add("SimpleITK")
+
 sitk = pyimport("SimpleITK")
 include("./MedImage_data_struct.jl")
 include("./Nifti_image_struct.jl")
@@ -19,9 +18,10 @@ helper function for dicom #1
 returns an array of unique SERIES INSTANCE UID within dicom files within a dicom directory
 """
 function unique_series_id_within_dicom_files(dicom_data_array)
-  return map(dicom_file_data -> dicom_file_data[tag"SeriesInstanceUID"], dicom_data_array) |>
-         Set |>
-         collect
+  return " "
+  # return map(dicom_file_data -> dicom_file_data[tag"SeriesInstanceUID"], dicom_data_array) |>
+  #        Set |>
+  #        collect
 end
 
 """
