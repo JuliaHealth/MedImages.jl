@@ -1,4 +1,4 @@
-# MedImage.jl
+# MedImages.jl
 
 The filesystem and choice of metadata is loosly based on BIDS format [1]
 
