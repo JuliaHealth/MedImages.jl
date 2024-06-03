@@ -1,6 +1,6 @@
-using Pkg
+# using Pkg
 # Pkg.add(["DICOM", "NIfTI", "Dictionaries", "Dates"])
-using DICOM, NIfTI, Dictionaries, Dates, PyCall
+using   Dictionaries, Dates, PyCall
 using Conda
 using Accessors
 # Conda.add("SimpleITK")

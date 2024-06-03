@@ -1,4 +1,4 @@
-using NIfTI, LinearAlgebra, DICOM,HDF5,Test
+using  LinearAlgebra, DICOM,HDF5,Test
 include("../src/Load_and_save.jl")
 # include("../src/Basic_transformations.jl")
 # include("./test_visualize.jl")
