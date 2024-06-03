@@ -78,11 +78,6 @@ end
 
 
 
-
-
-
-
-
 """
 Definitions of basic interpolators
 """
