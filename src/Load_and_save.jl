@@ -211,7 +211,7 @@ end
 helper function for nifti
 creates a data dictionary for header data can be used to create a new NIfTI.NIfTI1Header when saving to a file
 """
-function formulate_header_data_dict(nifti_image_header::NIfTI.NIfTI1Header)::Dictionaries.Dictionary
+function formulate_header_data_dict(nifti_image_header)::Dictionaries.Dictionary
 
   #below in the auxfile[1] and description[1] are the actual values for the field, followed by the string representation of them
   #for qform_code and sform_code , their string representations of separate feilds such as qform_code_name and sform_code_name
@@ -294,7 +294,7 @@ end
 helper function for nifti
 creates a nifti_image struct which basically encapsulates all the necessary data, contains voxel data
 """
-function formulate_nifti_image_struct(nifti_image::NIfTI.NIVolume)::Nifti_image
+function formulate_nifti_image_struct(nifti_image)
   nifti_image_header = nifti_image.header
 
   #set dimensions of data array 
@@ -501,12 +501,12 @@ function load_images(path::String)::Array{MedImage}
 
 
 
-    nifti_image = NIfTI.niread(path)
-    nifti_image_header = nifti_image.header
+    # nifti_image = NIfTI.niread(path)
+    # nifti_image_header = nifti_image.header
 
 
-    #1 voxel data from the nifti image
-    voxel_data = nifti_image.raw #this data is in image coordinates (conversion to world coordinates )
+    # #1 voxel data from the nifti image
+    # voxel_data = nifti_image.raw #this data is in image coordinates (conversion to world coordinates )
 
     # voxel_data = permutedims(voxel_data, (3, 2, 1))
 
