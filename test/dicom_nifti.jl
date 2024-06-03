@@ -1,7 +1,7 @@
 
-using LinearAlgebra,Test
+using LinearAlgebra, Test
 # Pkg.add(["DICOM", "NIfTI", "Dictionaries", "Dates"])
-using  Dictionaries, Dates, PyCall
+using Dictionaries, Dates, PyCall
 using Conda
 
 # Conda.add("SimpleITK")
@@ -58,23 +58,23 @@ compare two object MedImage and simpleITK image in some cases like rotations
 we can expect that there will be some diffrences on the edges of pixel
 arrays still the center should be the same
 """
-function test_object_equality(medIm::MedImage,sitk_image)
-    
+function test_object_equality(medIm::MedImage, sitk_image)
+
     #e want just the center of the image as we have artifacts on edges
 
     # arr = pyconvert(Array,sitk.GetArrayFromImage(sitk_image))# we need numpy in order for pycall to automatically change it into julia array
     arr = sitk.GetArrayFromImage(sitk_image)# we need numpy in order for pycall to automatically change it into julia array
     spacing = sitk_image.GetSpacing()
-    
+
     # sx,sy,sz=size(arr)
     # sx=Int(round(sx/4))
     # sy=Int(round(sy/4))
     # sz=Int(round(sz/4))
 
     # print("ssss shape  $(size(arr)) $([sx,sy,sz]) medim $(size(medIm.voxel_data[sx:end-sx,sy:end-sy,sz:end-sz]))  sitk $(size(medIm.voxel_data[sx:end-sx,sy:end-sy,sz:end-sz] )) \n")
-    vox=medIm.voxel_data
-    vox=permutedims(vox,(3,2,1))
-    vv=vox-arr
+    vox = medIm.voxel_data
+    vox = permutedims(vox, (3, 2, 1))
+    vv = vox - arr
     # print("\n mmmmmmmmm $(maximum(vv)) $(maximum(arr))  \n")
     # print("vvvox arrr $(isapprox(arr ,vox; rtol =0.4)) \n ")
 
@@ -88,37 +88,34 @@ function test_object_equality(medIm::MedImage,sitk_image)
     # @test isapprox(spacing
     # ,medIm.spacing; atol =0.1)
     # print("\n dirrr sitk $(collect(sitk_image.GetDirection())) medim $(collect(medIm.direction)) \n")
-    
-   
-
-    @test isapprox(collect(sitk_image.GetDirection())
-    ,collect(medIm.direction); atol =0.2)
-
-    @test isapprox(collect(sitk_image.GetSpacing())
-    ,collect(medIm.spacing); atol =0.1)
-        
 
 
-    @test isapprox(collect(sitk_image.GetOrigin())
-    ,collect(medIm.origin); atol =0.1)
 
-    @test isapprox(arr ,vox; rtol =0.1)
+    @test isapprox(collect(sitk_image.GetDirection()), collect(medIm.direction); atol=0.2)
+
+    @test isapprox(collect(sitk_image.GetSpacing()), collect(medIm.spacing); atol=0.1)
+
+
+
+    @test isapprox(collect(sitk_image.GetOrigin()), collect(medIm.origin); atol=0.1)
+
+    @test isapprox(arr, vox; rtol=0.1)
 
 
 end#test_image_equality
 
 
 
-function test_image_equality_full(path_dicom,path_nifti)
+function test_image_equality_full(path_dicom, path_nifti)
 
-    path_nifti_from_dicom="./test_data/test_nifti.nii.gz"
-    dicom_im=load_image(path_dicom)
-    save_image(dicom_im,path_nifti_from_dicom)
+    path_nifti_from_dicom = "./test_data/test_nifti.nii.gz"
+    dicom_im = load_image(path_dicom)
+    save_image(dicom_im, path_nifti_from_dicom)
 
-    test_image_equality(path_nifti,path_nifti_from_dicom)
+    test_image_equality(path_nifti, path_nifti_from_dicom)
 
 
-end    
+end
 
 """
 create_nii_from_medimage(med_image::MedImage, file_path::String)
@@ -128,17 +125,17 @@ Create a .nii.gz file from a MedImage object and save it to the given file path.
 function create_nii_from_medimage(med_image::MedImage, file_path::String)
     # Convert voxel_data to a numpy array (Assuming voxel_data is stored in Julia array format)
     voxel_data_np = np.array(med_image.voxel_data)
-    
+
     # Create a SimpleITK image from numpy array
     image_sitk = sitk.GetImageFromArray(voxel_data_np)
-    
+
     # Set spatial metadata
     image_sitk.SetOrigin(med_image.origin)
     image_sitk.SetSpacing(med_image.spacing)
     image_sitk.SetDirection(med_image.direction)
-    
+
     # Save the image as .nii.gz
-    sitk.WriteImage(image_sitk, file_path* ".nii.gz")
+    sitk.WriteImage(image_sitk, file_path * ".nii.gz")
 end
 
 
@@ -151,4 +148,4 @@ end
 
 # test_object_equality(medimage_instance,sitk.ReadImage(p))
 
-# dcm_data_array = dcmdir_parse("/workspaces/MedImage.jl/MedImage3D/test_data/ScalarVolume_0")
+# dcm_data_array = dcmdir_parse("/workspaces/MedImage.jl/MedImage/test_data/ScalarVolume_0")

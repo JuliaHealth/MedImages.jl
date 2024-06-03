@@ -1,5 +1,5 @@
 
-using   Dictionaries, Dates, PyCall
+using Dictionaries, Dates, PyCall
 using Conda
 using Accessors
 # Conda.add("SimpleITK")
@@ -410,7 +410,7 @@ function set_spacing_for_nifti_files(dimension)
   dx = dimension[1]
   dy = dimension[2]
   dz = dimension[3] #pixdim from nifti
-  return (dx, dy , dz)
+  return (dx, dy, dz)
 end
 
 
@@ -418,39 +418,39 @@ end
 
 
 
-  
+
 
 """
 helper function for nifti 
 checking similarity of s_transformation_matrix and q_transformation_matrix
 """
 function check_sform_qform_similarity(q_transformation_matrix, s_transformation_matrix)
-  s_rotation_scale = s_transformation_matrix[1:3,1:3]
-  q_rotation_scale = q_transformation_matrix[1:3,1:3]
-  
+  s_rotation_scale = s_transformation_matrix[1:3, 1:3]
+  q_rotation_scale = q_transformation_matrix[1:3, 1:3]
+
   qform_sform_similar = true
-    # Check if matrices have same dimensions
+  # Check if matrices have same dimensions
   if size(s_rotation_scale) != size(q_rotation_scale)
-        qform_sform_similar =  false
+    qform_sform_similar = false
   end
-    
-    # Check each element for equality within tolerance
-    for i in 1:size(s_rotation_scale, 1)
-        for j in 1:size(s_rotation_scale, 2)
-            if abs(s_rotation_scale[i, j] - q_rotation_scale[i, j]) > 1e-5
-                qform_sform_similar =  false
-            end
-        end
+
+  # Check each element for equality within tolerance
+  for i in 1:size(s_rotation_scale, 1)
+    for j in 1:size(s_rotation_scale, 2)
+      if abs(s_rotation_scale[i, j] - q_rotation_scale[i, j]) > 1e-5
+        qform_sform_similar = false
+      end
     end
-    
-    #Second check that the translations are the same with very small tolerance
+  end
+
+  #Second check that the translations are the same with very small tolerance
   if sum(abs.(s_transformation_matrix[:, 4] - q_transformation_matrix[:, 4])) > 1e-7
-    qform_sform_similar =  false
-  end 
+    qform_sform_similar = false
+  end
   if sum(abs.(s_transformation_matrix[4, :] - q_transformation_matrix[4, :])) > 1e-7
-    qform_sform_similar =  false
-  end 
-  
+    qform_sform_similar = false
+  end
+
   return qform_sform_similar
 end
 
@@ -459,22 +459,22 @@ end
 helper function for nifti
 setting the direction cosines (orientation) for a 3D nifti file
 """
-function set_direction_for_nifti_file(nifti_file_path,qform_xform_string, sform_xform_string, qform_sform_similar)
-#using SimpleITk for getting direction cosines
-itk_nifti_image = sitk.ReadImage(nifti_file_path)
-direction_cosines = itk_nifti_image.GetDirection()
-return direction_cosines
+function set_direction_for_nifti_file(nifti_file_path, qform_xform_string, sform_xform_string, qform_sform_similar)
+  #using SimpleITk for getting direction cosines
+  itk_nifti_image = sitk.ReadImage(nifti_file_path)
+  direction_cosines = itk_nifti_image.GetDirection()
+  return direction_cosines
 end
 
 """
 helper function for nifti
 setting the origin for a 3D nifti file
 """
-function set_origin_for_nifti_file(qform_sform_similar, s_transformation_matrix )
-if qform_sform_similar
-    origin = (s_transformation_matrix[1,4], s_transformation_matrix[2,4], s_transformation_matrix[3,4])
+function set_origin_for_nifti_file(qform_sform_similar, s_transformation_matrix)
+  if qform_sform_similar
+    origin = (s_transformation_matrix[1, 4], s_transformation_matrix[2, 4], s_transformation_matrix[3, 4])
     return origin
-end
+  end
 end
 
 
@@ -509,18 +509,18 @@ function load_images(path::String)::Array{MedImage}
 
     # voxel_data = permutedims(voxel_data, (3, 2, 1))
 
-  """
+    """
 
 
-      origin = nothing
-      spacing = nothing
-      direction = nothing #direction cosines for oreintation
-      #2 data for the fields within the MedImage struct
+        origin = nothing
+        spacing = nothing
+        direction = nothing #direction cosines for oreintation
+        #2 data for the fields within the MedImage struct
 
-      spatial_metadata_keys = ["origin", "spacing", "orientation"]
-      spatial_metadata_values = [nothing, nothing, nothing]
-      spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
-  """
+        spatial_metadata_keys = ["origin", "spacing", "orientation"]
+        spatial_metadata_values = [nothing, nothing, nothing]
+        spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
+    """
 
     #3 Image type
     image_type = Image_type(1) #set to MRI/PET/CT
@@ -561,25 +561,24 @@ function load_images(path::String)::Array{MedImage}
     metadata_values = [header_data_dict, nifti_image_struct]
     metadata = Dictionaries.Dictionary(metadata_keys, metadata_values)
 
-    
+
     """resetting origin, spacing and direction (since we have all the nifti image struct now)"""
     sform_qform_similar = check_sform_qform_similarity(nifti_image_struct.qto_xyz, nifti_image_struct.sto_xyz)
-    
+
 
     itk_nifti_image = sitk.ReadImage(path)
     origin = itk_nifti_image.GetOrigin()
     # origin = set_origin_for_nifti_file(sform_qform_similar, nifti_image_struct.sto_xyz)
     spacing = itk_nifti_image.GetSpacing()  #set_spacing_for_nifti_files([nifti_image_struct.dx, nifti_image_struct.dy,nifti_image_struct.dz])
     # spacing=(spacing[3],spacing[2],spacing[1])
-    direction = set_direction_for_nifti_file(path,header_data_dict["qform_code_name"], header_data_dict["sform_code_name"], sform_qform_similar)
-    voxel_arr=sitk.GetArrayFromImage(itk_nifti_image)
-    voxel_arr=permutedims(voxel_arr,(3,2,1))
-    spatial_metadata_keys = ["origin","spacing","direction"]
-    spatial_metadata_values=  [origin,spacing,direction]
-    spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys,spatial_metadata_values)
+    direction = set_direction_for_nifti_file(path, header_data_dict["qform_code_name"], header_data_dict["sform_code_name"], sform_qform_similar)
+    voxel_arr = sitk.GetArrayFromImage(itk_nifti_image)
+    voxel_arr = permutedims(voxel_arr, (3, 2, 1))
+    spatial_metadata_keys = ["origin", "spacing", "direction"]
+    spatial_metadata_values = [origin, spacing, direction]
+    spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
 
-    return [MedImage(voxel_data=voxel_arr, origin= origin, spacing=spacing, direction=direction,patient_id="test_id"
-    , image_type=CT_type, image_subtype=CT_subtype, legacy_file_name=string(legacy_file_name))]
+    return [MedImage(voxel_data=voxel_arr, origin=origin, spacing=spacing, direction=direction, patient_id="test_id", image_type=CT_type, image_subtype=CT_subtype, legacy_file_name=string(legacy_file_name))]
 
     #return [MedImage([nifti_image.raw, nifti_image_header.pixdim[2:4], (nifti_image_header.srow_x[1:3], nifti_image_header.srow_y[1:3], nifti_image_header.srow_z[1:3]), (nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z), " ", " "])]
 
@@ -705,7 +704,7 @@ end
 #   nifti_file_data =permutedims(medimage.voxel_data,(3,2,1))
 #   nifti_file_volume = NIfTI.NIVolume(nifti_file_header, nifti_file_data)
 #   NIfTI.niwrite("output_nifti_file.nii.gz",nifti_file_volume)
-  
+
 #   end
 
 # end
@@ -713,18 +712,18 @@ end
 
 function create_nii_from_medimage(med_image::MedImage, file_path::String)
   # Convert voxel_data to a numpy array (Assuming voxel_data is stored in Julia array format)
-  voxel_data_np =med_image.voxel_data
-  voxel_data_np=permutedims(voxel_data_np,(3,2,1))
+  voxel_data_np = med_image.voxel_data
+  voxel_data_np = permutedims(voxel_data_np, (3, 2, 1))
   # Create a SimpleITK image from numpy array
   image_sitk = sitk.GetImageFromArray(voxel_data_np)
-  
+
   # Set spatial metadata
   image_sitk.SetOrigin(med_image.origin)
   image_sitk.SetSpacing(med_image.spacing)
   image_sitk.SetDirection(med_image.direction)
-  
+
   # Save the image as .nii.gz
-  sitk.WriteImage(image_sitk, file_path* ".nii.gz")
+  sitk.WriteImage(image_sitk, file_path * ".nii.gz")
 end
 
 
@@ -732,40 +731,39 @@ end
 #**************************************************
 
 function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
-  
+
   return MedImage(
-      new_voxel_data, 
-      old_image.origin, 
-      old_image.spacing, 
-      old_image.direction, 
-      # old_image.spatial_metadata, 
-      old_image.image_type, 
-      old_image.image_subtype, 
-      old_image.voxel_datatype, 
-      old_image.date_of_saving, 
-      old_image.acquistion_time, 
-      old_image.patient_id, 
-      old_image.current_device, 
-      old_image.study_uid, 
-      old_image.patient_uid, 
-      old_image.series_uid, 
-      old_image.study_description, 
-      old_image.legacy_file_name, 
-      old_image.display_data, 
-      old_image.clinical_data, 
-      old_image.is_contrast_administered, 
-      old_image.metadata)
+    new_voxel_data,
+    old_image.origin,
+    old_image.spacing,
+    old_image.direction,
+    # old_image.spatial_metadata, 
+    old_image.image_type,
+    old_image.image_subtype,
+    old_image.voxel_datatype,
+    old_image.date_of_saving,
+    old_image.acquistion_time,
+    old_image.patient_id,
+    old_image.current_device,
+    old_image.study_uid,
+    old_image.patient_uid,
+    old_image.series_uid,
+    old_image.study_description,
+    old_image.legacy_file_name,
+    old_image.display_data,
+    old_image.clinical_data,
+    old_image.is_contrast_administered,
+    old_image.metadata)
 
 end
 
 
-function update_voxel_and_spatial_data(old_image::MedImage, new_voxel_data::AbstractArray
-  ,new_origin,new_spacing,new_direction)
+function update_voxel_and_spatial_data(old_image::MedImage, new_voxel_data::AbstractArray, new_origin, new_spacing, new_direction)
 
-  res=@set old_image.voxel_data=new_voxel_data
-  res=@set res.origin=ensure_tuple(new_origin)
-  res=@set res.spacing=ensure_tuple(new_spacing)
-  res=@set res.direction=ensure_tuple(new_direction)
+  res = @set old_image.voxel_data = new_voxel_data
+  res = @set res.origin = ensure_tuple(new_origin)
+  res = @set res.spacing = ensure_tuple(new_spacing)
+  res = @set res.direction = ensure_tuple(new_direction)
   # voxel_data=new_voxel_data
   # origin=new_origin
   # spacing=new_spacing
@@ -794,7 +792,7 @@ for testing purposes within test_data the volume-0.nii.gz constitutes a 3-D nift
 """
 
 #array_of_objects = load_image("../test_data/ScalarVolume_0")
-# array_of_objects = load_image("/workspaces/MedImage.jl/MedImage3D/test_data/volume-0.nii.gz")
+# array_of_objects = load_image("/workspaces/MedImage.jl/MedImage/test_data/volume-0.nii.gz")
 #println(length(array_of_objects[1].pixel_array))
 #
 
