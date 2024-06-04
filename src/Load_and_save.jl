@@ -1,6 +1,5 @@
 
 using Dictionaries, Dates, PyCall
-using Conda
 using Accessors
 
 

@@ -1,8 +1,0 @@
-channels = ["anaconda", "conda-forge"]
-
-[deps]
-numpy= ""
-seaborn = ""
-SimpleITK = ""
-python = ">=3.5,<4"
-monai = ""

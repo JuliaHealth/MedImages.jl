@@ -2,7 +2,6 @@
 using LinearAlgebra, Test
 # Pkg.add(["DICOM", "NIfTI", "Dictionaries", "Dates"])
 using Dictionaries, Dates, PyCall
-using Conda
 
 # Conda.add("SimpleITK")
 include("../src/MedImage_data_struct.jl")
