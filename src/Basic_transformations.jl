@@ -1,5 +1,5 @@
 include("MedImage_data_struct.jl")
-using ImageTransformations, CoordinateTransformations, Interpolations, StaticArrays, LinearAlgebra, Rotations, Dictionaries
+using  CoordinateTransformations, Interpolations, StaticArrays, LinearAlgebra, Rotations, Dictionaries
 using LinearAlgebra
 
 """
