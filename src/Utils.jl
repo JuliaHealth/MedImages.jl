@@ -191,6 +191,8 @@ function ensure_tuple(arr)
 # """
 function create_nii_from_medimage(med_image::MedImage, file_path::String)
     # Convert voxel_data to a numpy array (Assuming voxel_data is stored in Julia array format)
+    sitk = pyimport("SimpleITK")
+    np = pyimport("numpy")
     voxel_data_np = np.array(med_image.voxel_data)
     
     # Create a SimpleITK image from numpy array

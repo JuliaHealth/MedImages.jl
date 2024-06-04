@@ -36,8 +36,8 @@ function test_resample_to_target(path_nifti_fixed,path_nifti_moving)
 end
 
 
-path_nifti_2 = "/home/jm/projects_new/MedImage.jl/test_data/for_resample_target/ct_soft_pat_3_sudy_0.nii.gz"
-path_nifti_1 = "/home/jm/projects_new/MedImage.jl/test_data/for_resample_target/pat_2_SUV_sudy_0.nii.gz"
+# path_nifti_2 = "/home/jm/projects_new/MedImage.jl/test_data/for_resample_target/ct_soft_pat_3_sudy_0.nii.gz"
+# path_nifti_1 = "/home/jm/projects_new/MedImage.jl/test_data/for_resample_target/pat_2_SUV_sudy_0.nii.gz"
 
-# test_resample_to_spacing(path_nifti)
-test_resample_to_target(path_nifti_1,path_nifti_2)
+# # test_resample_to_spacing(path_nifti)
+# test_resample_to_target(path_nifti_1,path_nifti_2)

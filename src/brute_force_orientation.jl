@@ -61,10 +61,11 @@ ORIENTATION_LAS=>"LAS",
 string_to_orientation_enum = Dict(value => key for (key, value) in orientation_enum_to_string)
 
 
-sitk = pyimport_conda("SimpleITK","simpleITK")
+
 
 
 function change_image_orientation(path_nifti, orientation)
+    sitk = pyimport_conda("SimpleITK","simpleITK")
     # Read the image
     image = sitk.ReadImage(path_nifti)
     
@@ -93,7 +94,7 @@ Additionally in similar manner save all directions in a form of a vector and ass
 
 
 function brute_force_find_perm_rev(sitk_image1_arr,sitk_image2_arr)
-
+    sitk = pyimport_conda("SimpleITK","simpleITK")
     comb =collect(combinations([1,2,3]))
     push!(comb,[])
 
@@ -127,7 +128,7 @@ end
 
 
 function brute_force_find_perm_spacing(spacing_source,spacing_target)
-
+    sitk = pyimport_conda("SimpleITK","simpleITK")
     comb =collect(combinations([1,2,3]))
     push!(comb,[])
 
@@ -155,6 +156,7 @@ end
 
 
 function establish_orginn_transformation(medim,sitk_image2,new_orientation,perm_main,reverse_axes,spacing_transforms)
+    sitk = pyimport_conda("SimpleITK","simpleITK")
     sizz=size(medim.voxel_data)
     origin1=medim.origin
     origin2=sitk_image2.GetOrigin()
@@ -216,6 +218,7 @@ end
 
 
 function brute_force_find_from_sitk_single(path_nifti,or_enum_1::Orientation_code, or_enum_2::Orientation_code)
+    sitk = pyimport_conda("SimpleITK","simpleITK")
     or_enum_1_str=orientation_enum_to_string[or_enum_1]
     or_enum_2_str=orientation_enum_to_string[or_enum_2]
     sitk_image1 = change_image_orientation(path_nifti, or_enum_1_str)
@@ -244,6 +247,7 @@ end
 
 
 function brute_force_find_from_sitk(path_nifti)
+    sitk = pyimport_conda("SimpleITK","simpleITK")
     opts=[]
     for value_out in collect(instances(Orientation_code))
         for value_in in collect(instances(Orientation_code))
@@ -264,16 +268,16 @@ function get_orientations_vectors(path_nifti)
 end
 
 # path_nifti = "/home/jm/projects_new/MedImage.jl/test_data/volume-0.nii.gz"
-path_nifti = "/home/jm/projects_new/MedImage.jl/test_data/synthethic_small.nii.gz"
+# path_nifti = "/home/jm/projects_new/MedImage.jl/test_data/synthethic_small.nii.gz"
 
-# im=sitk.ReadImage("/home/jm/projects_new/MedImage.jl/test_data/volume-0.nii.gz")
-im=sitk.GetImageFromArray(rand(8,10,16))
-# im.SetSpacing([1.0,2.0,3.0])
-# im.SetOrigin((5.0,7.0,11.0))
-im.SetSpacing([1.06,2.055,3.13])
-im.SetOrigin((1.012,-2.2130,3.041))
-im.SetDirection([-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0])
-sitk.WriteImage(im,"/home/jm/projects_new/MedImage.jl/test_data/synthethic_small.nii.gz")
+# # im=sitk.ReadImage("/home/jm/projects_new/MedImage.jl/test_data/volume-0.nii.gz")
+# im=sitk.GetImageFromArray(rand(8,10,16))
+# # im.SetSpacing([1.0,2.0,3.0])
+# # im.SetOrigin((5.0,7.0,11.0))
+# im.SetSpacing([1.06,2.055,3.13])
+# im.SetOrigin((1.012,-2.2130,3.041))
+# im.SetDirection([-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0])
+# sitk.WriteImage(im,"/home/jm/projects_new/MedImage.jl/test_data/synthethic_small.nii.gz")
 
 
 # oo=get_orientations_vectors(path_nifti)
@@ -340,11 +344,11 @@ sitk.WriteImage(im,"/home/jm/projects_new/MedImage.jl/test_data/synthethic_small
 #     ,ORIENTATION_SLP => (0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0)
 # )
 
-all_res=brute_force_find_from_sitk(path_nifti)
-dict_curr=Dict(all_res)
-for el in collect(dict_curr)
-    println(",$(el)")
-end
+# all_res=brute_force_find_from_sitk(path_nifti)
+# dict_curr=Dict(all_res)
+# for el in collect(dict_curr)
+#     println(",$(el)")
+# end
 
 
 # save("/home/jakubmitura/projects/MedImage.jl/test_data/my_dict.jld", "my_dict", dict_curr)

@@ -5,7 +5,6 @@ using Dictionaries, Dates, PyCall
 using Conda
 
 # Conda.add("SimpleITK")
-sitk = pyimport("SimpleITK")
 include("../src/MedImage_data_struct.jl")
 include("../src/Load_and_save.jl")
 
@@ -59,7 +58,7 @@ we can expect that there will be some diffrences on the edges of pixel
 arrays still the center should be the same
 """
 function test_object_equality(medIm::MedImage, sitk_image)
-
+    sitk = pyimport("SimpleITK")
     #e want just the center of the image as we have artifacts on edges
 
     # arr = pyconvert(Array,sitk.GetArrayFromImage(sitk_image))# we need numpy in order for pycall to automatically change it into julia array
@@ -107,7 +106,7 @@ end#test_image_equality
 
 
 function test_image_equality_full(path_dicom, path_nifti)
-
+    sitk = pyimport("SimpleITK")
     path_nifti_from_dicom = "./test_data/test_nifti.nii.gz"
     dicom_im = load_image(path_dicom)
     save_image(dicom_im, path_nifti_from_dicom)
@@ -123,9 +122,10 @@ create_nii_from_medimage(med_image::MedImage, file_path::String)
 Create a .nii.gz file from a MedImage object and save it to the given file path.
 """
 function create_nii_from_medimage(med_image::MedImage, file_path::String)
+    sitk = pyimport("SimpleITK")
+    np = pyimport("numpy")
     # Convert voxel_data to a numpy array (Assuming voxel_data is stored in Julia array format)
     voxel_data_np = np.array(med_image.voxel_data)
-
     # Create a SimpleITK image from numpy array
     image_sitk = sitk.GetImageFromArray(voxel_data_np)
 
