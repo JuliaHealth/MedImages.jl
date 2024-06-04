@@ -1,6 +1,6 @@
 # MedImages.jl
 
-The filesystem and choice of metadata is loosly based on BIDS format [1]
+The filesystem and choice of metadata is loosly based on BIDS format [1] .
 
 
 This project was created to standardize data handling of 3D and 4D medical imaging. It is currently subject to change and I am open to suggestions that would improve the library in construction.
