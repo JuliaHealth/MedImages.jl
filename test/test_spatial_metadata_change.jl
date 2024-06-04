@@ -9,7 +9,7 @@ include("../src/Spatial_metadata_change.jl")
 
 
 function sitk_resample(path_nifti, targetSpac)
-
+    sitk = pyimport_conda("SimpleITK", "simpleitk")
     image = sitk.ReadImage(path_nifti)
     origSize = image.GetSize()
     orig_spacing = image.GetSpacing()
@@ -32,6 +32,7 @@ end
 
 
 function change_image_orientation(path_nifti, orientation)
+    sitk = pyimport_conda("SimpleITK", "simpleitk")
     # Read the image
     image = sitk.ReadImage(path_nifti)
 
@@ -56,7 +57,7 @@ OnCell() - give interpolation in the center of the voxel
 """
 function test_resample_to_spacing(path_nifti)
 
-
+    sitk = pyimport_conda("SimpleITK", "simpleitk")
     for spac in [(1.0, 2.0, 1.1), (2.0, 3.0, 4.0), (5.0, 0.9, 0.7)]        # Load SimpleITK
         # Load the image from path
         med_im = load_image(path_nifti)
@@ -87,23 +88,6 @@ function test_change_orientation(path_nifti)
 end
 
 
-path_nifti = "/home/jm/projects_new/MedImage.jl/test_data/volume-0.nii.gz"
-# path_nifti = "/home/jm/projects_new/MedImage.jl/test_data/for_resample_target/pat_2_sudy_0_2022-09-16_Standardized_Uptake_Value_body_weight.nii.gz"
-# path_nifti = "/home/jm/projects_new/MedImage.jl/test_data/synthethic_small.nii.gz"
+# path_nifti = "/home/jm/projects_new/MedImage.jl/test_data/volume-0.nii.gz"
+# test_change_orientation(path_nifti)
 
-# test_resample_to_spacing(path_nifti)
-test_change_orientation(path_nifti)
-
-# sitk = pyimport_conda("SimpleITK", "simpleitk")
-
-
-# spac=(6.3,4.1,0.5)
-# # Load the image from path
-# med_im=load_image(path_nifti)
-# # sitk.ReadImage(path_nifti)
-# sitk_image=sitk_resample(path_nifti,spac)
-# med_im=resample_to_spacing(med_im,spac,B_spline_en)
-# test_object_equality(med_im,sitk_image)
-
-# sitk.WriteImage(sitk_image,"/home/jakubmitura/projects/MedImage.jl/test_data/volume-0_resampled_sitk.nii.gz")
-# create_nii_from_medimage(med_im,"/home/jakubmitura/projects/MedImage.jl/test_data/volume-0_resampled_medimage.nii.gz")

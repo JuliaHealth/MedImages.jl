@@ -3,7 +3,7 @@ using Dictionaries, Dates, PyCall
 using Conda
 using Accessors
 
-sitk = pyimport("SimpleITK")
+
 include("./MedImage_data_struct.jl")
 include("./Nifti_image_struct.jl")
 include("./Utils.jl")
@@ -461,6 +461,7 @@ setting the direction cosines (orientation) for a 3D nifti file
 """
 function set_direction_for_nifti_file(nifti_file_path, qform_xform_string, sform_xform_string, qform_sform_similar)
   #using SimpleITk for getting direction cosines
+  sitk = pyimport("SimpleITK")
   itk_nifti_image = sitk.ReadImage(nifti_file_path)
   direction_cosines = itk_nifti_image.GetDirection()
   return direction_cosines
@@ -565,7 +566,7 @@ function load_images(path::String)::Array{MedImage}
     """resetting origin, spacing and direction (since we have all the nifti image struct now)"""
     sform_qform_similar = check_sform_qform_similarity(nifti_image_struct.qto_xyz, nifti_image_struct.sto_xyz)
 
-
+    sitk = pyimport("SimpleITK")
     itk_nifti_image = sitk.ReadImage(path)
     origin = itk_nifti_image.GetOrigin()
     # origin = set_origin_for_nifti_file(sform_qform_similar, nifti_image_struct.sto_xyz)
@@ -715,6 +716,7 @@ function create_nii_from_medimage(med_image::MedImage, file_path::String)
   voxel_data_np = med_image.voxel_data
   voxel_data_np = permutedims(voxel_data_np, (3, 2, 1))
   # Create a SimpleITK image from numpy array
+  sitk = pyimport("SimpleITK")
   image_sitk = sitk.GetImageFromArray(voxel_data_np)
 
   # Set spatial metadata

@@ -26,9 +26,6 @@ using LinearAlgebra
 # CondaPkg.add("numpy")
 # CondaPkg.add_pip("simpleitk", version="")
 
-sitk = pyimport("SimpleITK")
-np = pyimport("numpy")
-
 
 function load_image(path)
     """
@@ -84,6 +81,9 @@ function resample(image, transform)
     :param transform: An sitk transform (ex. resizing, rotation, etc.
     :return: The transformed sitk image
     """
+    sitk = pyimport("SimpleITK")
+    np = pyimport("numpy")
+    
     reference_image = image
     interpolator = sitk.sitkLinear
     default_value = 0
@@ -108,6 +108,9 @@ function rotation3d(image, axis, theta)
     respectively
     :return: The rotated image
     """
+    sitk = pyimport("SimpleITK")
+    np = pyimport("numpy")
+
     theta = np.deg2rad(theta)
     euler_transform = sitk.Euler3DTransform()
     image_center = get_center(image)
@@ -175,6 +178,9 @@ function test_single_rotation(medIm,sitk_image, axis::Int, theta::Float64,debug_
     and the metadata the operation will be tasted against Python simple itk function
     
     """
+    sitk = pyimport("SimpleITK")
+    np = pyimport("numpy")
+
     #sitk implementation
     rotated=rotation3d(sitk_image,axis, theta)
 
@@ -221,9 +227,9 @@ function test_rotation(path_nifti,debug_folder_path,dummy_run=false)
 end
 
 
-debug_folder="/home/jakubmitura/projects/MedImage.jl/test_data/debug"
-p="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
-test_rotation(p,debug_folder,false)
+# debug_folder="/home/jakubmitura/projects/MedImage.jl/test_data/debug"
+# p="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
+# test_rotation(p,debug_folder,false)
 
 
 
@@ -253,7 +259,8 @@ end#sitk_crop
 
 function test_single_crop(medIm,sitk_image, begining, size,debug_folder_path,dummy_run)
     #sitk implementation
-    
+    sitk = pyimport("SimpleITK")
+    np = pyimport("numpy")    
     cropped=sitk_crop(sitk_image,begining, size)
     if(dummy_run)
         sitk.WriteImage(cropped, "$(debug_folder_path)/cropped_$(begining)_$(size).nii.gz")
@@ -297,6 +304,10 @@ in case of begining it will mean first voxel and size how big will be the chunk 
 """
 
 function sitk_pad(sitk_image,pad_beg,pad_end,pad_val)
+    sitk = pyimport("SimpleITK")
+    np = pyimport("numpy")
+
+
     extract = sitk.ConstantPadImageFilter()
     extract.SetConstant(pad_val)
     extract.SetPadLowerBound(pad_beg)
@@ -311,6 +322,9 @@ function test_pads(path_nifti,debug_folder_path,dummy_run=false)
     and the metadata the operation will be tasted against Python simple itk function
 
     """   
+    sitk = pyimport("SimpleITK")
+    np = pyimport("numpy")
+
     for pad_beg in [(10,11,13),(15,17,19)]
         for pad_end in [(10,11,13),(15,17,19),(30,31,32)]
             for pad_val in [0.0,111.5]
@@ -340,6 +354,9 @@ end
 reference sitk translate function
 """
 function sitk_translate(image,translate_by,translate_in_axis)
+    sitk = pyimport("SimpleITK")
+    np = pyimport("numpy")
+
     translatee=[0,0,0]
     translatee[translate_in_axis]=translate_by
     transform=sitk.TranslationTransform(3,translatee )
@@ -360,7 +377,8 @@ and the metadata the operation will be tasted against Python simple itk function
 
 """
 function test_translate(path_nifti,debug_folder_path,dummy_run)
-    
+    sitk = pyimport("SimpleITK")
+    np = pyimport("numpy")    
     # Load the image from path
 
     for t_val in [1,10,16]
@@ -399,6 +417,9 @@ and the metadata the operation will be tasted against Python simple itk function
 
 # Scale the image using SimpleITK
 function sitk_scale(image, zoom)
+    sitk = pyimport("SimpleITK")
+    np = pyimport("numpy")
+
     scale_transform = sitk.ScaleTransform(3, [zoom, zoom, zoom])
 
     res=sitk.Resample(image, scale_transform, sitk.sitkBSpline, 0.0)
