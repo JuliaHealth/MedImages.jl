@@ -21,10 +21,10 @@ function cast_to_array_b_type(a,b)
         # Cast array a to the value type of array b
         if eltype(b) in [Int8,Int16,Int32, Int64, UInt8,UInt16,UInt32, UInt64]
             # Apply rounding to the array
-            a = round.(a)  # Array{Int64,1}
+            a = round.(a)  
         end
 
-        a = convert(Array{eltype(b)}, a)  # Array{Float64,1}
+        a = convert(Array{eltype(b)}, a)  
         return a
     else
         return a
