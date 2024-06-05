@@ -1,6 +1,6 @@
 
 using Dictionaries, Dates, PyCall
-using Accessors
+using Accessors,UUIDs
 
 
 include("./MedImage_data_struct.jl")
@@ -543,7 +543,7 @@ function load_images(path::String)::Array{MedImage}
     #12 series uid
     series_uid = nothing
     #13 study description
-    study_description = formulate_string(nifti_image_header.descrip)
+    # study_description = formulate_string(nifti_image_header.descrip)
     #14 legacy file name
     legacy_file_name = split(path, "/")[length(split(path, "/"))]
     #15 display data : RGB or gray
@@ -556,14 +556,14 @@ function load_images(path::String)::Array{MedImage}
 
     metadata_keys = ["header_data_dict", "nifti_image_struct"]
 
-    header_data_dict = formulate_header_data_dict(nifti_image_header)
-    nifti_image_struct = formulate_nifti_image_struct(nifti_image)
-    metadata_values = [header_data_dict, nifti_image_struct]
-    metadata = Dictionaries.Dictionary(metadata_keys, metadata_values)
+    # header_data_dict = formulate_header_data_dict(nifti_image_header)
+    # nifti_image_struct = formulate_nifti_image_struct(nifti_image)
+    # metadata_values = [header_data_dict, nifti_image_struct]
+    # metadata = Dictionaries.Dictionary(metadata_keys, metadata_values)
 
 
     """resetting origin, spacing and direction (since we have all the nifti image struct now)"""
-    sform_qform_similar = check_sform_qform_similarity(nifti_image_struct.qto_xyz, nifti_image_struct.sto_xyz)
+    # sform_qform_similar = check_sform_qform_similarity(nifti_image_struct.qto_xyz, nifti_image_struct.sto_xyz)
 
     sitk = pyimport("SimpleITK")
     itk_nifti_image = sitk.ReadImage(path)
@@ -571,7 +571,8 @@ function load_images(path::String)::Array{MedImage}
     # origin = set_origin_for_nifti_file(sform_qform_similar, nifti_image_struct.sto_xyz)
     spacing = itk_nifti_image.GetSpacing()  #set_spacing_for_nifti_files([nifti_image_struct.dx, nifti_image_struct.dy,nifti_image_struct.dz])
     # spacing=(spacing[3],spacing[2],spacing[1])
-    direction = set_direction_for_nifti_file(path, header_data_dict["qform_code_name"], header_data_dict["sform_code_name"], sform_qform_similar)
+    # direction = set_direction_for_nifti_file(path, header_data_dict["qform_code_name"], header_data_dict["sform_code_name"], sform_qform_similar)
+    direction=itk_nifti_image.GetDirection()
     voxel_arr = sitk.GetArrayFromImage(itk_nifti_image)
     voxel_arr = permutedims(voxel_arr, (3, 2, 1))
     spatial_metadata_keys = ["origin", "spacing", "direction"]

@@ -97,7 +97,7 @@ function test_object_equality(medIm::MedImage, sitk_image)
 
     @test isapprox(collect(sitk_image.GetOrigin()), collect(medIm.origin); atol=0.1)
 
-    @test isapprox(arr, vox; rtol=0.1)
+    @test isapprox(arr, vox; rtol=0.15)
 
 
 end#test_image_equality

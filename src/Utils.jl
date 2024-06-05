@@ -8,7 +8,7 @@ function get_base_indicies_arr(dims)
     indices=Tuple.(collect(indices))
     indices=collect(Iterators.flatten(indices))
     indices=reshape(indices,(3,dims[1]*dims[2]*dims[3]))
-    indices=permutedims(indices,(1,2))
+    # indices=permutedims(indices,(1,2))
     return indices
   end#get_base_indicies_arr
   
@@ -44,21 +44,19 @@ function interpolate_point(point,itp, keep_begining_same=false,extrapolate_value
         return extrapolate_value
     end
 
-    i_1= max(i,1)
-    j_1= max(j,1)
-    k_1= max(k,1)
+
     if(keep_begining_same)
-        if((i==1))
-            i_1=1
+        if((i<1))
+            i=1
         end        
-        if((j==1))
-            j_1=1
+        if((j<1))
+            j=1
         end        
-        if((k==1))
-            k_1=1
+        if((k<1))
+            k=1
         end                
     end
-    return itp(i_1, j_1,k_1)
+    return itp(i, j,k)
     
 end#interpolate_point    
 
