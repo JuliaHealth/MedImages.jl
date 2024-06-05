@@ -58,12 +58,18 @@ OnCell() - give interpolation in the center of the voxel
 function test_resample_to_spacing(path_nifti)
 
     sitk = pyimport_conda("SimpleITK", "simpleitk")
+    index=0
     for spac in [(1.0, 2.0, 1.1), (2.0, 3.0, 4.0), (5.0, 0.9, 0.7)]        # Load SimpleITK
+        index+=1
         # Load the image from path
         med_im = load_image(path_nifti)
         # sitk.ReadImage(path_nifti)
         sitk_image = sitk_resample(path_nifti, spac)
         med_im = resample_to_spacing(med_im, spac, B_spline_en)
+
+        # sitk.WriteImage(sitk_image, "/home/jakubmitura/projects/MedImage.jl/test_data/debug/sitk_$(index).nii.gz")
+        # create_nii_from_medimage(med_im,"/home/jakubmitura/projects/MedImage.jl/test_data/debug/medim_$(index)")
+
         test_object_equality(med_im, sitk_image)
 
     end
