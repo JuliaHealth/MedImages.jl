@@ -88,6 +88,7 @@ function test_change_orientation(path_nifti)
 end
 
 
-# path_nifti = "/home/jm/projects_new/MedImage.jl/test_data/volume-0.nii.gz"
+path_nifti = "/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
+test_resample_to_spacing(path_nifti)
 # test_change_orientation(path_nifti)
 
