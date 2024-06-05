@@ -3,7 +3,7 @@
 The filesystem and choice of metadata is loosly based on BIDS format [1] .
 
 
-This project was created to standardize data handling of 3D and 4D medical imaging. It is currently subject to change and I am open to suggestions that would improve the library in construction.
+This project was created to standardize data handling of 3D and 4D medical imaging, for now without support for ultrasonography as we are looking for contributor with expertise in this area . It is currently subject to change and I am open to suggestions that would improve the library in construction.
 I've included below in categories what needs to be done and some basic ideas on How to approach it. I will post it for consultations with the community and then process to create test cases where Python SimpleItk (or other) methods will be treated as a reference.
 1. Designing data structure - requirements (need to explicitly specify the most important and the rest will be just in an additional dictionary)
    * hold voxel data as a multidimensional array
