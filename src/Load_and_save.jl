@@ -742,7 +742,7 @@ function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
     # old_image.spatial_metadata, 
     old_image.image_type,
     old_image.image_subtype,
-    old_image.voxel_datatype,
+    # old_image.voxel_datatype,
     old_image.date_of_saving,
     old_image.acquistion_time,
     old_image.patient_id,
