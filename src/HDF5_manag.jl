@@ -1,8 +1,8 @@
-include("./MedImage_data_struct.jl")
-include("./Utils.jl")
-include("./Load_and_save.jl")
 using HDF5
 using JSON
+using ..MedImage_data_struct, ..Load_and_save, ..Utils
+
+# export save_med_image, load_med_image
 
 """
 saving a MedImage object to a HDF5 file into a group with the given name
