@@ -1,5 +1,5 @@
-include("./MedImage_data_struct.jl")
-
+module Orientation_dicts
+export orientation_enum_to_string, string_to_orientation_enum, orientation_dict_enum_to_number, number_to_enum_orientation_dict, orientation_pair_to_operation_dict
 orientation_enum_to_string = Dict(
 # ORIENTATION_RIP=>"RIP",
 # ORIENTATION_LIP=>"LIP",
@@ -170,3 +170,5 @@ orientation_pair_to_operation_dict =Dict((ORIENTATION_RAI, ORIENTATION_LPS) => (
 ,(ORIENTATION_RAS, ORIENTATION_RPS) => (Int64[], [2], [[1, 3, 1, 0], [2, 2, 2, -1], [1, 3, 3, 0]], [1, 2, 3])
 ,(ORIENTATION_RPI, ORIENTATION_RPI) => (Int64[], Int64[], [[1, 3, 1, 0], [1, 3, 2, 0], [1, 3, 3, 0]], [1, 2, 3])
 ,(ORIENTATION_LAS, ORIENTATION_RAI) => (Int64[], [1, 3], [[1, 1, 1, 1], [1, 3, 2, 0], [3, 3, 3, 1]], [1, 2, 3]))
+
+end
