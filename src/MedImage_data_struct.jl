@@ -2,7 +2,7 @@ module MedImage_data_struct
 using Dates, Dictionaries, Parameters
 using Dictionaries
 using Parameters
-# using UUIDs
+using UUIDs
 
 export MedImage, Image_type, Image_subtype, current_device_enum, Interpolator_enum, Mode_mi, CoordinateTerms, CoordinateMajornessTerms, Orientation_code
 
