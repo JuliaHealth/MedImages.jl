@@ -1,11 +1,9 @@
-include("MedImage_data_struct.jl")
+module Basic_transformations
+
 using  CoordinateTransformations, Interpolations, StaticArrays, LinearAlgebra, Rotations, Dictionaries
 using LinearAlgebra
-
-"""
-module implementing basic transformations on 3D images 
-like translation, rotation, scaling, and cropping both input and output are MedImage objects
-"""
+using ..MedImage_data_struct
+export rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, computeIndexToPhysicalPointMatrices_Julia, transformIndexToPhysicalPoint_Julia, get_voxel_center_Julia, get_real_center_Julia, Rodrigues_rotation_matrix, crop_image_around_center
 
 """
 given a MedImage object will rotate it by angle (angle) around axis (rotate_axis)
@@ -14,7 +12,6 @@ It modifies both pixel array and not metadata
 we are setting Interpolator by using Interpolator enum
 return the rotated MedImage object 
 """
-
 function computeIndexToPhysicalPointMatrices_Julia(im::MedImage)::Matrix{Float64}
   VImageDimension = length(im.spacing)
     spacing_vector = collect(im.spacing)
@@ -372,3 +369,4 @@ test_3D_To_PhysicalPoint("C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz"
 
 
 =#
+end#Basic_transformations

@@ -1,8 +1,6 @@
+module Brute_force_orientation
+using ..Orientation_dicts
 
-include("./MedImage_data_struct.jl")
-include("./Spatial_metadata_change.jl")
-include("./Utils.jl")
-include("./Load_and_save.jl")
 using Interpolations
 using Combinatorics
 using JLD
@@ -84,15 +82,11 @@ function change_image_orientation(path_nifti, orientation)
 
 end
 
+
 """
 force solution get all direction combinetions put it in sitk and try all possible ways to permute and reverse axis to get the same result as sitk then save the result in json or sth and use; do the same with the origin
 Additionally in similar manner save all directions in a form of a vector and associate it with 3 letter codes
 """
-
-
-
-
-
 function brute_force_find_perm_rev(sitk_image1_arr, sitk_image2_arr)
     sitk = pyimport("SimpleITK")
     comb = collect(combinations([1, 2, 3]))
@@ -353,3 +347,4 @@ end
 
 # save("/home/jakubmitura/projects/MedImage.jl/test_data/my_dict.jld", "my_dict", dict_curr)
 # # krowa now create a dictionary that will map orientation vector of numbers into orientation enum
+end

@@ -1,16 +1,11 @@
-
+module Load_and_save
 using Dictionaries, Dates, PyCall
-using Accessors,UUIDs
+using Accessors, UUIDs
+using ..MedImage_data_struct
+using ..MedImage_data_struct:MedImage
 
-
-include("./MedImage_data_struct.jl")
-include("./Nifti_image_struct.jl")
-include("./Utils.jl")
-
-
-
-"===============================================DICOM FUNCTIONS----------------------------------------------------------------------------"
-
+export load_images
+export load_image
 
 """
 helper function for dicom #1
@@ -36,16 +31,6 @@ function get_pixel_data(dicom_data_array)
     return cat([dcm.PixelData for dcm in dicom_data_array]...; dims=3)
   end
 end
-
-
-
-
-
-
-
-
-
-"-----------------------------------------------NIFTI FUNCTIONS---------------------------------------------------------------------------------------"
 
 """
 helper function for nifti #1
@@ -84,17 +69,15 @@ end
 """
 helper function for nifti
 calculates inverse of a 4x4 matrix
+INPUT MATRIX Is
+[r11 r12 r13 v1]
+[r21 r22 r23 v2]
+[r31 r32 r33 v3]
+[0    0   0   0]
 """
 function calculate_inverse_44_matrix(input_matrix)
 
-  # print(input_matrix)
-  """
-  INPUT MATRIX Is
-  [r11 r12 r13 v1]
-  [r21 r22 r23 v2]
-  [r31 r32 r33 v3]
-  [0    0   0   0]
-  """
+  # print(input_matrix
   r11, r12, r13 = input_matrix[1, 1], input_matrix[1, 2], input_matrix[1, 3]
   r21, r22, r23 = input_matrix[2, 1], input_matrix[2, 2], input_matrix[2, 3]
   r31, r32, r33 = input_matrix[3, 1], input_matrix[3, 2], input_matrix[3, 3]
@@ -238,15 +221,9 @@ function formulate_must_rescale(scl_slope, scl_intercept)
 end
 
 
-
-
-
-
 """
-
 stuff for additional information
 """
-
 function string_for_xyzt_units_space_code(space_code)
   code_dict = Dictionaries.Dictionary([1, 2, 3], ["NIFTI_UNITS_METER", "NIFTI_UNITS_MM", "NIFTI_UNITS_MICRON"])
   return code_dict[space_code]
@@ -509,18 +486,18 @@ function load_images(path::String)::Array{MedImage}
 
     # voxel_data = permutedims(voxel_data, (3, 2, 1))
 
-    """
 
 
-        origin = nothing
-        spacing = nothing
-        direction = nothing #direction cosines for oreintation
-        #2 data for the fields within the MedImage struct
 
-        spatial_metadata_keys = ["origin", "spacing", "orientation"]
-        spatial_metadata_values = [nothing, nothing, nothing]
-        spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
-    """
+    # origin = nothing
+    # spacing = nothing
+    # direction = nothing #direction cosines for oreintation
+    # #2 data for the fields within the MedImage struct
+
+    # spatial_metadata_keys = ["origin", "spacing", "orientation"]
+    # spatial_metadata_values = [nothing, nothing, nothing]
+    # spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
+
 
     #3 Image type
     image_type = Image_type(1) #set to MRI/PET/CT
@@ -572,14 +549,14 @@ function load_images(path::String)::Array{MedImage}
     spacing = itk_nifti_image.GetSpacing()  #set_spacing_for_nifti_files([nifti_image_struct.dx, nifti_image_struct.dy,nifti_image_struct.dz])
     # spacing=(spacing[3],spacing[2],spacing[1])
     # direction = set_direction_for_nifti_file(path, header_data_dict["qform_code_name"], header_data_dict["sform_code_name"], sform_qform_similar)
-    direction=itk_nifti_image.GetDirection()
+    direction = itk_nifti_image.GetDirection()
     voxel_arr = sitk.GetArrayFromImage(itk_nifti_image)
     voxel_arr = permutedims(voxel_arr, (3, 2, 1))
     spatial_metadata_keys = ["origin", "spacing", "direction"]
     spatial_metadata_values = [origin, spacing, direction]
     spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
 
-    return [MedImage(voxel_data=voxel_arr, origin=origin, spacing=spacing, direction=direction, patient_id="test_id", image_type=CT_type, image_subtype=CT_subtype, legacy_file_name=string(legacy_file_name))]
+    return [MedImage(voxel_data=voxel_arr, origin=origin, spacing=spacing, direction=direction, patient_id="test_id", image_type=MedImage_data_struct.CT_type, image_subtype=MedImage_data_struct.CT_subtype, legacy_file_name=string(legacy_file_name))]
 
     #return [MedImage([nifti_image.raw, nifti_image_header.pixdim[2:4], (nifti_image_header.srow_x[1:3], nifti_image_header.srow_y[1:3], nifti_image_header.srow_z[1:3]), (nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z), " ", " "])]
 
@@ -730,8 +707,6 @@ end
 
 
 
-#**************************************************
-
 function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
 
   return MedImage(
@@ -775,10 +750,10 @@ function update_voxel_and_spatial_data(old_image::MedImage, new_voxel_data::Abst
   return res
 end
 
+"""
+load image from path
+"""
 function load_image(path)
-  """
-  load image from path
-  """
   # test_image_equality(p,p)
 
   medimage_instance_array = load_images(path)
@@ -787,22 +762,22 @@ function load_image(path)
 end#load_image
 
 
-"""
-NOTES:
-conversion and storage n-dimensional voxel data within world-coordinate system (doesnt change the RAS system)
-for testing purposes within test_data the volume-0.nii.gz constitutes a 3-D nifti volume , whereas the filtered_func_data.nii.gz constitutes up of a 4D nifti volume (4th dimension is time, 3d stuff still applicable)
-"""
+# NOTES:
+# conversion and storage n-dimensional voxel data within world-coordinate system (doesnt change the RAS system)
+# for testing purposes within test_data the volume-0.nii.gz constitutes a 3-D nifti volume , whereas the filtered_func_data.nii.gz constitutes up of a 4D nifti volume (4th dimension is time, 3d stuff still applicable)
+
 
 #array_of_objects = load_image("../test_data/ScalarVolume_0")
 # array_of_objects = load_image("/workspaces/MedImage.jl/MedImage/test_data/volume-0.nii.gz")
 #println(length(array_of_objects[1].pixel_array))
 #
 
-"""
-testing with nifti volume
+
+# testing with nifti volume
 
 
-file_path = "./../test_data/volume-0.nii.gz"
-medimage_object_array = load_image(file_path)
-save_image(medimage_object_array, "./outputs")
-"""
+# file_path = "./../test_data/volume-0.nii.gz"
+# medimage_object_array = load_image(file_path)
+# save_image(medimage_object_array, "./outputs")
+
+end#Load_and_save

@@ -1,18 +1,10 @@
-using Dates
-# Pkg.add(["Dictionaries"])
+module MedImage_data_struct
+using Dates, Dictionaries, Parameters
 using Dictionaries
 using Parameters
-# using UUIDs
-include("./Nifti_image_struct.jl")
-"""
-Here we define necessary data structures for the project.
-Main data structure is a MedImage object which is a 3D image with some metadata.
+using UUIDs
 
-!!!! Currently implemented as Struct but will be better to use as metadata arrays
-"""
-
-
-
+export MedImage, Image_type, Image_subtype, current_device_enum, Interpolator_enum, Mode_mi, CoordinateTerms, CoordinateMajornessTerms, Orientation_code
 
 """
 Defining image type enum
@@ -43,11 +35,12 @@ Defining subimage type enum
 end
 
 
+# following struct can be expanded with all the relevant meta data mentioned within the readme.md of MedImage.jl
+  #struct for now, will switch to MetaArrays when it has GPU support
+
 """
 Definition for standardised MedImage Struct
 """
-#following struct can be expanded with all the relevant meta data mentioned within the readme.md of MedImage.jl
-#struct for now, will switch to MetaArrays when it has GPU support
 @with_kw struct MedImage
   voxel_data #mutlidimensional array (512,512,3)
   origin::Tuple{Float64,Float64,Float64}
@@ -159,3 +152,5 @@ end
     # ORIENTATION_AIL 
     # ORIENTATION_ASL
 end
+
+end#MedImage_data_struct
