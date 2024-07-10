@@ -1,6 +1,6 @@
 module Load_and_save
 using Dictionaries, Dates, PyCall
-using Accessors,UUIDs
+using Accessors, UUIDs
 using ..MedImage_data_struct
 
 export load_images
@@ -488,14 +488,14 @@ function load_images(path::String)::Array{MedImage}
 
 
 
-        # origin = nothing
-        # spacing = nothing
-        # direction = nothing #direction cosines for oreintation
-        # #2 data for the fields within the MedImage struct
+    # origin = nothing
+    # spacing = nothing
+    # direction = nothing #direction cosines for oreintation
+    # #2 data for the fields within the MedImage struct
 
-        # spatial_metadata_keys = ["origin", "spacing", "orientation"]
-        # spatial_metadata_values = [nothing, nothing, nothing]
-        # spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
+    # spatial_metadata_keys = ["origin", "spacing", "orientation"]
+    # spatial_metadata_values = [nothing, nothing, nothing]
+    # spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
 
 
     #3 Image type
@@ -548,14 +548,14 @@ function load_images(path::String)::Array{MedImage}
     spacing = itk_nifti_image.GetSpacing()  #set_spacing_for_nifti_files([nifti_image_struct.dx, nifti_image_struct.dy,nifti_image_struct.dz])
     # spacing=(spacing[3],spacing[2],spacing[1])
     # direction = set_direction_for_nifti_file(path, header_data_dict["qform_code_name"], header_data_dict["sform_code_name"], sform_qform_similar)
-    direction=itk_nifti_image.GetDirection()
+    direction = itk_nifti_image.GetDirection()
     voxel_arr = sitk.GetArrayFromImage(itk_nifti_image)
     voxel_arr = permutedims(voxel_arr, (3, 2, 1))
     spatial_metadata_keys = ["origin", "spacing", "direction"]
     spatial_metadata_values = [origin, spacing, direction]
     spatial_metadata = Dictionaries.Dictionary(spatial_metadata_keys, spatial_metadata_values)
 
-    return [MedImage(voxel_data=voxel_arr, origin=origin, spacing=spacing, direction=direction, patient_id="test_id", image_type=CT_type, image_subtype=CT_subtype, legacy_file_name=string(legacy_file_name))]
+    return [MedImage(voxel_data=voxel_arr, origin=origin, spacing=spacing, direction=direction, patient_id="test_id", image_type=MedImage_data_struct.CT_type, image_subtype=MedImage_data_struct.CT_subtype, legacy_file_name=string(legacy_file_name))]
 
     #return [MedImage([nifti_image.raw, nifti_image_header.pixdim[2:4], (nifti_image_header.srow_x[1:3], nifti_image_header.srow_y[1:3], nifti_image_header.srow_z[1:3]), (nifti_image_header.qoffset_x, nifti_image_header.qoffset_y, nifti_image_header.qoffset_z), " ", " "])]
 
