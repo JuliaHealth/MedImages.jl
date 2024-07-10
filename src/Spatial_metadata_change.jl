@@ -1,20 +1,11 @@
-include("./MedImage_data_struct.jl")
-include("./Utils.jl")
-include("./Load_and_save.jl")
-include("./orientattion_dicts.jl")
-
+module Spatial_metadata_change
 using Interpolations
+using ..MedImage_data_struct, ..Utils
 
-"""
-functions to change the metadata of a 3D image like change the orientation of the image
-change spaciing to desired etc 
-"""
 
 """
 given a MedImage object and desired spacing (spacing) return the MedImage object with the new spacing
-
 """
-
 function scale(itp::AbstractInterpolation{T,N,IT}, ranges::Vararg{AbstractRange,N}) where {T,N,IT}
     # overwriting this function becouse check_ranges giving error
     # check_ranges(itpflag(itp), axes(itp), ranges)
@@ -56,7 +47,6 @@ end#resample_to_spacing
 """
 given a MedImage object and desired orientation encoded as 3 letter string (like RAS or LPS) return the MedImage object with the new orientation
 """
-
 function change_orientation(im::MedImage, new_orientation::Orientation_code)::MedImage
     old_orientation = number_to_enum_orientation_dict[im.direction]
     reorient_operation = orientation_pair_to_operation_dict[(old_orientation, new_orientation)]
@@ -151,3 +141,4 @@ end#change_orientation
 
 # size(imm_res.voxel_data)
 # # range(1, stop=5, length=100,step=0.1)
+end#Spatial_metadata_change

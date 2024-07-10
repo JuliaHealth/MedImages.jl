@@ -1,3 +1,15 @@
+module Utils
+
+using ..MedImage_data_struct
+
+export interpolate_point
+export get_base_indicies_arr
+export cast_to_array_b_type
+export interpolate_my
+export TransformIndexToPhysicalPoint_julia
+export ensure_tuple
+export create_nii_from_medimage
+
 
 """
 return array of cartesian indices for given dimensions in a form of array
@@ -242,3 +254,4 @@ end
 # print(image.GetDirection())
 
 
+end#Utils
