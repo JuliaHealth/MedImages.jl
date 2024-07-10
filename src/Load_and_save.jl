@@ -2,6 +2,7 @@ module Load_and_save
 using Dictionaries, Dates, PyCall
 using Accessors, UUIDs
 using ..MedImage_data_struct
+using ..MedImage_data_struct:MedImage
 
 export load_images
 export load_image
