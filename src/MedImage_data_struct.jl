@@ -17,7 +17,9 @@ end
 
 @enum current_device_enum begin
   CPU_current_device
-  GPU_current_device
+  CUDA_current_device
+  AMD_current_device
+  ONEAPI_current_device
 
 end
 """
