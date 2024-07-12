@@ -187,13 +187,37 @@ macro threeDLinInterpol(input_array)
   for a1 in -0.5:0.5:0.5
      for b1 in -0.5:0.5:0.5
        for c1 in -0.5:0.5:0.5
+        if((shared_arr[index_loc,1]+a1)>0 || (shared_arr[index_loc,2]+b1)>0 || (shared_arr[index_loc,3]+c1)>0 
+            || (shared_arr[index_loc,1]+a1)<input_array_size[1] || (shared_arr[index_loc,2]+b1)<input_array_size[2] || (shared_arr[index_loc,3]+c1)<input_array_size[3])
             var2+= @get_interpolated_val(input_array,a1,b1,c1)
-          end
+        end 
+        end
       end
   end        
   var2=var2/var1
   end)
 end
+
+"""
+version that takes into account wider context of the point
+"""
+macro threeDLinInterpol_wider(input_array)
+    ## first we get the total distances of all points to be able to normalize it later
+    return  esc(quote
+    var1=0.0#
+    var2=0.0
+    var3=0.0
+    for a1 in -1.5:1.5:0.5
+       for b1 in -1.5:1.5:0.5
+         for c1 in -1.5:1.5:0.5
+              var2+= @get_interpolated_val(input_array,a1,b1,c1)
+            end
+        end
+    end        
+    var2=var2/var1
+    end)
+  end
+  
 
 
 @kernel function interpolate_point_fast_linear(points_arr,input_array, input_array_spacing,points_out,input_array_size,keep_begining_same,extrapolate_value)
