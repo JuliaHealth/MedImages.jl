@@ -1,6 +1,7 @@
 module Utils
 
 using ..MedImage_data_struct
+using KernelAbstractions
 
 export interpolate_point
 export get_base_indicies_arr
@@ -109,6 +110,8 @@ function interpolate_my(points_to_interpolate,input_array,input_array_spacing,in
     return res
 end#interpolate_my
 
+
+
 function TransformIndexToPhysicalPoint_julia(index::Tuple{Int,Int,Int}
     ,origin::Tuple{Float64,Float64,Float64}
     ,spacing::Tuple{Float64,Float64,Float64})
@@ -128,6 +131,115 @@ function ensure_tuple(arr)
         error("Input must be a Tuple or an AbstractArray")
     end
   end
+
+############ fast interpolation
+
+"""
+calculate distance between set location and neighbouring voxel coordinates
+"""
+macro get_dist(a,b,c)
+  return  esc(:(
+  sqrt(((((shared_arr[index_loc,1]-round(shared_arr[index_loc,1]+($a) ) *input_array_spacing[1])  )^2
+  +((shared_arr[index_loc,2]-round(shared_arr[index_loc,2] +($b)))*input_array_spacing[2])^2
+  +((shared_arr[index_loc,3]-round(shared_arr[index_loc,3]+($c)))*input_array_spacing[3])^2)^2  )+0.00000001)#we add a small number to avoid division by 0
+))
+end
+
+"""
+get interpolated value at point
+"""
+macro get_interpolated_val(input_array,a,b,c)
+
+  return  esc(quote       
+      var3=(@get_dist($a,$b,$c))
+      var1+=var3
+      ($input_array[Int(round(shared_arr[index_loc,1]+($a)))
+      ,Int(round(shared_arr[index_loc,2]+($b)))
+      ,Int(round(shared_arr[index_loc,3]+($c)))]/(var3 ))
+      
+    end)
+end
+
+"""
+used to get approximation of local variance
+"""
+macro get_interpolated_diff(input_array,a,b,c)
+
+  return  esc(quote       
+      ((($input_array[Int(round(shared_arr[index_loc,1]+($a)))
+      ,Int(round(shared_arr[index_loc,2]+($b)))
+      ,Int(round(shared_arr[index_loc,3]+($c)))])-var2)^2)*((@get_dist($a,$b,$c)) )
+end)
+end
+
+"""
+simple kernel friendly interpolator - given float coordinates and source array will 
+1) look for closest integers in all directions and calculate the euclidean distance to it 
+2) calculate the weights for each of the 27 points in the cube around the pointadding more weight the closer the point is to integer coordinate
+we take into account spacing
+"""  
+macro threeDLinInterpol(input_array)
+  ## first we get the total distances of all points to be able to normalize it later
+  return  esc(quote
+  var1=0.0#
+  var2=0.0
+  var3=0.0
+  for a1 in -0.5:0.5:0.5
+     for b1 in -0.5:0.5:0.5
+       for c1 in -0.5:0.5:0.5
+            var2+= @get_interpolated_val(input_array,a1,b1,c1)
+          end
+      end
+  end        
+  var2=var2/var1
+  end)
+end
+
+
+@kernel function interpolate_point_fast_linear(points_arr,input_array, input_array_spacing,points_out,input_array_size,keep_begining_same,extrapolate_value)
+    index_glob= @index(Global, Linear)
+    index_loc=@index(Local, Linear)
+    # +1 to avoid bank conflicts on shared memory
+    shared_arr = @localmem eltype(points_arr) ((@uniform @groupsize()[1])+1, 3)
+    #copy from global to local memory
+    shared_arr[index_loc,1]=points_arr[1,index_glob]
+    shared_arr[index_loc,2]=points_arr[2,index_glob]
+    shared_arr[index_loc,3]=points_arr[3,index_glob]
+    #check for extrapolation
+    if(shared_arr[index_loc,1]<0 || shared_arr[index_loc,2]<0 || shared_arr[index_loc,3]<0 || shared_arr[index_loc,1]>input_array_size[1] || shared_arr[index_loc,2]>input_array_size[2] || shared_arr[index_loc,3]>input_array_size[3])
+        points_out[index_glob]=extrapolate_value
+    else
+        if(keep_begining_same && ((shared_arr[index_loc,1]<1)))
+            shared_arr[index_loc,1]=1
+        end        
+        if(keep_begining_same && ((shared_arr[index_loc,2]<1)))
+            shared_arr[index_loc,2]=1
+        end    
+        if(keep_begining_same && ((shared_arr[index_loc,3]<1)))
+            shared_arr[index_loc,3]=1
+        end    
+    
+        #initialize variables in registry 
+        var1=0.0
+        var2=0.0
+        var3=0.0
+        @threeDLinInterpol(input_array)
+        #save output
+        points_out[index_glob]=var2
+    end
+
+end
+
+function call_interpolate_point_fast_linear(points_arr,input_array, input_array_spacing,keep_begining_same=false,extrapolate_value=0)
+    points_out=similar(points_arr)
+
+    dev = get_backend(points_arr)
+    interpolate_point_fast_linear(dev, 256)(points_arr,input_array, input_array_spacing,points_out,input_array_size,keep_begining_same, ndrange=(size(points_arr)[2]))
+    KernelAbstractions.synchronize(dev)
+    return points_out
+
+end
+
 
 # path_nifti="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
 # im=sitk.ReadImage(path_nifti)
