@@ -24,8 +24,8 @@
 
 
 # """
-# becouse Julia arrays is column wise contiguus in memory and open GL expects row wise we need to rotate and flip images 
-# pixels - 3 dimensional array of pixel data 
+# becouse Julia arrays is column wise contiguus in memory and open GL expects row wise we need to rotate and flip images
+# pixels - 3 dimensional array of pixel data
 # """
 # function permuteAndReverse(pixels)
 #     pixels=  permutedims(pixels, (3,2,1))
@@ -33,8 +33,8 @@
 #     for i in 1:sizz[1]
 #         for j in 1:sizz[3]
 #             pixels[i,:,j] =  reverse(pixels[i,:,j])
-#         end# 
-#     end# 
+#         end#
+#     end#
 #     return pixels
 #   end#permuteAndReverse
 
@@ -84,16 +84,16 @@
 #     tupleVect = [("rot",arr_a) ,("inrot",arr_b),("manualModif",zeros(UInt8,size(arr_b))) ]
 #     # tupleVect = [("rot",unrotated_arr) ,("inrot",rotated_arr),("manualModif",zeros(UInt8,size(unrotated_arr))) ]
 #     slicesDat= getThreeDims(tupleVect )
-    
+
 #     # datToScrollDimsB= MedEye3d.ForDisplayStructs.DataToScrollDims(imageSize=  size(rotated_arr) ,voxelSize=(rotated_spacing[3],rotated_spacing[2],rotated_spacing[1]), dimensionToScroll = 3 );
 #     datToScrollDimsB= MedEye3d.ForDisplayStructs.DataToScrollDims(imageSize=  size(arr_a) ,voxelSize=spacing, dimensionToScroll = 3 );
-    
+
 #     mainScrollDat = FullScrollableDat(dataToScrollDims =datToScrollDimsB
 #                                      ,dimensionToScroll=3 # what is the dimension of plane we will look into at the beginning for example transverse, coronal ...
 #                                      ,dataToScroll= slicesDat
 #                                      ,mainTextToDisp= mainLines
 #                                      ,sliceTextToDisp=supplLines );
-    
+
 #     fractionOfMainIm= Float32(0.8);
 #     SegmentationDisplay.coordinateDisplay(listOfTexturesSpec ,fractionOfMainIm ,datToScrollDimsB ,1000);
 #     Main.SegmentationDisplay.passDataForScrolling(mainScrollDat);
