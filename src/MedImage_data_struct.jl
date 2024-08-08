@@ -43,7 +43,7 @@ end
 """
 Definition for standardised MedImage Struct
 """
-@with_kw struct MedImage
+@with_kw mutable struct MedImage
   voxel_data #mutlidimensional array (512,512,3)
   origin::Tuple{Float64,Float64,Float64}
   spacing::Tuple{Float64,Float64,Float64}#spacing between the voxels
