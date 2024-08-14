@@ -4,13 +4,11 @@ return array of cartesian indices for given dimensions in a form of array
 """
 function get_base_indicies_arr(dims)    
     indices = CartesianIndices(dims)
-    # indices=collect.(Tuple.(collect(indices)))
     indices=Tuple.(collect(indices))
     indices=collect(Iterators.flatten(indices))
     indices=reshape(indices,(3,dims[1]*dims[2]*dims[3]))
-    # indices=permutedims(indices,(1,2))
     return indices
-  end#get_base_indicies_arr
+  end
   
 """
 cast array a to the value type of array b
@@ -58,7 +56,7 @@ function interpolate_point(point,itp, keep_begining_same=false,extrapolate_value
     end
     return itp(i, j,k)
     
-end#interpolate_point    
+end  
 
 """
 perform the interpolation of the set of points in a given space
@@ -87,25 +85,19 @@ function interpolate_my(points_to_interpolate,input_array,input_array_spacing,in
     
     itp=extrapolate(itp, extrapolate_value)   
     itp = scale(itp, A_x1, A_x2,A_x3)
-    # Create the new voxel data
-    # print("eeeeeeeeeeeeee $(itp(-1222.0,-1222.0,-1222.0))")
-
 
     res=collect(range(1,size(points_to_interpolate)[2]))
     res=map(el->interpolate_point( points_to_interpolate[:,el],itp,keep_begining_same,extrapolate_value),res)
 
     return res
-end#interpolate_my
+end
 
 function TransformIndexToPhysicalPoint_julia(index::Tuple{Int,Int,Int}
     ,origin::Tuple{Float64,Float64,Float64}
     ,spacing::Tuple{Float64,Float64,Float64})
-    
-    # return origin .+ ((collect(index) .- 1) .* collect(spacing))
+
     return collect(collect(origin) .+ ((collect(index) ) .* collect(spacing)))
 end
-
-
 
 function ensure_tuple(arr)
     if arr isa Tuple
@@ -117,6 +109,42 @@ function ensure_tuple(arr)
     end
   end
 
+
+
+function extrapolate_corner_median(image::Union{MedImage,Array{Float32, 3}})
+    im = union_check(image)
+    corners = [
+        im[1, 1, 1],
+        im[1, 1, end],
+        im[1, end, 1],
+        im[1, end, end],
+        im[end, 1, 1],
+        im[end, 1, end],
+        im[end, end, 1],
+        im[end, end, end]
+        ]
+    value_to_extrapolate=median(corners)
+    return value_to_extrapolate
+end
+
+function union_check(image::Union{MedImage, Array{Float32, 3}})
+    """
+    Work in progres
+    """
+    if image isa MedImage
+        im = copy(image.voxel_data)
+    elseif image isa Array{Float32, 3}
+        im = copy(image)
+    else
+        error("Invalid input type. Use MedImage or Array{Float32, 3}.")
+    end
+    return im
+end
+
+
+
+########################################## 👷TESTING SPACE👷  ##########################################
+############################### HISTORICAL CODE, TESTS AND USAGE EXAMPLES ###############################
 # path_nifti="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
 # im=sitk.ReadImage(path_nifti)
 # indexx=(2,2,2)
@@ -180,65 +208,3 @@ function ensure_tuple(arr)
 #       )
 #     return med_image
 # end
-
-
-# """
-# create_nii_from_medimage(med_image::MedImage, file_path::String)
-
-# Create a .nii.gz file from a MedImage object and save it to the given file path.
-# """
-function create_nii_from_medimage(med_image::MedImage, file_path::String)
-    # Convert voxel_data to a numpy array (Assuming voxel_data is stored in Julia array format)
-    sitk = pyimport("SimpleITK")
-    np = pyimport("numpy")
-    voxel_data_np = np.array(med_image.voxel_data)
-    
-    # Create a SimpleITK image from numpy array
-    image_sitk = sitk.GetImageFromArray(voxel_data_np)
-    
-    # Set spatial metadata
-    image_sitk.SetOrigin(med_image.origin)
-    image_sitk.SetSpacing(med_image.spacing)
-    image_sitk.SetDirection(med_image.direction)
-    
-    # Save the image as .nii.gz
-    sitk.WriteImage(image_sitk, file_path* ".nii.gz")
-end
-
-
-# function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
-  
-#     return MedImage(
-#         new_voxel_data, 
-#         old_image.origin, 
-#         old_image.spacing, 
-#         old_image.direction, 
-#         old_image.spatial_metadata, 
-#         old_image.image_type, 
-#         old_image.image_subtype, 
-#         old_image.voxel_datatype, 
-#         old_image.date_of_saving, 
-#         old_image.acquistion_time, 
-#         old_image.patient_id, 
-#         old_image.current_device, 
-#         old_image.study_uid, 
-#         old_image.patient_uid, 
-#         old_image.series_uid, 
-#         old_image.study_description, 
-#         old_image.legacy_file_name, 
-#         old_image.display_data, 
-#         old_image.clinical_data, 
-#         old_image.is_contrast_administered, 
-#         old_image.metadata)
-
-# image_3D=get_spatial_metadata("C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz")
-# image_path_3D = "C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz"
-# image_test_3D = sitk.ReadImage(image_path_3D)
-# image_4D=get_spatial_metadata("C:\\MedImage\\MedImage.jl\\test_data\\filtered_func_data.nii.gz")
-# image_path_4D = "C:\\MedImage\\MedImage.jl\\test_data\\filtered_func_data.nii.gz"
-# image_test_4D = sitk.ReadImage(image_path_4D)
-# print(image.GetOrigin())
-# print(image.GetSpacing())
-# print(image.GetDirection())
-
-

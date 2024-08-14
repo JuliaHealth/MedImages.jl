@@ -44,7 +44,7 @@ function resample_to_spacing(im::MedImage, new_spacing::Tuple{Float64,Float64,Fl
     new_im = update_voxel_and_spatial_data(im, new_voxel_data, im.origin, new_spacing, im.direction)
 
     return new_im
-end#resample_to_spacing
+end
 
 
 
