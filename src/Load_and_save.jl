@@ -4,10 +4,10 @@ using Dictionaries, Dates, PyCall
 using Accessors, UUIDs
 using ..MedImage_data_struct
 using ..MedImage_data_struct:MedImage
-
+using ..Utils
 export load_images
 export load_image
-
+export update_voxel_and_spatial_data
 
 """
 helper function for dicom #1
@@ -80,7 +80,7 @@ function infer_modality(image)
         return MedImage_data_struct.PET_type
     end
 
-    return "Unknown"
+    return MedImage_data_struct.CT_type
 end
 
 
@@ -98,6 +98,7 @@ function load_images(path::String)::Array{MedImage}
   else
     sitk = pyimport("SimpleITK")
     itk_nifti_image = sitk.ReadImage(path)
+    itk_nifti_image = sitk.DICOMOrient(itk_nifti_image,"LPS")
     origin = itk_nifti_image.GetOrigin()
     # origin = set_origin_for_nifti_file(sform_qform_similar, nifti_image_struct.sto_xyz)
     spacing = itk_nifti_image.GetSpacing()  #set_spacing_for_nifti_files([nifti_image_struct.dx, nifti_image_struct.dy,nifti_image_struct.dz])
@@ -170,9 +171,9 @@ end
 function update_voxel_and_spatial_data(old_image::MedImage, new_voxel_data::AbstractArray, new_origin, new_spacing, new_direction)
 
   res = @set old_image.voxel_data = new_voxel_data
-  res = @set res.origin = ensure_tuple(new_origin)
-  res = @set res.spacing = ensure_tuple(new_spacing)
-  res = @set res.direction = ensure_tuple(new_direction)
+  res = @set res.origin = Utils.ensure_tuple(new_origin)
+  res = @set res.spacing = Utils.ensure_tuple(new_spacing)
+  res = @set res.direction = Utils.ensure_tuple(new_direction)
   # voxel_data=new_voxel_data
   # origin=new_origin
   # spacing=new_spacing

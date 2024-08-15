@@ -1,8 +1,8 @@
 module Spatial_metadata_change
 using Interpolations
-using ..MedImage_data_struct, ..Utils
+using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Load_and_save
 
-
+export change_orientation, resample_to_spacing
 """
 given a MedImage object and desired spacing (spacing) return the MedImage object with the new spacing
 """
@@ -32,7 +32,7 @@ function resample_to_spacing(im::MedImage, new_spacing::Tuple{Float64,Float64,Fl
 
 
     # Create the new MedImage object
-    new_im = update_voxel_and_spatial_data(im, new_voxel_data, im.origin, new_spacing, im.direction)
+    new_im = Load_and_save.update_voxel_and_spatial_data(im, new_voxel_data, im.origin, new_spacing, im.direction)
 
     return new_im
 end#resample_to_spacing
@@ -48,8 +48,8 @@ end#resample_to_spacing
 given a MedImage object and desired orientation encoded as 3 letter string (like RAS or LPS) return the MedImage object with the new orientation
 """
 function change_orientation(im::MedImage, new_orientation::Orientation_code)::MedImage
-    old_orientation = number_to_enum_orientation_dict[im.direction]
-    reorient_operation = orientation_pair_to_operation_dict[(old_orientation, new_orientation)]
+    old_orientation = Orientation_dicts.number_to_enum_orientation_dict[im.direction]
+    reorient_operation = Orientation_dicts.orientation_pair_to_operation_dict[(old_orientation, new_orientation)]
     return change_orientation_main(im, new_orientation, reorient_operation)
 end#change_orientation
 
@@ -78,7 +78,7 @@ function change_orientation_main(im::MedImage, new_orientation::Orientation_code
     end
 
 
-    # first we need to permute the voxel data to match the desired orientation 
+    # first we need to permute the voxel data to match the desired orientation
     im_voxel_data = copy(im.voxel_data)
     if (length(perm) > 0)
         im_voxel_data = permutedims(im_voxel_data, (perm[1], perm[2], perm[3]))
@@ -99,7 +99,7 @@ function change_orientation_main(im::MedImage, new_orientation::Orientation_code
     st = spacing_transforms
     sp = im.spacing
     new_spacing = (sp[st[1]], sp[st[2]], sp[st[3]])
-    new_im = update_voxel_and_spatial_data(im, im_voxel_data, res_origin, new_spacing, orientation_dict_enum_to_number[new_orientation])
+    new_im = Load_and_save.update_voxel_and_spatial_data(im, im_voxel_data, res_origin, new_spacing, orientation_dict_enum_to_number[new_orientation])
 
     # print("\n res_origin $(res_origin) \n")
     return new_im
