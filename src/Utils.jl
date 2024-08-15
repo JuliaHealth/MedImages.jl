@@ -1,7 +1,7 @@
 module Utils
 
 using ..MedImage_data_struct
-using KernelAbstractions
+using KernelAbstractions, Interpolations
 
 export interpolate_point
 export get_base_indicies_arr
@@ -15,7 +15,7 @@ export create_nii_from_medimage
 """
 return array of cartesian indices for given dimensions in a form of array
 """
-function get_base_indicies_arr(dims)    
+function get_base_indicies_arr(dims)
     indices = CartesianIndices(dims)
     # indices=collect.(Tuple.(collect(indices)))
     indices=Tuple.(collect(indices))
@@ -24,7 +24,7 @@ function get_base_indicies_arr(dims)
     # indices=permutedims(indices,(1,2))
     return indices
   end#get_base_indicies_arr
-  
+
 """
 cast array a to the value type of array b
 """
@@ -34,10 +34,10 @@ function cast_to_array_b_type(a,b)
         # Cast array a to the value type of array b
         if eltype(b) in [Int8,Int16,Int32, Int64, UInt8,UInt16,UInt32, UInt64]
             # Apply rounding to the array
-            a = round.(a)  
+            a = round.(a)
         end
 
-        a = convert(Array{eltype(b)}, a)  
+        a = convert(Array{eltype(b)}, a)
         return a
     else
         return a
@@ -61,17 +61,17 @@ function interpolate_point(point,itp, keep_begining_same=false,extrapolate_value
     if(keep_begining_same)
         if((i<1))
             i=1
-        end        
+        end
         if((j<1))
             j=1
-        end        
+        end
         if((k<1))
             k=1
-        end                
+        end
     end
     return itp(i, j,k)
-    
-end#interpolate_point    
+
+end#interpolate_point
 
 """
 perform the interpolation of the set of points in a given space
@@ -86,19 +86,24 @@ IMPORTANT!!! - by convention if index to interpolate is less than 0 we will use 
 function interpolate_my(points_to_interpolate,input_array,input_array_spacing,interpolator_enum,keep_begining_same, extrapolate_value=0)
 
     old_size=size(input_array)
-    if interpolator_enum == Nearest_neighbour_en
+    if interpolator_enum == MedImage_data_struct.Nearest_neighbour_en
         itp = interpolate(input_array, BSpline(Constant()))
-    elseif interpolator_enum == Linear_en
+    elseif interpolator_enum == MedImage_data_struct.Linear_en
         itp = interpolate(input_array, BSpline(Linear()))
-    elseif interpolator_enum == B_spline_en
+    elseif interpolator_enum == MedImage_data_struct.B_spline_en
         itp = interpolate(input_array, BSpline(Cubic(Line(OnGrid()))))
     end
     #we indicate on each axis the spacing from area we are samplingA
-    A_x1 = 1:input_array_spacing[1]:(old_size[1]+input_array_spacing[1]*old_size[1])
-    A_x2 = 1:input_array_spacing[2]:(old_size[2]+input_array_spacing[2]*old_size[2])
-    A_x3 = 1:input_array_spacing[3]:(old_size[3]+input_array_spacing[3]*old_size[3])
-    
-    itp=extrapolate(itp, extrapolate_value)   
+    # A_x1 = 1:input_array_spacing[1]:(old_size[1]+input_array_spacing[1]*old_size[1])
+    # A_x2 = 1:input_array_spacing[2]:(old_size[2]+input_array_spacing[2]*old_size[2])
+    # A_x3 = 1:input_array_spacing[3]:(old_size[3]+input_array_spacing[3]*old_size[3])
+
+    A_x1 = 1:input_array_spacing[1]:(1 + input_array_spacing[1] * (old_size[1] - 1))
+    A_x2 = 1:input_array_spacing[2]:(1 + input_array_spacing[2] * (old_size[2] - 1))
+    A_x3 = 1:input_array_spacing[3]:(1 + input_array_spacing[3] * (old_size[3] - 1))
+
+
+    itp=extrapolate(itp, extrapolate_value)
     itp = scale(itp, A_x1, A_x2,A_x3)
     # Create the new voxel data
     # print("eeeeeeeeeeeeee $(itp(-1222.0,-1222.0,-1222.0))")
@@ -115,7 +120,7 @@ end#interpolate_my
 function TransformIndexToPhysicalPoint_julia(index::Tuple{Int,Int,Int}
     ,origin::Tuple{Float64,Float64,Float64}
     ,spacing::Tuple{Float64,Float64,Float64})
-    
+
     # return origin .+ ((collect(index) .- 1) .* collect(spacing))
     return collect(collect(origin) .+ ((collect(index) ) .* collect(spacing)))
 end
@@ -150,13 +155,13 @@ get interpolated value at point
 """
 macro get_interpolated_val(input_array,a,b,c)
 
-  return  esc(quote       
+  return  esc(quote
       var3=(@get_dist($a,$b,$c))
       var1+=var3
       ($input_array[Int(round(shared_arr[index_loc,1]+($a)))
       ,Int(round(shared_arr[index_loc,2]+($b)))
       ,Int(round(shared_arr[index_loc,3]+($c)))]/(var3 ))
-      
+
     end)
 end
 
@@ -165,7 +170,7 @@ used to get approximation of local variance
 """
 macro get_interpolated_diff(input_array,a,b,c)
 
-  return  esc(quote       
+  return  esc(quote
       ((($input_array[Int(round(shared_arr[index_loc,1]+($a)))
       ,Int(round(shared_arr[index_loc,2]+($b)))
       ,Int(round(shared_arr[index_loc,3]+($c)))])-var2)^2)*((@get_dist($a,$b,$c)) )
@@ -173,11 +178,11 @@ end)
 end
 
 """
-simple kernel friendly interpolator - given float coordinates and source array will 
-1) look for closest integers in all directions and calculate the euclidean distance to it 
+simple kernel friendly interpolator - given float coordinates and source array will
+1) look for closest integers in all directions and calculate the euclidean distance to it
 2) calculate the weights for each of the 27 points in the cube around the pointadding more weight the closer the point is to integer coordinate
 we take into account spacing
-"""  
+"""
 macro threeDLinInterpol(input_array)
   ## first we get the total distances of all points to be able to normalize it later
   return  esc(quote
@@ -187,13 +192,13 @@ macro threeDLinInterpol(input_array)
   for a1 in -0.5:0.5:0.5
      for b1 in -0.5:0.5:0.5
        for c1 in -0.5:0.5:0.5
-        if((shared_arr[index_loc,1]+a1)>0 || (shared_arr[index_loc,2]+b1)>0 || (shared_arr[index_loc,3]+c1)>0 
+        if((shared_arr[index_loc,1]+a1)>0 || (shared_arr[index_loc,2]+b1)>0 || (shared_arr[index_loc,3]+c1)>0
             || (shared_arr[index_loc,1]+a1)<input_array_size[1] || (shared_arr[index_loc,2]+b1)<input_array_size[2] || (shared_arr[index_loc,3]+c1)<input_array_size[3])
             var2+= @get_interpolated_val(input_array,a1,b1,c1)
-        end 
+        end
         end
       end
-  end        
+  end
   var2=var2/var1
   end)
 end
@@ -210,19 +215,19 @@ macro threeDLinInterpol_wider(input_array)
     for a1 in -1.5:1.5:0.5
        for b1 in -1.5:1.5:0.5
          for c1 in -1.5:1.5:0.5
-                if((shared_arr[index_loc,1]+a1)>0 || (shared_arr[index_loc,2]+b1)>0 || (shared_arr[index_loc,3]+c1)>0 
+                if((shared_arr[index_loc,1]+a1)>0 || (shared_arr[index_loc,2]+b1)>0 || (shared_arr[index_loc,3]+c1)>0
                     || (shared_arr[index_loc,1]+a1)<input_array_size[1] || (shared_arr[index_loc,2]+b1)<input_array_size[2] || (shared_arr[index_loc,3]+c1)<input_array_size[3])
-        
+
 
                     var2+= @get_interpolated_val(input_array,a1,b1,c1)
-                end 
+                end
             end
         end
-    end        
+    end
     var2=var2/var1
     end)
   end
-  
+
 
 
 @kernel function interpolate_point_fast_linear(points_arr,input_array, input_array_spacing,points_out,input_array_size,keep_begining_same,extrapolate_value)
@@ -240,15 +245,15 @@ macro threeDLinInterpol_wider(input_array)
     else
         if(keep_begining_same && ((shared_arr[index_loc,1]<1)))
             shared_arr[index_loc,1]=1
-        end        
+        end
         if(keep_begining_same && ((shared_arr[index_loc,2]<1)))
             shared_arr[index_loc,2]=1
-        end    
+        end
         if(keep_begining_same && ((shared_arr[index_loc,3]<1)))
             shared_arr[index_loc,3]=1
-        end    
-    
-        #initialize variables in registry 
+        end
+
+        #initialize variables in registry
         var1=0.0
         var2=0.0
         var3=0.0
@@ -319,7 +324,7 @@ end
 #     spacing = image.GetSpacing()
 #     direction = image.GetDirection()
 #     voxel_data = sitk.GetArrayFromImage(image)
-   
+
 #     med_image = MedImage(
 #         voxel_data,  # Przykład pustej wielowymiarowej tablicy
 #         origin,  # Pusty Tuple dla origin
@@ -345,43 +350,43 @@ function create_nii_from_medimage(med_image::MedImage, file_path::String)
     sitk = pyimport("SimpleITK")
     np = pyimport("numpy")
     voxel_data_np = np.array(med_image.voxel_data)
-    
+
     # Create a SimpleITK image from numpy array
     image_sitk = sitk.GetImageFromArray(voxel_data_np)
-    
+
     # Set spatial metadata
     image_sitk.SetOrigin(med_image.origin)
     image_sitk.SetSpacing(med_image.spacing)
     image_sitk.SetDirection(med_image.direction)
-    
+
     # Save the image as .nii.gz
     sitk.WriteImage(image_sitk, file_path* ".nii.gz")
 end
 
 
 # function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
-  
+
 #     return MedImage(
-#         new_voxel_data, 
-#         old_image.origin, 
-#         old_image.spacing, 
-#         old_image.direction, 
-#         old_image.spatial_metadata, 
-#         old_image.image_type, 
-#         old_image.image_subtype, 
-#         old_image.voxel_datatype, 
-#         old_image.date_of_saving, 
-#         old_image.acquistion_time, 
-#         old_image.patient_id, 
-#         old_image.current_device, 
-#         old_image.study_uid, 
-#         old_image.patient_uid, 
-#         old_image.series_uid, 
-#         old_image.study_description, 
-#         old_image.legacy_file_name, 
-#         old_image.display_data, 
-#         old_image.clinical_data, 
-#         old_image.is_contrast_administered, 
+#         new_voxel_data,
+#         old_image.origin,
+#         old_image.spacing,
+#         old_image.direction,
+#         old_image.spatial_metadata,
+#         old_image.image_type,
+#         old_image.image_subtype,
+#         old_image.voxel_datatype,
+#         old_image.date_of_saving,
+#         old_image.acquistion_time,
+#         old_image.patient_id,
+#         old_image.current_device,
+#         old_image.study_uid,
+#         old_image.patient_uid,
+#         old_image.series_uid,
+#         old_image.study_description,
+#         old_image.legacy_file_name,
+#         old_image.display_data,
+#         old_image.clinical_data,
+#         old_image.is_contrast_administered,
 #         old_image.metadata)
 
 # image_3D=get_spatial_metadata("C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz")
