@@ -2,7 +2,7 @@ module Resample_to_target
 using Interpolations
 using Statistics
 
-using ..MedImage_data_struct, ..Utils
+using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Spatial_metadata_change, ..Load_and_save
 export resample_to_image,  scale
 
 """
@@ -39,9 +39,9 @@ function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator
         value_to_extrapolate=median(corners)
     end
 
-    
+
     # get direction from one and set it to other
-    im_moving=change_orientation(im_moving,number_to_enum_orientation_dict[im_fixed.direction])
+    im_moving=Spatial_metadata_change.change_orientation(im_moving,Orientation_dicts.number_to_enum_orientation_dict[im_fixed.direction])
 
     # Calculate the transformation from moving image space to fixed image space
     old_spacing = im_moving.spacing
@@ -67,7 +67,7 @@ function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator
     # new_voxel_data=cast_to_array_b_type(new_voxel_data,im_fixed.voxel_data)
 
 
-    new_im =update_voxel_and_spatial_data(im_moving, new_voxel_data
+    new_im =Load_and_save.update_voxel_and_spatial_data(im_moving, new_voxel_data
     ,im_fixed.origin,new_spacing,im_fixed.direction)
 
 
@@ -103,7 +103,7 @@ end
 # get 4 dimensional array of cartesian indicies of a 3 dimensional array
 # thats size is passed as an argument dims
 # """
-# function get_base_indicies_arr(dims)    
+# function get_base_indicies_arr(dims)
 #     indices = CartesianIndices(dims)
 #     # indices=collect.(Tuple.(collect(indices)))
 #     indices=Tuple.(collect(indices))
