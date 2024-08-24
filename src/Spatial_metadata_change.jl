@@ -14,14 +14,13 @@ change spaciing to desired etc
 given a MedImage object and desired spacing (spacing) return the MedImage object with the new spacing
 
 """
-
 function scale(itp::AbstractInterpolation{T,N,IT}, ranges::Vararg{AbstractRange,N}) where {T,N,IT}
     # overwriting this function becouse check_ranges giving error
     # check_ranges(itpflag(itp), axes(itp), ranges)
     ScaledInterpolation{T,N,typeof(itp),IT,typeof(ranges)}(itp, ranges)
 end
 
-function resample_to_spacing(im::MedImage, new_spacing::Tuple{Float64,Float64,Float64}, interpolator_enum::Interpolator_enum)::MedImage
+function resample_to_spacing(im::MedImage, new_spacing::Tuple{Float,Float,Float}, interpolator_enum=::Interpolator_enum)::MedImage
     old_spacing = im.spacing
     old_size = size(im.voxel_data)
     new_size = Tuple{Int,Int,Int}(ceil.((old_size .* old_spacing) ./ new_spacing))
