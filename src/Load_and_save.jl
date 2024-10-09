@@ -1,9 +1,10 @@
 
 module Load_and_save
 using Dictionaries, Dates, PyCall
-using Accessors, UUIDs
+using Accessors, UUIDs, ITKIOWrapper
 using ..MedImage_data_struct
 using ..MedImage_data_struct:MedImage
+using ..Brute_force_orientation
 using ..Utils
 export load_images
 export load_image
@@ -96,16 +97,25 @@ function load_images(path::String)::Array{MedImage}
         " ",#dcom_data_loc[1].StudyCompletionDate
         dcom_data_loc[1].PatientID]), dcom_data_locs)
   else
+
+    #defaulting to LPS orientation for all images
+    Brute_force_orientation.change_image_orientation(path, MedImage_data_struct.ORIENTATION_LPS)
+    spatial_meta = ITKIOWrapper.loadSpatialMetaData(path)
+
+    #necessary for inferring modality
     sitk = pyimport("SimpleITK")
     itk_nifti_image = sitk.ReadImage(path)
-    itk_nifti_image = sitk.DICOMOrient(itk_nifti_image,"LPS")
-    origin = itk_nifti_image.GetOrigin()
+
+
+
+    origin = spatial_meta.origin
     # origin = set_origin_for_nifti_file(sform_qform_similar, nifti_image_struct.sto_xyz)
-    spacing = itk_nifti_image.GetSpacing()  #set_spacing_for_nifti_files([nifti_image_struct.dx, nifti_image_struct.dy,nifti_image_struct.dz])
+    spacing = spatial_meta.spacing  #set_spacing_for_nifti_files([nifti_image_struct.dx, nifti_image_struct.dy,nifti_image_struct.dz])
     # spacing=(spacing[3],spacing[2],spacing[1])
     # direction = set_direction_for_nifti_file(path, header_data_dict["qform_code_name"], header_data_dict["sform_code_name"], sform_qform_similar)
-    direction = itk_nifti_image.GetDirection()
-    voxel_arr = sitk.GetArrayFromImage(itk_nifti_image)
+    direction = spatial_meta.direction
+    voxel_arr = ITKIOWrapper.loadVoxelData(path,spatial_meta)
+    voxel_arr = voxel_arr.dat
     voxel_arr = permutedims(voxel_arr, (3, 2, 1))
     spatial_metadata_keys = ["origin", "spacing", "direction"]
     spatial_metadata_values = [origin, spacing, direction]
