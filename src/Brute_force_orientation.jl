@@ -1,9 +1,18 @@
 module Brute_force_orientation
-using ..Orientation_dicts
+using ..Orientation_dicts, ..MedImage_data_struct
 
 using Interpolations
 using Combinatorics
-using JLD
+using JLD, PyCall
+
+export orientation_enum_to_string
+export change_image_orientation
+export brute_force_find_perm_rev
+export brute_force_find_perm_spacing
+export establish_orginn_transformation
+export brute_force_find_from_sitk_single
+export brute_force_find_from_sitk
+export get_orientations_vectors
 
 orientation_enum_to_string = Dict(
     # ORIENTATION_RIP=>"RIP",
@@ -22,14 +31,14 @@ orientation_enum_to_string = Dict(
     # ORIENTATION_ILA=>"ILA",
     # ORIENTATION_SRA=>"SRA",
     # ORIENTATION_SLA=>"SLA",
-    ORIENTATION_RPI => "RPI",
-    ORIENTATION_LPI => "LPI",
-    ORIENTATION_RAI => "RAI",
-    ORIENTATION_LAI => "LAI",
-    ORIENTATION_RPS => "RPS",
-    ORIENTATION_LPS => "LPS",
-    ORIENTATION_RAS => "RAS",
-    ORIENTATION_LAS => "LAS",
+    MedImage_data_struct.ORIENTATION_RPI => "RPI",
+    MedImage_data_struct.ORIENTATION_LPI => "LPI",
+    MedImage_data_struct.ORIENTATION_RAI => "RAI",
+    MedImage_data_struct.ORIENTATION_LAI => "LAI",
+    MedImage_data_struct.ORIENTATION_RPS => "RPS",
+    MedImage_data_struct.ORIENTATION_LPS => "LPS",
+    MedImage_data_struct.ORIENTATION_RAS => "RAS",
+    MedImage_data_struct.ORIENTATION_LAS => "LAS",
     # ORIENTATION_PRI=>"PRI",
     # ORIENTATION_PLI=>"PLI",
     # ORIENTATION_ARI=>"ARI",
@@ -48,11 +57,11 @@ orientation_enum_to_string = Dict(
     # ORIENTATION_SAL=>"SAL",
     # ORIENTATION_PIR=>"PIR",
     # ORIENTATION_PSR=>"PSR",
-    # ORIENTATION_AIR=>"AIR", 
+    # ORIENTATION_AIR=>"AIR",
     # ORIENTATION_ASR=>"ASR",
     # ORIENTATION_PIL=>"PIL",
     # ORIENTATION_PSL=>"PSL",
-    # ORIENTATION_AIL=>"AIL", 
+    # ORIENTATION_AIL=>"AIL",
     # ORIENTATION_ASL=>"ASL"
 )
 
@@ -64,22 +73,29 @@ string_to_orientation_enum = Dict(value => key for (key, value) in orientation_e
 
 function change_image_orientation(path_nifti, orientation)
     sitk = pyimport("SimpleITK")
+
     # Read the image
     image = sitk.ReadImage(path_nifti)
 
-    # print("oroginal orientation $(image.GetDirection()) origin $(image.GetOrigin()) size $(image.GetSize())  \n")
     # Create a DICOMOrientImageFilter
     orient_filter = sitk.DICOMOrientImageFilter()
 
-    # Set the desired orientation
-    orient_filter.SetDesiredCoordinateOrientation(orientation)
+    # Convert the orientation enum to a string using the dictionary
+    orientation_str = orientation_enum_to_string[orientation]
+    # println("Setting orintation to : ", orientation_str)
+
+    # Set the desired orientation (ensure it's a string)
+    orient_filter.SetDesiredCoordinateOrientation(orientation_str)
 
     # Apply the filter to the image
     oriented_image = orient_filter.Execute(image)
-    return oriented_image
-    # Write the oriented image back to the file
-    # sitk.WriteImage(oriented_image, path_nifti)
 
+    # Verify the orientation change
+    # println("Original Orientation: ", image.GetDirection())
+    # println("New Orientation: ", oriented_image.GetDirection())
+
+    # Write the oriented image back to the file
+    sitk.WriteImage(oriented_image, path_nifti)
 end
 
 
