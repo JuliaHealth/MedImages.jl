@@ -1,12 +1,16 @@
-
 using LinearAlgebra, Test
-# Pkg.add(["DICOM", "NIfTI", "Dictionaries", "Dates"])
 using Dictionaries, Dates, PyCall
+
 
 # Conda.add("SimpleITK")
 include("../src/MedImage_data_struct.jl")
+include("../src/Orientation_dicts.jl")
+include("../src/Brute_force_orientation.jl")
+include("../src/Utils.jl")
+
 include("../src/Load_and_save.jl")
 
+import ..MedImage_data_struct: MedImage
 # include("./test_visualize.jl")
 
 # import ..Load_and_save
