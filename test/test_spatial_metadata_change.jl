@@ -1,16 +1,19 @@
 using LinearAlgebra
 using PyCall
+using BenchmarkTools,CUDA
+
 include("../src/MedImage_data_struct.jl")
 include("../src/Orientation_dicts.jl")
 include("../src/Brute_force_orientation.jl")
 include("../src/Utils.jl")
 include("../src/Load_and_save.jl")
 include("../src/Spatial_metadata_change.jl")
+include("./dicom_nifti.jl")
+
 import ..MedImage_data_struct: MedImage, Interpolator_enum, Mode_mi, Orientation_code, Nearest_neighbour_en, Linear_en, B_spline_en
-import ..Load_and_save: load_image
+import ..Load_and_save: load_image,create_nii_from_medimage,update_voxel_data
 import ..Spatial_metadata_change: change_orientation, resample_to_spacing
 # sitk = pyimport_conda("SimpleITK", "simpleitk")
-
 
 function sitk_resample(path_nifti, targetSpac)
     sitk = pyimport_conda("SimpleITK", "simpleitk")
@@ -63,13 +66,28 @@ function test_resample_to_spacing(path_nifti)
 
     sitk = pyimport_conda("SimpleITK", "simpleitk")
     index=0
-    for spac in [(1.0, 2.0, 1.1), (2.0, 3.0, 4.0), (5.0, 0.9, 0.7)]        # Load SimpleITK
+    for spac in [ (5.0, 0.9, 0.7),(1.0, 2.0, 1.1), (2.0, 3.0, 4.0)]        # Load SimpleITK
         index+=1
         # Load the image from path
         med_im = load_image(path_nifti)
         # sitk.ReadImage(path_nifti)
+
+        #precompile
+        sitk_resample(path_nifti, spac)     
+        resample_to_spacing(med_im, spac, B_spline_en)
+        resample_to_spacing(update_voxel_data(med_im,CuArray(med_im.voxel_data)), spac, B_spline_en,true)
+
+
+        current_time = Dates.now()
         sitk_image = sitk_resample(path_nifti, spac)
+        println("Time for SimpleITK resample: ", Dates.now() - current_time)
+        current_time = Dates.now()
         med_im = resample_to_spacing(med_im, spac, B_spline_en)
+        println("Time for MedImage resample: ", Dates.now() - current_time)
+        current_time = Dates.now()
+        resample_to_spacing(update_voxel_data(med_im,CuArray(med_im.voxel_data)), spac, B_spline_en,true)
+        println("Time for MedImage GPU resample: ", Dates.now() - current_time)
+
 
         sitk.WriteImage(sitk_image, "/workspaces/MedImage.jl/test_data/debug/sitk_$(index).nii.gz")
         create_nii_from_medimage(med_im,"/workspaces/MedImage.jl/test_data/debug/medim_$(index)")

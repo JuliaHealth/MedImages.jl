@@ -150,21 +150,20 @@ end
 
 
 
-function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
+function update_voxel_data(old_image, new_voxel_data::AbstractArray)
 
   return MedImage(
     new_voxel_data,
     old_image.origin,
     old_image.spacing,
     old_image.direction,
-    # old_image.spatial_metadata,
-    old_image.image_type,
-    old_image.image_subtype,
+    instances(Image_type)[Int(old_image.image_type)+1],#  Int(image.image_type),
+    instances(Image_subtype)[Int(old_image.image_subtype)+1],#  Int(image.image_subtype),
     # old_image.voxel_datatype,
     old_image.date_of_saving,
     old_image.acquistion_time,
     old_image.patient_id,
-    old_image.current_device,
+    instances(current_device_enum)[Int(old_image.current_device)+1], #Int(image.current_device),
     old_image.study_uid,
     old_image.patient_uid,
     old_image.series_uid,
@@ -177,21 +176,48 @@ function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
 
 end
 
+function update_voxel_and_spatial_data(old_image, new_voxel_data::AbstractArray
+  , new_origin, new_spacing, new_direction)
 
-function update_voxel_and_spatial_data(old_image::MedImage, new_voxel_data::AbstractArray, new_origin, new_spacing, new_direction)
+  return MedImage(
+    new_voxel_data,
+    new_origin,
+    new_spacing,
+    new_direction,
+    # old_image.spatial_metadata,
+    instances(Image_type)[Int(old_image.image_type)+1],#  Int(image.image_type),
+    instances(Image_subtype)[Int(old_image.image_subtype)+1],#  Int(image.image_subtype),
+    # old_image.voxel_datatype,
+    old_image.date_of_saving,
+    old_image.acquistion_time,
+    old_image.patient_id,
+    instances(current_device_enum)[Int(old_image.current_device)+1], #Int(image.current_device),
+    old_image.study_uid,
+    old_image.patient_uid,
+    old_image.series_uid,
+    old_image.study_description,
+    old_image.legacy_file_name,
+    old_image.display_data,
+    old_image.clinical_data,
+    old_image.is_contrast_administered,
+    old_image.metadata)
 
-  res = @set old_image.voxel_data = new_voxel_data
-  res = @set res.origin = Utils.ensure_tuple(new_origin)
-  res = @set res.spacing = Utils.ensure_tuple(new_spacing)
-  res = @set res.direction = Utils.ensure_tuple(new_direction)
-  # voxel_data=new_voxel_data
-  # origin=new_origin
-  # spacing=new_spacing
-  # direction=new_direction
-
-  # return @pack! old_image = voxel_data, origin, spacing, direction
-  return res
 end
+
+# function update_voxel_and_spatial_data(old_image, new_voxel_data::AbstractArray, new_origin, new_spacing, new_direction)
+
+#   res = @set old_image.voxel_data = new_voxel_data
+#   res = @set res.origin = Utils.ensure_tuple(new_origin)
+#   res = @set res.spacing = Utils.ensure_tuple(new_spacing)
+#   res = @set res.direction = Utils.ensure_tuple(new_direction)
+#   # voxel_data=new_voxel_data
+#   # origin=new_origin
+#   # spacing=new_spacing
+#   # direction=new_direction
+
+#   # return @pack! old_image = voxel_data, origin, spacing, direction
+#   return res
+# end
 
 """
 load image from path
