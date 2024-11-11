@@ -1,3 +1,4 @@
 {
-    "julia.executablePath": "/home/jm/.juliaup/bin/julia"
+    "julia.executablePath": "/usr/local/bin/julia",
+    "julia.editor": "/usr/local/bin/julia"
 }

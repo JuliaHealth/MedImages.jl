@@ -1,8 +1,6 @@
 using HDF5
 using JSON
-using ..MedImage_data_struct, ..Load_and_save, ..Utils
-
-# export save_med_image, load_med_image
+using .MedImage_data_struct: MedImage
 
 """
 saving a MedImage object to a HDF5 file into a group with the given name
@@ -38,8 +36,6 @@ function save_med_image(f::HDF5.File, group_name::String, image::MedImage)
 
     return image.study_uid
 end
-
-
 
 """
 loading a MedImage object from a HDF5 file from a group with the given name
