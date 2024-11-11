@@ -1,7 +1,7 @@
 module Spatial_metadata_change
 using Interpolations
-using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Load_and_save
 
+using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Load_and_save
 export change_orientation, resample_to_spacing
 """
 given a MedImage object and desired spacing (spacing) return the MedImage object with the new spacing
@@ -12,26 +12,27 @@ function scale(itp::AbstractInterpolation{T,N,IT}, ranges::Vararg{AbstractRange,
     ScaledInterpolation{T,N,typeof(itp),IT,typeof(ranges)}(itp, ranges)
 end
 
-function resample_to_spacing(im::MedImage, new_spacing::Tuple{Float64,Float64,Float64}, interpolator_enum::Interpolator_enum)::MedImage
+
+
+
+function resample_to_spacing(im, new_spacing::Tuple{Float64, Float64, Float64}, interpolator_enum,use_cuda=false)::MedImage
     old_spacing = im.spacing
+    old_spacing=(old_spacing[3],old_spacing[2],old_spacing[1])
+    new_spacing=(new_spacing[3],new_spacing[2],new_spacing[1])
     old_size = size(im.voxel_data)
-    new_size = Tuple{Int,Int,Int}(ceil.((old_size .* old_spacing) ./ new_spacing))
+    new_size = Tuple{Int, Int, Int}(ceil.((old_size .* old_spacing) ./ new_spacing))
     points_to_interpolate = get_base_indicies_arr(new_size)
 
     points_to_interpolate = points_to_interpolate .- 1
     points_to_interpolate = points_to_interpolate .* new_spacing
     points_to_interpolate = points_to_interpolate .+ 1
-
-    # print("\n ppppp $(points_to_interpolate) \n ")
-
-    interpolated_points = interpolate_my(points_to_interpolate, im.voxel_data, old_spacing, interpolator_enum, true)
+    # if(use_cuda)
+    #     points_to_interpolate = CuArray(points_to_interpolate)
+    # end    
+    interpolated_points = interpolate_my(points_to_interpolate, im.voxel_data, old_spacing, interpolator_enum, true, 0, true)
 
     new_voxel_data = reshape(interpolated_points, (new_size[1], new_size[2], new_size[3]))
-    # Check if array a and b have the same type
-    # new_voxel_data=cast_to_array_b_type(new_voxel_data,im.voxel_data)
-
-
-    # Create the new MedImage object
+    new_spacing=(new_spacing[3],new_spacing[2],new_spacing[1])
     new_im = Load_and_save.update_voxel_and_spatial_data(im, new_voxel_data, im.origin, new_spacing, im.direction)
 
     return new_im
@@ -142,3 +143,19 @@ end#change_orientation
 # size(imm_res.voxel_data)
 # # range(1, stop=5, length=100,step=0.1)
 end#Spatial_metadata_change
+
+
+
+# using KernelAbstractions, Test
+# @kernel function mul2_kernel(A)
+#     I = @index(Global)
+#     shared_arr=@localmem(Float32, (512,3))
+#     index_local = @index(Local, Linear)
+#     A[index_local] = 2 * A[I]
+#   end
+
+#   dev = CPU()
+# A = ones(1024, 1024)
+# ev = mul2_kernel(dev, 64)(A, ndrange=size(A))
+# synchronize(dev)
+# all(A .== 2.0)
