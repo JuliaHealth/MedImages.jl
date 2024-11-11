@@ -1,10 +1,14 @@
-using  LinearAlgebra
+using LinearAlgebra
+using PyCall
+include("../src/MedImage_data_struct.jl")
+include("../src/Orientation_dicts.jl")
+include("../src/Brute_force_orientation.jl")
+include("../src/Utils.jl")
 include("../src/Load_and_save.jl")
-# include("../src/Basic_transformations.jl")
-# include("./test_visualize.jl")
-include("./dicom_nifti.jl")
 include("../src/Spatial_metadata_change.jl")
-
+import ..MedImage_data_struct: MedImage, Interpolator_enum, Mode_mi, Orientation_code, Nearest_neighbour_en, Linear_en, B_spline_en
+import ..Load_and_save: load_image
+import ..Spatial_metadata_change: change_orientation, resample_to_spacing
 # sitk = pyimport_conda("SimpleITK", "simpleitk")
 
 
@@ -67,8 +71,8 @@ function test_resample_to_spacing(path_nifti)
         sitk_image = sitk_resample(path_nifti, spac)
         med_im = resample_to_spacing(med_im, spac, B_spline_en)
 
-        # sitk.WriteImage(sitk_image, "/home/jakubmitura/projects/MedImage.jl/test_data/debug/sitk_$(index).nii.gz")
-        # create_nii_from_medimage(med_im,"/home/jakubmitura/projects/MedImage.jl/test_data/debug/medim_$(index)")
+        sitk.WriteImage(sitk_image, "/workspaces/MedImage.jl/test_data/debug/sitk_$(index).nii.gz")
+        create_nii_from_medimage(med_im,"/workspaces/MedImage.jl/test_data/debug/medim_$(index)")
 
         test_object_equality(med_im, sitk_image)
 
@@ -84,7 +88,7 @@ We need to check can it change between RAS and LPS orientationas those are most 
 """
 function test_change_orientation(path_nifti)
 
-    # for orientation in ["LIP","LSP","RIA","LIA","RSA","LSA","IRP","ILP","SRP","SLP","IRA","ILA","SRA","SLA","RPI","LPI","RAI","LAI","RPS","LPS","RAS","LAS","PRI","PLI","ARI","ALI","PRS","PLS","ARS","ALS","IPR","SPR","IAR","SAR","IPL","SPL","IAL","SAL","PIR","PSR","AIR","ASR","PIL","PSL","AIL","ASL"]#,"RSP","RIP"
+    # for orientation in ["LIP","LSP","RIA","LIA","RSA","LSA","IRP","ILP","SRP","SLP","IRA","ILA","SRA","SLA","RPI","LPI","RAI","LAI","RPS","LPS"]#,"RSP","RIP"
     for orientation in ["RAS","LAS" ,"RPI","LPI","RAI","LAI","RPS","LPS"]#,"RSP","RIP"
         med_im = load_image(path_nifti)
         sitk_image = change_image_orientation(path_nifti, orientation)
@@ -94,7 +98,7 @@ function test_change_orientation(path_nifti)
 end
 
 
-path_nifti = "/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
+path_nifti = "/workspaces/MedImage.jl/test_data/for_resample_target/ct_soft_pat_3_sudy_0.nii.gz"
 test_resample_to_spacing(path_nifti)
 # test_change_orientation(path_nifti)
 

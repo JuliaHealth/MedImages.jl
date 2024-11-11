@@ -10,6 +10,7 @@ export interpolate_my
 export TransformIndexToPhysicalPoint_julia
 export ensure_tuple
 export create_nii_from_medimage
+import ..MedImage_data_struct: MedImage, Interpolator_enum, Mode_mi, Orientation_code, Nearest_neighbour_en, Linear_en, B_spline_en
 
 
 """
@@ -83,101 +84,102 @@ end#interpolate_point
 
 
     index_local = @index(Local, Linear)
+    KernelAbstractions.@print("index_local $(index_local)  @index(Global) $(@index(Global)) \n")
+    shared_arr[index_local,1]=points_to_interpolate[1,@index(Global)[1]]
+    shared_arr[index_local,2]=points_to_interpolate[2,@index(Global)[1]]
+    shared_arr[index_local,3]=points_to_interpolate[3,@index(Global)[1]]
 
-    shared_arr[index_local,1]=points_to_interpolate[1,@index(Global, Linear)]
-    shared_arr[index_local,2]=points_to_interpolate[2,@index(Global, Linear)]
-    shared_arr[index_local,3]=points_to_interpolate[3,@index(Global, Linear)]
+    # #check for extrapolation - if point is outside of the image
+    # if(shared_arr[index_local,1]<0 || shared_arr[index_local,2]<0 || shared_arr[index_local,3]<0   || shared_arr[index_local,1]>=source_arr_shape[1] || shared_arr[index_local,2]>=source_arr_shape[2] || shared_arr[index_local,3]>=source_arr_shape[3])
+    #     out_res[@index(Global, Linear)]=extrapolate_value
+   
+    # else
+    #     #simple implementation of nearest neighbour
+    #     if(is_nearest_neighbour)
+    #         #check x axis - if we are closer to the lower or upper bound
+    #         if( abs(((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])) < abs(((shared_arr[index_local,1]-ceil( shared_arr[index_local,1])))*spacing[1]))
+    #             #floor x smaller
+    #             shared_arr[index_local,1]=floor( shared_arr[index_local,1])
+    #         else
+    #             #ceil x smaller
+    #             shared_arr[index_local,1]=ceil( shared_arr[index_local,1])
+    #         end
+    #         #check y axis - if we are closer to the lower or upper bound
+    #         if( abs(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])) < abs(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2])))*spacing[2]))
+    #             #floor y smaller
+    #             shared_arr[index_local,2]=floor( shared_arr[index_local,2])
+    #         else
+    #             #ceil y smaller
+    #             shared_arr[index_local,2]=ceil( shared_arr[index_local,2])
+    #         end
+    #         #check z axis - if we are closer to the lower or upper bound
+    #         if( abs(((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])) < abs(((shared_arr[index_local,3]-ceil( shared_arr[index_local,3])))*spacing[3]))
+    #             #floor z smaller
+    #             shared_arr[index_local,3]=floor( shared_arr[index_local,3])
+    #         else
+    #             #ceil z smaller
+    #             shared_arr[index_local,3]=ceil( shared_arr[index_local,3])
+    #         end
 
-    #check for extrapolation - if point is outside of the image
-    if(shared_arr[index_local,1]<1 || shared_arr[index_local,2]<1 || shared_arr[index_local,3]<1   || shared_arr[index_local,1]>=source_arr_shape[1] || shared_arr[index_local,2]>=source_arr_shape[2] || shared_arr[index_local,3]>=source_arr_shape[3])
-        out_res[@index(Global, Linear)]=extrapolate_value
-    else
-        #simple implementation of nearest neighbour
-        if(is_nearest_neighbour)
-            #check x axis - if we are closer to the lower or upper bound
-            if( abs(((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])) < abs(((shared_arr[index_local,1]-ceil( shared_arr[index_local,1])))*spacing[1]))
-                #floor x smaller
-                shared_arr[index_local,1]=floor( shared_arr[index_local,1])
-            else
-                #ceil x smaller
-                shared_arr[index_local,1]=ceil( shared_arr[index_local,1])
-            end
-            #check y axis - if we are closer to the lower or upper bound
-            if( abs(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])) < abs(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2])))*spacing[2]))
-                #floor y smaller
-                shared_arr[index_local,2]=floor( shared_arr[index_local,2])
-            else
-                #ceil y smaller
-                shared_arr[index_local,2]=ceil( shared_arr[index_local,2])
-            end
-            #check z axis - if we are closer to the lower or upper bound
-            if( abs(((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])) < abs(((shared_arr[index_local,3]-ceil( shared_arr[index_local,3])))*spacing[3]))
-                #floor z smaller
-                shared_arr[index_local,3]=floor( shared_arr[index_local,3])
-            else
-                #ceil z smaller
-                shared_arr[index_local,3]=ceil( shared_arr[index_local,3])
-            end
-
-            #we ha already selected x,y,z so we can return the value
-            out_res[@index(Global, Linear)]=source_arr[Int(shared_arr[index_local,1]),Int(shared_arr[index_local,2]),Int(shared_arr[index_local,3])]
-        else
-            # if we are not using nearest neighbour we will use linear interpolation 
-            #interpolation based on distance of each point to the 8 points in the cube around it divided by recaluclated sum of those distances
-            shared_arr[index_local,1]=(( (source_arr[Int(ceil( shared_arr[index_local,1])), Int(ceil( shared_arr[index_local,2])), Int(ceil( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ))   +  (source_arr[Int(ceil( shared_arr[index_local,1])), Int(ceil( shared_arr[index_local,2])), Int(floor( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ))   +  (source_arr[Int(ceil( shared_arr[index_local,1])), Int(floor( shared_arr[index_local,2])), Int(ceil( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ))   +  (source_arr[Int(ceil( shared_arr[index_local,1])), Int(floor( shared_arr[index_local,2])), Int(floor( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ))   +  (source_arr[Int(floor( shared_arr[index_local,1])), Int(ceil( shared_arr[index_local,2])), Int(ceil( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ))   +  (source_arr[Int(floor( shared_arr[index_local,1])), Int(ceil( shared_arr[index_local,2])), Int(floor( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ))   +  (source_arr[Int(floor( shared_arr[index_local,1])), Int(floor( shared_arr[index_local,2])), Int(ceil( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ))   +  (source_arr[Int(floor( shared_arr[index_local,1])), Int(floor( shared_arr[index_local,2])), Int(floor( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ))  )/(( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
-                +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
-                + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
-                )) )))
+    #         #we ha already selected x,y,z so we can return the value
+    #         out_res[@index(Global, Linear)]=source_arr[Int(shared_arr[index_local,1]),Int(shared_arr[index_local,2]),Int(shared_arr[index_local,3])]
+    #     else
+    #         # if we are not using nearest neighbour we will use linear interpolation 
+    #         #interpolation based on distance of each point to the 8 points in the cube around it divided by recaluclated sum of those distances
+    #         shared_arr[index_local,1]=(( (source_arr[Int(ceil( shared_arr[index_local,1])), Int(ceil( shared_arr[index_local,2])), Int(ceil( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ))   +  (source_arr[Int(ceil( shared_arr[index_local,1])), Int(ceil( shared_arr[index_local,2])), Int(floor( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ))   +  (source_arr[Int(ceil( shared_arr[index_local,1])), Int(floor( shared_arr[index_local,2])), Int(ceil( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ))   +  (source_arr[Int(ceil( shared_arr[index_local,1])), Int(floor( shared_arr[index_local,2])), Int(floor( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ))   +  (source_arr[Int(floor( shared_arr[index_local,1])), Int(ceil( shared_arr[index_local,2])), Int(ceil( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ))   +  (source_arr[Int(floor( shared_arr[index_local,1])), Int(ceil( shared_arr[index_local,2])), Int(floor( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ))   +  (source_arr[Int(floor( shared_arr[index_local,1])), Int(floor( shared_arr[index_local,2])), Int(ceil( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ))   +  (source_arr[Int(floor( shared_arr[index_local,1])), Int(floor( shared_arr[index_local,2])), Int(floor( shared_arr[index_local,3])),1,blockIdx().y]*( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ))  )/(( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-ceil( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-ceil( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-ceil( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) ) + ( (1/sqrt( ((((shared_arr[index_local,1]-floor( shared_arr[index_local,1]))*spacing[1])^2)
+    #             +(((shared_arr[index_local,2]-floor( shared_arr[index_local,2]))*spacing[2])^2)
+    #             + (((shared_arr[index_local,3]-floor( shared_arr[index_local,3]))*spacing[3])^2) )+0.000001
+    #             )) )))
 
 
-            out_res[@index(Global, Linear)]=shared_arr[index_local,1]
-        end#is_nearest_neighbour
-    end#check is in range    
+    #         out_res[@index(Global, Linear)]=shared_arr[index_local,1]
+    #     end#is_nearest_neighbour
+    # end#check is in range    
 end
 
 
@@ -199,13 +201,13 @@ function interpolate_my(points_to_interpolate,input_array,input_array_spacing,in
     
     if(use_fast)
         is_nearest_neighbour=(interpolator_enum == Nearest_neighbour_en)
-        out_res = similar(points_to_interpolate, eltype(points_to_interpolate), size(points_to_interpolate, 1))
+        out_res = similar(points_to_interpolate, eltype(points_to_interpolate), size(points_to_interpolate, 2))
         print("\n oooo out_res $(size(out_res))\n")
         backend = get_backend(points_to_interpolate)
         source_arr_shape=size(input_array)
-        interpolate_kernel(backend, 512)(out_res,source_arr_shape,source_arr,points_to_interpolate
-        ,spacing,keep_begining_same
-        ,extrapolate_value,is_nearest_neighbour, ndrange=size(out_res))
+        interpolate_kernel(backend, 512)(out_res,source_arr_shape,input_array,points_to_interpolate
+        ,input_array_spacing,keep_begining_same
+        ,extrapolate_value,is_nearest_neighbour, ndrange=size(out_res,1))
         synchronize(backend)
         return out_res
 

@@ -8,7 +8,14 @@ https://www.cs.cornell.edu/courses/cs4620/2010fa/lectures/03transforms3d.pdf
 
 """
 
-# include("../src/MedImage_data_struct.jl")
+
+
+
+include("../src/MedImage_data_struct.jl")
+include("../src/Orientation_dicts.jl")
+include("../src/Brute_force_orientation.jl")
+include("../src/Utils.jl")
+
 include("../src/Load_and_save.jl")
 include("../src/Basic_transformations.jl")
 # include("./test_visualize.jl")
@@ -17,6 +24,8 @@ include("./dicom_nifti.jl")
 # using .dicom_nifti
 
 using LinearAlgebra
+using MedImage_data_struct
+using Load_and_save
 
 
 # sitk = pyimport("SimpleITK")
