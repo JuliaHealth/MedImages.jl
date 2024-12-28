@@ -7,7 +7,18 @@ using UUIDs
 export MedImage, Image_type, Image_subtype, current_device_enum, Interpolator_enum, Mode_mi, CoordinateTerms, CoordinateMajornessTerms, Orientation_code
 
 """
-Defining image type enum
+
+    @enum Image_type
+
+
+Defines the type of medical image. Possible values are:
+
+- `MRI_type`: Magnetic Resonance Imaging
+
+- `PET_type`: Positron Emission Tomography
+
+- `CT_type`: Computed Tomography
+
 """
 @enum Image_type begin
   MRI_type
@@ -15,6 +26,24 @@ Defining image type enum
   CT_type
 end
 
+
+
+"""
+
+    @enum current_device_enum
+
+
+Specifies the current device used for processing. Possible values are:
+
+- `CPU_current_device`: Central Processing Unit
+
+- `CUDA_current_device`: NVIDIA CUDA-enabled GPU
+
+- `AMD_current_device`: AMD GPU
+
+- `ONEAPI_current_device`: Intel oneAPI-enabled device
+
+"""
 @enum current_device_enum begin
   CPU_current_device
   CUDA_current_device
@@ -22,8 +51,30 @@ end
   ONEAPI_current_device
 
 end
+
+
 """
-Defining subimage type enum
+    @enum Image_subtype
+
+
+Defines the subtype of medical image. Possible values include:
+
+- `CT_subtype`: CT scan subtype
+
+- `ADC_subtype`: Apparent Diffusion Coefficient
+
+- `DWI_subtype`: Diffusion Weighted Imaging
+
+- `T1_subtype`: T1-weighted MRI
+
+- `T2_subtype`: T2-weighted MRI
+
+- `FLAIR_subtype`: Fluid-attenuated inversion recovery
+
+- `FDG_subtype`: Fluorodeoxyglucose PET
+
+- `PSMA_subtype`: Prostate-Specific Membrane Antigen PET
+
 """
 @enum Image_subtype begin
   CT_subtype
@@ -41,7 +92,53 @@ end
   #struct for now, will switch to MetaArrays when it has GPU support
 
 """
-Definition for standardised MedImage Struct
+
+    mutable struct MedImage
+
+
+A standardized structure for storing medical image data and metadata.
+
+
+# Fields
+
+- `voxel_data`: Multidimensional array representing the image data.
+
+- `origin`: Tuple of 3 Float64 values indicating the origin of the image.
+
+- `spacing`: Tuple of 3 Float64 values indicating the spacing between voxels.
+
+- `direction`: 9-element tuple of Float64 values for orientation cosines.
+
+- `image_type`: Enum `Image_type` indicating the type of image.
+
+- `image_subtype`: Enum `Image_subtype` indicating the subtype of image.
+
+- `date_of_saving`: DateTime when the image was saved.
+
+- `acquistion_time`: DateTime when the image was acquired.
+
+- `patient_id`: String identifier for the patient.
+
+- `current_device`: Enum `current_device_enum` indicating the processing device.
+
+- `study_uid`: Unique identifier for the study.
+
+- `patient_uid`: Unique identifier for the patient.
+
+- `series_uid`: Unique identifier for the series.
+
+- `study_description`: Description of the study.
+
+- `legacy_file_name`: Original file name.
+
+- `display_data`: Dictionary for color values (e.g., RGB or grayscale).
+
+- `clinical_data`: Dictionary with clinical data (e.g., age, gender).
+
+- `is_contrast_administered`: Boolean indicating if contrast was used.
+
+- `metadata`: Dictionary for additional metadata.
+
 """
 @with_kw mutable struct MedImage
   voxel_data #mutlidimensional array (512,512,3)
@@ -71,22 +168,61 @@ end
 #   return MedImage(MedImage_struct_attribute_values...)
 # end
 
-
-
 """
-Definitions of basic interpolators
+
+    @enum Interpolator_enum
+
+
+Defines basic interpolators for image processing. Possible values are:
+
+- `Nearest_neighbour_en`: Nearest neighbor interpolation
+
+- `Linear_en`: Linear interpolation
+
+- `B_spline_en`: B-spline interpolation
+
 """
 @enum Interpolator_enum Nearest_neighbour_en Linear_en B_spline_en
 
 """
-Indicating do we want to change underlying pixel array spatial metadata or both
+
+    @enum Mode_mi
+
+
+Indicates the mode of operation for modifying image data. Possible values are:
+
+- `pixel_array_mode`: Modify pixel array only
+
+- `spat_metadata_mode`: Modify spatial metadata only
+
+- `all_mode`: Modify both pixel array and spatial metadata
+
 """
 @enum Mode_mi pixel_array_mode = 0 spat_metadata_mode = 2 all_mode = 3
 
 
 ################## orientation
 """
-enums based on https://github.com/InsightSoftwareConsortium/ITK/blob/311b7060ef39e371f3cd209ec135284ff5fde735/Modules/Core/Common/include/itkSpatialOrientation.h#L88
+
+    @enum CoordinateTerms
+
+
+Defines coordinate terms based on ITK spatial orientation. Possible values are:
+
+- `ITK_COORDINATE_UNKNOWN`: Unknown coordinate
+
+- `ITK_COORDINATE_Right`: Right
+
+- `ITK_COORDINATE_Left`: Left
+
+- `ITK_COORDINATE_Posterior`: Posterior
+
+- `ITK_COORDINATE_Anterior`: Anterior
+
+- `ITK_COORDINATE_Inferior`: Inferior
+
+- `ITK_COORDINATE_Superior`: Superior
+
 """
 @enum CoordinateTerms begin
     ITK_COORDINATE_UNKNOWN = 0
@@ -98,12 +234,57 @@ enums based on https://github.com/InsightSoftwareConsortium/ITK/blob/311b7060ef3
     ITK_COORDINATE_Superior = 9
 end
 
+
+
+
+
+"""
+
+    @enum CoordinateMajornessTerms
+
+
+Defines the majorness of coordinates. Possible values are:
+
+- `PrimaryMinor`: Primary minor coordinate
+
+- `SecondaryMinor`: Secondary minor coordinate
+
+- `TertiaryMinor`: Tertiary minor coordinate
+
+"""
 @enum CoordinateMajornessTerms begin
     PrimaryMinor = 0
     SecondaryMinor = 8
     TertiaryMinor = 16
 end
 
+
+
+
+"""
+
+    @enum Orientation_code
+
+
+Defines orientation codes for medical images. Possible values include:
+
+- `ORIENTATION_RPI`: Right-Posterior-Inferior
+
+- `ORIENTATION_LPI`: Left-Posterior-Inferior
+
+- `ORIENTATION_RAI`: Right-Anterior-Inferior
+
+- `ORIENTATION_LAI`: Left-Anterior-Inferior
+
+- `ORIENTATION_RPS`: Right-Posterior-Superior
+
+- `ORIENTATION_LPS`: Left-Posterior-Superior
+
+- `ORIENTATION_RAS`: Right-Anterior-Superior
+
+- `ORIENTATION_LAS`: Left-Anterior-Superior
+
+"""
 @enum Orientation_code begin
     # ORIENTATION_RIP
     # ORIENTATION_LIP
