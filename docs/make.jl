@@ -10,7 +10,7 @@ makedocs(;
     authors="Jakub-Mitura <jakubmitura14@gmail.com>, Divyansh-Goyal <divital2004@gmail.com> and contributors",
     sitename="MedImages.jl",
     format=DocumenterVitepress.MarkdownVitepress(
-        repo="https://github.com/JuliaHealth/MedImage.jl",
+        repo="https://github.com/JuliaHealth/MedImages.jl",
     ),
     pages=[
         "Home" => "index.md",
