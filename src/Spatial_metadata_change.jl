@@ -1,47 +1,39 @@
-include("./MedImage_data_struct.jl")
-include("./Utils.jl")
-include("./Load_and_save.jl")
-include("/workspaces/MedImage.jl/src/Orientation_dicts.jl")
-
+module Spatial_metadata_change
 using Interpolations
 
-"""
-functions to change the metadata of a 3D image like change the orientation of the image
-change spaciing to desired etc 
-"""
-
+using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Load_and_save
+export change_orientation, resample_to_spacing
 """
 given a MedImage object and desired spacing (spacing) return the MedImage object with the new spacing
-
 """
-
 function scale(itp::AbstractInterpolation{T,N,IT}, ranges::Vararg{AbstractRange,N}) where {T,N,IT}
     # overwriting this function becouse check_ranges giving error
     # check_ranges(itpflag(itp), axes(itp), ranges)
     ScaledInterpolation{T,N,typeof(itp),IT,typeof(ranges)}(itp, ranges)
 end
 
-function resample_to_spacing(im, new_spacing::Tuple{Float64,Float64,Float64}, interpolator_enum)
+
+
+
+function resample_to_spacing(im, new_spacing::Tuple{Float64, Float64, Float64}, interpolator_enum,use_cuda=false)::MedImage
     old_spacing = im.spacing
+    old_spacing=(old_spacing[3],old_spacing[2],old_spacing[1])
+    new_spacing=(new_spacing[3],new_spacing[2],new_spacing[1])
     old_size = size(im.voxel_data)
-    new_size = Tuple{Int,Int,Int}(ceil.((old_size .* old_spacing) ./ new_spacing))
+    new_size = Tuple{Int, Int, Int}(ceil.((old_size .* old_spacing) ./ new_spacing))
     points_to_interpolate = get_base_indicies_arr(new_size)
 
     points_to_interpolate = points_to_interpolate .- 1
     points_to_interpolate = points_to_interpolate .* new_spacing
     points_to_interpolate = points_to_interpolate .+ 1
-
-    # print("\n ppppp $(points_to_interpolate) \n ")
-
-    interpolated_points = interpolate_my(points_to_interpolate, im.voxel_data, old_spacing, interpolator_enum, true)
+    # if(use_cuda)
+    #     points_to_interpolate = CuArray(points_to_interpolate)
+    # end    
+    interpolated_points = interpolate_my(points_to_interpolate, im.voxel_data, old_spacing, interpolator_enum, true, 0, true)
 
     new_voxel_data = reshape(interpolated_points, (new_size[1], new_size[2], new_size[3]))
-    # Check if array a and b have the same type
-    # new_voxel_data=cast_to_array_b_type(new_voxel_data,im.voxel_data)
-
-
-    # Create the new MedImage object
-    new_im = update_voxel_and_spatial_data(im, new_voxel_data, im.origin, new_spacing, im.direction)
+    new_spacing=(new_spacing[3],new_spacing[2],new_spacing[1])
+    new_im = Load_and_save.update_voxel_and_spatial_data(im, new_voxel_data, im.origin, new_spacing, im.direction)
 
     return new_im
 end#resample_to_spacing
@@ -56,16 +48,15 @@ end#resample_to_spacing
 """
 given a MedImage object and desired orientation encoded as 3 letter string (like RAS or LPS) return the MedImage object with the new orientation
 """
-
-function change_orientation(im, new_orientation)
-    old_orientation = number_to_enum_orientation_dict[im.direction]
-    reorient_operation = orientation_pair_to_operation_dict[(old_orientation, new_orientation)]
+function change_orientation(im::MedImage, new_orientation::Orientation_code)::MedImage
+    old_orientation = Orientation_dicts.number_to_enum_orientation_dict[im.direction]
+    reorient_operation = Orientation_dicts.orientation_pair_to_operation_dict[(old_orientation, new_orientation)]
     return change_orientation_main(im, new_orientation, reorient_operation)
 end#change_orientation
 
 
 
-function change_orientation_main(im, new_orientation, reorient_operation)
+function change_orientation_main(im::MedImage, new_orientation::Orientation_code, reorient_operation)::MedImage
     perm = reorient_operation[1]
     reverse_axes = reorient_operation[2]
     origin_transforms = reorient_operation[3]
@@ -88,7 +79,7 @@ function change_orientation_main(im, new_orientation, reorient_operation)
     end
 
 
-    # first we need to permute the voxel data to match the desired orientation 
+    # first we need to permute the voxel data to match the desired orientation
     im_voxel_data = copy(im.voxel_data)
     if (length(perm) > 0)
         im_voxel_data = permutedims(im_voxel_data, (perm[1], perm[2], perm[3]))
@@ -109,7 +100,7 @@ function change_orientation_main(im, new_orientation, reorient_operation)
     st = spacing_transforms
     sp = im.spacing
     new_spacing = (sp[st[1]], sp[st[2]], sp[st[3]])
-    new_im = update_voxel_and_spatial_data(im, im_voxel_data, res_origin, new_spacing, orientation_dict_enum_to_number[new_orientation])
+    new_im = Load_and_save.update_voxel_and_spatial_data(im, im_voxel_data, res_origin, new_spacing, orientation_dict_enum_to_number[new_orientation])
 
     # print("\n res_origin $(res_origin) \n")
     return new_im
@@ -151,3 +142,20 @@ end#change_orientation
 
 # size(imm_res.voxel_data)
 # # range(1, stop=5, length=100,step=0.1)
+end#Spatial_metadata_change
+
+
+
+# using KernelAbstractions, Test
+# @kernel function mul2_kernel(A)
+#     I = @index(Global)
+#     shared_arr=@localmem(Float32, (512,3))
+#     index_local = @index(Local, Linear)
+#     A[index_local] = 2 * A[I]
+#   end
+
+#   dev = CPU()
+# A = ones(1024, 1024)
+# ev = mul2_kernel(dev, 64)(A, ndrange=size(A))
+# synchronize(dev)
+# all(A .== 2.0)
