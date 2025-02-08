@@ -58,6 +58,27 @@ function change_image_orientation(path_nifti, orientation)
     # sitk.WriteImage(oriented_image, path_nifti)
 
 end
+
+
+function create_nii_from_medimagee(med_image, file_path::String)
+    # Convert voxel_data to a numpy array (Assuming voxel_data is stored in Julia array format)
+    voxel_data_np = med_image.voxel_data
+    voxel_data_np = permutedims(voxel_data_np, (3, 2, 1))
+    # Create a SimpleITK image from numpy array
+    sitk = pyimport("SimpleITK")
+    image_sitk = sitk.GetImageFromArray(voxel_data_np)
+  
+    # Set spatial metadata
+    image_sitk.SetOrigin(med_image.origin)
+    image_sitk.SetSpacing(med_image.spacing)
+    image_sitk.SetDirection(med_image.direction)
+  
+    # Save the image as .nii.gz
+    sitk.WriteImage(image_sitk, file_path * ".nii.gz")
+  end
+
+
+
 """
 test if the resample_to_spacing of the image lead to correct change in the pixel array
 and the metadata the operation will be tasted against Python simple itk function
@@ -92,7 +113,7 @@ function test_resample_to_spacing(path_nifti)
 
 
         sitk.WriteImage(sitk_image, "/workspaces/MedImage.jl/test_data/debug/sitk_$(index).nii.gz")
-        create_nii_from_medimage(med_im,"/workspaces/MedImage.jl/test_data/debug/medim_$(index)")
+        create_nii_from_medimagee(med_im,"/workspaces/MedImage.jl/test_data/debug/medim_$(index)")
 
         test_object_equality(med_im, sitk_image)
 
@@ -102,22 +123,6 @@ end
 
 
 
-function create_nii_from_medimage(med_image, file_path::String)
-    # Convert voxel_data to a numpy array (Assuming voxel_data is stored in Julia array format)
-    voxel_data_np = med_image.voxel_data
-    # voxel_data_np = permutedims(voxel_data_np, (3, 2, 1))
-    # Create a SimpleITK image from numpy array
-    sitk = pyimport("SimpleITK")
-    image_sitk = sitk.GetImageFromArray(voxel_data_np)
-  
-    # Set spatial metadata
-    image_sitk.SetOrigin(med_image.origin)
-    image_sitk.SetSpacing(med_image.spacing)
-    image_sitk.SetDirection(med_image.direction)
-  
-    # Save the image as .nii.gz
-    sitk.WriteImage(image_sitk, file_path * ".nii.gz")
-  end
 
 
 """
@@ -138,7 +143,7 @@ function test_change_orientation(path_nifti)
         test_object_equality(med_im, sitk_image)
   
         sitk.WriteImage(sitk_image, "/workspaces/MedImage.jl/test_data/debug/sitk_$(index).nii.gz")
-        create_nii_from_medimage(med_im,"/workspaces/MedImage.jl/test_data/debug/medim_$(index)")
+        create_nii_from_medimagee(med_im,"/workspaces/MedImage.jl/test_data/debug/medim_$(index)")
 
   
     end
@@ -146,6 +151,6 @@ end
 
 
 path_nifti = "/workspaces/MedImage.jl/test_data/for_resample_target/ct_soft_pat_3_sudy_0.nii.gz"
-test_resample_to_spacing(path_nifti)
+# test_resample_to_spacing(path_nifti)
 # test_change_orientation(path_nifti)
 

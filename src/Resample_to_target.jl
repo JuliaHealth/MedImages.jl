@@ -1,9 +1,11 @@
-module Resample_to_target
+# module Resample_to_target
 using Interpolations
-using Statistics
-
-using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Spatial_metadata_change, ..Load_and_save
-export resample_to_image,  scale
+using Statistics,Revise
+include("/workspaces/MedImage.jl/src/MedImage_data_struct.jl")
+includet("/workspaces/MedImage.jl/src/Orientation_dicts.jl")
+includet("/workspaces/MedImage.jl/src/Spatial_metadata_change.jl")
+# using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Spatial_metadata_change, ..Load_and_save
+# export resample_to_image,  scale
 
 """
 overwriting this function from Interpolations.jl becouse check_ranges giving error
@@ -22,7 +24,7 @@ It require multiple steps some idea of implementation is below
 1) check origin of both images as for example in case origin of the moving image is not in the fixed image we need to return zeros
 2) we should define a grid on the basis of locations of the voxels in the fixed image and interpolate voxels from the moving image to the grid using for example GridInterpolations
 """
-function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator_enum::Interpolator_enum,value_to_extrapolate=Nothing)::MedImage
+function resample_to_image(im_fixed, im_moving, interpolator_enum,value_to_extrapolate=Nothing)
 
     if(value_to_extrapolate==Nothing)
         corners = [
@@ -41,7 +43,7 @@ function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator
 
 
     # get direction from one and set it to other
-    im_moving=Spatial_metadata_change.change_orientation(im_moving,Orientation_dicts.number_to_enum_orientation_dict[im_fixed.direction])
+    im_moving=change_orientation(im_moving,number_to_enum_orientation_dict[im_fixed.direction])
 
     # Calculate the transformation from moving image space to fixed image space
     old_spacing = im_moving.spacing
@@ -67,12 +69,12 @@ function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator
     # new_voxel_data=cast_to_array_b_type(new_voxel_data,im_fixed.voxel_data)
 
 
-    new_im =Load_and_save.update_voxel_and_spatial_data(im_moving, new_voxel_data
+    new_im =update_voxel_and_spatial_data(im_moving, new_voxel_data
     ,im_fixed.origin,new_spacing,im_fixed.direction)
 
 
     return new_im
-end
+# end
 
 
 # function load_image(path)
