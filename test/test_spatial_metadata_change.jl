@@ -151,6 +151,7 @@ end
 
 
 path_nifti = "/workspaces/MedImage.jl/test_data/for_resample_target/ct_soft_pat_3_sudy_0.nii.gz"
-# test_resample_to_spacing(path_nifti)
+
+test_resample_to_spacing(path_nifti)
 # test_change_orientation(path_nifti)
 
