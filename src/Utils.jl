@@ -1,3 +1,4 @@
+module Utils
 
 """
 return array of cartesian indices for given dimensions in a form of array
@@ -241,4 +242,4 @@ end
 # print(image.GetSpacing())
 # print(image.GetDirection())
 
-
+end #Utils

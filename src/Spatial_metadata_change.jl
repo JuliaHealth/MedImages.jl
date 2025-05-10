@@ -1,7 +1,8 @@
+module Spatial_metadata_change
 include("./MedImage_data_struct.jl")
 include("./Utils.jl")
 include("./Load_and_save.jl")
-include("/workspaces/MedImage.jl/src/Orientation_dicts.jl")
+include("./Orientation_dicts.jl")
 
 using Interpolations
 
@@ -151,3 +152,4 @@ end#change_orientation
 
 # size(imm_res.voxel_data)
 # # range(1, stop=5, length=100,step=0.1)
+end #Spatial_metadata_change

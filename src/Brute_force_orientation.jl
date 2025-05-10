@@ -1,6 +1,8 @@
 # module Brute_force_orientation
 # using ..Orientation_dicts, ..MedImage_data_struct
-include("/workspaces/MedImage.jl/src/Orientation_dicts.jl")
+include(joinpath(@__DIR__, "MedImage_data_struct.jl"))
+include(joinpath(@__DIR__, "Orientation_dicts.jl"))
+const MI = MedImage_data_struct
 using Interpolations
 using Combinatorics
 using JLD, PyCall
@@ -31,14 +33,14 @@ orientation_enum_to_string = Dict(
     # ORIENTATION_ILA=>"ILA",
     # ORIENTATION_SRA=>"SRA",
     # ORIENTATION_SLA=>"SLA",
-    ORIENTATION_RPI => "RPI",
-    ORIENTATION_LPI => "LPI",
-    ORIENTATION_RAI => "RAI",
-    ORIENTATION_LAI => "LAI",
-    ORIENTATION_RPS => "RPS",
-    ORIENTATION_LPS => "LPS",
-    ORIENTATION_RAS => "RAS",
-    ORIENTATION_LAS => "LAS",
+    MI.ORIENTATION_RPI => "RPI",
+    MI.ORIENTATION_LPI => "LPI",
+    MI.ORIENTATION_RAI => "RAI",
+    MI.ORIENTATION_LAI => "LAI",
+    MI.ORIENTATION_RPS => "RPS",
+    MI.ORIENTATION_LPS => "LPS",
+    MI.ORIENTATION_RAS => "RAS",
+    MI.ORIENTATION_LAS => "LAS",
     # ORIENTATION_PRI=>"PRI",
     # ORIENTATION_PLI=>"PLI",
     # ORIENTATION_ARI=>"ARI",
