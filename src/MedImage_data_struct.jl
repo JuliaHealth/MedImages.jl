@@ -1,3 +1,4 @@
+module MedImage_data_struct
 using Dates, Dictionaries, Parameters
 using Dictionaries
 using Parameters
@@ -334,3 +335,4 @@ Defines orientation codes for medical images. Possible values include:
     # ORIENTATION_ASL
 end
 
+end # module

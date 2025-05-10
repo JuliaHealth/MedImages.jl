@@ -5,3 +5,5 @@ src/test_rotacji.nii.gz
 test_data/pet_data/
 .vscode/settings.json
 test_data/for_resample_target/
+test_data/Tests/
+test/new/

@@ -1,9 +1,10 @@
 module Basic_transformations
 
-using  CoordinateTransformations, Interpolations, StaticArrays, LinearAlgebra, Rotations, Dictionaries
+using CoordinateTransformations, Interpolations, StaticArrays, LinearAlgebra, Rotations, Dictionaries
 using LinearAlgebra
 using ..MedImage_data_struct
 export rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, computeIndexToPhysicalPointMatrices_Julia, transformIndexToPhysicalPoint_Julia, get_voxel_center_Julia, get_real_center_Julia, Rodrigues_rotation_matrix, crop_image_around_center
+
 
 """
 given a MedImage object will rotate it by angle (angle) around axis (rotate_axis)
@@ -12,7 +13,7 @@ It modifies both pixel array and not metadata
 we are setting Interpolator by using Interpolator enum
 return the rotated MedImage object 
 """
-function computeIndexToPhysicalPointMatrices_Julia(im::MedImage)::Matrix{Float64}
+function computeIndexToPhysicalPointMatrices_Julia(im)
   VImageDimension = length(im.spacing)
     spacing_vector = collect(im.spacing)
     if any(spacing_vector .== 0.0)
@@ -34,7 +35,7 @@ function computeIndexToPhysicalPointMatrices_Julia(im::MedImage)::Matrix{Float64
 end
 
 
-function transformIndexToPhysicalPoint_Julia(im::MedImage, index::Tuple{Vararg{Int}})::Tuple{Vararg{Float64}}
+function transformIndexToPhysicalPoint_Julia(im, index::Tuple{Vararg{Int}})::Tuple{Vararg{Float64}}
   indexToPhysicalPoint = computeIndexToPhysicalPointMatrices_Julia(im)
   VImageDimension = length(index)
   point = zeros(Float64, VImageDimension)
@@ -53,14 +54,14 @@ function get_voxel_center_Julia(image::Array{T, 3})::Tuple{Vararg{Float64}} wher
   return Tuple((real_size .+ real_origin) ./ 2)
 end
 
-function get_real_center_Julia(im::MedImage)::Tuple{Vararg{Float64}}
+function get_real_center_Julia(im)::Tuple{Vararg{Float64}}
   real_size = transformIndexToPhysicalPoint_Julia(im,size(im.voxel_data))
   real_origin = transformIndexToPhysicalPoint_Julia(im,(0,0,0))
   return Tuple((real_size .+ real_origin) ./ 2)
 end
 
 
-function Rodrigues_rotation_matrix(image::MedImage, axis::Int, angle::Float64)::Matrix{Float64}
+function Rodrigues_rotation_matrix(image, axis::Int, angle::Float64)::Matrix{Float64}
   #=
   Rotarion matrix using Rodrigues' rotation formula
   !"As it currently stands, it only supports 3D!
@@ -102,7 +103,7 @@ function crop_image_around_center(image::Array{T, 3}, new_dims::Tuple{Int, Int, 
 end
 
 
-function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator_enum, crop::Bool=true)::MedImage
+function rotate_mi(image, axis::Int, angle::Float64, Interpolator, crop::Bool=true)
   # Compute the rotation matrix
 
   R = Rodrigues_rotation_matrix(image, axis, angle)
@@ -132,7 +133,7 @@ It modifies both pixel array and metadata
 we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used)
 return the cropped MedImage object 
 """
-function crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::MedImage
+function crop_mi(im, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator)
 
     # Create a view of the original voxel_data array with the specified crop
     cropped_voxel_data = @view im.voxel_data[crop_beg[1]:(crop_beg[1]+crop_size[1]-1), crop_beg[2]:(crop_beg[2]+crop_size[2]-1), crop_beg[3]:(crop_beg[3]+crop_size[3]-1)]
@@ -156,7 +157,7 @@ It modifies both pixel array and metadata
 we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used)
 return the cropped MedImage object 
 """
-function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64},pad_val, Interpolator::Interpolator_enum)::MedImage
+function pad_mi(im, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64},pad_val, Interpolator)
 
     # Create padding arrays for the beginning and end of each axis
     pad_beg_array = fill(pad_val, (pad_beg[1], im.voxel_data.size[2], im.voxel_data.size[3]))
@@ -183,7 +184,7 @@ It is diffrent from pad by the fact that it changes only the metadata of the ima
 we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used)
 return the translated MedImage object
 """
-function translate_mi(im::MedImage, translate_by::Int64, translate_in_axis::Int64, Interpolator::Interpolator_enum)::MedImage
+function translate_mi(im, translate_by::Int64, translate_in_axis::Int64, Interpolator)
 
     # Create a copy of the origin
     translated_origin = copy(im.origin)
@@ -206,7 +207,7 @@ given a MedImage object and a Tuple that contains the scaling values for each ax
 we are setting Interpolator by using Interpolator enum
 return the scaled MedImage object 
 """
-function scale_mi(im::MedImage, scale::Tuple{Float64,Float64,Float64}, Interpolator::Interpolator_enum)::MedImage
+function scale_mi(im, scale::Tuple{Float64,Float64,Float64}, Interpolator)
 
     # Determine the interpolation method
     interp_method = nothing

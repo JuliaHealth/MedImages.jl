@@ -1,4 +1,4 @@
-
+module Load_and_save
 using Dictionaries, Dates, PyCall
 using Accessors,UUIDs
 
@@ -6,7 +6,6 @@ using Accessors,UUIDs
 include("./MedImage_data_struct.jl")
 # include("./Nifti_image_struct.jl")
 include("./Utils.jl")
-include("/workspaces/MedImage.jl/src/MedImage_data_struct.jl")
 
 
 
@@ -807,3 +806,5 @@ file_path = "./../test_data/volume-0.nii.gz"
 medimage_object_array = load_image(file_path)
 save_image(medimage_object_array, "./outputs")
 """
+
+end #module

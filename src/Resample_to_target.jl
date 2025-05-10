@@ -22,7 +22,7 @@ It require multiple steps some idea of implementation is below
 1) check origin of both images as for example in case origin of the moving image is not in the fixed image we need to return zeros
 2) we should define a grid on the basis of locations of the voxels in the fixed image and interpolate voxels from the moving image to the grid using for example GridInterpolations
 """
-function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator_enum::Interpolator_enum,value_to_extrapolate=Nothing)::MedImage
+function resample_to_image(im_fixed, im_moving, interpolator_enum,value_to_extrapolate=Nothing)
 
     if(value_to_extrapolate==Nothing)
         corners = [
