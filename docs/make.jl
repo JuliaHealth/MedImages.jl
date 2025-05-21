@@ -4,7 +4,7 @@ makedocs(;
     sitename = "MedImages.jl", 
     authors = "Jakub Mitura <jakub.mitura14@gmail>, Divyansh Goyal <divital2004@gmail.com>, Jan Zubik",
     format=DocumenterVitepress.MarkdownVitepress(
-        repo = "github.com/juliahealth/MedImages.jl", 
+        repo = "github.com/JuliaHealth/MedImages.jl", 
         devbranch = "main",
         devurl = "dev",
     ),
@@ -26,7 +26,7 @@ makedocs(;
 
 # This is the critical part that creates the version structure
 DocumenterVitepress.deploydocs(;
-    repo = "github.com/juliahealth/MedImages.jl", 
+    repo = "github.com/JuliaHealth/MedImages.jl", 
     devbranch = "main",
     push_preview = true,
 )
