@@ -14,8 +14,8 @@ function save_med_image(f::HDF5.File, group_name::String, image::MedImage)
     end
 
     dset = create_dataset(g, image.study_uid, image.voxel_data)
-    dset =g[image.study_uid]
-    write(dset,image.voxel_data)   
+    dset = g[image.study_uid]
+    write(dset, image.voxel_data)
     attributes(dset)["origin"] = collect(image.origin)
     attributes(dset)["spacing"] = collect(image.spacing)
     attributes(dset)["direction"] = collect(image.direction)
@@ -46,43 +46,24 @@ function load_med_image(f::HDF5.File, group_name::String, dataset_name::String)
     dset = g[dataset_name]
 
     voxel_data = read(dset)
-    origin = read_attribute(dset,"origin")
-    spacing = read_attribute(dset,"spacing")
-    direction = read_attribute(dset,"direction")
-    image_type = instances(Image_type)[read_attribute(dset,"image_type")+1]
-    image_subtype = instances(Image_subtype)[read_attribute(dset,"image_subtype")+1]
-    date_of_saving = DateTime(read_attribute(dset,"date_of_saving"))
-    acquistion_time = DateTime(read_attribute(dset,"acquistion_time"))
-    patient_id = read_attribute(dset,"patient_id")
-    current_device = instances(current_device_enum)[read_attribute(dset,"current_device")+1]
+    origin = read_attribute(dset, "origin")
+    spacing = read_attribute(dset, "spacing")
+    direction = read_attribute(dset, "direction")
+    image_type = instances(Image_type)[read_attribute(dset, "image_type")+1]
+    image_subtype = instances(Image_subtype)[read_attribute(dset, "image_subtype")+1]
+    date_of_saving = DateTime(read_attribute(dset, "date_of_saving"))
+    acquistion_time = DateTime(read_attribute(dset, "acquistion_time"))
+    patient_id = read_attribute(dset, "patient_id")
+    current_device = instances(current_device_enum)[read_attribute(dset, "current_device")+1]
     study_uid = dataset_name
-    patient_uid = read_attribute(dset,"patient_uid")
-    series_uid = read_attribute(dset,"series_uid")
-    study_description = read_attribute(dset,"study_description")
-    legacy_file_name = read_attribute(dset,"legacy_file_name")
-    display_data = JSON.parse(read_attribute(dset,"display_data"))
-    clinical_data = JSON.parse(read_attribute(dset,"clinical_data"))
-    is_contrast_administered = read_attribute(dset,"is_contrast_administered")
-    metadata = JSON.parse(read_attribute(dset,"metadata"))
+    patient_uid = read_attribute(dset, "patient_uid")
+    series_uid = read_attribute(dset, "series_uid")
+    study_description = read_attribute(dset, "study_description")
+    legacy_file_name = read_attribute(dset, "legacy_file_name")
+    display_data = JSON.parse(read_attribute(dset, "display_data"))
+    clinical_data = JSON.parse(read_attribute(dset, "clinical_data"))
+    is_contrast_administered = read_attribute(dset, "is_contrast_administered")
+    metadata = JSON.parse(read_attribute(dset, "metadata"))
 
-    return MedImage(voxel_data=voxel_data
-    , origin=ensure_tuple(origin)
-    , spacing=ensure_tuple(spacing)
-    , direction=ensure_tuple(direction)
-    , image_type=image_type
-    , image_subtype=image_subtype
-    , date_of_saving=date_of_saving
-    , acquistion_time=acquistion_time
-    , patient_id=patient_id
-    , current_device=current_device
-    , study_uid=study_uid
-    , patient_uid=patient_uid
-    , series_uid=series_uid
-    , study_description=study_description
-    , legacy_file_name=legacy_file_name
-    , display_data=display_data
-    , clinical_data=clinical_data
-    , is_contrast_administered=is_contrast_administered
-    , metadata=metadata)
+    return MedImage(voxel_data=voxel_data, origin=ensure_tuple(origin), spacing=ensure_tuple(spacing), direction=ensure_tuple(direction), image_type=image_type, image_subtype=image_subtype, date_of_saving=date_of_saving, acquistion_time=acquistion_time, patient_id=patient_id, current_device=current_device, study_uid=study_uid, patient_uid=patient_uid, series_uid=series_uid, study_description=study_description, legacy_file_name=legacy_file_name, display_data=display_data, clinical_data=clinical_data, is_contrast_administered=is_contrast_administered, metadata=metadata)
 end
-

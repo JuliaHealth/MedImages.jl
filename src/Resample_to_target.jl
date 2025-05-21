@@ -3,7 +3,7 @@ using Interpolations
 using Statistics
 
 using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Spatial_metadata_change, ..Load_and_save
-export resample_to_image,  scale
+export resample_to_image, scale
 
 """
 overwriting this function from Interpolations.jl becouse check_ranges giving error
@@ -22,9 +22,9 @@ It require multiple steps some idea of implementation is below
 1) check origin of both images as for example in case origin of the moving image is not in the fixed image we need to return zeros
 2) we should define a grid on the basis of locations of the voxels in the fixed image and interpolate voxels from the moving image to the grid using for example GridInterpolations
 """
-function resample_to_image(im_fixed, im_moving, interpolator_enum,value_to_extrapolate=Nothing)
+function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator_enum::Interpolator_enum, value_to_extrapolate=Nothing)::MedImage
 
-    if(value_to_extrapolate==Nothing)
+    if (value_to_extrapolate == Nothing)
         corners = [
             im_fixed.voxel_data[1, 1, 1],
             im_fixed.voxel_data[1, 1, end],
@@ -36,39 +36,38 @@ function resample_to_image(im_fixed, im_moving, interpolator_enum,value_to_extra
             im_fixed.voxel_data[end, end, end]
         ]
 
-        value_to_extrapolate=median(corners)
+        value_to_extrapolate = median(corners)
     end
 
 
     # get direction from one and set it to other
-    im_moving=Spatial_metadata_change.change_orientation(im_moving,Orientation_dicts.number_to_enum_orientation_dict[im_fixed.direction])
+    im_moving = Spatial_metadata_change.change_orientation(im_moving, Orientation_dicts.number_to_enum_orientation_dict[im_fixed.direction])
 
     # Calculate the transformation from moving image space to fixed image space
     old_spacing = im_moving.spacing
-    new_spacing=im_fixed.spacing
+    new_spacing = im_fixed.spacing
     new_size = size(im_fixed.voxel_data)
     points_to_interpolate = get_base_indicies_arr(new_size)
 
-    points_to_interpolate=points_to_interpolate.-1
-    points_to_interpolate=points_to_interpolate.*new_spacing
-    points_to_interpolate=points_to_interpolate.+1
+    points_to_interpolate = points_to_interpolate .- 1
+    points_to_interpolate = points_to_interpolate .* new_spacing
+    points_to_interpolate = points_to_interpolate .+ 1
 
     #adding diffrence in origin we act as if moving image has origin 0.0,0.0,0.0 - needed for interpolation
-    origin_diff=(collect(im_fixed.origin)-collect(im_moving.origin))
-    points_to_interpolate=points_to_interpolate.+origin_diff
+    origin_diff = (collect(im_fixed.origin) - collect(im_moving.origin))
+    points_to_interpolate = points_to_interpolate .+ origin_diff
 
 
 
 
 
-    interpolated_points=interpolate_my(points_to_interpolate,im_moving.voxel_data,old_spacing,interpolator_enum,false,value_to_extrapolate)
+    interpolated_points = interpolate_my(points_to_interpolate, im_moving.voxel_data, old_spacing, interpolator_enum, false, value_to_extrapolate)
 
-    new_voxel_data=reshape(interpolated_points,(new_size[1],new_size[2],new_size[3]))
+    new_voxel_data = reshape(interpolated_points, (new_size[1], new_size[2], new_size[3]))
     # new_voxel_data=cast_to_array_b_type(new_voxel_data,im_fixed.voxel_data)
 
 
-    new_im =Load_and_save.update_voxel_and_spatial_data(im_moving, new_voxel_data
-    ,im_fixed.origin,new_spacing,im_fixed.direction)
+    new_im = Load_and_save.update_voxel_and_spatial_data(im_moving, new_voxel_data, im_fixed.origin, new_spacing, im_fixed.direction)
 
 
     return new_im
