@@ -25,7 +25,7 @@ makedocs(;
 )
 
 # This is the critical part that creates the version structure
-DocumenterVitepress.deploydocs(;
+deploydocs(;
     repo = "github.com/JuliaHealth/MedImages.jl", 
     devbranch = "main",
     push_preview = true,
