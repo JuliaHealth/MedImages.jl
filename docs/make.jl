@@ -1,30 +1,32 @@
-using MedImages
-using Documenter
-using DocumenterVitepress
+using Documenter, DocumenterVitepress
 
-DocMeta.setdocmeta!(MedImages, :DocTestSetup, :(using MedImages); recursive=true)
+makedocs(; 
+    sitename = "MedImages.jl", 
+    authors = "Jakub Mitura <jakub.mitura14@gmail>, Divyansh Goyal <divital2004@gmail.com>, Jan Zubik",
+    format=DocumenterVitepress.MarkdownVitepress(
+        repo = "github.com/juliahealth/MedImages.jl", 
+        devbranch = "main",
+        devurl = "dev",
+    ),
+    warnonly = true,
+    draft = false,
+    source = "src",
+    build = "build",
+    pages=[
+        "Manual" => [
+            "Get Started" => "manual/get_started.md",
+            "Code" => "manual/code_example.md",
+        ],
+        "Developers' documentation" => [
+            "Image Registration" => "devs/image_registration.md",
+        ],
+        "api.md",
+        ],
+)
 
-pgs = [ "Home" => "index.md",
-        "Tutorials" => "tutorials.md",
-        "Contributing" => "contributing.md"
-       ]
-
-fmt = DocumenterVitepress.MarkdownVitepress(
-      repo = "https://github.com/Juliahealth/MedImages.jl",)
-
-
-makedocs(;
-    modules=[MedImages],
-    repo=Remotes.GitHub("JuliaHealth", "MedImages.jl"),
-    authors="Jakub-Mitura <jakubmitura14@gmail.com>, Divyansh-Goyal <divital2004@gmail.com>, Jan-Zubik and contributors",
-    sitename="MedImages.jl",
-    format=fmt,
-    pages=pgs
-   )    
-deploydocs(;
-    repo="github.com/JuliaHealth/MedImages.jl",
-    target="build", # this is where Vitepress stores its output
-    devbranch="main",
-    branch="gh-pages",
-    push_preview=true
+# This is the critical part that creates the version structure
+DocumenterVitepress.deploydocs(;
+    repo = "github.com/juliahealth/MedImages.jl", 
+    devbranch = "main",
+    push_preview = true,
 )
