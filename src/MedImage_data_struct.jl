@@ -4,6 +4,7 @@ using Dictionaries
 using Parameters
 using UUIDs
 
+export MedImage, Image_type, Image_subtype, current_device_enum, Interpolator_enum, Mode_mi, CoordinateTerms, CoordinateMajornessTerms, Orientation_code
 
 """
 
@@ -20,9 +21,9 @@ Defines the type of medical image. Possible values are:
 
 """
 @enum Image_type begin
-  MRI_type
-  PET_type
-  CT_type
+    MRI_type
+    PET_type
+    CT_type
 end
 
 
@@ -44,10 +45,10 @@ Specifies the current device used for processing. Possible values are:
 
 """
 @enum current_device_enum begin
-  CPU_current_device
-  CUDA_current_device
-  AMD_current_device
-  ONEAPI_current_device
+    CPU_current_device
+    CUDA_current_device
+    AMD_current_device
+    ONEAPI_current_device
 
 end
 
@@ -76,19 +77,19 @@ Defines the subtype of medical image. Possible values include:
 
 """
 @enum Image_subtype begin
-  CT_subtype
-  ADC_subtype
-  DWI_subtype
-  T1_subtype
-  T2_subtype
-  FLAIR_subtype
-  FDG_subtype
-  PSMA_subtype
+    CT_subtype
+    ADC_subtype
+    DWI_subtype
+    T1_subtype
+    T2_subtype
+    FLAIR_subtype
+    FDG_subtype
+    PSMA_subtype
 end
 
 
 # following struct can be expanded with all the relevant meta data mentioned within the readme.md of MedImage.jl
-  #struct for now, will switch to MetaArrays when it has GPU support
+#struct for now, will switch to MetaArrays when it has GPU support
 
 """
 
@@ -140,25 +141,25 @@ A standardized structure for storing medical image data and metadata.
 
 """
 @with_kw mutable struct MedImage
-  voxel_data #mutlidimensional array (512,512,3)
-  origin::Tuple{Float64,Float64,Float64}
-  spacing::Tuple{Float64,Float64,Float64}#spacing between the voxels
-  direction::NTuple{9, Float64} #direction cosines for orientation
-  image_type::Image_type#enum defining the type of the image
-  image_subtype::Image_subtype #enum defining the subtype of the image
-  date_of_saving::DateTime = Dates.today()
-  acquistion_time::DateTime = Dates.now()
-  patient_id::String #the id of the patient in the data file
-  current_device::current_device_enum = CPU_current_device# CPU or GPU , preferrably GPU
-  study_uid::String=string(UUIDs.uuid4())#unique identifier for the study
-  patient_uid::String=string(UUIDs.uuid4())#unique identifier for the patient
-  series_uid::String=string(UUIDs.uuid4())#unique identifier for the series
-  study_description::String=" "
-  legacy_file_name::String=" "#original file name
-  display_data::Dict{Any, Any}=Dict() #color values for the data such as RGB or gray
-  clinical_data::Dict{Any, Any}=Dict()#dictionary with age , gender data of the patient
-  is_contrast_administered::Bool=false #bool, any substance for visibility enhancement given during imaging procedure?
-  metadata::Dict{Any, Any}=Dict() #dictionary for any other relevant metadata from individual data file
+    voxel_data #mutlidimensional array (512,512,3)
+    origin::Tuple{Float64,Float64,Float64}
+    spacing::Tuple{Float64,Float64,Float64}#spacing between the voxels
+    direction::NTuple{9,Float64} #direction cosines for orientation
+    image_type::Image_type#enum defining the type of the image
+    image_subtype::Image_subtype #enum defining the subtype of the image
+    date_of_saving::DateTime = Dates.today()
+    acquistion_time::DateTime = Dates.now()
+    patient_id::String #the id of the patient in the data file
+    current_device::current_device_enum = CPU_current_device# CPU or GPU , preferrably GPU
+    study_uid::String = string(UUIDs.uuid4())#unique identifier for the study
+    patient_uid::String = string(UUIDs.uuid4())#unique identifier for the patient
+    series_uid::String = string(UUIDs.uuid4())#unique identifier for the series
+    study_description::String = " "
+    legacy_file_name::String = " "#original file name
+    display_data::Dict{Any,Any} = Dict() #color values for the data such as RGB or gray
+    clinical_data::Dict{Any,Any} = Dict()#dictionary with age , gender data of the patient
+    is_contrast_administered::Bool = false #bool, any substance for visibility enhancement given during imaging procedure?
+    metadata::Dict{Any,Any} = Dict() #dictionary for any other relevant metadata from individual data file
 end
 
 
@@ -327,12 +328,12 @@ Defines orientation codes for medical images. Possible values include:
     # ORIENTATION_SAL
     # ORIENTATION_PIR
     # ORIENTATION_PSR
-    # ORIENTATION_AIR 
+    # ORIENTATION_AIR
     # ORIENTATION_ASR
     # ORIENTATION_PIL
     # ORIENTATION_PSL
-    # ORIENTATION_AIL 
+    # ORIENTATION_AIL
     # ORIENTATION_ASL
 end
 
-end # module
+end#MedImage_data_struct
