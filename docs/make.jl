@@ -20,7 +20,7 @@ makedocs(;
         "Developers' documentation" => [
             "Image Registration" => "devs/image_registration.md",
         ],
-        "api.md",
+        "api.md"
         ],
 )
 
