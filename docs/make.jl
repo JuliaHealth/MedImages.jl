@@ -15,12 +15,12 @@ makedocs(;
     pages=[
         "Manual" => [
             "Get Started" => "manual/get_started.md",
-            "Code" => "manual/code_example.md",
+            "Code" => "manual/code_example.md"
         ],
         "Developers' documentation" => [
-            "Image Registration" => "devs/image_registration.md",
+            "Image Registration" => "devs/image_registration.md"
         ],
-        "api.md"
+        "api" => "api.md"
         ],
 )
 
