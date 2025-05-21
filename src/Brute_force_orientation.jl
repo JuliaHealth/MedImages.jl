@@ -1,20 +1,18 @@
-# module Brute_force_orientation
-# using ..Orientation_dicts, ..MedImage_data_struct
-include(joinpath(@__DIR__, "MedImage_data_struct.jl"))
-include(joinpath(@__DIR__, "Orientation_dicts.jl"))
-const MI = MedImage_data_struct
+module Brute_force_orientation
+using ..Orientation_dicts, ..MedImage_data_struct
+
 using Interpolations
 using Combinatorics
 using JLD, PyCall
 
-# export orientation_enum_to_string
-# export change_image_orientation
-# export brute_force_find_perm_rev
-# export brute_force_find_perm_spacing
-# export establish_orginn_transformation
-# export brute_force_find_from_sitk_single
-# export brute_force_find_from_sitk
-# export get_orientations_vectors
+export orientation_enum_to_string
+export change_image_orientation
+export brute_force_find_perm_rev
+export brute_force_find_perm_spacing
+export establish_orginn_transformation
+export brute_force_find_from_sitk_single
+export brute_force_find_from_sitk
+export get_orientations_vectors
 
 orientation_enum_to_string = Dict(
     # ORIENTATION_RIP=>"RIP",
@@ -33,14 +31,14 @@ orientation_enum_to_string = Dict(
     # ORIENTATION_ILA=>"ILA",
     # ORIENTATION_SRA=>"SRA",
     # ORIENTATION_SLA=>"SLA",
-    MI.ORIENTATION_RPI => "RPI",
-    MI.ORIENTATION_LPI => "LPI",
-    MI.ORIENTATION_RAI => "RAI",
-    MI.ORIENTATION_LAI => "LAI",
-    MI.ORIENTATION_RPS => "RPS",
-    MI.ORIENTATION_LPS => "LPS",
-    MI.ORIENTATION_RAS => "RAS",
-    MI.ORIENTATION_LAS => "LAS",
+    MedImage_data_struct.ORIENTATION_RPI => "RPI",
+    MedImage_data_struct.ORIENTATION_LPI => "LPI",
+    MedImage_data_struct.ORIENTATION_RAI => "RAI",
+    MedImage_data_struct.ORIENTATION_LAI => "LAI",
+    MedImage_data_struct.ORIENTATION_RPS => "RPS",
+    MedImage_data_struct.ORIENTATION_LPS => "LPS",
+    MedImage_data_struct.ORIENTATION_RAS => "RAS",
+    MedImage_data_struct.ORIENTATION_LAS => "LAS",
     # ORIENTATION_PRI=>"PRI",
     # ORIENTATION_PLI=>"PLI",
     # ORIENTATION_ARI=>"ARI",
@@ -229,55 +227,55 @@ end
 
 
 
-# function brute_force_find_from_sitk_single(path_nifti, or_enum_1::Orientation_code, or_enum_2::Orientation_code)
-#     sitk = pyimport("SimpleITK")
-#     or_enum_1_str = orientation_enum_to_string[or_enum_1]
-#     or_enum_2_str = orientation_enum_to_string[or_enum_2]
-#     sitk_image1 = change_image_orientation(path_nifti, or_enum_1_str)
-#     sitk_image2 = change_image_orientation(path_nifti, or_enum_2_str)
+function brute_force_find_from_sitk_single(path_nifti, or_enum_1::Orientation_code, or_enum_2::Orientation_code)
+    sitk = pyimport("SimpleITK")
+    or_enum_1_str = orientation_enum_to_string[or_enum_1]
+    or_enum_2_str = orientation_enum_to_string[or_enum_2]
+    sitk_image1 = change_image_orientation(path_nifti, or_enum_1_str)
+    sitk_image2 = change_image_orientation(path_nifti, or_enum_2_str)
 
-#     sitk_image1_arr = sitk.GetArrayFromImage(sitk_image1)
-#     sitk_image2_arr = sitk.GetArrayFromImage(sitk_image2)
+    sitk_image1_arr = sitk.GetArrayFromImage(sitk_image1)
+    sitk_image2_arr = sitk.GetArrayFromImage(sitk_image2)
 
-#     sitk_image1_arr = permutedims(sitk_image1_arr, (3, 2, 1))
-#     sitk_image2_arr = permutedims(sitk_image2_arr, (3, 2, 1))
+    sitk_image1_arr = permutedims(sitk_image1_arr, (3, 2, 1))
+    sitk_image2_arr = permutedims(sitk_image2_arr, (3, 2, 1))
 
-#     #find what permutation of axis and reversing is needed to get the same result as in sitk
-#     p, c = brute_force_find_perm_rev(sitk_image1_arr, sitk_image2_arr)
+    #find what permutation of axis and reversing is needed to get the same result as in sitk
+    p, c = brute_force_find_perm_rev(sitk_image1_arr, sitk_image2_arr)
 
-#     p_spac = brute_force_find_perm_spacing(collect(sitk_image1.GetSpacing()), collect(sitk_image2.GetSpacing()))
-#     path_nifti_temp = "/home/jm/projects_new/MedImage.jl/test_data/synthethic_small_temp.nii.gz"
-#     sitk.WriteImage(sitk_image1, path_nifti_temp)
-#     med_im = load_image(path_nifti_temp)
+    p_spac = brute_force_find_perm_spacing(collect(sitk_image1.GetSpacing()), collect(sitk_image2.GetSpacing()))
+    path_nifti_temp = "/home/jm/projects_new/MedImage.jl/test_data/synthethic_small_temp.nii.gz"
+    sitk.WriteImage(sitk_image1, path_nifti_temp)
+    med_im = load_image(path_nifti_temp)
 
-#     # get idea how to get ransformed origin
-#     origin_perm = establish_orginn_transformation(med_im, sitk_image2, or_enum_2, p, c, p_spac)
-#     return ((or_enum_1, or_enum_2), (p, c, origin_perm, p_spac))
+    # get idea how to get ransformed origin
+    origin_perm = establish_orginn_transformation(med_im, sitk_image2, or_enum_2, p, c, p_spac)
+    return ((or_enum_1, or_enum_2), (p, c, origin_perm, p_spac))
 
-# end
+end
 
 
 
-# function brute_force_find_from_sitk(path_nifti)
-#     sitk = pyimport("SimpleITK")
-#     opts = []
-#     for value_out in collect(instances(Orientation_code))
-#         for value_in in collect(instances(Orientation_code))
-#             opts = push!(opts, (value_out, value_in))
-#         end
-#     end
+function brute_force_find_from_sitk(path_nifti)
+    sitk = pyimport("SimpleITK")
+    opts = []
+    for value_out in collect(instances(Orientation_code))
+        for value_in in collect(instances(Orientation_code))
+            opts = push!(opts, (value_out, value_in))
+        end
+    end
 
-#     return map(el -> brute_force_find_from_sitk_single(path_nifti, el[1], el[2]), opts)
-# end
+    return map(el -> brute_force_find_from_sitk_single(path_nifti, el[1], el[2]), opts)
+end
 
-# function get_orientations_vectors(path_nifti)
-#     opts = []
+function get_orientations_vectors(path_nifti)
+    opts = []
 
-#     for orientation in collect(instances(Orientation_code))
-#         opts = push!(opts, (orientation, change_image_orientation(path_nifti, orientation_enum_to_string[orientation]).GetDirection()))
-#     end
-#     return opts
-# end
+    for orientation in collect(instances(Orientation_code))
+        opts = push!(opts, (orientation, change_image_orientation(path_nifti, orientation_enum_to_string[orientation]).GetDirection()))
+    end
+    return opts
+end
 
 # path_nifti = "/home/jm/projects_new/MedImage.jl/test_data/volume-0.nii.gz"
 # path_nifti = "/home/jm/projects_new/MedImage.jl/test_data/synthethic_small.nii.gz"
@@ -365,4 +363,4 @@ end
 
 # save("/home/jakubmitura/projects/MedImage.jl/test_data/my_dict.jld", "my_dict", dict_curr)
 # # krowa now create a dictionary that will map orientation vector of numbers into orientation enum
-# end
+end
