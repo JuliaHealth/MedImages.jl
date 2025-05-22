@@ -11,11 +11,11 @@ hero:
     alt: MedImages.jl Graphic
   actions:
     - theme: brand
-      text: My Projects
-      link: /#research-interests-contributions
+      text: View on JuliaHealth 
+      link: https://JuliaHealth.org
     - theme: alt
       text: View on Github
-      link: https://github.com/divital-coder
+      link: https://github.com/JuliaHealth/MedImages.jl
 
 features:
   - icon: 🔬
