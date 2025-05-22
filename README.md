@@ -1,5 +1,7 @@
 # MedImages.jl
 
+![./docs/src/assets/logo.png]
+
 The filesystem and choice of metadata is loosly based on BIDS format [1] .
 
 
