@@ -1,6 +1,6 @@
 # MedImages.jl
 
-![./docs/src/assets/logo.png]
+![MedImages.jl JuliaHealth Logo](./docs/src/assets/logo.png)
 
 The filesystem and choice of metadata is loosly based on BIDS format [1] .
 
@@ -41,7 +41,6 @@ I've included below in categories what needs to be done and some basic ideas on 
    * add the possibility to save back as nifty and dicom files for exporting
   
 Point 3 is the trickiest one to do as there are a lot of corner cases
-    
 to look for https://github.com/haberdashPI/MetaArrays.jl
 
 ## References
