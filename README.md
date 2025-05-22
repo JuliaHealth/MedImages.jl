@@ -1,8 +1,10 @@
 <div align="center">
-  <img src="./docs/src/assets/logo.png" alt="MedImages.jl JuliaHealth Logo" width="200"/>
+  <img src="./docs/src/assets/logo.png" alt="MedImages.jl JuliaHealth Logo" width="200" align="left" style="margin-right: 20px"/>
   <h1>MedImages.jl</h1>
   <p><em>A comprehensive Julia library for standardized 3D and 4D medical imaging data handling</em></p>
 </div>
+
+<br clear="all"/>
 
 ## Overview
 
@@ -12,16 +14,22 @@ This project aims to create a unified approach to medical image processing acros
 
 ## Features & Development Roadmap
 
+<div align="center">
+
 | Feature Category | Status | Description |
-|------------------|--------|-------------|
+|------------------|:------:|-------------|
 | **Data Structure Design** | ✅ | Core data structures for medical imaging standardization |
 | **Data Loading** | ✅ | Support for common medical imaging formats |
 | **Spatial Transformations** | 🚧 | Advanced spatial processing with metadata preservation |
 | **Persistence Layer** | 🚧 | Efficient storage and retrieval mechanisms |
 
+</div>
+
 ### Data Structure Design
 
 The core architecture manages these key components:
+
+<div align="center">
 
 <table>
   <tr>
@@ -78,13 +86,19 @@ The core architecture manages these key components:
   </tr>
 </table>
 
+</div>
+
 ### Data Loading Capabilities
 
+<div align="center">
+
 | Format | Implementation | Status |
-|--------|---------------|--------|
+|--------|---------------|:------:|
 | **NIfTI** | via Nifti.jl | ✅ |
 | **DICOM** | via Dicom.jl | ✅ |
 | **MHA** | direct implementation | 🚧 |
+
+</div>
 
 ### Spatial Transformations
 
@@ -97,15 +111,21 @@ Our spatial processing framework preserves metadata while enabling:
 
 ### Persistence Layer
 
+<div align="center">
+
 | Feature | Description | Status |
-|---------|-------------|--------|
+|---------|-------------|:------:|
 | **HDF5-based storage** | Arrays with metadata attributes | ✅ |
 | **Device-agnostic I/O** | Operations for CPU/GPU | 🚧 |
 | **Format conversion** | Exporting to standard medical formats | 🚧 |
 
+</div>
+
 ## Development Status
 
 This project is under active development. The spatial transformation components present the most significant challenges due to numerous edge cases. We're exploring solutions based on packages like [MetaArrays.jl](https://github.com/haberdashPI/MetaArrays.jl).
+
+<div align="center">
 
 <table>
   <tr>
@@ -139,6 +159,8 @@ This project is under active development. The spatial transformation components 
     <td>Low</td>
   </tr>
 </table>
+
+</div>
 
 ## Contributing
 
