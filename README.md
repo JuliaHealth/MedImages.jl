@@ -1,10 +1,8 @@
 <div align="center">
-  <img src="./docs/src/assets/logo.png" alt="MedImages.jl JuliaHealth Logo" width="200" align="left" style="margin-right: 20px"/>
+  <img src="./docs/src/assets/logo.png" alt="MedImages.jl JuliaHealth Logo" width="200"/>
   <h1>MedImages.jl</h1>
   <p><em>A comprehensive Julia library for standardized 3D and 4D medical imaging data handling</em></p>
 </div>
-
-<br clear="all"/>
 
 ## Overview
 
