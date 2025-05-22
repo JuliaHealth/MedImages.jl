@@ -1,71 +1,144 @@
 <div align="center">
-  <img src="./docs/src/assets/logo.png" alt="MedImages.jl JuliaHealth Logo" width="200" align="left" style="margin-right: 20px"/>
+  <img src="./docs/src/assets/logo.png" alt="MedImages.jl JuliaHealth Logo" width="200"/>
   <h1>MedImages.jl</h1>
   <p><em>A comprehensive Julia library for standardized 3D and 4D medical imaging data handling</em></p>
 </div>
 
-<br clear="all"/>
-
 ## Overview
 
-MedImages.jl provides a standardized framework for handling 3D and 4D medical imaging data. The metadata structure is loosely based on the BIDS format [1](#references).
+MedImages.jl provides a standardized framework for handling 3D and 4D medical imaging data. The metadata structure is loosely based on the BIDS format<sup>[1](#references)</sup>.
 
 This project aims to create a unified approach to medical image processing across various modalities including CT, MRI, and PET scans. Currently, ultrasonography support is not included, and we welcome contributors with expertise in this area.
 
 ## Features & Development Roadmap
 
-### 1. Data Structure Design
+| Feature Category | Status | Description |
+|------------------|--------|-------------|
+| **Data Structure Design** | ✅ | Core data structures for medical imaging standardization |
+| **Data Loading** | ✅ | Support for common medical imaging formats |
+| **Spatial Transformations** | 🚧 | Advanced spatial processing with metadata preservation |
+| **Persistence Layer** | 🚧 | Efficient storage and retrieval mechanisms |
 
-The core data structure will manage:
+### Data Structure Design
 
-- **Voxel data** as multidimensional arrays
-- **Spatial metadata**:
-  - Origin coordinates
-  - Orientation information
-  - Spacing/resolution data
-- **Image classification**:
-  - Primary type (CT/MRI/PET/label maps)
-  - Subtype (e.g., MRI: ADC/DWI/T2)
-  - Voxel data type (e.g., Float32)
-- **Study metadata**:
-  - Acquisition date/time
-  - Patient identifiers
-  - Study/Series UIDs
-  - Study descriptions
-  - Original filenames
-- **Display properties**:
-  - Color mappings for labels
-  - Window/level values for CT scans
-- **Clinical data**:
-  - Patient demographics
-  - Contrast administration status
-- **Additional metadata** stored in extensible dictionaries
+The core architecture manages these key components:
 
-### 2. Data Loading Capabilities
+<table>
+  <tr>
+    <th>Component</th>
+    <th>Includes</th>
+  </tr>
+  <tr>
+    <td><strong>Voxel data</strong></td>
+    <td>Multidimensional arrays</td>
+  </tr>
+  <tr>
+    <td><strong>Spatial metadata</strong></td>
+    <td>
+      • Origin coordinates<br>
+      • Orientation information<br>
+      • Spacing/resolution data
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Image classification</strong></td>
+    <td>
+      • Primary type (CT/MRI/PET/label maps)<br>
+      • Subtype (e.g., MRI: ADC/DWI/T2)<br>
+      • Voxel data type (e.g., Float32)
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Study metadata</strong></td>
+    <td>
+      • Acquisition date/time<br>
+      • Patient identifiers<br>
+      • Study/Series UIDs<br>
+      • Study descriptions<br>
+      • Original filenames
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Display properties</strong></td>
+    <td>
+      • Color mappings for labels<br>
+      • Window/level values for CT scans
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Clinical data</strong></td>
+    <td>
+      • Patient demographics<br>
+      • Contrast administration status
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Additional metadata</strong></td>
+    <td>Stored in extensible dictionaries</td>
+  </tr>
+</table>
 
-Support for common medical imaging formats:
-- **NIfTI** files via Nifti.jl
-- **DICOM** files via Dicom.jl
-- **MHA** format (implementation pending)
+### Data Loading Capabilities
 
-### 3. Spatial Transformations
+| Format | Implementation | Status |
+|--------|---------------|--------|
+| **NIfTI** | via Nifti.jl | ✅ |
+| **DICOM** | via Dicom.jl | ✅ |
+| **MHA** | direct implementation | 🚧 |
 
-Advanced spatial processing with metadata preservation:
+### Spatial Transformations
+
+Our spatial processing framework preserves metadata while enabling:
+
 - **Orientation standardization** to a common reference frame (e.g., RAS)
 - **Spacing/resolution adjustment** with appropriate interpolation methods
 - **Cross-modality resampling** for multi-modal registration
 - **Region-of-interest operations** (cropping, dilation) with origin adjustments
 
-### 4. Persistence Layer
+### Persistence Layer
 
-Efficient storage and retrieval mechanisms:
-- **HDF5-based storage** for arrays with metadata attributes
-- **Device-agnostic I/O** operations (CPU/GPU)
-- **Format conversion** for exporting to standard medical formats
+| Feature | Description | Status |
+|---------|-------------|--------|
+| **HDF5-based storage** | Arrays with metadata attributes | ✅ |
+| **Device-agnostic I/O** | Operations for CPU/GPU | 🚧 |
+| **Format conversion** | Exporting to standard medical formats | 🚧 |
 
 ## Development Status
 
-This project is under active development. The spatial transformation components (point 3) present the most significant challenges due to numerous edge cases. We're exploring solutions based on packages like [MetaArrays.jl](https://github.com/haberdashPI/MetaArrays.jl).
+This project is under active development. The spatial transformation components present the most significant challenges due to numerous edge cases. We're exploring solutions based on packages like [MetaArrays.jl](https://github.com/haberdashPI/MetaArrays.jl).
+
+<table>
+  <tr>
+    <th>Component</th>
+    <th>Status</th>
+    <th>Priority</th>
+  </tr>
+  <tr>
+    <td>Core data structures</td>
+    <td>✅ Complete</td>
+    <td>High</td>
+  </tr>
+  <tr>
+    <td>Format loading/saving</td>
+    <td>✅ Complete</td>
+    <td>High</td>
+  </tr>
+  <tr>
+    <td>Spatial transformations</td>
+    <td>🚧 In progress</td>
+    <td>High</td>
+  </tr>
+  <tr>
+    <td>GPU compatibility</td>
+    <td>🚧 In progress</td>
+    <td>Medium</td>
+  </tr>
+  <tr>
+    <td>Ultrasonography support</td>
+    <td>📋 Planned</td>
+    <td>Low</td>
+  </tr>
+</table>
 
 ## Contributing
 
