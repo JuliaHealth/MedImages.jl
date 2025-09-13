@@ -260,15 +260,13 @@ function TransformIndexToPhysicalPoint_julia(index::Tuple{Int,Int,Int}, origin::
     return collect(collect(origin) .+ ((collect(index)) .* collect(spacing)))
 end
 
-
-
 function ensure_tuple(arr)
-    if arr isa Tuple
+    if isa(arr, Tuple)
         return arr
-    elseif arr isa AbstractArray
-        return tuple(arr...)
+    elseif isa(arr, AbstractArray)
+        return Tuple(arr)
     else
-        error("Input must be a Tuple or an AbstractArray")
+        error("Cannot convert to tuple: $arr")
     end
 end
 
