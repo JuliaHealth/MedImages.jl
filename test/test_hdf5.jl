@@ -1,21 +1,50 @@
-using  LinearAlgebra, HDF5,Test
-include("../src/Load_and_save.jl")
-# include("../src/Basic_transformations.jl")
-# include("./test_visualize.jl")
-include("./dicom_nifti.jl")
-include("../src/HDF5_manag.jl")
+using Test
+using LinearAlgebra
+using HDF5
+using MedImages
 
-function test_hdf5()
-
-
-    path_nifti = "/home/jm/projects_new/MedImage.jl/test_data/volume-0.nii.gz"
-    med_im = load_image(path_nifti)
-
-    h5_path="/home/jm/projects_new/MedImage.jl/test_data/debug.h5"
-    f = h5open(h5_path, "w")
-    typeof(f)
-    uid=save_med_image(f,"aa",med_im)
-    med_im_2=load_med_image(f,"aa",uid)
-
-    @test med_im.voxel_data==med_im_2.voxel_data
-end# test_hdf5
+function test_hdf5_suite()
+    @testset "HDF5 Test Suite" begin
+        # Test data path
+        test_data_dir = joinpath(dirname(@__FILE__), "..", "test_data")
+        path_nifti = joinpath(test_data_dir, "volume-0.nii.gz")
+        h5_path = joinpath(test_data_dir, "debug.h5")
+        
+        @testset "HDF5 Save and Load" begin
+            @test begin
+                # Load image using MedImages
+                med_im = MedImages.load_image(path_nifti, "CT")
+                
+                # Save to HDF5
+                f = h5open(h5_path, "w")
+                uid = MedImages.save_med_image(f, "test_image", med_im)
+                
+                # Load from HDF5
+                med_im_2 = MedImages.load_med_image(f, "test_image", uid)
+                
+                close(f)
+                
+                # Test that voxel data is preserved
+                med_im.voxel_data == med_im_2.voxel_data
+            end
+        end
+        
+        @testset "HDF5 Metadata Preservation" begin
+            @test begin
+                # Load image using MedImages
+                med_im = MedImages.load_image(path_nifti, "CT")
+                
+                # Save and load via HDF5
+                f = h5open(h5_path, "w")
+                uid = MedImages.save_med_image(f, "test_image", med_im)
+                med_im_2 = MedImages.load_med_image(f, "test_image", uid)
+                close(f)
+                
+                # Test metadata preservation
+                (med_im.spacing == med_im_2.spacing) &&
+                (med_im.origin == med_im_2.origin) &&
+                (med_im.direction == med_im_2.direction)
+            end
+        end
+    end
+end
