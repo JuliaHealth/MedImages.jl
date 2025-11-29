@@ -18,8 +18,10 @@ function sitk_resample(path_nifti, targetSpac)
     resample.SetOutputOrigin(image.GetOrigin())
     resample.SetTransform(sitk.Transform())
     resample.SetDefaultPixelValue(image.GetPixelIDValue())
-    resample.SetInterpolator(sitk.sitkBSpline)
-    resample.SetSize(new_size)
+    resample.SetInterpolator(sitk.sitkLinear)
+    # Fix types for SimpleITK - use Tuple for size
+    py_size = PyObject((Int(new_size[1]), Int(new_size[2]), Int(new_size[3])))
+    resample.SetSize(py_size)
     return resample.Execute(image)
 end
 
@@ -56,7 +58,7 @@ function test_resample_to_spacing_suite(path_nifti)
                     sitk_image = sitk_resample(path_nifti, spac)
                     
                     # MedImages implementation
-                    med_im_resampled = MedImages.resample_to_spacing(med_im, spac, MedImages.B_spline_en)
+                    med_im_resampled = MedImages.resample_to_spacing(med_im, spac, MedImages.Linear_en)
                     
                     # Save debug outputs
                     debug_dir = joinpath(dirname(@__FILE__), "..", "test_data", "debug")
@@ -64,7 +66,7 @@ function test_resample_to_spacing_suite(path_nifti)
                     sitk.WriteImage(sitk_image, "$(debug_dir)/sitk_resample_$(index).nii.gz")
                     create_nii_from_medimage_test(med_im_resampled, "$(debug_dir)/medim_resample_$(index)")
                     
-                    MedImages.test_object_equality(med_im_resampled, sitk_image)
+                    test_object_equality(med_im_resampled, sitk_image)
                     true
                 end
             end
@@ -98,7 +100,7 @@ function test_change_orientation_suite(path_nifti)
                     sitk.WriteImage(sitk_image, "$(debug_dir)/sitk_orient_$(index).nii.gz")
                     create_nii_from_medimage_test(med_im_oriented, "$(debug_dir)/medim_orient_$(index)")
                     
-                    MedImages.test_object_equality(med_im_oriented, sitk_image)
+                    test_object_equality(med_im_oriented, sitk_image)
                     true
                 end
             end

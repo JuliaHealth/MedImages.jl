@@ -2,7 +2,9 @@ module Basic_transformations
 
 using CoordinateTransformations, Interpolations, StaticArrays, LinearAlgebra, Rotations, Dictionaries
 using LinearAlgebra
+using ImageTransformations
 using ..MedImage_data_struct
+using ..Load_and_save: update_voxel_data
 export rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, computeIndexToPhysicalPointMatrices_Julia, transformIndexToPhysicalPoint_Julia, get_voxel_center_Julia, get_real_center_Julia, Rodrigues_rotation_matrix, crop_image_around_center
 
 """
@@ -47,7 +49,7 @@ function transformIndexToPhysicalPoint_Julia(im::MedImage, index::Tuple{Vararg{I
 end
 
 
-function get_voxel_center_Julia(image::Array{T,3})::Tuple{Vararg{Float64}} where {T}
+function get_voxel_center_Julia(image::AbstractArray{T,3})::Tuple{Vararg{Float64}} where {T}
   real_size = size(image)
   real_origin = (0, 0, 0)
   return Tuple((real_size .+ real_origin) ./ 2)
@@ -86,7 +88,7 @@ function Rodrigues_rotation_matrix(image::MedImage, axis::Int, angle::Float64)::
   return R
 end
 
-function crop_image_around_center(image::Array{T,3}, new_dims::Tuple{Int,Int,Int}, center::Tuple{Int,Int,Int}) where {T}
+function crop_image_around_center(image::AbstractArray{T,3}, new_dims::Tuple{Int,Int,Int}, center::Tuple{Int,Int,Int}) where {T}
   start_z = max(1, center[1] - new_dims[1] ÷ 2)
   end_z = min(size(image, 1), start_z + new_dims[1] - 1)
 

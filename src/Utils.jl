@@ -9,6 +9,7 @@ export interpolate_my
 export TransformIndexToPhysicalPoint_julia
 export ensure_tuple
 export create_nii_from_medimage
+export resample_kernel_launch
 import ..MedImage_data_struct: MedImage, Interpolator_enum, Mode_mi, Orientation_code, Nearest_neighbour_en, Linear_en, B_spline_en
 
 
@@ -79,117 +80,58 @@ end#interpolate_point
 @kernel function interpolate_kernel(out_res, @Const(source_arr_shape), @Const(source_arr), @Const(points_to_interpolate), @Const(spacing), keep_begining_same, extrapolate_value, is_nearest_neighbour)
     shared_arr = @localmem(Float32, (512, 3))
 
-
     index_local = @index(Local, Linear)
     I = @index(Global)
 
+    # Use shared memory to buffer points (coalesced read)
     shared_arr[index_local, 1] = points_to_interpolate[1, I]
     shared_arr[index_local, 2] = points_to_interpolate[2, I]
     shared_arr[index_local, 3] = points_to_interpolate[3, I]
 
-    #check for extrapolation - if point is outside of the image
-    if (shared_arr[index_local, 1] < 0 || shared_arr[index_local, 2] < 0 || shared_arr[index_local, 3] < 0 || shared_arr[index_local, 1] >= source_arr_shape[1] || shared_arr[index_local, 2] >= source_arr_shape[2] || shared_arr[index_local, 3] >= source_arr_shape[3])
+    real_x = shared_arr[index_local, 1]
+    real_y = shared_arr[index_local, 2]
+    real_z = shared_arr[index_local, 3]
+
+    # Bounds check
+    if real_x < 1.0f0 || real_y < 1.0f0 || real_z < 1.0f0 || real_x > Float32(source_arr_shape[1]) || real_y > Float32(source_arr_shape[2]) || real_z > Float32(source_arr_shape[3])
         out_res[I] = extrapolate_value
     else
-        if (shared_arr[index_local, 1] < 1 && keep_begining_same)
-            shared_arr[index_local, 1] = 1
+        # Handle keep_beginning_same logic
+        if keep_begining_same
+            real_x = max(real_x, 1.0f0)
+            real_y = max(real_y, 1.0f0)
+            real_z = max(real_z, 1.0f0)
         end
-        if (shared_arr[index_local, 2] < 1 && keep_begining_same)
-            shared_arr[index_local, 2] = 1
-        end
-        if (shared_arr[index_local, 3] < 1 && keep_begining_same)
-            shared_arr[index_local, 3] = 1
-        end
-        if (shared_arr[index_local, 1] == 1 || shared_arr[index_local, 2] == 2 || shared_arr[index_local, 3] == 3)
-            out_res[I] = source_arr[Int(round(shared_arr[index_local, 1])), Int(round(shared_arr[index_local, 2])), Int(round(shared_arr[index_local, 3]))]
+
+        if is_nearest_neighbour
+            # Nearest Neighbor
+            out_res[I] = source_arr[Int(round(real_x)), Int(round(real_y)), Int(round(real_z))]
         else
-            #simple implementation of nearest neighbour
-            if (is_nearest_neighbour)
-                #check x axis - if we are closer to the lower or upper bound
-                if (abs(((shared_arr[index_local, 1] - floor(shared_arr[index_local, 1])) * spacing[1])) < abs(((shared_arr[index_local, 1] - ceil(shared_arr[index_local, 1]))) * spacing[1]))
-                    #floor x smaller
-                    shared_arr[index_local, 1] = floor(shared_arr[index_local, 1])
-                else
-                    #ceil x smaller
-                    shared_arr[index_local, 1] = ceil(shared_arr[index_local, 1])
-                end
-                #check y axis - if we are closer to the lower or upper bound
-                if (abs(((shared_arr[index_local, 2] - floor(shared_arr[index_local, 2])) * spacing[2])) < abs(((shared_arr[index_local, 2] - ceil(shared_arr[index_local, 2]))) * spacing[2]))
-                    #floor y smaller
-                    shared_arr[index_local, 2] = floor(shared_arr[index_local, 2])
-                else
-                    #ceil y smaller
-                    shared_arr[index_local, 2] = ceil(shared_arr[index_local, 2])
-                end
-                #check z axis - if we are closer to the lower or upper bound
-                if (abs(((shared_arr[index_local, 3] - floor(shared_arr[index_local, 3])) * spacing[3])) < abs(((shared_arr[index_local, 3] - ceil(shared_arr[index_local, 3])) * spacing[3])))
-                    #floor z smaller
-                    shared_arr[index_local, 3] = floor(shared_arr[index_local, 3])
-                else
-                    #ceil z smaller
-                    shared_arr[index_local, 3] = ceil(shared_arr[index_local, 3])
-                end
+            # Trilinear Interpolation (Optimized)
+            x0 = floor(Int, real_x)
+            y0 = floor(Int, real_y)
+            z0 = floor(Int, real_z)
 
-                #we ha already selected x,y,z so we can return the value
-                out_res[I] = source_arr[Int(shared_arr[index_local, 1]), Int(shared_arr[index_local, 2]), Int(shared_arr[index_local, 3])]
-            else
-                # if we are not using nearest neighbour we will use linear interpolation
-                #interpolation based on distance of each point to the 8 points in the cube around it divided by recaluclated sum of those distances
-                shared_arr[index_local, 1] = (((source_arr[Int(ceil(shared_arr[index_local, 1])), Int(ceil(shared_arr[index_local, 2])), Int(ceil(shared_arr[index_local, 3]))] * ((1 / sqrt(((((shared_arr[index_local, 1] - ceil(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                                                                                                                              + (((shared_arr[index_local, 2] - ceil(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                                                                                                                              + (((shared_arr[index_local, 3] - ceil(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                               )))) + (source_arr[Int(ceil(shared_arr[index_local, 1])), Int(ceil(shared_arr[index_local, 2])), Int(floor(shared_arr[index_local, 3]))] * ((1 / sqrt(((((shared_arr[index_local, 1] - ceil(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                                                                                                                                          + (((shared_arr[index_local, 2] - ceil(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                                                                                                                                          + (((shared_arr[index_local, 3] - floor(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                               )))) + (source_arr[Int(ceil(shared_arr[index_local, 1])), Int(floor(shared_arr[index_local, 2])), Int(ceil(shared_arr[index_local, 3]))] * ((1 / sqrt(((((shared_arr[index_local, 1] - ceil(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                                                                                                                                          + (((shared_arr[index_local, 2] - floor(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                                                                                                                                          + (((shared_arr[index_local, 3] - ceil(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                               )))) + (source_arr[Int(ceil(shared_arr[index_local, 1])), Int(floor(shared_arr[index_local, 2])), Int(floor(shared_arr[index_local, 3]))] * ((1 / sqrt(((((shared_arr[index_local, 1] - ceil(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                                                                                                                                           + (((shared_arr[index_local, 2] - floor(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                                                                                                                                           + (((shared_arr[index_local, 3] - floor(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                               )))) + (source_arr[Int(floor(shared_arr[index_local, 1])), Int(ceil(shared_arr[index_local, 2])), Int(ceil(shared_arr[index_local, 3]))] * ((1 / sqrt(((((shared_arr[index_local, 1] - floor(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                                                                                                                                          + (((shared_arr[index_local, 2] - ceil(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                                                                                                                                          + (((shared_arr[index_local, 3] - ceil(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                               )))) + (source_arr[Int(floor(shared_arr[index_local, 1])), Int(ceil(shared_arr[index_local, 2])), Int(floor(shared_arr[index_local, 3]))] * ((1 / sqrt(((((shared_arr[index_local, 1] - floor(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                                                                                                                                           + (((shared_arr[index_local, 2] - ceil(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                                                                                                                                           + (((shared_arr[index_local, 3] - floor(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                               )))) + (source_arr[Int(floor(shared_arr[index_local, 1])), Int(floor(shared_arr[index_local, 2])), Int(ceil(shared_arr[index_local, 3]))] * ((1 / sqrt(((((shared_arr[index_local, 1] - floor(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                                                                                                                                           + (((shared_arr[index_local, 2] - floor(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                                                                                                                                           + (((shared_arr[index_local, 3] - ceil(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                               )))) + (source_arr[Int(floor(shared_arr[index_local, 1])), Int(floor(shared_arr[index_local, 2])), Int(floor(shared_arr[index_local, 3]))] * ((1 / sqrt(((((shared_arr[index_local, 1] - floor(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                                                                                                                                            + (((shared_arr[index_local, 2] - floor(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                                                                                                                                            + (((shared_arr[index_local, 3] - floor(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                               ))))) / (((1 / sqrt(((((shared_arr[index_local, 1] - ceil(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                        + (((shared_arr[index_local, 2] - ceil(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                        + (((shared_arr[index_local, 3] - ceil(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                                            ))) + ((1 / sqrt(((((shared_arr[index_local, 1] - ceil(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                  + (((shared_arr[index_local, 2] - ceil(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                  + (((shared_arr[index_local, 3] - floor(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                                            ))) + ((1 / sqrt(((((shared_arr[index_local, 1] - ceil(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                  + (((shared_arr[index_local, 2] - floor(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                  + (((shared_arr[index_local, 3] - ceil(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                                            ))) + ((1 / sqrt(((((shared_arr[index_local, 1] - ceil(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                  + (((shared_arr[index_local, 2] - floor(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                  + (((shared_arr[index_local, 3] - floor(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                                            ))) + ((1 / sqrt(((((shared_arr[index_local, 1] - floor(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                  + (((shared_arr[index_local, 2] - ceil(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                  + (((shared_arr[index_local, 3] - ceil(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                                            ))) + ((1 / sqrt(((((shared_arr[index_local, 1] - floor(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                  + (((shared_arr[index_local, 2] - ceil(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                  + (((shared_arr[index_local, 3] - floor(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                                            ))) + ((1 / sqrt(((((shared_arr[index_local, 1] - floor(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                  + (((shared_arr[index_local, 2] - floor(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                  + (((shared_arr[index_local, 3] - ceil(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                                            ))) + ((1 / sqrt(((((shared_arr[index_local, 1] - floor(shared_arr[index_local, 1])) * spacing[1])^2)
-                                                                                  + (((shared_arr[index_local, 2] - floor(shared_arr[index_local, 2])) * spacing[2])^2)
-                                                                                  + (((shared_arr[index_local, 3] - floor(shared_arr[index_local, 3])) * spacing[3])^2)) + 0.000001
-                                                            )))))
+            x1 = min(x0 + 1, source_arr_shape[1])
+            y1 = min(y0 + 1, source_arr_shape[2])
+            z1 = min(z0 + 1, source_arr_shape[3])
 
+            xd = real_x - x0
+            yd = real_y - y0
+            zd = real_z - z0
 
-                out_res[I] = shared_arr[index_local, 1]
-            end#is one
-        end#is_nearest_neighbour
-    end#check is in range
+            @inbounds begin
+                # Interpolate inline to minimize variables
+                out_res[I] = (1.0f0 - zd) * (
+                    (1.0f0 - yd) * (Float32(source_arr[x0, y0, z0]) * (1.0f0 - xd) + Float32(source_arr[x1, y0, z0]) * xd) +
+                    yd * (Float32(source_arr[x0, y1, z0]) * (1.0f0 - xd) + Float32(source_arr[x1, y1, z0]) * xd)
+                ) + zd * (
+                    (1.0f0 - yd) * (Float32(source_arr[x0, y0, z1]) * (1.0f0 - xd) + Float32(source_arr[x1, y0, z1]) * xd) +
+                    yd * (Float32(source_arr[x0, y1, z1]) * (1.0f0 - xd) + Float32(source_arr[x1, y1, z1]) * xd)
+                )
+            end
+        end
+    end
 end
 
 
@@ -527,5 +469,99 @@ end
 # print(image.GetSpacing())
 # print(image.GetDirection())
 
+@kernel function trilinear_resample_kernel(output, @Const(image_data), @Const(old_spacing), @Const(new_spacing), @Const(new_dims))
+    i = @index(Global, Linear)
+
+    # Map linear index to x,y,z (1-based)
+    stride_z = new_dims[1] * new_dims[2]
+    iz = (i - 1) ÷ stride_z + 1
+    rem_z = (i - 1) % stride_z
+    iy = rem_z ÷ new_dims[1] + 1
+    ix = rem_z % new_dims[1] + 1
+
+    # Map to source index space
+    real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing[1]) / Float32(old_spacing[1])) + 1.0f0
+    real_y = (Float32(iy) - 1.0f0) * (Float32(new_spacing[2]) / Float32(old_spacing[2])) + 1.0f0
+    real_z = (Float32(iz) - 1.0f0) * (Float32(new_spacing[3]) / Float32(old_spacing[3])) + 1.0f0
+
+    # Bounds checking
+    sx, sy, sz = size(image_data)
+    if real_x < 1.0f0 || real_y < 1.0f0 || real_z < 1.0f0 || real_x > Float32(sx) || real_y > Float32(sy) || real_z > Float32(sz)
+        output[i] = 0 # Extrapolation value 0
+    else
+        x0 = floor(Int, real_x)
+        y0 = floor(Int, real_y)
+        z0 = floor(Int, real_z)
+
+        # Clamp upper bounds
+        x1 = min(x0 + 1, sx)
+        y1 = min(y0 + 1, sy)
+        z1 = min(z0 + 1, sz)
+
+        xd = real_x - x0
+        yd = real_y - y0
+        zd = real_z - z0
+
+        # Inline Interpolation with @inbounds
+        @inbounds begin
+            c00 = Float32(image_data[x0, y0, z0]) * (1.0f0 - xd) + Float32(image_data[x1, y0, z0]) * xd
+            c10 = Float32(image_data[x0, y1, z0]) * (1.0f0 - xd) + Float32(image_data[x1, y1, z0]) * xd
+            c01 = Float32(image_data[x0, y0, z1]) * (1.0f0 - xd) + Float32(image_data[x1, y0, z1]) * xd
+            c11 = Float32(image_data[x0, y1, z1]) * (1.0f0 - xd) + Float32(image_data[x1, y1, z1]) * xd
+
+            c0 = c00 * (1.0f0 - yd) + c10 * yd
+            c1 = c01 * (1.0f0 - yd) + c11 * yd
+
+            output[i] = c0 * (1.0f0 - zd) + c1 * zd
+        end
+    end
+end
+
+@kernel function nearest_resample_kernel(output, @Const(image_data), @Const(old_spacing), @Const(new_spacing), @Const(new_dims))
+    i = @index(Global, Linear)
+
+    iz = (i - 1) ÷ (new_dims[1] * new_dims[2]) + 1
+    rem_z = (i - 1) % (new_dims[1] * new_dims[2])
+    iy = rem_z ÷ new_dims[1] + 1
+    ix = rem_z % new_dims[1] + 1
+
+    real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing[1]) / Float32(old_spacing[1])) + 1.0f0
+    real_y = (Float32(iy) - 1.0f0) * (Float32(new_spacing[2]) / Float32(old_spacing[2])) + 1.0f0
+    real_z = (Float32(iz) - 1.0f0) * (Float32(new_spacing[3]) / Float32(old_spacing[3])) + 1.0f0
+
+    src_size = size(image_data)
+
+    # Nearest neighbor rounding
+    nx = Int(round(real_x))
+    ny = Int(round(real_y))
+    nz = Int(round(real_z))
+
+    if nx < 1 || ny < 1 || nz < 1 || nx > src_size[1] || ny > src_size[2] || nz > src_size[3]
+        output[i] = 0
+    else
+        output[i] = image_data[nx, ny, nz]
+    end
+end
+
+function resample_kernel_launch(image_data, old_spacing, new_spacing, new_dims, interpolator_enum)
+    # Output array
+    output = similar(image_data, new_dims)
+
+    # Select backend
+    backend = get_backend(output)
+
+    # Select kernel
+    if interpolator_enum == Nearest_neighbour_en
+        kernel = nearest_resample_kernel(backend, 256)
+    else
+        kernel = trilinear_resample_kernel(backend, 256)
+    end
+
+    # Launch
+    kernel(output, image_data, old_spacing, new_spacing, new_dims, ndrange=prod(new_dims))
+    synchronize(backend)
+
+    return output
+end
 
 end#Utils
