@@ -44,7 +44,7 @@ function test_resample_to_target_suite(path_nifti_fixed, path_nifti_moving)
                 create_nii_from_medimage_resample(resampled_julia, "$(debug_dir)/resampled_medimage")
                 
                 # Compare the results
-                MedImages.test_object_equality(resampled_julia, im_resampled_sitk)
+                test_object_equality(resampled_julia, im_resampled_sitk)
                 true
             end
         end

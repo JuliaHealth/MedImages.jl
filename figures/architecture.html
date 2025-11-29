@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: transparent;
+    display: inline-block; /* Helps container size fit content */
+    margin: 0;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    background: white;
+    padding: 20px; /* Reduced padding */
+    border-radius: 12px;
+    /* Removed large shadow that adds whitespace, using subtle border instead */
+    border: 1px solid #ddd;
+    width: 600px; /* Slightly narrower to be more vertical/compact */
+  }
+
+  .box {
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+    color: #333;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    font-size: 0.95em;
+  }
+
+  .io-box {
+    background: linear-gradient(135deg, #eeeeee 0%, #e0e0e0 100%);
+    border-left: 5px solid #757575;
+    width: 250px;
+  }
+
+  .function-box {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border: 1px solid #90caf9;
+    color: #1565c0;
+    width: 200px;
+    border-radius: 20px; /* Pill shape for functions */
+  }
+
+  .medimage-container {
+    background: linear-gradient(to bottom right, #fffde7, #fff9c4);
+    border: 1px solid #fbc02d;
+    border-radius: 10px;
+    padding: 15px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 4px 8px rgba(251, 192, 45, 0.2);
+  }
+
+  .medimage-title {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #f57f17;
+    border-bottom: 2px solid #fbc02d;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+  }
+
+  .medimage-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .field {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px dashed #fbc02d;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 0.85em;
+    text-align: center;
+    color: #f57f17;
+  }
+
+  .field-large {
+    grid-column: span 2;
+  }
+
+  .interaction-area {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .system-box {
+    flex: 1;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+
+  .julia-side {
+    background-color: #e8f5e9; /* Greenish for transformations */
+    border: 1px solid #a5d6a7;
+    color: #2e7d32;
+  }
+
+  .backend-side {
+    background-color: #f3e5f5; /* Purpleish for backend */
+    border: 1px solid #ce93d8;
+    color: #7b1fa2;
+  }
+
+  .arrow {
+    color: #757575;
+    font-size: 1.5em;
+    line-height: 0.5;
+  }
+
+  .arrow-small {
+    color: #999;
+    font-size: 1.2em;
+  }
+
+  /* Connector lines could be SVG, but simple arrows work for now */
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Input -->
+  <div class="box io-box">
+    <strong>Input Files</strong><br>
+    <span style="font-size:0.8em; color:#666;">NIfTI (.nii), DICOM (.dcm)</span>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- Load Function -->
+  <div class="box function-box">load_image()</div>
+
+  <div class="arrow">↓</div>
+
+  <!-- Central Data Structure -->
+  <div class="medimage-container">
+    <div class="medimage-title">MedImage Struct</div>
+    <div class="medimage-grid">
+      <div class="field field-large"><strong>voxel_data</strong><br>(Multi-dimensional Array)</div>
+      <div class="field"><strong>origin</strong><br>(x, y, z)</div>
+      <div class="field"><strong>spacing</strong><br>(dx, dy, dz)</div>
+      <div class="field"><strong>direction</strong><br>(Direction Cosines)</div>
+      <div class="field"><strong>metadata</strong><br>(Dicts)</div>
+    </div>
+  </div>
+
+  <div class="arrow">↕</div>
+
+  <!-- Logic & Backend -->
+  <div class="interaction-area">
+    <div class="system-box julia-side">
+      <strong>Native Julia Processing</strong><br>
+      <span style="font-size:0.85em; margin-top:5px; display:block;">
+        Transformations, Resampling, Math
+      </span>
+    </div>
+
+    <div style="display:flex; align-items:center; color:#999;">↔</div>
+
+    <div class="system-box backend-side">
+      <strong>IO Backend</strong><br>
+      <span style="font-size:0.85em; margin-top:5px; display:block;">
+        ITK C++ (via ITKIOWrapper)<br>HDF5 (Native)
+      </span>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- Save Function -->
+  <div class="box function-box">save_med_image()</div>
+
+  <div class="arrow">↓</div>
+
+  <!-- Output -->
+  <div class="box io-box">
+    <strong>Processed Files</strong><br>
+    <span style="font-size:0.8em; color:#666;">NIfTI, DICOM, etc.</span>
+  </div>
+</div>
+
+</body>
+</html>

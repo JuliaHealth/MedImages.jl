@@ -21,17 +21,10 @@ function resample_to_spacing(im, new_spacing::Tuple{Float64,Float64,Float64}, in
     new_spacing = (new_spacing[3], new_spacing[2], new_spacing[1])
     old_size = size(im.voxel_data)
     new_size = Tuple{Int,Int,Int}(ceil.((old_size .* old_spacing) ./ new_spacing))
-    points_to_interpolate = get_base_indicies_arr(new_size)
 
-    points_to_interpolate = points_to_interpolate .- 1
-    points_to_interpolate = points_to_interpolate .* new_spacing
-    points_to_interpolate = points_to_interpolate .+ 1
-    # if(use_cuda)
-    #     points_to_interpolate = CuArray(points_to_interpolate)
-    # end
-    interpolated_points = interpolate_my(points_to_interpolate, im.voxel_data, old_spacing, interpolator_enum, true, 0, true)
+    # Use optimized kernel resampling
+    new_voxel_data = resample_kernel_launch(im.voxel_data, old_spacing, new_spacing, new_size, interpolator_enum)
 
-    new_voxel_data = reshape(interpolated_points, (new_size[1], new_size[2], new_size[3]))
     new_spacing = (new_spacing[3], new_spacing[2], new_spacing[1])
     new_im = Load_and_save.update_voxel_and_spatial_data(im, new_voxel_data, im.origin, new_spacing, im.direction)
 

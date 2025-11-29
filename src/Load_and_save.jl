@@ -8,6 +8,7 @@ using ..Brute_force_orientation
 using ..Utils
 export load_image
 export update_voxel_and_spatial_data
+export update_voxel_data
 
 """
 helper function for dicom #2
@@ -117,9 +118,9 @@ function update_voxel_and_spatial_data(old_image, new_voxel_data::AbstractArray,
 
   return MedImage(
     new_voxel_data,
-    new_origin,
-    new_spacing,
-    new_direction,
+    Utils.ensure_tuple(new_origin),
+    Utils.ensure_tuple(new_spacing),
+    Utils.ensure_tuple(new_direction),
     # old_image.spatial_metadata,
     instances(Image_type)[Int(old_image.image_type)+1],#  Int(image.image_type),
     instances(Image_subtype)[Int(old_image.image_subtype)+1],#  Int(image.image_subtype),
