@@ -1,0 +1,13 @@
+Change Log
+-----------
+
+* elsarticle.dtx
+
+1. global\bibsep=0pt commented out for all models 
+   since it produced error for all \jtype options.
+   
+2. The error "!LaTeX Error: Command \c@author already defined."
+   has been resolved by updating elsarticle.dtx.
+
+
+------------------------------------------------------------------------
