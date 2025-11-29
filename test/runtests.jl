@@ -48,8 +48,9 @@ end
 include("test_basic_transformation.jl")
 include("test_spatial_metadata_change.jl") 
 include("test_resample_to_target.jl")
-# include("test_hdf5.jl")
+include("test_hdf5.jl")
 include("dicom_nifti.jl")
+include("test_kernel_validity.jl")
 
 @testset "MedImages.jl Complete Test Suite" begin
     
@@ -163,6 +164,12 @@ include("dicom_nifti.jl")
                 end
             else
                 @test_skip "HDF5.jl not available"
+            end
+        end
+
+        @testset "Kernel Validity Tests" begin
+            @test_with_error_handling "Kernel Validity" begin
+                test_kernel_validity()
             end
         end
 

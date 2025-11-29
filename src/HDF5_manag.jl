@@ -1,5 +1,6 @@
 using HDF5
 using JSON
+using Dates
 using .MedImage_data_struct: MedImage
 
 """
@@ -13,9 +14,11 @@ function save_med_image(f::HDF5.File, group_name::String, image::MedImage)
         g = create_group(f, group_name)
     end
 
-    dset = create_dataset(g, image.study_uid, image.voxel_data)
+    # Ensure voxel_data is a standard Array for HDF5 compatibility
+    voxel_data_arr = collect(image.voxel_data)
+    dset = create_dataset(g, image.study_uid, voxel_data_arr)
     dset = g[image.study_uid]
-    write(dset, image.voxel_data)
+    write(dset, voxel_data_arr)
     attributes(dset)["origin"] = collect(image.origin)
     attributes(dset)["spacing"] = collect(image.spacing)
     attributes(dset)["direction"] = collect(image.direction)
