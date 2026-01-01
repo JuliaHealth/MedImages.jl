@@ -46,7 +46,8 @@ using .TestConfig
             # Read with SimpleITK
             sitk_image = sitk.ReadImage(output_path)
 
-            @test sitk_image.GetSize() == reverse(size(med_im.voxel_data))
+            # After permutedims(3,2,1) in create_nii_from_medimage, the sizes should match directly
+            @test sitk_image.GetSize() == size(med_im.voxel_data)
         end
 
         @testset "Metadata preserved in output" begin
