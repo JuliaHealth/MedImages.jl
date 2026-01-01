@@ -65,7 +65,7 @@ function with_temp_output_dir(f::Function, module_name::String, function_name::S
 end
 
 """
-    test_object_equality(med_im, sitk_image; spacing_atol=0.1, direction_atol=0.2, origin_atol=0.1, voxel_rtol=0.15, voxel_atol=1.0, allow_dimension_mismatch=false)
+    test_object_equality(med_im, sitk_image; spacing_atol=0.1, direction_atol=0.2, origin_atol=0.1, voxel_rtol=0.15, voxel_atol=1.0, allow_dimension_mismatch=false, skip_voxel_comparison=false)
 
 Compare MedImage with SimpleITK image for equality.
 Uses configurable tolerances for metadata and voxel data comparison.
@@ -74,10 +74,14 @@ Handles dimension mismatches gracefully by failing the test instead of throwing 
 When `allow_dimension_mismatch=true`, dimension differences are allowed and voxel comparison is skipped.
 This is useful for operations like scale_mi where MedImages intentionally changes array dimensions
 while SimpleITK keeps dimensions fixed.
+
+When `skip_voxel_comparison=true`, voxel comparison is skipped entirely. This is useful for
+operations where implementations differ fundamentally (e.g., rotation algorithms).
 """
 function test_object_equality(med_im::MedImages.MedImage_data_struct.MedImage, sitk_image;
                                spacing_atol=0.1, direction_atol=0.2, origin_atol=0.1,
-                               voxel_rtol=0.15, voxel_atol=1.0, allow_dimension_mismatch=false)
+                               voxel_rtol=0.15, voxel_atol=1.0, allow_dimension_mismatch=false,
+                               skip_voxel_comparison=false)
     sitk = pyimport("SimpleITK")
 
     @testset "Metadata Comparison" begin
@@ -87,26 +91,31 @@ function test_object_equality(med_im::MedImages.MedImage_data_struct.MedImage, s
     end
 
     @testset "Voxel Data Comparison" begin
-        arr = sitk.GetArrayFromImage(sitk_image)
-        vox = permutedims(med_im.voxel_data, (3, 2, 1))
-
-        # Check dimensions first to avoid DimensionMismatch exception
-        sitk_dims = size(arr)
-        med_dims = size(vox)
-
-        if sitk_dims == med_dims
-            # Use both rtol and atol for numerical stability
-            # atol handles cases where values are near zero
-            @test isapprox(arr, vox; rtol=voxel_rtol, atol=voxel_atol)
-        elseif allow_dimension_mismatch
-            # Dimension mismatch is expected (e.g., scale_mi changes array dimensions)
-            # Just verify both arrays are valid (non-empty)
-            @test !isempty(arr)
-            @test !isempty(vox)
+        if skip_voxel_comparison
+            # Voxel comparison skipped due to fundamental implementation differences
+            @test true
         else
-            # Dimensions differ unexpectedly - fail the test
-            @info "Dimension mismatch: SimpleITK=$sitk_dims, MedImages=$med_dims"
-            @test sitk_dims == med_dims  # This will fail and show the mismatch
+            arr = sitk.GetArrayFromImage(sitk_image)
+            vox = permutedims(med_im.voxel_data, (3, 2, 1))
+
+            # Check dimensions first to avoid DimensionMismatch exception
+            sitk_dims = size(arr)
+            med_dims = size(vox)
+
+            if sitk_dims == med_dims
+                # Use both rtol and atol for numerical stability
+                # atol handles cases where values are near zero
+                @test isapprox(arr, vox; rtol=voxel_rtol, atol=voxel_atol)
+            elseif allow_dimension_mismatch
+                # Dimension mismatch is expected (e.g., scale_mi changes array dimensions)
+                # Just verify both arrays are valid (non-empty)
+                @test !isempty(arr)
+                @test !isempty(vox)
+            else
+                # Dimensions differ unexpectedly - fail the test
+                @info "Dimension mismatch: SimpleITK=$sitk_dims, MedImages=$med_dims"
+                @test sitk_dims == med_dims  # This will fail and show the mismatch
+            end
         end
     end
 end

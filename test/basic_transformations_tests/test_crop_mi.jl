@@ -15,11 +15,16 @@ using .TestHelpers
 using .TestConfig
 
 # SimpleITK reference implementation
+# Note: beginning/crop_size are in Julia array dim order (dim1, dim2, dim3)
+# which maps to physical (z, y, x). SimpleITK expects (x, y, z) order,
+# so we reverse the tuples before passing to SimpleITK.
 function sitk_crop(sitk_image, beginning, crop_size)
     sitk = pyimport("SimpleITK")
-    # SimpleITK expects Python tuples of unsigned integers
-    py_size = (UInt(crop_size[1]), UInt(crop_size[2]), UInt(crop_size[3]))
-    py_index = (UInt(beginning[1]), UInt(beginning[2]), UInt(beginning[3]))
+    # Reverse tuples: Julia (dim1,dim2,dim3) -> SimpleITK (x,y,z)
+    rev_size = reverse(crop_size)
+    rev_index = reverse(beginning)
+    py_size = (UInt(rev_size[1]), UInt(rev_size[2]), UInt(rev_size[3]))
+    py_index = (UInt(rev_index[1]), UInt(rev_index[2]), UInt(rev_index[3]))
     return sitk.RegionOfInterest(sitk_image, py_size, py_index)
 end
 
