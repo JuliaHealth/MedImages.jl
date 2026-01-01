@@ -3,11 +3,12 @@
 
 using Test
 using MedImages
-using MedImages.Utils
 
-# Import test infrastructure
-include(joinpath(@__DIR__, "..", "test_helpers.jl"))
-include(joinpath(@__DIR__, "..", "test_config.jl"))
+# Import test infrastructure (conditionally include if not already defined)
+if !isdefined(@__MODULE__, :TestHelpers)
+    include(joinpath(@__DIR__, "..", "test_helpers.jl"))
+    include(joinpath(@__DIR__, "..", "test_config.jl"))
+end
 using .TestHelpers
 using .TestConfig
 
@@ -16,7 +17,7 @@ using .TestConfig
 
         @testset "Basic functionality" begin
             dims = (3, 4, 5)
-            result = Utils.get_base_indicies_arr(dims)
+            result = MedImages.Utils.get_base_indicies_arr(dims)
 
             # Result should be 3xN where N = prod(dims)
             @test size(result, 1) == 3
@@ -25,28 +26,28 @@ using .TestConfig
 
         @testset "Small dimensions" begin
             dims = (2, 2, 2)
-            result = Utils.get_base_indicies_arr(dims)
+            result = MedImages.Utils.get_base_indicies_arr(dims)
 
             @test size(result, 2) == 8  # 2*2*2 = 8 points
         end
 
         @testset "Single dimension" begin
             dims = (1, 1, 1)
-            result = Utils.get_base_indicies_arr(dims)
+            result = MedImages.Utils.get_base_indicies_arr(dims)
 
             @test size(result, 2) == 1
         end
 
         @testset "Asymmetric dimensions" begin
             dims = (10, 5, 3)
-            result = Utils.get_base_indicies_arr(dims)
+            result = MedImages.Utils.get_base_indicies_arr(dims)
 
             @test size(result, 2) == 150  # 10*5*3 = 150
         end
 
         @testset "Index values are valid" begin
             dims = (3, 4, 5)
-            result = Utils.get_base_indicies_arr(dims)
+            result = MedImages.Utils.get_base_indicies_arr(dims)
 
             # All indices should be within valid ranges
             for i in 1:size(result, 2)
@@ -58,7 +59,7 @@ using .TestConfig
 
         @testset "All grid points covered" begin
             dims = (2, 3, 2)
-            result = Utils.get_base_indicies_arr(dims)
+            result = MedImages.Utils.get_base_indicies_arr(dims)
 
             # Convert to set of tuples to check uniqueness and coverage
             points = Set{Tuple{Int,Int,Int}}()

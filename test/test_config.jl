@@ -72,16 +72,16 @@ const SPACING_TEST_VALUES = [
     (2.0, 2.0, 2.0)
 ]
 
-# Orientation test values
+# Orientation test values (from MedImage_data_struct submodule)
 const AVAILABLE_ORIENTATIONS = [
-    MedImages.ORIENTATION_RAS,
-    MedImages.ORIENTATION_LAS,
-    MedImages.ORIENTATION_RPI,
-    MedImages.ORIENTATION_LPI,
-    MedImages.ORIENTATION_RAI,
-    MedImages.ORIENTATION_LAI,
-    MedImages.ORIENTATION_RPS,
-    MedImages.ORIENTATION_LPS
+    MedImages.MedImage_data_struct.ORIENTATION_RAS,
+    MedImages.MedImage_data_struct.ORIENTATION_LAS,
+    MedImages.MedImage_data_struct.ORIENTATION_RPI,
+    MedImages.MedImage_data_struct.ORIENTATION_LPI,
+    MedImages.MedImage_data_struct.ORIENTATION_RAI,
+    MedImages.MedImage_data_struct.ORIENTATION_LAI,
+    MedImages.MedImage_data_struct.ORIENTATION_RPS,
+    MedImages.MedImage_data_struct.ORIENTATION_LPS
 ]
 
 end # module TestConfig

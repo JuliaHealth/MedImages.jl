@@ -3,12 +3,13 @@
 
 using Test
 using MedImages
-using MedImages.Utils
 using Random
 
-# Import test infrastructure
-include(joinpath(@__DIR__, "..", "test_helpers.jl"))
-include(joinpath(@__DIR__, "..", "test_config.jl"))
+# Import test infrastructure (conditionally include if not already defined)
+if !isdefined(@__MODULE__, :TestHelpers)
+    include(joinpath(@__DIR__, "..", "test_helpers.jl"))
+    include(joinpath(@__DIR__, "..", "test_config.jl"))
+end
 using .TestHelpers
 using .TestConfig
 
@@ -32,7 +33,7 @@ using .TestConfig
             points[:, 7] = [5.0, 5.0, 1.0]
             points[:, 8] = [10.0, 10.0, 10.0]
 
-            result = Utils.interpolate_my(points, data, spacing, MedImages.Linear_en, true, 0.0, false)
+            result = MedImages.Utils.interpolate_my(points, data, spacing, MedImages.Linear_en, true, 0.0, false)
 
             @test length(result) == 8
             @test !any(isnan, result)
@@ -47,8 +48,8 @@ using .TestConfig
             points[:, 3] = [3.5, 3.5, 3.5]
             points[:, 4] = [5.0, 5.0, 5.0]
 
-            result_slow = Utils.interpolate_my(points, data, spacing, MedImages.Linear_en, true, 0.0, false)
-            result_fast = Utils.interpolate_my(points, data, spacing, MedImages.Linear_en, true, 0.0, true)
+            result_slow = MedImages.Utils.interpolate_my(points, data, spacing, MedImages.Linear_en, true, 0.0, false)
+            result_fast = MedImages.Utils.interpolate_my(points, data, spacing, MedImages.Linear_en, true, 0.0, true)
 
             # Results should be very similar
             @test length(result_slow) == length(result_fast)
@@ -64,7 +65,7 @@ using .TestConfig
             points[:, 1] = [10.0, 10.0, 10.0]  # Outside 5x5x5 grid
 
             extrap_val = -999.0
-            result = Utils.interpolate_my(points, data, spacing, MedImages.Linear_en, true, extrap_val, false)
+            result = MedImages.Utils.interpolate_my(points, data, spacing, MedImages.Linear_en, true, extrap_val, false)
 
             # If outside, should return extrapolation value
             @test length(result) == 1
@@ -79,9 +80,9 @@ using .TestConfig
             points[:, 3] = [3.0, 3.0, 3.0]
             points[:, 4] = [5.5, 5.5, 5.5]
 
-            result_nearest = Utils.interpolate_my(points, data, spacing, MedImages.Nearest_neighbour_en, true, 0.0, false)
-            result_linear = Utils.interpolate_my(points, data, spacing, MedImages.Linear_en, true, 0.0, false)
-            result_bspline = Utils.interpolate_my(points, data, spacing, MedImages.B_spline_en, true, 0.0, false)
+            result_nearest = MedImages.Utils.interpolate_my(points, data, spacing, MedImages.Nearest_neighbour_en, true, 0.0, false)
+            result_linear = MedImages.Utils.interpolate_my(points, data, spacing, MedImages.Linear_en, true, 0.0, false)
+            result_bspline = MedImages.Utils.interpolate_my(points, data, spacing, MedImages.B_spline_en, true, 0.0, false)
 
             @test length(result_nearest) == 4
             @test length(result_linear) == 4
@@ -102,7 +103,7 @@ using .TestConfig
             points[:, 2] = [4.0, 4.0, 4.0]
             points[:, 3] = [6.0, 6.0, 6.0]
 
-            result = Utils.interpolate_my(points, data, spacing, MedImages.Linear_en, true, 0.0, false)
+            result = MedImages.Utils.interpolate_my(points, data, spacing, MedImages.Linear_en, true, 0.0, false)
 
             @test length(result) == 3
             @test !any(isnan, result)
