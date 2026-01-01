@@ -165,12 +165,21 @@ return the cropped MedImage object
 """
 function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64}, pad_val, Interpolator::Interpolator_enum)::MedImage
 
-  # Create padding arrays for the beginning and end of each axis
-  pad_beg_array = fill(pad_val, (pad_beg[1], size(im.voxel_data, 2), size(im.voxel_data, 3)))
-  pad_end_array = fill(pad_val, (pad_end[1], size(im.voxel_data, 2), size(im.voxel_data, 3)))
+  # Get original dimensions
+  orig_dims = size(im.voxel_data)
 
-  # Concatenate the padding arrays with the original voxel_data array
-  padded_voxel_data = cat(pad_beg_array, im.voxel_data, pad_end_array, dims=1)
+  # Calculate new dimensions after padding all axes
+  new_dims = (orig_dims[1] + pad_beg[1] + pad_end[1],
+              orig_dims[2] + pad_beg[2] + pad_end[2],
+              orig_dims[3] + pad_beg[3] + pad_end[3])
+
+  # Create padded array filled with pad_val
+  padded_voxel_data = fill(convert(eltype(im.voxel_data), pad_val), new_dims)
+
+  # Copy original data into the center of the padded array
+  padded_voxel_data[(pad_beg[1]+1):(pad_beg[1]+orig_dims[1]),
+                    (pad_beg[2]+1):(pad_beg[2]+orig_dims[2]),
+                    (pad_beg[3]+1):(pad_beg[3]+orig_dims[3])] = im.voxel_data
 
   # Adjust the origin according to the padding beginning coordinates
   padded_origin = im.origin .- (im.spacing .* pad_beg)
