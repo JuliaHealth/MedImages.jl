@@ -15,10 +15,11 @@ using .TestHelpers
 using .TestConfig
 
 # SimpleITK reference implementation
-function sitk_crop(sitk_image, beginning, size)
+function sitk_crop(sitk_image, beginning, crop_size)
     sitk = pyimport("SimpleITK")
-    py_size = PyObject([Int(size[1]), Int(size[2]), Int(size[3])])
-    py_index = PyObject([Int(beginning[1]), Int(beginning[2]), Int(beginning[3])])
+    # SimpleITK expects Python tuples of unsigned integers
+    py_size = (UInt(crop_size[1]), UInt(crop_size[2]), UInt(crop_size[3]))
+    py_index = (UInt(beginning[1]), UInt(beginning[2]), UInt(beginning[3]))
     return sitk.RegionOfInterest(sitk_image, py_size, py_index)
 end
 
