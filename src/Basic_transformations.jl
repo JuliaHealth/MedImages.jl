@@ -146,7 +146,9 @@ function crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tu
   cropped_voxel_data = @view im.voxel_data[julia_beg[1]:(julia_beg[1]+crop_size[1]-1), julia_beg[2]:(julia_beg[2]+crop_size[2]-1), julia_beg[3]:(julia_beg[3]+crop_size[3]-1)]
 
   # Adjust the origin according to the crop beginning coordinates (using original 0-based values)
-  cropped_origin = im.origin .+ (im.spacing .* crop_beg)
+  # Note: origin/spacing are in (x,y,z) order, but crop_beg is in Julia array dim order
+  # Julia dim1 -> Z, dim2 -> Y, dim3 -> X, so we reverse crop_beg for origin calculation
+  cropped_origin = im.origin .+ (im.spacing .* reverse(crop_beg))
 
   # Create a new MedImage with the cropped voxel_data and adjusted origin
   cropped_im = update_voxel_and_spatial_data(im, cropped_voxel_data, cropped_origin, im.spacing, im.direction)
@@ -182,7 +184,9 @@ function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{
                     (pad_beg[3]+1):(pad_beg[3]+orig_dims[3])] = im.voxel_data
 
   # Adjust the origin according to the padding beginning coordinates
-  padded_origin = im.origin .- (im.spacing .* pad_beg)
+  # Note: origin/spacing are in (x,y,z) order, but pad_beg is in Julia array dim order
+  # Julia dim1 -> Z, dim2 -> Y, dim3 -> X, so we reverse pad_beg for origin calculation
+  padded_origin = im.origin .- (im.spacing .* reverse(pad_beg))
 
   # Create a new MedImage with the padded voxel_data and adjusted origin
   padded_im = update_voxel_and_spatial_data(im, padded_voxel_data, padded_origin, im.spacing, im.direction)
