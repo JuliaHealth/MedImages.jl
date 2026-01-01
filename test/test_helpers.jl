@@ -8,6 +8,7 @@ using PyCall
 using MedImages
 using LinearAlgebra
 using Dates
+using Random
 
 export TEST_DATA_DIR
 export setup_test_output_dir

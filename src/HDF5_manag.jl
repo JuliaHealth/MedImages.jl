@@ -1,6 +1,7 @@
 using HDF5
 using JSON
 using Dates
+using UUIDs
 using .MedImage_data_struct: MedImage
 
 """
@@ -14,10 +15,13 @@ function save_med_image(f::HDF5.File, group_name::String, image::MedImage)
         g = create_group(f, group_name)
     end
 
+    # Generate a unique dataset name to avoid collisions when saving the same image multiple times
+    dataset_name = string(UUIDs.uuid4())
+
     # Ensure voxel_data is a standard Array for HDF5 compatibility
     voxel_data_arr = collect(image.voxel_data)
-    dset = create_dataset(g, image.study_uid, voxel_data_arr)
-    dset = g[image.study_uid]
+    dset = create_dataset(g, dataset_name, voxel_data_arr)
+    dset = g[dataset_name]
     write(dset, voxel_data_arr)
     attributes(dset)["origin"] = collect(image.origin)
     attributes(dset)["spacing"] = collect(image.spacing)
@@ -28,6 +32,7 @@ function save_med_image(f::HDF5.File, group_name::String, image::MedImage)
     attributes(dset)["acquistion_time"] = string(image.acquistion_time)
     attributes(dset)["patient_id"] = image.patient_id
     attributes(dset)["current_device"] = Int(image.current_device)
+    attributes(dset)["study_uid"] = image.study_uid
     attributes(dset)["patient_uid"] = image.patient_uid
     attributes(dset)["series_uid"] = image.series_uid
     attributes(dset)["study_description"] = image.study_description
@@ -37,7 +42,7 @@ function save_med_image(f::HDF5.File, group_name::String, image::MedImage)
     attributes(dset)["clinical_data"] = string(JSON.json(image.clinical_data))
     attributes(dset)["metadata"] = string(JSON.json(image.metadata))
 
-    return image.study_uid
+    return dataset_name
 end
 
 """
@@ -58,7 +63,7 @@ function load_med_image(f::HDF5.File, group_name::String, dataset_name::String)
     acquistion_time = DateTime(read_attribute(dset, "acquistion_time"))
     patient_id = read_attribute(dset, "patient_id")
     current_device = instances(current_device_enum)[read_attribute(dset, "current_device")+1]
-    study_uid = dataset_name
+    study_uid = read_attribute(dset, "study_uid")
     patient_uid = read_attribute(dset, "patient_uid")
     series_uid = read_attribute(dset, "series_uid")
     study_description = read_attribute(dset, "study_description")
