@@ -15,16 +15,12 @@ using .TestHelpers
 using .TestConfig
 
 # SimpleITK reference implementation
-# Note: beginning/crop_size are in Julia array dim order (dim1, dim2, dim3)
-# which maps to physical (z, y, x). SimpleITK expects (x, y, z) order,
-# so we reverse the tuples before passing to SimpleITK.
+# Note: beginning/crop_size are in SimpleITK (x, y, z) order as defined in test_config.jl
 function sitk_crop(sitk_image, beginning, crop_size)
     sitk = pyimport("SimpleITK")
-    # Reverse tuples: Julia (dim1,dim2,dim3) -> SimpleITK (x,y,z)
-    rev_size = reverse(crop_size)
-    rev_index = reverse(beginning)
-    py_size = (UInt(rev_size[1]), UInt(rev_size[2]), UInt(rev_size[3]))
-    py_index = (UInt(rev_index[1]), UInt(rev_index[2]), UInt(rev_index[3]))
+    # Pass directly to SimpleITK which expects (x, y, z) order
+    py_size = (UInt(crop_size[1]), UInt(crop_size[2]), UInt(crop_size[3]))
+    py_index = (UInt(beginning[1]), UInt(beginning[2]), UInt(beginning[3]))
     return sitk.RegionOfInterest(sitk_image, py_size, py_index)
 end
 
@@ -55,7 +51,10 @@ end
                             sitk.WriteImage(cropped_sitk, output_file)
 
                             # MedImages implementation
-                            medIm_cropped = MedImages.crop_mi(med_im, beginning, crop_size, interp)
+                            # Convert from SimpleITK (x,y,z) order to Julia (dim1,dim2,dim3) order
+                            julia_beginning = reverse(beginning)
+                            julia_crop_size = reverse(crop_size)
+                            medIm_cropped = MedImages.crop_mi(med_im, julia_beginning, julia_crop_size, interp)
 
                             # Save MedImages output
                             mi_output_file = joinpath(output_dir, "cropped_$(interp_name)_$(beginning)_$(crop_size)_mi.nii.gz")

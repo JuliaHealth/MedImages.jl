@@ -15,19 +15,14 @@ using .TestHelpers
 using .TestConfig
 
 # SimpleITK reference implementation
-# Note: pad_beg/pad_end are in Julia array dim order (dim1, dim2, dim3)
-# which maps to physical (z, y, x). SimpleITK expects (x, y, z) order,
-# so we reverse the tuples before passing to SimpleITK.
+# Note: pad_beg/pad_end are in SimpleITK (x, y, z) order as defined in test_config.jl
 function sitk_pad(sitk_image, pad_beg, pad_end, pad_val)
     sitk = pyimport("SimpleITK")
     extract = sitk.ConstantPadImageFilter()
     extract.SetConstant(pad_val)
-    # Reverse tuples: Julia (dim1,dim2,dim3) -> SimpleITK (x,y,z)
-    # Julia dim1=Z, dim2=Y, dim3=X -> SimpleITK needs (X,Y,Z) = (dim3,dim2,dim1)
-    rev_beg = reverse(pad_beg)
-    rev_end = reverse(pad_end)
-    py_pad_beg = (UInt(rev_beg[1]), UInt(rev_beg[2]), UInt(rev_beg[3]))
-    py_pad_end = (UInt(rev_end[1]), UInt(rev_end[2]), UInt(rev_end[3]))
+    # Pass directly to SimpleITK which expects (x, y, z) order
+    py_pad_beg = (UInt(pad_beg[1]), UInt(pad_beg[2]), UInt(pad_beg[3]))
+    py_pad_end = (UInt(pad_end[1]), UInt(pad_end[2]), UInt(pad_end[3]))
     extract.SetPadLowerBound(py_pad_beg)
     extract.SetPadUpperBound(py_pad_end)
     return extract.Execute(sitk_image)
@@ -60,7 +55,10 @@ end
                             sitk.WriteImage(sitk_padded, output_file)
 
                             # MedImages implementation
-                            mi_padded = MedImages.pad_mi(med_im, pad_beg, pad_end, pad_val, interp)
+                            # Convert from SimpleITK (x,y,z) order to Julia (dim1,dim2,dim3) order
+                            julia_pad_beg = reverse(pad_beg)
+                            julia_pad_end = reverse(pad_end)
+                            mi_padded = MedImages.pad_mi(med_im, julia_pad_beg, julia_pad_end, pad_val, interp)
 
                             # Save MedImages output
                             mi_output_file = joinpath(output_dir, "padded_$(interp_name)_$(pad_beg)_$(pad_end)_$(pad_val)_mi.nii.gz")
