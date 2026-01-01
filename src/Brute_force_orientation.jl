@@ -128,12 +128,16 @@ function brute_force_find_perm_rev(sitk_image1_arr, sitk_image2_arr)
                 # println("Found")
                 # println(p)
                 # println(c)
-                return (p, c)
+                # Convert vectors to tuples for type consistency
+                p_tuple = isempty(p) ? () : Tuple(p)
+                c_tuple = isempty(c) ? () : Tuple(c)
+                return (p_tuple, c_tuple)
             end
 
         end
     end
-
+    # Return empty tuples if no match found
+    return ((), ())
 end
 
 
@@ -156,11 +160,13 @@ function brute_force_find_perm_spacing(spacing_source, spacing_target)
             # println("Found spacing perm")
             # println(p)
             # println(c)
-            return p
+            # Convert vector to tuple for type consistency
+            return Tuple(p)
         end
 
     end
-
+    # Return identity permutation tuple if no match found
+    return (1, 2, 3)
 end
 
 
@@ -205,7 +211,9 @@ function establish_orginn_transformation(medim, sitk_image2, new_orientation, pe
 
         if (isapprox(collect(re_im.origin), collect(origin2); atol=0.1))
             print("ffffffffffffff")
-            return res
+            # Convert vector of vectors to tuple of tuples for type consistency
+            res_tuple = (Tuple(res[1]), Tuple(res[2]), Tuple(res[3]))
+            return res_tuple
         end
     end
 
@@ -222,7 +230,8 @@ function establish_orginn_transformation(medim, sitk_image2, new_orientation, pe
     diff = collect(origin1) - collect(origin2)
     # print("\n ooooo origin1 $(origin1) origin2 $(origin2) spacing1 $(spacing1) spacing2 $(spacing2) diff $(diff)  sizzz $(sizzz) \n")
     # end
-    # return res
+    # Return default transformation tuple if no match found
+    return ((1, 1, 1, 0), (1, 1, 1, 0), (1, 1, 1, 0))
 end
 
 

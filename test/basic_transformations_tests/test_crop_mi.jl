@@ -49,8 +49,7 @@ end
                             sitk.WriteImage(cropped_sitk, output_file)
 
                             # MedImages implementation
-                            # Note: crop_mi takes an array of images
-                            medIm_cropped = MedImages.crop_mi([med_im], beginning, crop_size, interp)[1]
+                            medIm_cropped = MedImages.crop_mi(med_im, beginning, crop_size, interp)
 
                             # Save MedImages output
                             mi_output_file = joinpath(output_dir, "cropped_$(interp_name)_$(beginning)_$(crop_size)_mi.nii.gz")
@@ -82,7 +81,7 @@ end
 
         @testset "Single voxel crop" begin
             try
-                result = MedImages.crop_mi([med_im], (0, 0, 0), (1, 1, 1), MedImages.Linear_en)[1]
+                result = MedImages.crop_mi(med_im, (0, 0, 0), (1, 1, 1), MedImages.Linear_en)
                 @test size(result.voxel_data) == (1, 1, 1)
             catch e
                 @test_broken false
@@ -93,7 +92,7 @@ end
         @testset "Full image crop (no-op)" begin
             try
                 dims = size(med_im.voxel_data)
-                result = MedImages.crop_mi([med_im], (0, 0, 0), dims, MedImages.Linear_en)[1]
+                result = MedImages.crop_mi(med_im, (0, 0, 0), dims, MedImages.Linear_en)
                 @test size(result.voxel_data) == dims
             catch e
                 @test_broken false
