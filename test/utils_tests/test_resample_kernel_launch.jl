@@ -3,12 +3,13 @@
 
 using Test
 using MedImages
-using MedImages.Utils
 using Random
 
-# Import test infrastructure
-include(joinpath(@__DIR__, "..", "test_helpers.jl"))
-include(joinpath(@__DIR__, "..", "test_config.jl"))
+# Import test infrastructure (conditionally include if not already defined)
+if !isdefined(@__MODULE__, :TestHelpers)
+    include(joinpath(@__DIR__, "..", "test_helpers.jl"))
+    include(joinpath(@__DIR__, "..", "test_config.jl"))
+end
 using .TestHelpers
 using .TestConfig
 
@@ -22,7 +23,7 @@ using .TestConfig
             new_spacing = (0.5, 0.5, 0.5)
             new_dims = (32, 32, 32)
 
-            result = Utils.resample_kernel_launch(data, old_spacing, new_spacing,
+            result = MedImages.Utils.resample_kernel_launch(data, old_spacing, new_spacing,
                                                    new_dims, MedImages.Linear_en)
 
             @test size(result) == new_dims
@@ -36,7 +37,7 @@ using .TestConfig
             new_spacing = (2.0, 2.0, 2.0)
             new_dims = (16, 16, 16)
 
-            result = Utils.resample_kernel_launch(data, old_spacing, new_spacing,
+            result = MedImages.Utils.resample_kernel_launch(data, old_spacing, new_spacing,
                                                    new_dims, MedImages.Linear_en)
 
             @test size(result) == new_dims
@@ -48,7 +49,7 @@ using .TestConfig
             new_spacing = (0.5, 1.0, 2.0)
             new_dims = (40, 20, 10)
 
-            result = Utils.resample_kernel_launch(data, old_spacing, new_spacing,
+            result = MedImages.Utils.resample_kernel_launch(data, old_spacing, new_spacing,
                                                    new_dims, MedImages.Linear_en)
 
             @test size(result) == new_dims
@@ -61,7 +62,7 @@ using .TestConfig
             new_dims = (14, 14, 14)
 
             for interp in INTERPOLATORS
-                result = Utils.resample_kernel_launch(data, old_spacing, new_spacing,
+                result = MedImages.Utils.resample_kernel_launch(data, old_spacing, new_spacing,
                                                        new_dims, interp)
                 @test size(result) == new_dims
                 @test !any(isnan, result)
@@ -74,7 +75,7 @@ using .TestConfig
             new_spacing = (1.0, 1.0, 1.0)
             new_dims = (10, 10, 10)
 
-            result = Utils.resample_kernel_launch(data, old_spacing, new_spacing,
+            result = MedImages.Utils.resample_kernel_launch(data, old_spacing, new_spacing,
                                                    new_dims, MedImages.Linear_en)
 
             @test size(result) == new_dims
@@ -88,7 +89,7 @@ using .TestConfig
             new_spacing = (0.5, 0.5, 0.5)
             new_dims = (16, 16, 16)
 
-            result = Utils.resample_kernel_launch(data, old_spacing, new_spacing,
+            result = MedImages.Utils.resample_kernel_launch(data, old_spacing, new_spacing,
                                                    new_dims, MedImages.Linear_en)
 
             @test eltype(result) == Float32

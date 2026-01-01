@@ -4,9 +4,11 @@
 using Test
 using MedImages
 
-# Import test infrastructure
-include(joinpath(@__DIR__, "..", "test_helpers.jl"))
-include(joinpath(@__DIR__, "..", "test_config.jl"))
+# Import test infrastructure (conditionally include if not already defined)
+if !isdefined(@__MODULE__, :TestHelpers)
+    include(joinpath(@__DIR__, "..", "test_helpers.jl"))
+    include(joinpath(@__DIR__, "..", "test_config.jl"))
+end
 using .TestHelpers
 using .TestConfig
 
@@ -26,14 +28,14 @@ using .TestConfig
 
         @testset "orientation_enum_to_string dictionary" begin
             orientations = [
-                MedImages.ORIENTATION_RAS,
-                MedImages.ORIENTATION_LAS,
-                MedImages.ORIENTATION_RPI,
-                MedImages.ORIENTATION_LPI,
-                MedImages.ORIENTATION_RAI,
-                MedImages.ORIENTATION_LAI,
-                MedImages.ORIENTATION_RPS,
-                MedImages.ORIENTATION_LPS
+                MedImages.MedImage_data_struct.ORIENTATION_RAS,
+                MedImages.MedImage_data_struct.ORIENTATION_LAS,
+                MedImages.MedImage_data_struct.ORIENTATION_RPI,
+                MedImages.MedImage_data_struct.ORIENTATION_LPI,
+                MedImages.MedImage_data_struct.ORIENTATION_RAI,
+                MedImages.MedImage_data_struct.ORIENTATION_LAI,
+                MedImages.MedImage_data_struct.ORIENTATION_RPS,
+                MedImages.MedImage_data_struct.ORIENTATION_LPS
             ]
 
             for orient_enum in orientations

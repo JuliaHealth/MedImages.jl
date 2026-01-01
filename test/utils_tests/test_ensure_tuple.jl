@@ -3,11 +3,12 @@
 
 using Test
 using MedImages
-using MedImages.Utils
 
-# Import test infrastructure
-include(joinpath(@__DIR__, "..", "test_helpers.jl"))
-include(joinpath(@__DIR__, "..", "test_config.jl"))
+# Import test infrastructure (conditionally include if not already defined)
+if !isdefined(@__MODULE__, :TestHelpers)
+    include(joinpath(@__DIR__, "..", "test_helpers.jl"))
+    include(joinpath(@__DIR__, "..", "test_config.jl"))
+end
 using .TestHelpers
 using .TestConfig
 
@@ -16,28 +17,28 @@ using .TestConfig
 
         @testset "Already a tuple" begin
             t = (1.0, 2.0, 3.0)
-            result = Utils.ensure_tuple(t)
+            result = MedImages.Utils.ensure_tuple(t)
             @test result === t
             @test result isa Tuple
         end
 
         @testset "Vector to tuple" begin
             v = [1.0, 2.0, 3.0]
-            result = Utils.ensure_tuple(v)
+            result = MedImages.Utils.ensure_tuple(v)
             @test result isa Tuple
             @test result == (1.0, 2.0, 3.0)
         end
 
         @testset "Integer vector to tuple" begin
             v = [1, 2, 3]
-            result = Utils.ensure_tuple(v)
+            result = MedImages.Utils.ensure_tuple(v)
             @test result isa Tuple
             @test length(result) == 3
         end
 
         @testset "9-element vector (direction matrix)" begin
             v = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
-            result = Utils.ensure_tuple(v)
+            result = MedImages.Utils.ensure_tuple(v)
             @test result isa Tuple
             @test length(result) == 9
         end
@@ -46,7 +47,7 @@ using .TestConfig
             # Empty vector
             try
                 v = Float64[]
-                result = Utils.ensure_tuple(v)
+                result = MedImages.Utils.ensure_tuple(v)
                 @test result isa Tuple
                 @test length(result) == 0
             catch e
@@ -57,11 +58,11 @@ using .TestConfig
 
         @testset "Type preservation" begin
             v_float = [1.0, 2.0, 3.0]
-            result_float = Utils.ensure_tuple(v_float)
+            result_float = MedImages.Utils.ensure_tuple(v_float)
             @test all(x -> x isa Float64, result_float)
 
             v_int = [1, 2, 3]
-            result_int = Utils.ensure_tuple(v_int)
+            result_int = MedImages.Utils.ensure_tuple(v_int)
             # Result might be Int or converted
             @test length(result_int) == 3
         end
