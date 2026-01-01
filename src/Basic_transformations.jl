@@ -115,7 +115,9 @@ function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Int
   translation = Translation(v_center...)
   transkation_center = Translation(-v_center...)
   combined_transformation = translation ∘ rotation_transformation ∘ transkation_center
-  resampled_image = collect(warp(img, combined_transformation, Interpolations.Linear()))
+  # Use fillvalue=0.0 to match SimpleITK behavior (default is NaN for float arrays)
+  # Use keyword argument syntax to avoid deprecation warning
+  resampled_image = collect(warp(img, combined_transformation; method=Interpolations.Linear(), fillvalue=0.0))
   if crop
     new_center = get_voxel_center_Julia(resampled_image)
     resampled_image = crop_image_around_center(resampled_image, size(img), map(x -> round(Int, x), new_center))

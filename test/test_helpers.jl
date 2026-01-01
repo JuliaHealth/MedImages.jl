@@ -142,8 +142,10 @@ Returns the full path to the created file.
 function create_nii_from_medimage_for_test(med_image, file_path::String)
     sitk, np = get_sitk_modules()
 
-    # Convert voxel_data to numpy array
-    voxel_data_np = np.array(med_image.voxel_data)
+    # Convert voxel_data to numpy array with axis permutation for SimpleITK compatibility
+    # Julia uses column-major (Fortran) ordering, SimpleITK uses row-major (C) ordering
+    voxel_data_permuted = permutedims(med_image.voxel_data, (3, 2, 1))
+    voxel_data_np = np.array(voxel_data_permuted)
     image_sitk = sitk.GetImageFromArray(voxel_data_np)
 
     # Set spatial metadata
