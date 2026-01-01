@@ -209,11 +209,25 @@ end#translate_mi
 
 
 """
-given a MedImage object and a scaling value (either a single Float64 for uniform scaling
-or a Tuple for per-axis scaling), scales the image.
+    scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::MedImage
 
-we are setting Interpolator by using Interpolator enum
-return the scaled MedImage object
+Scale a MedImage object by the given scaling factor(s).
+
+# Arguments
+- `im`: The input MedImage to scale
+- `scale`: Scaling factor - either a single Float64 for uniform scaling, or a Tuple for per-axis scaling
+- `Interpolator`: Interpolation method (Nearest_neighbour_en, Linear_en, or B_spline_en)
+
+# Returns
+A new MedImage with scaled voxel data.
+
+# Behavior Note
+Unlike SimpleITK's ScaleTransform+Resample which keeps output dimensions fixed and scales
+content within the same canvas, MedImages.scale_mi changes the array dimensions based on
+the scale factor. For example, scaling a 512x512x75 image by 0.5 produces a 256x256x38 image.
+
+This is intentional behavior that changes the number of voxels while maintaining
+the same physical extent covered by the image.
 """
 function scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::MedImage
 
