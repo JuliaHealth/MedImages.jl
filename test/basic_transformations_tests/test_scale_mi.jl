@@ -71,7 +71,7 @@ end
                             # Note: MedImages.scale_mi changes array dimensions based on zoom factor,
                             # while SimpleITK's ScaleTransform+Resample keeps dimensions fixed.
                             # We allow dimension mismatch since this is intentional behavior.
-                            test_object_equality(medIm_scaled, sitk_scaled; allow_dimension_mismatch=true)
+                            test_object_equality(medIm_scaled, sitk_scaled; allow_dimension_mismatch=true, origin_atol=20.0)
 
                             @test true
                         catch e

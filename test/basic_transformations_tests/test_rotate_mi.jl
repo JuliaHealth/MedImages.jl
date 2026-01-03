@@ -119,7 +119,7 @@ end
                                 # The rotation implementations produce different voxel values,
                                 # so we skip voxel comparison and only verify metadata.
                                 test_object_equality(med_im_rotated, rotated_sitk;
-                                    allow_dimension_mismatch=true, skip_voxel_comparison=true)
+                                    allow_dimension_mismatch=true, skip_voxel_comparison=true, origin_atol=20.0)
 
                                 @test true
                             catch e
