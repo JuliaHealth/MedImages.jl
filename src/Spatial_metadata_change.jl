@@ -23,13 +23,10 @@ function resample_to_spacing(im, new_spacing::Tuple{Float64,Float64,Float64}, in
     # Formula: new_size = ceil(old_size * old_spacing / new_spacing)
     new_size = Tuple{Int,Int,Int}(ceil.((old_size .* old_spacing) ./ new_spacing))
 
-    # For the resampling kernel, we need to reverse the spacing to match array indexing
-    # Julia arrays are (x,y,z) but physical coords are (z,y,x) in the kernel
-    old_spacing_reversed = (old_spacing[3], old_spacing[2], old_spacing[1])
-    new_spacing_reversed = (new_spacing[3], new_spacing[2], new_spacing[1])
-
+    # Julia array dims map as: dim1 -> X, dim2 -> Y, dim3 -> Z
+    # Spacing is already in (x,y,z) order, so no reversal needed
     # Use optimized kernel resampling
-    new_voxel_data = resample_kernel_launch(im.voxel_data, old_spacing_reversed, new_spacing_reversed, new_size, interpolator_enum)
+    new_voxel_data = resample_kernel_launch(im.voxel_data, old_spacing, new_spacing, new_size, interpolator_enum)
 
     new_im = Load_and_save.update_voxel_and_spatial_data(im, new_voxel_data, im.origin, new_spacing, im.direction)
 

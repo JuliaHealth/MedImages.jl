@@ -5,7 +5,7 @@ using PyCall
 println("=== Verifying Axis Mapping Fixes ===\n")
 
 # Load test image
-test_file = "MedImages.jl/test_data/volume-0.nii.gz"
+test_file = "test_data/volume-0.nii.gz"
 med_im = MedImages.load_image(test_file, "CT")
 
 # Load with SimpleITK
