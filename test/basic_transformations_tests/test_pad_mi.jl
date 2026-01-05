@@ -55,10 +55,9 @@ end
                             sitk.WriteImage(sitk_padded, output_file)
 
                             # MedImages implementation
-                            # Convert from SimpleITK (x,y,z) order to Julia (dim1,dim2,dim3) order
-                            julia_pad_beg = reverse(pad_beg)
-                            julia_pad_end = reverse(pad_end)
-                            mi_padded = MedImages.pad_mi(med_im, julia_pad_beg, julia_pad_end, pad_val, interp)
+                            # Julia dim1->X, dim2->Y, dim3->Z, so same order as SimpleITK (x,y,z)
+                            # No need to reverse the coordinates
+                            mi_padded = MedImages.pad_mi(med_im, pad_beg, pad_end, pad_val, interp)
 
                             # Save MedImages output
                             mi_output_file = joinpath(output_dir, "padded_$(interp_name)_$(pad_beg)_$(pad_end)_$(pad_val)_mi.nii.gz")
