@@ -51,10 +51,9 @@ end
                             sitk.WriteImage(cropped_sitk, output_file)
 
                             # MedImages implementation
-                            # Convert from SimpleITK (x,y,z) order to Julia (dim1,dim2,dim3) order
-                            julia_beginning = reverse(beginning)
-                            julia_crop_size = reverse(crop_size)
-                            medIm_cropped = MedImages.crop_mi(med_im, julia_beginning, julia_crop_size, interp)
+                            # Julia dim1->X, dim2->Y, dim3->Z, so same order as SimpleITK (x,y,z)
+                            # No need to reverse the coordinates
+                            medIm_cropped = MedImages.crop_mi(med_im, beginning, crop_size, interp)
 
                             # Save MedImages output
                             mi_output_file = joinpath(output_dir, "cropped_$(interp_name)_$(beginning)_$(crop_size)_mi.nii.gz")
