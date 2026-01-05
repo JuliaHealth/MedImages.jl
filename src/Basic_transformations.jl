@@ -149,7 +149,9 @@ function crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tu
   # Note: Both origin/spacing and crop_beg are in (x,y,z) order
   # Julia array dims map as: dim1 -> X, dim2 -> Y, dim3 -> Z
   # So crop_beg is already in the correct order for origin calculation
-  cropped_origin = im.origin .+ (im.spacing .* crop_beg)
+  # Account for direction matrix: extract diagonal elements (row-major indexing)
+  dir_diag = [im.direction[1], im.direction[5], im.direction[9]]
+  cropped_origin = im.origin .+ (im.spacing .* crop_beg .* dir_diag)
 
   # Create a new MedImage with the cropped voxel_data and adjusted origin
   cropped_im = update_voxel_and_spatial_data(im, cropped_voxel_data, cropped_origin, im.spacing, im.direction)
@@ -188,7 +190,9 @@ function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{
   # Note: Both origin/spacing and pad_beg are in (x,y,z) order
   # Julia array dims map as: dim1 -> X, dim2 -> Y, dim3 -> Z
   # So pad_beg is already in the correct order for origin calculation
-  padded_origin = im.origin .- (im.spacing .* pad_beg)
+  # Account for direction matrix: extract diagonal elements (row-major indexing)
+  dir_diag = [im.direction[1], im.direction[5], im.direction[9]]
+  padded_origin = im.origin .- (im.spacing .* pad_beg .* dir_diag)
 
   # Create a new MedImage with the padded voxel_data and adjusted origin
   padded_im = update_voxel_and_spatial_data(im, padded_voxel_data, padded_origin, im.spacing, im.direction)
