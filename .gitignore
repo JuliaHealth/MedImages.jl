@@ -8,3 +8,6 @@ test_data/for_resample_target/
 test_data/Tests/
 test/new/
 .venv
+
+# Test outputs
+test/*/outputs/

@@ -1,0 +1,5 @@
+# Data files (too large for git)
+benchmark_data/
+
+# Julia artifacts
+Manifest.toml

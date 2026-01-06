@@ -1,10 +1,10 @@
 using Documenter, DocumenterVitepress
 
-makedocs(; 
-    sitename = "MedImages.jl", 
+makedocs(;
+    sitename = "MedImages.jl",
     authors = "Jakub Mitura <jakub.mitura14@gmail>, Divyansh Goyal <divital2004@gmail.com>, Jan Zubik",
     format=DocumenterVitepress.MarkdownVitepress(
-        repo = "github.com/JuliaHealth/MedImages.jl", 
+        repo = "github.com/JuliaHealth/MedImages.jl",
         devbranch = "main",
         devurl = "dev",
     ),
@@ -13,20 +13,26 @@ makedocs(;
     source = "src",
     build = "build",
     pages=[
+        "Home" => "index.md",
         "Manual" => [
-            "Get Started" => "manual/get_started.md",
-            "Code" => "manual/code_example.md"
+            "Getting Started" => "manual/get_started.md",
+            "Tutorials" => "manual/tutorials.md",
+            "Code Examples" => "manual/code_example.md",
+            "Coordinate Systems" => "manual/coordinate_systems.md"
         ],
-        "Developers' documentation" => [
+        "Reference" => [
+            "API Reference" => "api.md",
+            "Data Structures" => "reference/data_structures.md"
+        ],
+        "Developers" => [
             "Image Registration" => "devs/image_registration.md"
-        ],
-        "api" => "api.md"
-        ],
+        ]
+    ],
 )
 
 # This is the critical part that creates the version structure
 DocumenterVitepress.deploydocs(;
-    repo = "github.com/JuliaHealth/MedImages.jl", 
+    repo = "github.com/JuliaHealth/MedImages.jl",
     devbranch = "main",
     push_preview = true,
 )

@@ -17,15 +17,17 @@ end
 
 function resample_to_spacing(im, new_spacing::Tuple{Float64,Float64,Float64}, interpolator_enum, use_cuda=false)::MedImage
     old_spacing = im.spacing
-    old_spacing = (old_spacing[3], old_spacing[2], old_spacing[1])
-    new_spacing = (new_spacing[3], new_spacing[2], new_spacing[1])
     old_size = size(im.voxel_data)
+
+    # Calculate new size based on the ratio of physical extent to new spacing
+    # Formula: new_size = ceil(old_size * old_spacing / new_spacing)
     new_size = Tuple{Int,Int,Int}(ceil.((old_size .* old_spacing) ./ new_spacing))
 
+    # Julia array dims map as: dim1 -> X, dim2 -> Y, dim3 -> Z
+    # Spacing is already in (x,y,z) order, so no reversal needed
     # Use optimized kernel resampling
     new_voxel_data = resample_kernel_launch(im.voxel_data, old_spacing, new_spacing, new_size, interpolator_enum)
 
-    new_spacing = (new_spacing[3], new_spacing[2], new_spacing[1])
     new_im = Load_and_save.update_voxel_and_spatial_data(im, new_voxel_data, im.origin, new_spacing, im.direction)
 
     return new_im
