@@ -5,6 +5,8 @@ using Parameters
 using UUIDs
 
 export MedImage, Image_type, Image_subtype, current_device_enum, Interpolator_enum, Mode_mi, CoordinateTerms, CoordinateMajornessTerms, Orientation_code
+export ORIENTATION_RPI, ORIENTATION_LPI, ORIENTATION_RAI, ORIENTATION_LAI
+export ORIENTATION_RPS, ORIENTATION_LPS, ORIENTATION_RAS, ORIENTATION_LAS
 
 """
 

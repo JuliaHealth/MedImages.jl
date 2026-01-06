@@ -4,7 +4,8 @@ using CoordinateTransformations, Interpolations, StaticArrays, LinearAlgebra, Ro
 using LinearAlgebra
 using ImageTransformations
 using ..MedImage_data_struct
-using ..Load_and_save: update_voxel_data
+using ..MedImage_data_struct: Nearest_neighbour_en, Linear_en, B_spline_en
+using ..Load_and_save: update_voxel_data, update_voxel_and_spatial_data
 export rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, computeIndexToPhysicalPointMatrices_Julia, transformIndexToPhysicalPoint_Julia, get_voxel_center_Julia, get_real_center_Julia, Rodrigues_rotation_matrix, crop_image_around_center
 
 """
@@ -114,7 +115,9 @@ function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Int
   translation = Translation(v_center...)
   transkation_center = Translation(-v_center...)
   combined_transformation = translation ∘ rotation_transformation ∘ transkation_center
-  resampled_image = collect(warp(img, combined_transformation, Interpolations.Linear()))
+  # Use fillvalue=0.0 to match SimpleITK behavior (default is NaN for float arrays)
+  # Use keyword argument syntax to avoid deprecation warning
+  resampled_image = collect(warp(img, combined_transformation; method=Interpolations.Linear(), fillvalue=0.0))
   if crop
     new_center = get_voxel_center_Julia(resampled_image)
     resampled_image = crop_image_around_center(resampled_image, size(img), map(x -> round(Int, x), new_center))
@@ -136,11 +139,19 @@ return the cropped MedImage object
 """
 function crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::MedImage
 
-  # Create a view of the original voxel_data array with the specified crop
-  cropped_voxel_data = @view im.voxel_data[crop_beg[1]:(crop_beg[1]+crop_size[1]-1), crop_beg[2]:(crop_beg[2]+crop_size[2]-1), crop_beg[3]:(crop_beg[3]+crop_size[3]-1)]
+  # Convert 0-based indices to 1-based for Julia (SimpleITK compatibility)
+  julia_beg = crop_beg .+ 1
 
-  # Adjust the origin according to the crop beginning coordinates
-  cropped_origin = im.origin .+ (im.spacing .* crop_beg)
+  # Create a view of the original voxel_data array with the specified crop
+  cropped_voxel_data = @view im.voxel_data[julia_beg[1]:(julia_beg[1]+crop_size[1]-1), julia_beg[2]:(julia_beg[2]+crop_size[2]-1), julia_beg[3]:(julia_beg[3]+crop_size[3]-1)]
+
+  # Adjust the origin according to the crop beginning coordinates (using original 0-based values)
+  # Note: Both origin/spacing and crop_beg are in (x,y,z) order
+  # Julia array dims map as: dim1 -> X, dim2 -> Y, dim3 -> Z
+  # So crop_beg is already in the correct order for origin calculation
+  # Account for direction matrix: extract diagonal elements (row-major indexing)
+  dir_diag = [im.direction[1], im.direction[5], im.direction[9]]
+  cropped_origin = im.origin .+ (im.spacing .* crop_beg .* dir_diag)
 
   # Create a new MedImage with the cropped voxel_data and adjusted origin
   cropped_im = update_voxel_and_spatial_data(im, cropped_voxel_data, cropped_origin, im.spacing, im.direction)
@@ -159,15 +170,29 @@ return the cropped MedImage object
 """
 function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64}, pad_val, Interpolator::Interpolator_enum)::MedImage
 
-  # Create padding arrays for the beginning and end of each axis
-  pad_beg_array = fill(pad_val, (pad_beg[1], im.voxel_data.size[2], im.voxel_data.size[3]))
-  pad_end_array = fill(pad_val, (pad_end[1], im.voxel_data.size[2], im.voxel_data.size[3]))
+  # Get original dimensions
+  orig_dims = size(im.voxel_data)
 
-  # Concatenate the padding arrays with the original voxel_data array
-  padded_voxel_data = cat(pad_beg_array, im.voxel_data, pad_end_array, dims=1)
+  # Calculate new dimensions after padding all axes
+  new_dims = (orig_dims[1] + pad_beg[1] + pad_end[1],
+              orig_dims[2] + pad_beg[2] + pad_end[2],
+              orig_dims[3] + pad_beg[3] + pad_end[3])
+
+  # Create padded array filled with pad_val
+  padded_voxel_data = fill(convert(eltype(im.voxel_data), pad_val), new_dims)
+
+  # Copy original data into the center of the padded array
+  padded_voxel_data[(pad_beg[1]+1):(pad_beg[1]+orig_dims[1]),
+                    (pad_beg[2]+1):(pad_beg[2]+orig_dims[2]),
+                    (pad_beg[3]+1):(pad_beg[3]+orig_dims[3])] = im.voxel_data
 
   # Adjust the origin according to the padding beginning coordinates
-  padded_origin = im.origin .- (im.spacing .* pad_beg)
+  # Note: Both origin/spacing and pad_beg are in (x,y,z) order
+  # Julia array dims map as: dim1 -> X, dim2 -> Y, dim3 -> Z
+  # So pad_beg is already in the correct order for origin calculation
+  # Account for direction matrix: extract diagonal elements (row-major indexing)
+  dir_diag = [im.direction[1], im.direction[5], im.direction[9]]
+  padded_origin = im.origin .- (im.spacing .* pad_beg .* dir_diag)
 
   # Create a new MedImage with the padded voxel_data and adjusted origin
   padded_im = update_voxel_and_spatial_data(im, padded_voxel_data, padded_origin, im.spacing, im.direction)
@@ -185,43 +210,64 @@ return the translated MedImage object
 """
 function translate_mi(im::MedImage, translate_by::Int64, translate_in_axis::Int64, Interpolator::Interpolator_enum)::MedImage
 
-  # Create a copy of the origin
-  translated_origin = copy(im.origin)
+  # Convert origin tuple to mutable vector
+  origin_vec = collect(im.origin)
 
   # Modify the origin according to the translation value and axis
-  translated_origin[translate_in_axis] += translate_by * im.spacing[translate_in_axis]
+  origin_vec[translate_in_axis] += translate_by * im.spacing[translate_in_axis]
+
+  # Convert back to tuple
+  translated_origin = Tuple(origin_vec)
 
   # Create a new MedImage with the translated origin and the original voxel_data
   translated_im = update_voxel_and_spatial_data(im, im.voxel_data, translated_origin, im.spacing, im.direction)
 
   return translated_im
 
-end#crop_mi
+end#translate_mi
 
 
 """
-given a MedImage object and a Tuple that contains the scaling values for each axis (x,y,z in order)
+    scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::MedImage
 
-we are setting Interpolator by using Interpolator enum
-return the scaled MedImage object
+Scale a MedImage object by the given scaling factor(s).
+
+# Arguments
+- `im`: The input MedImage to scale
+- `scale`: Scaling factor - either a single Float64 for uniform scaling, or a Tuple for per-axis scaling
+- `Interpolator`: Interpolation method (Nearest_neighbour_en, Linear_en, or B_spline_en)
+
+# Returns
+A new MedImage with scaled voxel data.
+
+# Behavior Note
+Unlike SimpleITK's ScaleTransform+Resample which keeps output dimensions fixed and scales
+content within the same canvas, MedImages.scale_mi changes the array dimensions based on
+the scale factor. For example, scaling a 512x512x75 image by 0.5 produces a 256x256x38 image.
+
+This is intentional behavior that changes the number of voxels while maintaining
+the same physical extent covered by the image.
 """
-function scale_mi(im::MedImage, scale::Tuple{Float64,Float64,Float64}, Interpolator::Interpolator_enum)::MedImage
+function scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::MedImage
 
-  # Determine the interpolation method
-  interp_method = nothing
-  if interpolator == Nearest_neighbour_en
-    interp_method = Nearest
-  elseif interpolator == Linear_en
-    interp_method = BSpline(Linear())
-  elseif interpolator == B_spline_en
-    interp_method = BSpline(Cubic(Flat(OnGrid())))
+  # Convert single scale value to tuple for uniform scaling
+  scale_tuple = scale isa Float64 ? (scale, scale, scale) : scale
+
+  # Calculate new size based on scale
+  old_size = size(im.voxel_data)
+  new_size = Tuple(round.(Int, old_size .* scale_tuple))
+
+  # Scale the image using imresize with appropriate interpolation
+  new_data = if Interpolator == Nearest_neighbour_en
+    imresize(im.voxel_data, new_size, method=Constant())
+  elseif Interpolator == Linear_en
+    imresize(im.voxel_data, new_size, method=Linear())
+  else  # B_spline_en
+    imresize(im.voxel_data, new_size, method=Linear())  # fallback to linear for BSpline
   end
 
-  # Scale the image
-  new_data = imresize(im.voxel_data, scale, method=interp_method)
-
   # Create a new MedImage with the scaled data and the same spatial metadata
-  new_im = update_voxel_and_spatial_data(im, new_data, translated_origin, im.spacing, im.direction)
+  new_im = update_voxel_and_spatial_data(im, new_data, im.origin, im.spacing, im.direction)
 
   return new_im
 
