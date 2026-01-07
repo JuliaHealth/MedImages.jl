@@ -36,6 +36,23 @@ include("gpu_benchmarks.jl")
 include("benchmark_utils.jl")
 
 """
+    ensure_native_array(img::MedImage) -> MedImage
+
+Convert MedImage voxel_data to native Julia Array if it's wrapped in a C++ type.
+SimpleITK returns data wrapped in CxxWrap types which KernelAbstractions doesn't recognize.
+"""
+function ensure_native_array(img::MedImage)
+    voxel_data = img.voxel_data
+
+    # Check if the underlying data is not a native Julia Array
+    if !(typeof(voxel_data) <: Array)
+        # Convert to native Julia Array and update the mutable struct
+        img.voxel_data = Array(voxel_data)
+    end
+    return img
+end
+
+"""
 Parse command line arguments
 """
 function parse_commandline()
@@ -117,6 +134,8 @@ function load_or_create_test_images(catalog_file::String, use_synthetic::Bool)
                         # Load NIFTI using MedImages
                         # Since NIFTI files don't contain modality info, we assume CT
                         img = MedImages.load_image(replace(row.file, ".nii.gz" => ""), "CT")
+                        # Convert to native Julia Array for KernelAbstractions compatibility
+                        img = ensure_native_array(img)
                         push!(images[size_cat], img)
                     catch e
                         @warn "Failed to load image" file=row.file exception=e
