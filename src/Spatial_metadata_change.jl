@@ -1,5 +1,6 @@
 module Spatial_metadata_change
 using Interpolations
+using CUDA
 
 using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Load_and_save
 export change_orientation, resample_to_spacing
@@ -74,8 +75,11 @@ function change_orientation_main(im::MedImage, new_orientation::Orientation_code
     end
 
 
-    # first we need to permute the voxel data to match the desired orientation
-    im_voxel_data = copy(im.voxel_data)
+    # Permute and reverse voxel data
+    # CUDA.jl natively supports permutedims and reverse on CuArrays
+    # No CPU transfers needed - operations execute directly on GPU
+    im_voxel_data = im.voxel_data
+
     if (length(perm) > 0)
         im_voxel_data = permutedims(im_voxel_data, (perm[1], perm[2], perm[3]))
     end
