@@ -128,6 +128,14 @@ end
         im_fixed = MedImages.load_image(TEST_NIFTI_FILE, "CT")
         im_moving = MedImages.load_image(TEST_SYNTHETIC_FILE, "CT")
 
+        @testset "Extrapolation with auto-detected value (median of corners)" begin
+            # When value_to_extrapolate is Nothing (default), extract_corners is called
+            # to compute median of corner values as extrapolation value
+            resampled = MedImages.resample_to_image(im_fixed, im_moving, MedImages.Linear_en)
+            @test !isempty(resampled.voxel_data)
+            @test size(resampled.voxel_data) == size(im_fixed.voxel_data)
+        end
+
         @testset "Extrapolation with zero" begin
             resampled = MedImages.resample_to_image(im_fixed, im_moving, MedImages.Linear_en, 0.0)
             @test !isempty(resampled.voxel_data)
