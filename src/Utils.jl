@@ -348,4 +348,40 @@ function resample_kernel_launch(image_data, old_spacing, new_spacing, new_dims, 
     return output
 end
 
+function ChainRulesCore.rrule(::typeof(resample_kernel_launch), image_data, old_spacing, new_spacing, new_dims, interpolator_enum)
+    output = resample_kernel_launch(image_data, old_spacing, new_spacing, new_dims, interpolator_enum)
+
+    function resample_pullback(d_output_unthunked)
+        d_output = unthunk(d_output_unthunked)
+        d_image = zero(image_data)
+
+        backend = get_backend(output)
+
+        if interpolator_enum == Nearest_neighbour_en
+            kernel = nearest_resample_kernel(backend, 256)
+        else
+            kernel = trilinear_resample_kernel(backend, 256)
+        end
+
+        function kernel_wrapper(out, img, osp, nsp, ndims)
+             kernel(out, img, osp, nsp, ndims, ndrange=prod(ndims))
+             return nothing
+        end
+
+        Enzyme.autodiff(
+            Reverse,
+            kernel_wrapper,
+            Const,
+            Duplicated(output, d_output),
+            Duplicated(image_data, d_image),
+            Const(old_spacing),
+            Const(new_spacing),
+            Const(new_dims)
+        )
+
+        return NoTangent(), d_image, NoTangent(), NoTangent(), NoTangent(), NoTangent()
+    end
+    return output, resample_pullback
+end
+
 end#Utils
