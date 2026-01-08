@@ -51,3 +51,11 @@ Setfield = "1.1.1"
 StaticArrays = "1.4.2"
 Statistics = "1.9.0"
 julia = "1.10.3"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
+FiniteDifferences = "26cc04aa-876d-5657-8c51-4c34ba976000"
+
+[targets]
+test = ["Test", "Zygote", "FiniteDifferences"]
