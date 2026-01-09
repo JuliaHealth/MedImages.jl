@@ -1,0 +1,117 @@
+# MedImages.jl Docker Compose Configuration
+# Usage:
+#   docker compose up medimages    - Interactive Julia REPL with GPU
+#   docker compose run test        - Run test suite
+#   docker compose run benchmark   - Run GPU benchmarks
+
+services:
+  # Interactive development environment with GPU support
+  medimages:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: medimages:latest
+    container_name: medimages-dev
+    volumes:
+      - .:/workspace/MedImages.jl
+      - julia-depot:/root/.julia
+      - ./test_data:/workspace/MedImages.jl/test_data:ro
+    working_dir: /workspace/MedImages.jl
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - JULIA_NUM_THREADS=auto
+      - JULIA_CUDA_SOFT_MEMORY_LIMIT=90%
+    command: ["julia", "--project=."]
+
+  # Run test suite
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: medimages:latest
+    volumes:
+      - .:/workspace/MedImages.jl
+      - julia-depot:/root/.julia
+      - ./test_data:/workspace/MedImages.jl/test_data:ro
+    working_dir: /workspace/MedImages.jl
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - JULIA_NUM_THREADS=auto
+    command: ["julia", "--project=.", "-e", "using Pkg; Pkg.test()"]
+
+  # Run GPU benchmarks with synthetic data
+  benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: medimages:latest
+    volumes:
+      - .:/workspace/MedImages.jl
+      - julia-depot:/root/.julia
+      - ./benchmark_results:/workspace/MedImages.jl/benchmark/benchmark_results
+      - ./test_data:/workspace/MedImages.jl/test_data:ro
+    working_dir: /workspace/MedImages.jl/benchmark
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - JULIA_NUM_THREADS=auto
+      - JULIA_CUDA_SOFT_MEMORY_LIMIT=90%
+    command: ["julia", "--project=.", "run_gpu_benchmarks.jl", "--synthetic", "--backends", "all"]
+
+  # CPU-only mode (no GPU required)
+  medimages-cpu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: medimages:latest
+    container_name: medimages-cpu
+    volumes:
+      - .:/workspace/MedImages.jl
+      - julia-depot:/root/.julia
+      - ./test_data:/workspace/MedImages.jl/test_data:ro
+    working_dir: /workspace/MedImages.jl
+    stdin_open: true
+    tty: true
+    environment:
+      - JULIA_NUM_THREADS=auto
+      - CUDA_VISIBLE_DEVICES=
+    command: ["julia", "--project=."]
+
+  # Run CPU-only tests
+  test-cpu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: medimages:latest
+    volumes:
+      - .:/workspace/MedImages.jl
+      - julia-depot:/root/.julia
+      - ./test_data:/workspace/MedImages.jl/test_data:ro
+    working_dir: /workspace/MedImages.jl
+    environment:
+      - JULIA_NUM_THREADS=auto
+      - CUDA_VISIBLE_DEVICES=
+    command: ["julia", "--project=.", "-e", "using Pkg; Pkg.test()"]
+
+volumes:
+  julia-depot:
+    name: medimages-julia-depot
