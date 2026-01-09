@@ -11,6 +11,8 @@ using Printf
 using JSON3
 using Statistics
 using Dates
+using DataFrames
+using CSV
 
 """
     convert_dicom_to_nifti(dicom_dir::String, output_dir::String; modality::String="CT") -> Union{String, Nothing}
@@ -95,7 +97,7 @@ function convert_dicom_to_nifti(dicom_dir::String, output_dir::String; modality:
                 JSON3.write(f, metadata, allow_inf=true)
             end
 
-            println("  ✓ Conversion successful\n")
+            println("  Conversion successful\n")
             return nifti_file
         else
             @error "NIFTI file was not created" nifti_path=nifti_file
@@ -228,8 +230,6 @@ end
 Create a catalog of all converted NIFTI files for benchmarking.
 """
 function create_benchmark_catalog(nifti_root::String)
-    using DataFrames
-
     println("\nCreating benchmark catalog...")
 
     catalog = DataFrame(
@@ -274,7 +274,6 @@ function create_benchmark_catalog(nifti_root::String)
     sort!(catalog, :size_mb, rev=true)
 
     catalog_file = joinpath(nifti_root, "benchmark_catalog.csv")
-    using CSV
     CSV.write(catalog_file, catalog)
 
     println("Catalog saved to: $catalog_file")

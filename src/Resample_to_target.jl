@@ -1,6 +1,7 @@
 module Resample_to_target
 using Interpolations
 using Statistics
+using CUDA
 
 using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Spatial_metadata_change, ..Load_and_save
 export resample_to_image, scale
@@ -25,17 +26,8 @@ It require multiple steps some idea of implementation is below
 function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator_enum::Interpolator_enum, value_to_extrapolate=Nothing)::MedImage
 
     if (value_to_extrapolate == Nothing)
-        corners = [
-            im_fixed.voxel_data[1, 1, 1],
-            im_fixed.voxel_data[1, 1, end],
-            im_fixed.voxel_data[1, end, 1],
-            im_fixed.voxel_data[1, end, end],
-            im_fixed.voxel_data[end, 1, 1],
-            im_fixed.voxel_data[end, 1, end],
-            im_fixed.voxel_data[end, end, 1],
-            im_fixed.voxel_data[end, end, end]
-        ]
-
+        # Use CUDA-safe corner extraction
+        corners = Utils.extract_corners(im_fixed.voxel_data)
         value_to_extrapolate = median(corners)
     end
 

@@ -110,6 +110,7 @@ mkpath(DEBUG_DIR)
         include("utils_tests/test_ensure_tuple.jl")
         include("utils_tests/test_interpolate_my.jl")
         include("utils_tests/test_resample_kernel_launch.jl")
+        include("utils_tests/test_cuda_utils.jl")
     end
 
     # Kernel Validity Tests

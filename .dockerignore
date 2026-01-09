@@ -1,0 +1,72 @@
+# Git
+.git
+.gitignore
+.github
+
+# Julia artifacts (rebuilt in container)
+Manifest.toml
+*.ji
+*.so
+.julia/
+
+# Development containers (we have our own Dockerfile)
+.devcontainer/
+.vscode/
+.CondaPkg/
+.venv/
+
+# Test outputs (regenerated)
+test/*/outputs/
+test_data/debug/
+benchmark/benchmark_results/
+benchmark_data/
+
+# Documentation build artifacts
+docs/build/
+docs/site/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+docs/node_modules/
+
+# Large data files (mount as volumes instead)
+*.nii
+*.nii.gz
+*.dcm
+*.mha
+*.h5
+*.hdf5
+
+# LaTeX/paper artifacts
+*.pdf
+*.aux
+*.log
+*.bbl
+*.blg
+elsarticle/
+
+# Temporary files
+*.tmp
+*.bak
+*~
+*.swp
+*.swo
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+
+# Editor files
+.idea/
+*.sublime-*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
