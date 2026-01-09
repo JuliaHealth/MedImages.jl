@@ -1,6 +1,8 @@
 module Utils
 using ..MedImage_data_struct
+using CUDA
 using KernelAbstractions, Interpolations
+import KernelAbstractions: synchronize, get_backend
 
 export interpolate_point
 export get_base_indicies_arr
@@ -10,19 +12,54 @@ export TransformIndexToPhysicalPoint_julia
 export ensure_tuple
 export create_nii_from_medimage
 export resample_kernel_launch
+export is_cuda_array, extract_corners
 import ..MedImage_data_struct: MedImage, Interpolator_enum, Mode_mi, Orientation_code, Nearest_neighbour_en, Linear_en, B_spline_en
 
+# CUDA detection utilities
+"""
+Check if array is on GPU
+"""
+is_cuda_array(arr) = isa(arr, CuArray)
+
+"""
+Extract 8 corner values safely from CUDA or CPU arrays.
+Uses @allowscalar for GPU arrays since 8 scalar reads is faster than kernel setup.
+"""
+function extract_corners(arr::AbstractArray{T,3}) where T
+    dims = size(arr)
+    if is_cuda_array(arr)
+        # Allow 8 scalar reads - faster than kernel setup for so few values
+        return CUDA.@allowscalar [
+            arr[1, 1, 1], arr[1, 1, dims[3]],
+            arr[1, dims[2], 1], arr[1, dims[2], dims[3]],
+            arr[dims[1], 1, 1], arr[dims[1], 1, dims[3]],
+            arr[dims[1], dims[2], 1], arr[dims[1], dims[2], dims[3]]
+        ]
+    else
+        return [arr[1,1,1], arr[1,1,end], arr[1,end,1], arr[1,end,end],
+                arr[end,1,1], arr[end,1,end], arr[end,end,1], arr[end,end,end]]
+    end
+end
 
 """
 return array of cartesian indices for given dimensions in a form of array
+Optimized: uses vectorized broadcasting instead of scalar loops
 """
 function get_base_indicies_arr(dims)
-    indices = CartesianIndices(dims)
-    # indices=collect.(Tuple.(collect(indices)))
-    indices = Tuple.(collect(indices))
-    indices = collect(Iterators.flatten(indices))
-    indices = reshape(indices, (3, dims[1] * dims[2] * dims[3]))
-    # indices=permutedims(indices,(1,2))
+    n_points = prod(dims)
+
+    # Use broadcasting to generate indices efficiently
+    # This is much faster than triple-nested loops for large arrays
+    i_indices = repeat(1:dims[1], dims[2] * dims[3])
+    j_indices = repeat(repeat(1:dims[2], inner=dims[1]), dims[3])
+    k_indices = repeat(1:dims[3], inner=dims[1] * dims[2])
+
+    # Stack into 3xN matrix
+    indices = Matrix{Int32}(undef, 3, n_points)
+    indices[1, :] = i_indices
+    indices[2, :] = j_indices
+    indices[3, :] = k_indices
+
     return indices
 end#get_base_indicies_arr
 
@@ -155,8 +192,17 @@ function interpolate_my(points_to_interpolate, input_array, input_array_spacing,
 
     if (use_fast)
         is_nearest_neighbour = (interpolator_enum == Nearest_neighbour_en)
-        out_res = similar(points_to_interpolate, eltype(points_to_interpolate), size(points_to_interpolate, 2))
-        backend = get_backend(points_to_interpolate)
+
+        # Determine backend from input_array (the data source)
+        # Both points and output must match this backend
+        backend = get_backend(input_array)
+
+        # Ensure points_to_interpolate is on the same backend as input_array
+        if is_cuda_array(input_array) && !is_cuda_array(points_to_interpolate)
+            points_to_interpolate = CuArray(Float32.(points_to_interpolate))
+        end
+
+        out_res = similar(input_array, eltype(points_to_interpolate), size(points_to_interpolate, 2))
         source_arr_shape = size(input_array)
         interpolate_kernel(backend, 512)(out_res, source_arr_shape, input_array, points_to_interpolate, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour, ndrange=size(out_res))
         synchronize(backend)

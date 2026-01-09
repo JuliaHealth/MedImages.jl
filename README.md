@@ -162,6 +162,90 @@ This project is under active development. The spatial transformation components 
 
 </div>
 
+## Quick Start with Docker
+
+The easiest way to get started is using Docker with GPU support for benchmarks.
+
+### Prerequisites
+
+- Docker with NVIDIA GPU support (for GPU benchmarks)
+- Or Docker without GPU (CPU-only mode available)
+
+### Build and Run
+
+```bash
+# Build the Docker image
+make build
+
+# Start interactive Julia REPL (with GPU)
+make shell
+
+# Start interactive Julia REPL (CPU only)
+make shell-cpu
+```
+
+### Run Tests
+
+```bash
+# Run the full test suite
+make test
+
+# Run tests in CPU-only mode
+make test-cpu
+```
+
+### Run Benchmarks
+
+```bash
+# Run GPU benchmarks (uses synthetic data)
+make benchmark
+
+# Run CPU-only benchmarks
+make benchmark-cpu
+
+# Custom benchmark options
+make benchmark-custom ARGS="--size 64 --iterations 5"
+```
+
+### Verify Setup
+
+```bash
+# Check CUDA/GPU availability
+make check-cuda
+
+# Check Python/SimpleITK setup
+make check-python
+
+# Run quick start verification
+./scripts/quick-start.sh
+```
+
+### Test Data
+
+Test data files are expected in `test_data/`:
+- `volume-0.nii.gz` - Primary NIfTI test file
+- `synthethic_small.nii.gz` - Synthetic test file
+- `ScalarVolume_0/` - DICOM test directory
+
+```bash
+# Check test data availability
+./scripts/check-test-data.sh
+
+# Download benchmark data from TCIA
+make download-data
+
+# Convert DICOM to NIfTI for benchmarks
+make convert-data
+```
+
+Note: Benchmarks use synthetic data by default (`make benchmark`). Real data download is only needed for `make benchmark-full`.
+
+### All Make Commands
+
+```bash
+make help  # Show all available commands
+```
+
 ## Contributing
 
 Contributions are welcome! If you have expertise in medical imaging, particularly ultrasonography, or experience with the technical challenges described above, please consider getting involved.
