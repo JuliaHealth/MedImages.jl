@@ -3,6 +3,7 @@ module Basic_transformations
 using CoordinateTransformations, Interpolations, StaticArrays, LinearAlgebra, Rotations, Dictionaries
 using LinearAlgebra
 using ImageTransformations
+using ChainRulesCore
 using ..MedImage_data_struct
 using ..MedImage_data_struct: Nearest_neighbour_en, Linear_en, B_spline_en
 using ..Load_and_save: update_voxel_data, update_voxel_and_spatial_data
@@ -49,12 +50,18 @@ function get_voxel_center_Julia(image::AbstractArray{T,3})::Tuple{Vararg{Float64
   return Tuple((real_size .+ real_origin) ./ 2)
 end
 
+# Geometric computations are not differentiable - they depend on image shape not voxel values
+ChainRulesCore.@non_differentiable get_voxel_center_Julia(::Any)
+
 function get_real_center_Julia(im::MedImage)::Tuple{Vararg{Float64}}
   real_size = transformIndexToPhysicalPoint_Julia(im, size(im.voxel_data))
   real_origin = transformIndexToPhysicalPoint_Julia(im, (0, 0, 0))
   return Tuple((real_size .+ real_origin) ./ 2)
 end
 
+ChainRulesCore.@non_differentiable get_real_center_Julia(::Any)
+ChainRulesCore.@non_differentiable computeIndexToPhysicalPointMatrices_Julia(::Any)
+ChainRulesCore.@non_differentiable transformIndexToPhysicalPoint_Julia(::Any, ::Any)
 
 function Rodrigues_rotation_matrix(image::MedImage, axis::Int, angle::Float64)::Matrix{Float64}
   img_direction = image.direction
@@ -78,6 +85,8 @@ function Rodrigues_rotation_matrix(image::MedImage, axis::Int, angle::Float64)::
   return R
 end
 
+ChainRulesCore.@non_differentiable Rodrigues_rotation_matrix(::Any, ::Any, ::Any)
+
 function crop_image_around_center(image::AbstractArray{T,3}, new_dims::Tuple{Int,Int,Int}, center::Tuple{Int,Int,Int}) where {T}
   start_z = max(1, center[1] - new_dims[1] ÷ 2)
   end_z = min(size(image, 1), start_z + new_dims[1] - 1)
@@ -92,14 +101,19 @@ function crop_image_around_center(image::AbstractArray{T,3}, new_dims::Tuple{Int
 end
 
 
-function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator_enum, crop::Bool=true)::MedImage
+# Helper to build rotation transformation - non-differentiable (purely geometric)
+function build_rotation_transform(image::MedImage, axis::Int, angle::Float64)
   R = Rodrigues_rotation_matrix(image, axis, angle)
   v_center = collect(get_voxel_center_Julia(image.voxel_data))
-
   rotation_transformation = LinearMap(RotXYZ(R))
   translation = Translation(v_center...)
   transkation_center = Translation(-v_center...)
-  combined_transformation = translation ∘ rotation_transformation ∘ transkation_center
+  return translation ∘ rotation_transformation ∘ transkation_center
+end
+ChainRulesCore.@non_differentiable build_rotation_transform(::Any, ::Any, ::Any)
+
+function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator_enum, crop::Bool=true)::MedImage
+  combined_transformation = build_rotation_transform(image, axis, angle)
 
   img = image.voxel_data
 
@@ -180,19 +194,36 @@ function translate_mi(im::MedImage, translate_by::Int64, translate_in_axis::Int6
 end
 
 
+# Helper to build scale interpolation points - non-differentiable (purely geometric)
+function build_scale_points(old_size, scale_tuple)
+  new_size = Tuple(round.(Int, old_size .* scale_tuple))
+  n_points = prod(new_size)
+  points_to_interpolate = Matrix{Float64}(undef, 3, n_points)
+
+  idx = 1
+  for k in 1:new_size[3], j in 1:new_size[2], i in 1:new_size[1]
+    # Map new coordinate to old coordinate
+    points_to_interpolate[1, idx] = (i - 1.0) / scale_tuple[1] + 1.0
+    points_to_interpolate[2, idx] = (j - 1.0) / scale_tuple[2] + 1.0
+    points_to_interpolate[3, idx] = (k - 1.0) / scale_tuple[3] + 1.0
+    idx += 1
+  end
+
+  return points_to_interpolate, new_size
+end
+ChainRulesCore.@non_differentiable build_scale_points(::Any, ::Any)
+
 function scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::MedImage
 
   scale_tuple = scale isa Float64 ? (scale, scale, scale) : scale
   old_size = size(im.voxel_data)
-  new_size = Tuple(round.(Int, old_size .* scale_tuple))
 
-  new_data = if Interpolator == Nearest_neighbour_en
-    imresize(im.voxel_data, new_size, method=Constant())
-  elseif Interpolator == Linear_en
-    imresize(im.voxel_data, new_size, method=Linear())
-  else
-    imresize(im.voxel_data, new_size, method=Linear())
-  end
+  # Use helper to build points (non-differentiable)
+  points_to_interpolate, new_size = build_scale_points(old_size, scale_tuple)
+
+  # Use our differentiable interpolation
+  resampled_flat = interpolate_my(points_to_interpolate, im.voxel_data, (1.0, 1.0, 1.0), Interpolator, false, 0.0, true)
+  new_data = reshape(resampled_flat, new_size)
 
   new_im = update_voxel_and_spatial_data(im, new_data, im.origin, im.spacing, im.direction)
 

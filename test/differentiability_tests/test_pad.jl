@@ -1,7 +1,11 @@
 using Test
 using MedImages
 using Zygote
+using Dates
 using MedImages.MedImage_data_struct: MRI_type, T1_subtype, Linear_en
+
+# Fixed datetime values to avoid Zygote trying to differentiate through Dates.now()
+const FIXED_DATE = DateTime(2024, 1, 1)
 
 function create_mock_medimage(data)
     MedImage(
@@ -11,7 +15,9 @@ function create_mock_medimage(data)
         direction = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),
         image_type = MRI_type,
         image_subtype = T1_subtype,
-        patient_id = "test_patient"
+        patient_id = "test_patient",
+        date_of_saving = FIXED_DATE,
+        acquistion_time = FIXED_DATE
     )
 end
 
