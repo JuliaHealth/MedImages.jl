@@ -3,12 +3,16 @@ using MedImages
 using Zygote
 using FiniteDifferences
 using LinearAlgebra
+using Dates
 using MedImages.MedImage_data_struct
 
 const TEST_MRI = MedImages.MedImage_data_struct.MRI_type
 const TEST_SUBTYPE = MedImages.MedImage_data_struct.T1_subtype
 const TEST_LINEAR = MedImages.MedImage_data_struct.Linear_en
 const TEST_LPI = MedImages.MedImage_data_struct.ORIENTATION_LPI
+
+# Fixed datetime values to avoid Zygote trying to differentiate through Dates.now()
+const FIXED_DATE = DateTime(2024, 1, 1)
 
 # Helper to create mock image
 function create_mock_medimage(data)
@@ -19,7 +23,9 @@ function create_mock_medimage(data)
         direction = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),
         image_type = TEST_MRI,
         image_subtype = TEST_SUBTYPE,
-        patient_id = "test_patient"
+        patient_id = "test_patient",
+        date_of_saving = FIXED_DATE,
+        acquistion_time = FIXED_DATE
     )
 end
 

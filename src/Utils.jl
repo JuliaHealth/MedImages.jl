@@ -67,6 +67,12 @@ function get_base_indicies_arr(dims)
     return indices
 end#get_base_indicies_arr
 
+# Mark as non-differentiable - indices are not differentiated
+ChainRulesCore.@non_differentiable get_base_indicies_arr(::Any)
+
+# Mark as non-differentiable - corner extraction is for computing extrapolation values
+ChainRulesCore.@non_differentiable extract_corners(::Any)
+
 """
 cast array a to the value type of array b
 """
@@ -176,12 +182,69 @@ end#interpolate_point
     end
 end
 
+# Pure Julia CPU interpolation without KernelAbstractions (for Enzyme compatibility)
+function interpolate_cpu_loop!(out_res, source_arr_shape, source_arr, points_to_interpolate, spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour)
+    n_points = size(points_to_interpolate, 2)
+    @inbounds for I in 1:n_points
+        # Convert physical coordinates to index space
+        real_x = (points_to_interpolate[1, I] - 1.0f0) / Float32(spacing[1]) + 1.0f0
+        real_y = (points_to_interpolate[2, I] - 1.0f0) / Float32(spacing[2]) + 1.0f0
+        real_z = (points_to_interpolate[3, I] - 1.0f0) / Float32(spacing[3]) + 1.0f0
+
+        # Bounds check
+        if real_x < 1.0f0 || real_y < 1.0f0 || real_z < 1.0f0 || real_x > Float32(source_arr_shape[1]) || real_y > Float32(source_arr_shape[2]) || real_z > Float32(source_arr_shape[3])
+            out_res[I] = extrapolate_value
+        else
+            # Handle keep_beginning_same logic
+            if keep_begining_same
+                real_x = max(real_x, 1.0f0)
+                real_y = max(real_y, 1.0f0)
+                real_z = max(real_z, 1.0f0)
+            end
+
+            if is_nearest_neighbour
+                # Nearest Neighbor
+                out_res[I] = source_arr[Int(round(real_x)), Int(round(real_y)), Int(round(real_z))]
+            else
+                # Trilinear Interpolation
+                x0 = floor(Int, real_x)
+                y0 = floor(Int, real_y)
+                z0 = floor(Int, real_z)
+
+                x1 = min(x0 + 1, source_arr_shape[1])
+                y1 = min(y0 + 1, source_arr_shape[2])
+                z1 = min(z0 + 1, source_arr_shape[3])
+
+                xd = real_x - x0
+                yd = real_y - y0
+                zd = real_z - z0
+
+                out_res[I] = (1.0f0 - zd) * (
+                    (1.0f0 - yd) * (Float32(source_arr[x0, y0, z0]) * (1.0f0 - xd) + Float32(source_arr[x1, y0, z0]) * xd) +
+                    yd * (Float32(source_arr[x0, y1, z0]) * (1.0f0 - xd) + Float32(source_arr[x1, y1, z0]) * xd)
+                ) + zd * (
+                    (1.0f0 - yd) * (Float32(source_arr[x0, y0, z1]) * (1.0f0 - xd) + Float32(source_arr[x1, y0, z1]) * xd) +
+                    yd * (Float32(source_arr[x0, y1, z1]) * (1.0f0 - xd) + Float32(source_arr[x1, y1, z1]) * xd)
+                )
+            end
+        end
+    end
+    return nothing
+end
+
 function interpolate_pure(points_to_interpolate, input_array, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour)
     out_res = similar(points_to_interpolate, eltype(points_to_interpolate), size(points_to_interpolate, 2))
     backend = get_backend(points_to_interpolate)
     source_arr_shape = size(input_array)
-    interpolate_kernel(backend, 512)(out_res, source_arr_shape, input_array, points_to_interpolate, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour, ndrange=size(out_res))
-    synchronize(backend)
+
+    if backend isa KernelAbstractions.CPU
+        # Use pure Julia loop on CPU for better Enzyme compatibility
+        interpolate_cpu_loop!(out_res, source_arr_shape, input_array, points_to_interpolate, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour)
+    else
+        # Use KA kernel on GPU
+        interpolate_kernel(backend, 512)(out_res, source_arr_shape, input_array, points_to_interpolate, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour, ndrange=size(out_res))
+        synchronize(backend)
+    end
     return out_res
 end
 
@@ -196,23 +259,45 @@ function ChainRulesCore.rrule(::typeof(interpolate_pure), points_to_interpolate,
         backend = get_backend(points_to_interpolate)
         source_arr_shape = size(input_array)
 
-        function kernel_wrapper(out, src, pts, sp, kbs, ev, inn)
-             interpolate_kernel(backend, 512)(out, source_arr_shape, src, pts, sp, kbs, ev, inn, ndrange=size(out))
-             return nothing
-        end
+        if backend isa KernelAbstractions.CPU
+            # Use pure Julia loop for CPU - Enzyme compatible
+            function cpu_wrapper(out, src, pts, sp, kbs, ev, inn)
+                interpolate_cpu_loop!(out, source_arr_shape, src, pts, sp, kbs, ev, inn)
+                return nothing
+            end
 
-        Enzyme.autodiff(
-            Reverse,
-            kernel_wrapper,
-            Const,
-            Duplicated(output, d_output),
-            Duplicated(input_array, d_input),
-            Duplicated(points_to_interpolate, d_points),
-            Const(input_array_spacing),
-            Const(keep_begining_same),
-            Const(extrapolate_value),
-            Const(is_nearest_neighbour)
-        )
+            Enzyme.autodiff(
+                Reverse,
+                cpu_wrapper,
+                Const,
+                Duplicated(output, d_output),
+                Duplicated(input_array, d_input),
+                Duplicated(points_to_interpolate, d_points),
+                Const(input_array_spacing),
+                Const(keep_begining_same),
+                Const(extrapolate_value),
+                Const(is_nearest_neighbour)
+            )
+        else
+            # Use KA kernel for GPU
+            function kernel_wrapper(out, src, pts, sp, kbs, ev, inn)
+                 interpolate_kernel(backend, 512)(out, source_arr_shape, src, pts, sp, kbs, ev, inn, ndrange=size(out))
+                 return nothing
+            end
+
+            Enzyme.autodiff(
+                Reverse,
+                kernel_wrapper,
+                Const,
+                Duplicated(output, d_output),
+                Duplicated(input_array, d_input),
+                Duplicated(points_to_interpolate, d_points),
+                Const(input_array_spacing),
+                Const(keep_begining_same),
+                Const(extrapolate_value),
+                Const(is_nearest_neighbour)
+            )
+        end
         return NoTangent(), d_points, d_input, NoTangent(), NoTangent(), NoTangent(), NoTangent()
     end
     return output, interpolate_pullback
@@ -371,6 +456,80 @@ end
     end
 end
 
+# CPU version of trilinear resample loop (Enzyme compatible)
+function trilinear_resample_cpu_loop!(output, image_data, old_spacing, new_spacing, new_dims)
+    n_points = prod(new_dims)
+    stride_z = new_dims[1] * new_dims[2]
+    sx, sy, sz = size(image_data)
+
+    @inbounds for i in 1:n_points
+        iz = (i - 1) ÷ stride_z + 1
+        rem_z = (i - 1) % stride_z
+        iy = rem_z ÷ new_dims[1] + 1
+        ix = rem_z % new_dims[1] + 1
+
+        real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing[1]) / Float32(old_spacing[1])) + 1.0f0
+        real_y = (Float32(iy) - 1.0f0) * (Float32(new_spacing[2]) / Float32(old_spacing[2])) + 1.0f0
+        real_z = (Float32(iz) - 1.0f0) * (Float32(new_spacing[3]) / Float32(old_spacing[3])) + 1.0f0
+
+        if real_x < 1.0f0 || real_y < 1.0f0 || real_z < 1.0f0 || real_x > Float32(sx) || real_y > Float32(sy) || real_z > Float32(sz)
+            output[i] = 0
+        else
+            x0 = floor(Int, real_x)
+            y0 = floor(Int, real_y)
+            z0 = floor(Int, real_z)
+
+            x1 = min(x0 + 1, sx)
+            y1 = min(y0 + 1, sy)
+            z1 = min(z0 + 1, sz)
+
+            xd = real_x - x0
+            yd = real_y - y0
+            zd = real_z - z0
+
+            c00 = Float32(image_data[x0, y0, z0]) * (1.0f0 - xd) + Float32(image_data[x1, y0, z0]) * xd
+            c10 = Float32(image_data[x0, y1, z0]) * (1.0f0 - xd) + Float32(image_data[x1, y1, z0]) * xd
+            c01 = Float32(image_data[x0, y0, z1]) * (1.0f0 - xd) + Float32(image_data[x1, y0, z1]) * xd
+            c11 = Float32(image_data[x0, y1, z1]) * (1.0f0 - xd) + Float32(image_data[x1, y1, z1]) * xd
+
+            c0 = c00 * (1.0f0 - yd) + c10 * yd
+            c1 = c01 * (1.0f0 - yd) + c11 * yd
+
+            output[i] = c0 * (1.0f0 - zd) + c1 * zd
+        end
+    end
+    return nothing
+end
+
+# CPU version of nearest resample loop (Enzyme compatible)
+function nearest_resample_cpu_loop!(output, image_data, old_spacing, new_spacing, new_dims)
+    n_points = prod(new_dims)
+    stride_z = new_dims[1] * new_dims[2]
+    sx, sy, sz = size(image_data)
+
+    @inbounds for i in 1:n_points
+        iz = (i - 1) ÷ stride_z + 1
+        rem_z = (i - 1) % stride_z
+        iy = rem_z ÷ new_dims[1] + 1
+        ix = rem_z % new_dims[1] + 1
+
+        real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing[1]) / Float32(old_spacing[1])) + 1.0f0
+        real_y = (Float32(iy) - 1.0f0) * (Float32(new_spacing[2]) / Float32(old_spacing[2])) + 1.0f0
+        real_z = (Float32(iz) - 1.0f0) * (Float32(new_spacing[3]) / Float32(old_spacing[3])) + 1.0f0
+
+        nx = Int(round(real_x))
+        ny = Int(round(real_y))
+        nz = Int(round(real_z))
+
+        if nx < 1 || ny < 1 || nz < 1 || nx > sx || ny > sy || nz > sz
+            output[i] = 0
+        else
+            output[i] = image_data[nx, ny, nz]
+        end
+    end
+    return nothing
+end
+
 function resample_kernel_launch(image_data, old_spacing, new_spacing, new_dims, interpolator_enum)
     # Output array
     output = similar(image_data, new_dims)
@@ -378,16 +537,23 @@ function resample_kernel_launch(image_data, old_spacing, new_spacing, new_dims, 
     # Select backend
     backend = get_backend(output)
 
-    # Select kernel
-    if interpolator_enum == Nearest_neighbour_en
-        kernel = nearest_resample_kernel(backend, 256)
+    if backend isa KernelAbstractions.CPU
+        # Use pure Julia loops on CPU for Enzyme compatibility
+        if interpolator_enum == Nearest_neighbour_en
+            nearest_resample_cpu_loop!(vec(output), image_data, old_spacing, new_spacing, new_dims)
+        else
+            trilinear_resample_cpu_loop!(vec(output), image_data, old_spacing, new_spacing, new_dims)
+        end
     else
-        kernel = trilinear_resample_kernel(backend, 256)
+        # Use KA kernels on GPU
+        if interpolator_enum == Nearest_neighbour_en
+            kernel = nearest_resample_kernel(backend, 256)
+        else
+            kernel = trilinear_resample_kernel(backend, 256)
+        end
+        kernel(output, image_data, old_spacing, new_spacing, new_dims, ndrange=prod(new_dims))
+        synchronize(backend)
     end
-
-    # Launch
-    kernel(output, image_data, old_spacing, new_spacing, new_dims, ndrange=prod(new_dims))
-    synchronize(backend)
 
     return output
 end
@@ -401,27 +567,63 @@ function ChainRulesCore.rrule(::typeof(resample_kernel_launch), image_data, old_
 
         backend = get_backend(output)
 
-        if interpolator_enum == Nearest_neighbour_en
-            kernel = nearest_resample_kernel(backend, 256)
+        if backend isa KernelAbstractions.CPU
+            # Use pure Julia loops for CPU - Enzyme compatible
+            if interpolator_enum == Nearest_neighbour_en
+                function nearest_cpu_wrapper(out, img, osp, nsp, ndims)
+                    nearest_resample_cpu_loop!(out, img, osp, nsp, ndims)
+                    return nothing
+                end
+                Enzyme.autodiff(
+                    Reverse,
+                    nearest_cpu_wrapper,
+                    Const,
+                    Duplicated(vec(output), vec(d_output)),
+                    Duplicated(image_data, d_image),
+                    Const(old_spacing),
+                    Const(new_spacing),
+                    Const(new_dims)
+                )
+            else
+                function trilinear_cpu_wrapper(out, img, osp, nsp, ndims)
+                    trilinear_resample_cpu_loop!(out, img, osp, nsp, ndims)
+                    return nothing
+                end
+                Enzyme.autodiff(
+                    Reverse,
+                    trilinear_cpu_wrapper,
+                    Const,
+                    Duplicated(vec(output), vec(d_output)),
+                    Duplicated(image_data, d_image),
+                    Const(old_spacing),
+                    Const(new_spacing),
+                    Const(new_dims)
+                )
+            end
         else
-            kernel = trilinear_resample_kernel(backend, 256)
-        end
+            # Use KA kernels for GPU
+            if interpolator_enum == Nearest_neighbour_en
+                kernel = nearest_resample_kernel(backend, 256)
+            else
+                kernel = trilinear_resample_kernel(backend, 256)
+            end
 
-        function kernel_wrapper(out, img, osp, nsp, ndims)
-             kernel(out, img, osp, nsp, ndims, ndrange=prod(ndims))
-             return nothing
-        end
+            function kernel_wrapper(out, img, osp, nsp, ndims)
+                 kernel(out, img, osp, nsp, ndims, ndrange=prod(ndims))
+                 return nothing
+            end
 
-        Enzyme.autodiff(
-            Reverse,
-            kernel_wrapper,
-            Const,
-            Duplicated(output, d_output),
-            Duplicated(image_data, d_image),
-            Const(old_spacing),
-            Const(new_spacing),
-            Const(new_dims)
-        )
+            Enzyme.autodiff(
+                Reverse,
+                kernel_wrapper,
+                Const,
+                Duplicated(output, d_output),
+                Duplicated(image_data, d_image),
+                Const(old_spacing),
+                Const(new_spacing),
+                Const(new_dims)
+            )
+        end
 
         return NoTangent(), d_image, NoTangent(), NoTangent(), NoTangent(), NoTangent()
     end

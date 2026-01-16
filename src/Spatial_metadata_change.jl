@@ -1,6 +1,7 @@
 module Spatial_metadata_change
 using Interpolations
 using CUDA
+using ChainRulesCore
 
 using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Load_and_save
 export change_orientation, resample_to_spacing
@@ -50,7 +51,48 @@ function change_orientation(im::MedImage, new_orientation::Orientation_code)::Me
     return change_orientation_main(im, new_orientation, reorient_operation)
 end#change_orientation
 
+# Custom rrule for change_orientation that handles dictionary lookups properly
+function ChainRulesCore.rrule(::typeof(change_orientation), im::MedImage, new_orientation::Orientation_code)
+    # Forward pass
+    output = change_orientation(im, new_orientation)
 
+    function change_orientation_pullback(d_output)
+        d_output_unthunked = unthunk(d_output)
+        # Get the voxel data tangent
+        d_voxel = d_output_unthunked.voxel_data
+
+        if isnothing(d_voxel) || d_voxel isa ChainRulesCore.NoTangent || d_voxel isa ChainRulesCore.ZeroTangent
+            d_im = Tangent{MedImage}(; voxel_data=ChainRulesCore.ZeroTangent())
+            return NoTangent(), d_im, NoTangent()
+        end
+
+        # Get the reorientation operation to reverse it
+        old_orientation = Orientation_dicts.number_to_enum_orientation_dict[im.direction]
+        reorient_op = Orientation_dicts.orientation_pair_to_operation_dict[(old_orientation, new_orientation)]
+        perm = reorient_op[1]
+        reverse_axes = reorient_op[2]
+
+        # Reverse the operations in reverse order
+        # First undo reverse, then undo permute
+        d_voxel_back = d_voxel
+        if length(reverse_axes) == 1
+            d_voxel_back = reverse(d_voxel_back; dims=reverse_axes[1])
+        elseif length(reverse_axes) > 1
+            d_voxel_back = reverse(d_voxel_back; dims=Tuple(reverse_axes))
+        end
+
+        if length(perm) > 0
+            # Inverse permutation
+            inv_perm = invperm((perm[1], perm[2], perm[3]))
+            d_voxel_back = permutedims(d_voxel_back, inv_perm)
+        end
+
+        d_im = Tangent{MedImage}(; voxel_data=d_voxel_back)
+        return NoTangent(), d_im, NoTangent()
+    end
+
+    return output, change_orientation_pullback
+end
 
 function change_orientation_main(im::MedImage, new_orientation::Orientation_code, reorient_operation)::MedImage
     perm = reorient_operation[1]
