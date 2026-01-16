@@ -6,15 +6,10 @@ using ImageTransformations
 using ..MedImage_data_struct
 using ..MedImage_data_struct: Nearest_neighbour_en, Linear_en, B_spline_en
 using ..Load_and_save: update_voxel_data, update_voxel_and_spatial_data
+using ..Utils: interpolate_my
+
 export rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, computeIndexToPhysicalPointMatrices_Julia, transformIndexToPhysicalPoint_Julia, get_voxel_center_Julia, get_real_center_Julia, Rodrigues_rotation_matrix, crop_image_around_center
 
-"""
-given a MedImage object will rotate it by angle (angle) around axis (rotate_axis)
-the center of rotation is set to be center of the image
-It modifies both pixel array and not metadata
-we are setting Interpolator by using Interpolator enum
-return the rotated MedImage object
-"""
 function computeIndexToPhysicalPointMatrices_Julia(im::MedImage)::Matrix{Float64}
   VImageDimension = length(im.spacing)
   spacing_vector = collect(im.spacing)
@@ -31,9 +26,7 @@ function computeIndexToPhysicalPointMatrices_Julia(im::MedImage)::Matrix{Float64
   scaleMatrix = Diagonal(spacing_vector)
 
   indexToPhysicalPoint = direction_matrix * scaleMatrix
-  #physicalPointToIndex = inv(indexToPhysicalPoint)
-
-  return indexToPhysicalPoint #, physicalPointToIndex
+  return indexToPhysicalPoint
 end
 
 
@@ -64,10 +57,6 @@ end
 
 
 function Rodrigues_rotation_matrix(image::MedImage, axis::Int, angle::Float64)::Matrix{Float64}
-  #=
-  Rotarion matrix using Rodrigues' rotation formula
-  !"As it currently stands, it only supports 3D!
-  =#
   img_direction = image.direction
   axis_angle = if axis == 3
     (img_direction[9], img_direction[6], img_direction[3])
@@ -99,318 +88,115 @@ function crop_image_around_center(image::AbstractArray{T,3}, new_dims::Tuple{Int
   start_x = max(1, center[3] - new_dims[3] ÷ 2)
   end_x = min(size(image, 3), start_x + new_dims[3] - 1)
   cropped_image = image[start_z:end_z, start_y:end_y, start_x:end_x]
-  # print(" \n ccccrrrrrrrrrr orig $(size(image)) cropped_image $(size(cropped_image)) start_z $(start_z) end_z $(end_z) start_y $(start_y) end_y $(end_y) start_x $(start_x) end_x $(end_x) \n")
-
   return cropped_image
 end
 
 
 function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator_enum, crop::Bool=true)::MedImage
-  # Compute the rotation matrix
-
   R = Rodrigues_rotation_matrix(image, axis, angle)
   v_center = collect(get_voxel_center_Julia(image.voxel_data))
-  img = convert(Array{Float64,3}, image.voxel_data)
+
   rotation_transformation = LinearMap(RotXYZ(R))
   translation = Translation(v_center...)
   transkation_center = Translation(-v_center...)
   combined_transformation = translation ∘ rotation_transformation ∘ transkation_center
-  # Use fillvalue=0.0 to match SimpleITK behavior (default is NaN for float arrays)
-  # Use keyword argument syntax to avoid deprecation warning
-  resampled_image = collect(warp(img, combined_transformation; method=Interpolations.Linear(), fillvalue=0.0))
+
+  img = image.voxel_data
+
   if crop
-    new_center = get_voxel_center_Julia(resampled_image)
-    resampled_image = crop_image_around_center(resampled_image, size(img), map(x -> round(Int, x), new_center))
-    image = update_voxel_data(image, resampled_image)
+      out_size = size(img)
+      indices = CartesianIndices(out_size)
+      indices_vec = vec(collect(indices))
+
+      points_vec = map(idx -> begin
+          pt = [Float64(idx[1]), Float64(idx[2]), Float64(idx[3])]
+          combined_transformation(pt)
+      end, indices_vec)
+
+      points_to_interpolate = reduce(hcat, points_vec)
+
+      # Interpolate
+      # Use spacing (1,1,1) so that points are treated as indices
+      resampled_flat = interpolate_my(points_to_interpolate, img, (1.0,1.0,1.0), Interpolator, false, 0.0, true)
+
+      resampled_image = reshape(resampled_flat, out_size)
+
+      image = update_voxel_data(image, resampled_image)
+  else
+      error("rotate_mi with crop=false is not fully supported in this patch")
   end
 
   return image
 end
 
 
-
-
-
-"""
-given a MedImage object and a Tuples that contains the location of the begining of the crop (crop_beg) and the size of the crop (crop_size) crops image
-It modifies both pixel array and metadata
-we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used)
-return the cropped MedImage object
-"""
 function crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::MedImage
 
-  # Convert 0-based indices to 1-based for Julia (SimpleITK compatibility)
   julia_beg = crop_beg .+ 1
-
-  # Create a view of the original voxel_data array with the specified crop
   cropped_voxel_data = @view im.voxel_data[julia_beg[1]:(julia_beg[1]+crop_size[1]-1), julia_beg[2]:(julia_beg[2]+crop_size[2]-1), julia_beg[3]:(julia_beg[3]+crop_size[3]-1)]
 
-  # Adjust the origin according to the crop beginning coordinates (using original 0-based values)
-  # Note: Both origin/spacing and crop_beg are in (x,y,z) order
-  # Julia array dims map as: dim1 -> X, dim2 -> Y, dim3 -> Z
-  # So crop_beg is already in the correct order for origin calculation
-  # Account for direction matrix: extract diagonal elements (row-major indexing)
   dir_diag = [im.direction[1], im.direction[5], im.direction[9]]
   cropped_origin = im.origin .+ (im.spacing .* crop_beg .* dir_diag)
 
-  # Create a new MedImage with the cropped voxel_data and adjusted origin
   cropped_im = update_voxel_and_spatial_data(im, cropped_voxel_data, cropped_origin, im.spacing, im.direction)
 
   return cropped_im
 
-end#crop_mi
+end
 
+function pad_dim(arr, dim, l, r, val)
+   if l==0 && r==0 return arr end
+   sz = size(arr)
 
-"""
-given a MedImage object and a Tuples that contains the information on how many voxels to add in each axis (pad_beg) and on the end of the axis (pad_end)
-we are performing padding by adding voxels with value pad_val
-It modifies both pixel array and metadata
-we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used)
-return the cropped MedImage object
-"""
+   left_shape = ntuple(i -> i == dim ? l : sz[i], length(sz))
+   left_block = fill(convert(eltype(arr), val), left_shape)
+
+   right_shape = ntuple(i -> i == dim ? r : sz[i], length(sz))
+   right_block = fill(convert(eltype(arr), val), right_shape)
+
+   cat(left_block, arr, right_block; dims=dim)
+end
+
 function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64}, pad_val, Interpolator::Interpolator_enum)::MedImage
 
-  # Get original dimensions
-  orig_dims = size(im.voxel_data)
+  data = im.voxel_data
+  data = pad_dim(data, 1, pad_beg[1], pad_end[1], pad_val)
+  data = pad_dim(data, 2, pad_beg[2], pad_end[2], pad_val)
+  data = pad_dim(data, 3, pad_beg[3], pad_end[3], pad_val)
 
-  # Calculate new dimensions after padding all axes
-  new_dims = (orig_dims[1] + pad_beg[1] + pad_end[1],
-              orig_dims[2] + pad_beg[2] + pad_end[2],
-              orig_dims[3] + pad_beg[3] + pad_end[3])
-
-  # Create padded array filled with pad_val
-  padded_voxel_data = fill(convert(eltype(im.voxel_data), pad_val), new_dims)
-
-  # Copy original data into the center of the padded array
-  padded_voxel_data[(pad_beg[1]+1):(pad_beg[1]+orig_dims[1]),
-                    (pad_beg[2]+1):(pad_beg[2]+orig_dims[2]),
-                    (pad_beg[3]+1):(pad_beg[3]+orig_dims[3])] = im.voxel_data
-
-  # Adjust the origin according to the padding beginning coordinates
-  # Note: Both origin/spacing and pad_beg are in (x,y,z) order
-  # Julia array dims map as: dim1 -> X, dim2 -> Y, dim3 -> Z
-  # So pad_beg is already in the correct order for origin calculation
-  # Account for direction matrix: extract diagonal elements (row-major indexing)
   dir_diag = [im.direction[1], im.direction[5], im.direction[9]]
   padded_origin = im.origin .- (im.spacing .* pad_beg .* dir_diag)
 
-  # Create a new MedImage with the padded voxel_data and adjusted origin
-  padded_im = update_voxel_and_spatial_data(im, padded_voxel_data, padded_origin, im.spacing, im.direction)
+  padded_im = update_voxel_and_spatial_data(im, data, padded_origin, im.spacing, im.direction)
   return padded_im
-end#pad_mi
+end
 
 
-
-
-"""
-given a MedImage object translation value (translate_by) and axis (translate_in_axis) in witch to translate the image return translated image
-It is diffrent from pad by the fact that it changes only the metadata of the image do not influence pixel array
-we are setting Interpolator by using Interpolator enum (in basic implementation it will not be used)
-return the translated MedImage object
-"""
 function translate_mi(im::MedImage, translate_by::Int64, translate_in_axis::Int64, Interpolator::Interpolator_enum)::MedImage
-
-  # Convert origin tuple to mutable vector
-  origin_vec = collect(im.origin)
-
-  # Modify the origin according to the translation value and axis
-  origin_vec[translate_in_axis] += translate_by * im.spacing[translate_in_axis]
-
-  # Convert back to tuple
-  translated_origin = Tuple(origin_vec)
-
-  # Create a new MedImage with the translated origin and the original voxel_data
+  origin_val = im.origin[translate_in_axis] + translate_by * im.spacing[translate_in_axis]
+  translated_origin = ntuple(i -> i == translate_in_axis ? origin_val : im.origin[i], 3)
   translated_im = update_voxel_and_spatial_data(im, im.voxel_data, translated_origin, im.spacing, im.direction)
-
   return translated_im
+end
 
-end#translate_mi
 
-
-"""
-    scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::MedImage
-
-Scale a MedImage object by the given scaling factor(s).
-
-# Arguments
-- `im`: The input MedImage to scale
-- `scale`: Scaling factor - either a single Float64 for uniform scaling, or a Tuple for per-axis scaling
-- `Interpolator`: Interpolation method (Nearest_neighbour_en, Linear_en, or B_spline_en)
-
-# Returns
-A new MedImage with scaled voxel data.
-
-# Behavior Note
-Unlike SimpleITK's ScaleTransform+Resample which keeps output dimensions fixed and scales
-content within the same canvas, MedImages.scale_mi changes the array dimensions based on
-the scale factor. For example, scaling a 512x512x75 image by 0.5 produces a 256x256x38 image.
-
-This is intentional behavior that changes the number of voxels while maintaining
-the same physical extent covered by the image.
-"""
 function scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::MedImage
 
-  # Convert single scale value to tuple for uniform scaling
   scale_tuple = scale isa Float64 ? (scale, scale, scale) : scale
-
-  # Calculate new size based on scale
   old_size = size(im.voxel_data)
   new_size = Tuple(round.(Int, old_size .* scale_tuple))
 
-  # Scale the image using imresize with appropriate interpolation
   new_data = if Interpolator == Nearest_neighbour_en
     imresize(im.voxel_data, new_size, method=Constant())
   elseif Interpolator == Linear_en
     imresize(im.voxel_data, new_size, method=Linear())
-  else  # B_spline_en
-    imresize(im.voxel_data, new_size, method=Linear())  # fallback to linear for BSpline
+  else
+    imresize(im.voxel_data, new_size, method=Linear())
   end
 
-  # Create a new MedImage with the scaled data and the same spatial metadata
   new_im = update_voxel_and_spatial_data(im, new_data, im.origin, im.spacing, im.direction)
 
   return new_im
-
-end#scale_mi
-
-
-
-
-#=
-Testa i old functions
-
-old functions:
------------------TransformIndexToPhysicalPoint--------------------------------------------------
-# prostsze podejście - zwraca wyłacznie dla 3D - błędnie wylicza y
-function transformIndexToPhysicalPoint_Julia_v1(im::MedImage, index::Tuple{Int, Int, Int})::Tuple{Float64, Float64, Float64}
-  point = (
-      im.origin[1] + index[1] * im.spacing[1],
-      im.origin[2] + index[2] * im.spacing[2],
-      im.origin[3] + index[3] * im.spacing[3]
-  )
-  return point
 end
 
-
-
-struct Rodrigues3DTransform
-  center::Vector{Float64}
-  rotation_matrix::Matrix{Float64} # Nowe pole dla macierzy rotacji
-  translation::Vector{Float64}
-end
-
-function Rodrigues3DTransform(center=[0.0, 0.0, 0.0], rotation_matrix=Matrix{Float64}(I, 3, 3), translation=[0.0, 0.0, 0.0])
-    new(center, rotation_matrix, translation)
-end
-
-
-function set_rotation_matrix!(transform::Rodrigues3DTransform, rotation_matrix::Matrix{Float64})
-    transform.rotation_matrix = rotation_matrix
-end
-
-function set_center!(transform::Rodrigues3DTransform, new_center::Tuple{Vararg{Float64}})
-  new_center= collect(new_center)
-  transform.center = new_center
-end
-
-function Rodrigues_transform_point(transform::Rodrigues3DTransform, point::Vector{Float64})
-    R = transform.rotation_matrix
-    shifted_point = point - transform.center
-    transformed_point = R * shifted_point + transform.center + transform.translation
-    return transformed_point
-end
-
-
-
-
-Testry
------------------Test PhysicalPoint 3 i 4 D--------------------------------------------------
-
-function test_4D_To_PhysicalPoint(image_path::String)
-  image_test1 = sitk.ReadImage(image_path)
-  # Zakładam, że `get_spatial_metadata` zwraca odpowiedni obiekt MedImage.
-  image_test2 = get_spatial_metadata(image_path)
-  # Pobranie rozmiaru obrazu.
-  size = image_test1.GetSize()
-  errors = 0
-  all_iter = 0
-  all_pixels = size[1]*size[2]*size[3]*size[4]
-  # Dostosowanie do przechowywania 4-wymiarowych indeksów i punktów.
-  error_details = Vector{Tuple{Tuple{Int,Int,Int,Int}, Tuple{Float64, Float64, Float64, Float64}, Tuple{Float64, Float64, Float64, Float64}}}()
-
-
-
-  # Iteracja przez wszystkie indeksy w oparciu o rozmiar obrazu.
-  for t in 0:(size[4]-1)
-      for x in 0:(size[1]-1)
-          for y in 0:(size[2]-1)
-              for z in 0:(size[3]-1)
-                  index = (x, y, z, t)
-                  test1 = image_test1.TransformIndexToPhysicalPoint(index)
-                  indexToPhysicalPoint, _ = computeIndexToPhysicalPointMatrices_Julia(image_test2)
-                  test2 = transformIndexToPhysicalPoint_Julia(image_test2, index, indexToPhysicalPoint)
-                  all_iner += 1
-                  if !all(isapprox(test1[i], test2[i], atol=1e-5) for i in 1:4)
-                      errors += 1
-                      push!(error_details, (index, test1, test2))
-                  end
-              end
-          end
-      end
-  end
-
-  println("Liczba błędów: $errors")
-  println("All interations: $(all_iter)")
-  println("All pixels: $(all_pixels)")
-  if errors > 0
-      println("Szczegóły błędów (pierwsze 10):")
-      for detail in error_details[1:min(10, end)]
-          println("Indeks: $(detail[1]), Test1: $(detail[2]), Test2: $(detail[3])")
-      end
-  end
-end
-
-
-test_4D_To_PhysicalPoint("C:\\MedImage\\MedImage.jl\\test_data\\filtered_func_data.nii.gz")
-
-function test_3D_To_PhysicalPoint(image_path::String)
-  image_test1 = sitk.ReadImage(image_path)
-  image_test2 = get_spatial_metadata(image_path)
-  size = image_test1.GetSize()
-  errors = 0
-  all_iter = 0
-  all_pixels = size[1]*size[2]*size[3]
-  error_details = Vector{Tuple{Tuple{Int,Int,Int}, Tuple{Float64, Float64, Float64}, Tuple{Float64, Float64, Float64}}}()
-  for x in 0:(size[1]-1)
-      for y in 0:(size[2]-1)
-          for z in 0:(size[3]-1)
-              index = (x, y, z)
-              test1 = image_test1.TransformIndexToPhysicalPoint(index)
-              indexToPhysicalPoint, _ = computeIndexToPhysicalPointMatrices_Julia(image)
-              test2 = transformIndexToPhysicalPoint_Julia(image_test2, index, indexToPhysicalPoint)
-              all_iner += 1
-              if !all(isapprox(test1[i], test2[i], atol=1e-5) for i in 1:3)
-                  errors += 1
-                  push!(error_details, (index, test1, test2))
-              end
-          end
-      end
-  end
-
-  println("Liczba błędów: $errors")
-  println("All interations: $(all_iter)")
-  println("All pixels: $(all_pixels)")
-  if errors > 0
-    println("Szczegóły błędów (pierwsze 10):")
-    for detail in error_details[1:min(100, end)]
-        println("Indeks: $(detail[1]), Test1: $(detail[2]), Test2: $(detail[3])")
-        println("All interations: $all_iner")
-    end
-  end
-end
-
-test_3D_To_PhysicalPoint("C:\\MedImage\\MedImage.jl\\test_data\\volume-0.nii.gz")
-
-
-=#
 end#Basic_transformations

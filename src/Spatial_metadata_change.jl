@@ -58,28 +58,20 @@ function change_orientation_main(im::MedImage, new_orientation::Orientation_code
     origin_transforms = reorient_operation[3]
     spacing_transforms = reorient_operation[4]
 
-    origin1 = copy(collect(im.origin))
-
+    origin1 = im.origin
     sizz = size(im.voxel_data)
-    spacing1 = copy(collect(im.spacing))
+    spacing1 = im.spacing
 
-    res_origin = [0.0, 0.0, 0.0]
-
-    for origin_axis in [1, 2, 3]
-
-        spac = collect(spacing1)
-        spac_axis, sizz_axis, prim_origin_axis, op_sign = origin_transforms[origin_axis]
-        res_origin[origin_axis] = origin1[prim_origin_axis] + ((spac[spac_axis] * (sizz[sizz_axis] - 1)) * op_sign)
-
-
-    end
-
+    # Non-mutating origin calculation
+    res_origin = ntuple(i -> begin
+        spac_axis, sizz_axis, prim_origin_axis, op_sign = origin_transforms[i]
+        origin1[prim_origin_axis] + ((spacing1[spac_axis] * (sizz[sizz_axis] - 1)) * op_sign)
+    end, 3)
 
     # Permute and reverse voxel data
     # CUDA.jl natively supports permutedims and reverse on CuArrays
     # No CPU transfers needed - operations execute directly on GPU
     im_voxel_data = im.voxel_data
-
     if (length(perm) > 0)
         im_voxel_data = permutedims(im_voxel_data, (perm[1], perm[2], perm[3]))
     end
@@ -89,10 +81,6 @@ function change_orientation_main(im::MedImage, new_orientation::Orientation_code
     elseif (length(reverse_axes) > 1)
         im_voxel_data = reverse(im_voxel_data; dims=Tuple(reverse_axes))
     end
-
-
-
-
 
 
     # now we need to change spacing as needed
@@ -105,56 +93,4 @@ function change_orientation_main(im::MedImage, new_orientation::Orientation_code
     return new_im
 end#change_orientation
 
-
-
-
-
-# im_fixed=load_image("/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz")
-# imm_res=resample_to_spacing(im_fixed, (1.0,2.0,3.0),Linear_en)
-
-# # sitk = pyimport("SimpleITK")
-# # # function create_nii_from_medimage(med_image::MedImage, file_path::String)
-# # #     # Convert voxel_data to a numpy array (Assuming voxel_data is stored in Julia array format)
-# # #     # voxel_data_np = np.array(med_image.voxel_data)
-
-# # #     # Create a SimpleITK image from numpy array
-# # #     image_sitk = sitk.GetImageFromArray(med_image.voxel_data)
-
-# # #     # Set spatial metadata
-# # #     image_sitk.SetOrigin(med_image.origin)
-# # #     image_sitk.SetSpacing(med_image.spacing)
-# # #     image_sitk.SetDirection(med_image.direction)
-
-# # #     # Save the image as .nii.gz
-# # #     sitk.WriteImage(image_sitk, file_path)
-# # # end
-
-
-# voxel_arr=permutedims(imm_res.voxel_data,(3,2,1))
-# image_sitk = sitk.GetImageFromArray(voxel_arr)
-
-# image_sitk.SetOrigin(imm_res.origin)
-# image_sitk.SetSpacing(imm_res.spacing)
-# image_sitk.SetDirection(imm_res.direction)
-# sitk.WriteImage(image_sitk, "/home/jakubmitura/projects/MedImage.jl/test_data/debug/resampled_sitk.nii.gz")
-# create_nii_from_medimage(imm_res,"/home/jakubmitura/projects/MedImage.jl/test_data/debug/resampled_medimage.nii.gz")
-
-# size(imm_res.voxel_data)
-# # range(1, stop=5, length=100,step=0.1)
 end#Spatial_metadata_change
-
-
-
-# using KernelAbstractions, Test
-# @kernel function mul2_kernel(A)
-#     I = @index(Global)
-#     shared_arr=@localmem(Float32, (512,3))
-#     index_local = @index(Local, Linear)
-#     A[index_local] = 2 * A[I]
-#   end
-
-#   dev = CPU()
-# A = ones(1024, 1024)
-# ev = mul2_kernel(dev, 64)(A, ndrange=size(A))
-# synchronize(dev)
-# all(A .== 2.0)
