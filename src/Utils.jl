@@ -5,7 +5,6 @@ using KernelAbstractions, Interpolations
 import KernelAbstractions: synchronize, get_backend
 using Enzyme
 using ChainRulesCore
-using Atomix
 import Random
 
 export interpolate_point
@@ -462,28 +461,39 @@ end
     end
 end
 
-# Backward (adjoint) kernels for manual gradient computation on GPU
-# KernelAbstractions + Enzyme doesn't support active kernel arguments on GPU,
-# so we implement the gradient kernels directly.
+# =============================================================================
+# Enzyme-compatible kernels for GPU autodiff
+# These use KernelAbstractions without @Const annotations, matching the pattern
+# that works with Enzyme for automatic differentiation on GPU
+# =============================================================================
 
-@kernel function trilinear_resample_backward_kernel!(d_image, @Const(d_output), @Const(old_spacing), @Const(new_spacing), @Const(new_dims), @Const(src_dims))
+@kernel function trilinear_resample_enzyme_kernel!(output, image_data, old_spacing_arr, new_spacing_arr, new_dims_arr, src_dims_arr)
     i = @index(Global, Linear)
 
-    # Map linear index to output x,y,z (1-based)
-    stride_z = new_dims[1] * new_dims[2]
+    # Read dims from arrays (not tuples)
+    ndx = Int(new_dims_arr[1])
+    ndy = Int(new_dims_arr[2])
+
+    # Map linear index to x,y,z (1-based)
+    stride_z = ndx * ndy
     iz = (i - 1) ÷ stride_z + 1
     rem_z = (i - 1) % stride_z
-    iy = rem_z ÷ new_dims[1] + 1
-    ix = rem_z % new_dims[1] + 1
+    iy = rem_z ÷ ndx + 1
+    ix = rem_z % ndx + 1
 
-    # Map to source index space
-    real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing[1]) / Float32(old_spacing[1])) + 1.0f0
-    real_y = (Float32(iy) - 1.0f0) * (Float32(new_spacing[2]) / Float32(old_spacing[2])) + 1.0f0
-    real_z = (Float32(iz) - 1.0f0) * (Float32(new_spacing[3]) / Float32(old_spacing[3])) + 1.0f0
+    # Map to source index space using array indexing
+    real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing_arr[1]) / Float32(old_spacing_arr[1])) + 1.0f0
+    real_y = (Float32(iy) - 1.0f0) * (Float32(new_spacing_arr[2]) / Float32(old_spacing_arr[2])) + 1.0f0
+    real_z = (Float32(iz) - 1.0f0) * (Float32(new_spacing_arr[3]) / Float32(old_spacing_arr[3])) + 1.0f0
 
-    # Bounds checking - if outside, no gradient contribution
-    sx, sy, sz = src_dims[1], src_dims[2], src_dims[3]
-    if !(real_x < 1.0f0 || real_y < 1.0f0 || real_z < 1.0f0 || real_x > Float32(sx) || real_y > Float32(sy) || real_z > Float32(sz))
+    # Bounds checking - use passed dims instead of size()
+    sx = Int(src_dims_arr[1])
+    sy = Int(src_dims_arr[2])
+    sz = Int(src_dims_arr[3])
+
+    if real_x < 1.0f0 || real_y < 1.0f0 || real_z < 1.0f0 || real_x > Float32(sx) || real_y > Float32(sy) || real_z > Float32(sz)
+        output[i] = 0.0f0
+    else
         x0 = floor(Int, real_x)
         y0 = floor(Int, real_y)
         z0 = floor(Int, real_z)
@@ -497,58 +507,72 @@ end
         yd = real_y - y0
         zd = real_z - z0
 
-        # Get the upstream gradient for this output voxel
-        d_out = d_output[i]
-
-        # Compute trilinear interpolation weights and accumulate gradients to d_image
-        # Weight for each corner is the product of distances to opposite corner
+        # Trilinear interpolation
         @inbounds begin
-            w000 = (1.0f0 - xd) * (1.0f0 - yd) * (1.0f0 - zd)
-            w100 = xd * (1.0f0 - yd) * (1.0f0 - zd)
-            w010 = (1.0f0 - xd) * yd * (1.0f0 - zd)
-            w110 = xd * yd * (1.0f0 - zd)
-            w001 = (1.0f0 - xd) * (1.0f0 - yd) * zd
-            w101 = xd * (1.0f0 - yd) * zd
-            w011 = (1.0f0 - xd) * yd * zd
-            w111 = xd * yd * zd
+            c00 = Float32(image_data[x0, y0, z0]) * (1.0f0 - xd) + Float32(image_data[x1, y0, z0]) * xd
+            c10 = Float32(image_data[x0, y1, z0]) * (1.0f0 - xd) + Float32(image_data[x1, y1, z0]) * xd
+            c01 = Float32(image_data[x0, y0, z1]) * (1.0f0 - xd) + Float32(image_data[x1, y0, z1]) * xd
+            c11 = Float32(image_data[x0, y1, z1]) * (1.0f0 - xd) + Float32(image_data[x1, y1, z1]) * xd
 
-            # Atomic add to handle race conditions from multiple output voxels
-            # contributing to the same source voxel
-            Atomix.@atomic d_image[x0, y0, z0] += d_out * w000
-            Atomix.@atomic d_image[x1, y0, z0] += d_out * w100
-            Atomix.@atomic d_image[x0, y1, z0] += d_out * w010
-            Atomix.@atomic d_image[x1, y1, z0] += d_out * w110
-            Atomix.@atomic d_image[x0, y0, z1] += d_out * w001
-            Atomix.@atomic d_image[x1, y0, z1] += d_out * w101
-            Atomix.@atomic d_image[x0, y1, z1] += d_out * w011
-            Atomix.@atomic d_image[x1, y1, z1] += d_out * w111
+            c0 = c00 * (1.0f0 - yd) + c10 * yd
+            c1 = c01 * (1.0f0 - yd) + c11 * yd
+
+            output[i] = c0 * (1.0f0 - zd) + c1 * zd
         end
     end
 end
 
-@kernel function nearest_resample_backward_kernel!(d_image, @Const(d_output), @Const(old_spacing), @Const(new_spacing), @Const(new_dims), @Const(src_dims))
+@kernel function nearest_resample_enzyme_kernel!(output, image_data, old_spacing_arr, new_spacing_arr, new_dims_arr, src_dims_arr)
     i = @index(Global, Linear)
 
-    iz = (i - 1) ÷ (new_dims[1] * new_dims[2]) + 1
-    rem_z = (i - 1) % (new_dims[1] * new_dims[2])
-    iy = rem_z ÷ new_dims[1] + 1
-    ix = rem_z % new_dims[1] + 1
+    # Read dims from arrays (not tuples)
+    ndx = Int(new_dims_arr[1])
+    ndy = Int(new_dims_arr[2])
 
-    real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing[1]) / Float32(old_spacing[1])) + 1.0f0
-    real_y = (Float32(iy) - 1.0f0) * (Float32(new_spacing[2]) / Float32(old_spacing[2])) + 1.0f0
-    real_z = (Float32(iz) - 1.0f0) * (Float32(new_spacing[3]) / Float32(old_spacing[3])) + 1.0f0
+    iz = (i - 1) ÷ (ndx * ndy) + 1
+    rem_z = (i - 1) % (ndx * ndy)
+    iy = rem_z ÷ ndx + 1
+    ix = rem_z % ndx + 1
 
-    sx, sy, sz = src_dims[1], src_dims[2], src_dims[3]
+    real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing_arr[1]) / Float32(old_spacing_arr[1])) + 1.0f0
+    real_y = (Float32(iy) - 1.0f0) * (Float32(new_spacing_arr[2]) / Float32(old_spacing_arr[2])) + 1.0f0
+    real_z = (Float32(iz) - 1.0f0) * (Float32(new_spacing_arr[3]) / Float32(old_spacing_arr[3])) + 1.0f0
+
+    # Use passed dims instead of size()
+    sx = Int(src_dims_arr[1])
+    sy = Int(src_dims_arr[2])
+    sz = Int(src_dims_arr[3])
 
     # Nearest neighbor rounding
     nx = Int(round(real_x))
     ny = Int(round(real_y))
     nz = Int(round(real_z))
 
-    if !(nx < 1 || ny < 1 || nz < 1 || nx > sx || ny > sy || nz > sz)
-        d_out = d_output[i]
-        @inbounds Atomix.@atomic d_image[nx, ny, nz] += d_out
+    if nx < 1 || ny < 1 || nz < 1 || nx > sx || ny > sy || nz > sz
+        output[i] = 0.0f0
+    else
+        @inbounds output[i] = Float32(image_data[nx, ny, nz])
     end
+end
+
+# Launcher functions for Enzyme-compatible kernels
+# These convert tuples to arrays and match the working example pattern
+# NOTE: ndrange_val is passed as a scalar to avoid scalar indexing on GPU arrays
+
+function trilinear_enzyme_launcher!(out, img, osp_arr, nsp_arr, ndims_arr, src_dims_arr, ndrange_val)
+    backend = KernelAbstractions.get_backend(out)
+    kernel = trilinear_resample_enzyme_kernel!(backend, 256)
+    kernel(out, img, osp_arr, nsp_arr, ndims_arr, src_dims_arr, ndrange=ndrange_val)
+    KernelAbstractions.synchronize(backend)
+    return nothing
+end
+
+function nearest_enzyme_launcher!(out, img, osp_arr, nsp_arr, ndims_arr, src_dims_arr, ndrange_val)
+    backend = KernelAbstractions.get_backend(out)
+    kernel = nearest_resample_enzyme_kernel!(backend, 256)
+    kernel(out, img, osp_arr, nsp_arr, ndims_arr, src_dims_arr, ndrange=ndrange_val)
+    KernelAbstractions.synchronize(backend)
+    return nothing
 end
 
 # CPU version of trilinear resample loop (Enzyme compatible)
@@ -697,25 +721,54 @@ function ChainRulesCore.rrule(::typeof(resample_kernel_launch), image_data, old_
                 )
             end
         else
-            # Use manual backward kernels for GPU
-            # KernelAbstractions + Enzyme doesn't support active kernel arguments on GPU,
-            # so we run the backward pass directly without Enzyme.autodiff
+            # GPU backward pass using Enzyme with new pattern (no @Const, arrays instead of tuples)
+            # This matches the working example pattern for Enzyme + KernelAbstractions GPU autodiff
 
-            # Ensure arrays are on GPU
+            # Ensure gradient arrays are on GPU
             d_output = is_cuda_array(output) && !is_cuda_array(d_output_raw) ? CuArray(d_output_raw) : d_output_raw
             d_image = is_cuda_array(image_data) && !is_cuda_array(d_image) ? CuArray(d_image) : d_image
 
+            # Convert tuples to GPU arrays (matching working example pattern)
+            old_spacing_arr = CuArray(Float32[old_spacing...])
+            new_spacing_arr = CuArray(Float32[new_spacing...])
+            new_dims_arr = CuArray(Int32[new_dims...])
             src_dims = size(image_data)
-            n_output = prod(new_dims)
+            src_dims_arr = CuArray(Int32[src_dims...])
+
+            # Shadow arrays for spacing/dims (not differentiated but need Duplicated for pattern)
+            d_osp = CUDA.zeros(Float32, 3)
+            d_nsp = CUDA.zeros(Float32, 3)
+            d_ndims = CUDA.zeros(Int32, 3)
+            d_src_dims = CUDA.zeros(Int32, 3)
+
+            # ndrange computed as scalar to avoid GPU scalar indexing in launcher
+            ndrange_val = prod(new_dims)
 
             if interpolator_enum == Nearest_neighbour_en
-                backward_kernel = nearest_resample_backward_kernel!(backend, 256)
-                backward_kernel(d_image, d_output, old_spacing, new_spacing, new_dims, src_dims, ndrange=n_output)
+                Enzyme.autodiff(
+                    Reverse,
+                    nearest_enzyme_launcher!,
+                    Duplicated(vec(output), vec(d_output)),
+                    Duplicated(image_data, d_image),
+                    Duplicated(old_spacing_arr, d_osp),
+                    Duplicated(new_spacing_arr, d_nsp),
+                    Duplicated(new_dims_arr, d_ndims),
+                    Duplicated(src_dims_arr, d_src_dims),
+                    Const(ndrange_val)
+                )
             else
-                backward_kernel = trilinear_resample_backward_kernel!(backend, 256)
-                backward_kernel(d_image, d_output, old_spacing, new_spacing, new_dims, src_dims, ndrange=n_output)
+                Enzyme.autodiff(
+                    Reverse,
+                    trilinear_enzyme_launcher!,
+                    Duplicated(vec(output), vec(d_output)),
+                    Duplicated(image_data, d_image),
+                    Duplicated(old_spacing_arr, d_osp),
+                    Duplicated(new_spacing_arr, d_nsp),
+                    Duplicated(new_dims_arr, d_ndims),
+                    Duplicated(src_dims_arr, d_src_dims),
+                    Const(ndrange_val)
+                )
             end
-            synchronize(backend)
         end
 
         # Convert gradients back to CPU if needed for Zygote
