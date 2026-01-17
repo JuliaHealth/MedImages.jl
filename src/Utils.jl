@@ -5,6 +5,7 @@ using KernelAbstractions, Interpolations
 import KernelAbstractions: synchronize, get_backend
 using Enzyme
 using ChainRulesCore
+using Atomix
 import Random
 
 export interpolate_point
@@ -252,7 +253,7 @@ function ChainRulesCore.rrule(::typeof(interpolate_pure), points_to_interpolate,
     output = interpolate_pure(points_to_interpolate, input_array, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour)
 
     function interpolate_pullback(d_output_unthunked)
-        d_output = unthunk(d_output_unthunked)
+        d_output_raw = unthunk(d_output_unthunked)
         d_points = zero(points_to_interpolate)
         d_input = zero(input_array)
 
@@ -261,6 +262,7 @@ function ChainRulesCore.rrule(::typeof(interpolate_pure), points_to_interpolate,
 
         if backend isa KernelAbstractions.CPU
             # Use pure Julia loop for CPU - Enzyme compatible
+            d_output = d_output_raw
             function cpu_wrapper(out, src, pts, sp, kbs, ev, inn)
                 interpolate_cpu_loop!(out, source_arr_shape, src, pts, sp, kbs, ev, inn)
                 return nothing
@@ -279,7 +281,8 @@ function ChainRulesCore.rrule(::typeof(interpolate_pure), points_to_interpolate,
                 Const(is_nearest_neighbour)
             )
         else
-            # Use KA kernel for GPU
+            # Use KA kernel for GPU - ensure gradient arrays are on the same device
+            d_output = is_cuda_array(output) && !is_cuda_array(d_output_raw) ? CuArray(d_output_raw) : d_output_raw
             function kernel_wrapper(out, src, pts, sp, kbs, ev, inn)
                  interpolate_kernel(backend, 512)(out, source_arr_shape, src, pts, sp, kbs, ev, inn, ndrange=size(out))
                  return nothing
@@ -298,7 +301,10 @@ function ChainRulesCore.rrule(::typeof(interpolate_pure), points_to_interpolate,
                 Const(is_nearest_neighbour)
             )
         end
-        return NoTangent(), d_points, d_input, NoTangent(), NoTangent(), NoTangent(), NoTangent()
+        # Convert gradients back to CPU if needed for Zygote
+        d_points_out = is_cuda_array(d_points) ? Array(d_points) : d_points
+        d_input_out = is_cuda_array(d_input) ? Array(d_input) : d_input
+        return NoTangent(), d_points_out, d_input_out, NoTangent(), NoTangent(), NoTangent(), NoTangent()
     end
     return output, interpolate_pullback
 end
@@ -456,6 +462,95 @@ end
     end
 end
 
+# Backward (adjoint) kernels for manual gradient computation on GPU
+# KernelAbstractions + Enzyme doesn't support active kernel arguments on GPU,
+# so we implement the gradient kernels directly.
+
+@kernel function trilinear_resample_backward_kernel!(d_image, @Const(d_output), @Const(old_spacing), @Const(new_spacing), @Const(new_dims), @Const(src_dims))
+    i = @index(Global, Linear)
+
+    # Map linear index to output x,y,z (1-based)
+    stride_z = new_dims[1] * new_dims[2]
+    iz = (i - 1) ÷ stride_z + 1
+    rem_z = (i - 1) % stride_z
+    iy = rem_z ÷ new_dims[1] + 1
+    ix = rem_z % new_dims[1] + 1
+
+    # Map to source index space
+    real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing[1]) / Float32(old_spacing[1])) + 1.0f0
+    real_y = (Float32(iy) - 1.0f0) * (Float32(new_spacing[2]) / Float32(old_spacing[2])) + 1.0f0
+    real_z = (Float32(iz) - 1.0f0) * (Float32(new_spacing[3]) / Float32(old_spacing[3])) + 1.0f0
+
+    # Bounds checking - if outside, no gradient contribution
+    sx, sy, sz = src_dims[1], src_dims[2], src_dims[3]
+    if !(real_x < 1.0f0 || real_y < 1.0f0 || real_z < 1.0f0 || real_x > Float32(sx) || real_y > Float32(sy) || real_z > Float32(sz))
+        x0 = floor(Int, real_x)
+        y0 = floor(Int, real_y)
+        z0 = floor(Int, real_z)
+
+        # Clamp upper bounds
+        x1 = min(x0 + 1, sx)
+        y1 = min(y0 + 1, sy)
+        z1 = min(z0 + 1, sz)
+
+        xd = real_x - x0
+        yd = real_y - y0
+        zd = real_z - z0
+
+        # Get the upstream gradient for this output voxel
+        d_out = d_output[i]
+
+        # Compute trilinear interpolation weights and accumulate gradients to d_image
+        # Weight for each corner is the product of distances to opposite corner
+        @inbounds begin
+            w000 = (1.0f0 - xd) * (1.0f0 - yd) * (1.0f0 - zd)
+            w100 = xd * (1.0f0 - yd) * (1.0f0 - zd)
+            w010 = (1.0f0 - xd) * yd * (1.0f0 - zd)
+            w110 = xd * yd * (1.0f0 - zd)
+            w001 = (1.0f0 - xd) * (1.0f0 - yd) * zd
+            w101 = xd * (1.0f0 - yd) * zd
+            w011 = (1.0f0 - xd) * yd * zd
+            w111 = xd * yd * zd
+
+            # Atomic add to handle race conditions from multiple output voxels
+            # contributing to the same source voxel
+            Atomix.@atomic d_image[x0, y0, z0] += d_out * w000
+            Atomix.@atomic d_image[x1, y0, z0] += d_out * w100
+            Atomix.@atomic d_image[x0, y1, z0] += d_out * w010
+            Atomix.@atomic d_image[x1, y1, z0] += d_out * w110
+            Atomix.@atomic d_image[x0, y0, z1] += d_out * w001
+            Atomix.@atomic d_image[x1, y0, z1] += d_out * w101
+            Atomix.@atomic d_image[x0, y1, z1] += d_out * w011
+            Atomix.@atomic d_image[x1, y1, z1] += d_out * w111
+        end
+    end
+end
+
+@kernel function nearest_resample_backward_kernel!(d_image, @Const(d_output), @Const(old_spacing), @Const(new_spacing), @Const(new_dims), @Const(src_dims))
+    i = @index(Global, Linear)
+
+    iz = (i - 1) ÷ (new_dims[1] * new_dims[2]) + 1
+    rem_z = (i - 1) % (new_dims[1] * new_dims[2])
+    iy = rem_z ÷ new_dims[1] + 1
+    ix = rem_z % new_dims[1] + 1
+
+    real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing[1]) / Float32(old_spacing[1])) + 1.0f0
+    real_y = (Float32(iy) - 1.0f0) * (Float32(new_spacing[2]) / Float32(old_spacing[2])) + 1.0f0
+    real_z = (Float32(iz) - 1.0f0) * (Float32(new_spacing[3]) / Float32(old_spacing[3])) + 1.0f0
+
+    sx, sy, sz = src_dims[1], src_dims[2], src_dims[3]
+
+    # Nearest neighbor rounding
+    nx = Int(round(real_x))
+    ny = Int(round(real_y))
+    nz = Int(round(real_z))
+
+    if !(nx < 1 || ny < 1 || nz < 1 || nx > sx || ny > sy || nz > sz)
+        d_out = d_output[i]
+        @inbounds Atomix.@atomic d_image[nx, ny, nz] += d_out
+    end
+end
+
 # CPU version of trilinear resample loop (Enzyme compatible)
 function trilinear_resample_cpu_loop!(output, image_data, old_spacing, new_spacing, new_dims)
     n_points = prod(new_dims)
@@ -562,13 +657,14 @@ function ChainRulesCore.rrule(::typeof(resample_kernel_launch), image_data, old_
     output = resample_kernel_launch(image_data, old_spacing, new_spacing, new_dims, interpolator_enum)
 
     function resample_pullback(d_output_unthunked)
-        d_output = unthunk(d_output_unthunked)
+        d_output_raw = unthunk(d_output_unthunked)
         d_image = zero(image_data)
 
         backend = get_backend(output)
 
         if backend isa KernelAbstractions.CPU
             # Use pure Julia loops for CPU - Enzyme compatible
+            d_output = d_output_raw
             if interpolator_enum == Nearest_neighbour_en
                 function nearest_cpu_wrapper(out, img, osp, nsp, ndims)
                     nearest_resample_cpu_loop!(out, img, osp, nsp, ndims)
@@ -601,31 +697,30 @@ function ChainRulesCore.rrule(::typeof(resample_kernel_launch), image_data, old_
                 )
             end
         else
-            # Use KA kernels for GPU
+            # Use manual backward kernels for GPU
+            # KernelAbstractions + Enzyme doesn't support active kernel arguments on GPU,
+            # so we run the backward pass directly without Enzyme.autodiff
+
+            # Ensure arrays are on GPU
+            d_output = is_cuda_array(output) && !is_cuda_array(d_output_raw) ? CuArray(d_output_raw) : d_output_raw
+            d_image = is_cuda_array(image_data) && !is_cuda_array(d_image) ? CuArray(d_image) : d_image
+
+            src_dims = size(image_data)
+            n_output = prod(new_dims)
+
             if interpolator_enum == Nearest_neighbour_en
-                kernel = nearest_resample_kernel(backend, 256)
+                backward_kernel = nearest_resample_backward_kernel!(backend, 256)
+                backward_kernel(d_image, d_output, old_spacing, new_spacing, new_dims, src_dims, ndrange=n_output)
             else
-                kernel = trilinear_resample_kernel(backend, 256)
+                backward_kernel = trilinear_resample_backward_kernel!(backend, 256)
+                backward_kernel(d_image, d_output, old_spacing, new_spacing, new_dims, src_dims, ndrange=n_output)
             end
-
-            function kernel_wrapper(out, img, osp, nsp, ndims)
-                 kernel(out, img, osp, nsp, ndims, ndrange=prod(ndims))
-                 return nothing
-            end
-
-            Enzyme.autodiff(
-                Reverse,
-                kernel_wrapper,
-                Const,
-                Duplicated(output, d_output),
-                Duplicated(image_data, d_image),
-                Const(old_spacing),
-                Const(new_spacing),
-                Const(new_dims)
-            )
+            synchronize(backend)
         end
 
-        return NoTangent(), d_image, NoTangent(), NoTangent(), NoTangent(), NoTangent()
+        # Convert gradients back to CPU if needed for Zygote
+        d_image_out = is_cuda_array(d_image) ? Array(d_image) : d_image
+        return NoTangent(), d_image_out, NoTangent(), NoTangent(), NoTangent(), NoTangent()
     end
     return output, resample_pullback
 end
