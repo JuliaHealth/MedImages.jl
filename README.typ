@@ -41,6 +41,8 @@
   Researchers waste time on data wrangling instead of algorithm development.
 ]
 
+#pagebreak()
+
 #concept("The Solution")[
   MedImages.jl provides a unified approach to medical image processing:
 
@@ -50,6 +52,8 @@
   - *Full differentiability*: Zygote and Enzyme compatible for end-to-end gradient computation
   - *Spatial correctness*: All transforms preserve origin, spacing, and orientation metadata
 ]
+
+#pagebreak()
 
 = Core Architecture
 
@@ -88,6 +92,8 @@
   ```
 ]
 
+#pagebreak()
+
 #architecture("MedImage Data Structure")[
   The `MedImage` struct is the central data type:
 
@@ -107,6 +113,8 @@
     [`metadata`], [`Dict`], [Extensible metadata storage],
   )
 ]
+
+#pagebreak()
 
 #code-block("Type Enumerations")[
   *Image Type Enum*
@@ -141,6 +149,8 @@
   )
 ]
 
+#pagebreak()
+
 = File I/O
 
 #code-block("File I/O Operations")[
@@ -171,6 +181,8 @@
   ```
 ]
 
+#pagebreak()
+
 = Spatial Concepts
 
 #concept("Spatial Coordinate System")[
@@ -184,6 +196,8 @@
 
   All transforms in MedImages.jl automatically update these properties to maintain spatial correctness.
 ]
+
+#pagebreak()
 
 #architecture("Orientation Codes")[
   Standard orientation codes define anatomical coordinate systems:
@@ -205,6 +219,8 @@
 
   The first letter indicates left-right axis, second indicates anterior-posterior, third indicates superior-inferior.
 ]
+
+#pagebreak()
 
 = Transformations
 
@@ -233,6 +249,8 @@
   ```
 ]
 
+#pagebreak()
+
 #architecture("Interpolation Methods")[
   Choose interpolation based on your use case:
 
@@ -248,6 +266,8 @@
 
   *Critical*: Always use `Nearest_neighbour_en` for segmentation masks to preserve label integrity. Linear and B-spline interpolation will create invalid intermediate values.
 ]
+
+#pagebreak()
 
 #code-block("Resampling Operations")[
   *Change Resolution*
@@ -268,6 +288,8 @@
   lps = change_orientation(ct, ORIENTATION_LPS)
   ```
 ]
+
+#pagebreak()
 
 #example("Cross-Modal Registration")[
   Align images from different modalities to a common space:
@@ -294,6 +316,8 @@
   This operation is essential for multi-modal analysis, fusion imaging, and preparing training data for deep learning.
 ]
 
+#pagebreak()
+
 = GPU Acceleration
 
 #architecture("GPU Backend")[
@@ -314,6 +338,8 @@
 
   The same transform functions work on both CPU and GPU data. Backend selection is automatic based on array type.
 ]
+
+#pagebreak()
 
 #example("GPU Usage")[
   ```julia
@@ -341,6 +367,8 @@
   ```
 ]
 
+#pagebreak()
+
 #concept("Differentiability")[
   MedImages.jl supports automatic differentiation through two mechanisms:
 
@@ -354,6 +382,8 @@
   - Image registration with gradient descent
   - End-to-end learning with geometric augmentation
 ]
+
+#pagebreak()
 
 #code-block("Gradient Computation")[
   ```julia
@@ -388,6 +418,8 @@
   ```
 ]
 
+#pagebreak()
+
 = Complete Workflow
 
 #example("Complete Pipeline")[
@@ -419,6 +451,8 @@
   println("Processing complete")
   ```
 ]
+
+#pagebreak()
 
 #result("API Quick Reference")[
   #table(
