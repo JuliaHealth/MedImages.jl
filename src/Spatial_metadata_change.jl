@@ -1,6 +1,7 @@
 module Spatial_metadata_change
 using Interpolations
 using CUDA
+using ChainRulesCore
 
 using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Load_and_save
 export change_orientation, resample_to_spacing
@@ -50,7 +51,48 @@ function change_orientation(im::MedImage, new_orientation::Orientation_code)::Me
     return change_orientation_main(im, new_orientation, reorient_operation)
 end#change_orientation
 
+# Custom rrule for change_orientation that handles dictionary lookups properly
+function ChainRulesCore.rrule(::typeof(change_orientation), im::MedImage, new_orientation::Orientation_code)
+    # Forward pass
+    output = change_orientation(im, new_orientation)
 
+    function change_orientation_pullback(d_output)
+        d_output_unthunked = unthunk(d_output)
+        # Get the voxel data tangent
+        d_voxel = d_output_unthunked.voxel_data
+
+        if isnothing(d_voxel) || d_voxel isa ChainRulesCore.NoTangent || d_voxel isa ChainRulesCore.ZeroTangent
+            d_im = Tangent{MedImage}(; voxel_data=ChainRulesCore.ZeroTangent())
+            return NoTangent(), d_im, NoTangent()
+        end
+
+        # Get the reorientation operation to reverse it
+        old_orientation = Orientation_dicts.number_to_enum_orientation_dict[im.direction]
+        reorient_op = Orientation_dicts.orientation_pair_to_operation_dict[(old_orientation, new_orientation)]
+        perm = reorient_op[1]
+        reverse_axes = reorient_op[2]
+
+        # Reverse the operations in reverse order
+        # First undo reverse, then undo permute
+        d_voxel_back = d_voxel
+        if length(reverse_axes) == 1
+            d_voxel_back = reverse(d_voxel_back; dims=reverse_axes[1])
+        elseif length(reverse_axes) > 1
+            d_voxel_back = reverse(d_voxel_back; dims=Tuple(reverse_axes))
+        end
+
+        if length(perm) > 0
+            # Inverse permutation
+            inv_perm = invperm((perm[1], perm[2], perm[3]))
+            d_voxel_back = permutedims(d_voxel_back, inv_perm)
+        end
+
+        d_im = Tangent{MedImage}(; voxel_data=d_voxel_back)
+        return NoTangent(), d_im, NoTangent()
+    end
+
+    return output, change_orientation_pullback
+end
 
 function change_orientation_main(im::MedImage, new_orientation::Orientation_code, reorient_operation)::MedImage
     perm = reorient_operation[1]
@@ -58,28 +100,20 @@ function change_orientation_main(im::MedImage, new_orientation::Orientation_code
     origin_transforms = reorient_operation[3]
     spacing_transforms = reorient_operation[4]
 
-    origin1 = copy(collect(im.origin))
-
+    origin1 = im.origin
     sizz = size(im.voxel_data)
-    spacing1 = copy(collect(im.spacing))
+    spacing1 = im.spacing
 
-    res_origin = [0.0, 0.0, 0.0]
-
-    for origin_axis in [1, 2, 3]
-
-        spac = collect(spacing1)
-        spac_axis, sizz_axis, prim_origin_axis, op_sign = origin_transforms[origin_axis]
-        res_origin[origin_axis] = origin1[prim_origin_axis] + ((spac[spac_axis] * (sizz[sizz_axis] - 1)) * op_sign)
-
-
-    end
-
+    # Non-mutating origin calculation
+    res_origin = ntuple(i -> begin
+        spac_axis, sizz_axis, prim_origin_axis, op_sign = origin_transforms[i]
+        origin1[prim_origin_axis] + ((spacing1[spac_axis] * (sizz[sizz_axis] - 1)) * op_sign)
+    end, 3)
 
     # Permute and reverse voxel data
     # CUDA.jl natively supports permutedims and reverse on CuArrays
     # No CPU transfers needed - operations execute directly on GPU
     im_voxel_data = im.voxel_data
-
     if (length(perm) > 0)
         im_voxel_data = permutedims(im_voxel_data, (perm[1], perm[2], perm[3]))
     end
@@ -89,10 +123,6 @@ function change_orientation_main(im::MedImage, new_orientation::Orientation_code
     elseif (length(reverse_axes) > 1)
         im_voxel_data = reverse(im_voxel_data; dims=Tuple(reverse_axes))
     end
-
-
-
-
 
 
     # now we need to change spacing as needed
@@ -105,56 +135,4 @@ function change_orientation_main(im::MedImage, new_orientation::Orientation_code
     return new_im
 end#change_orientation
 
-
-
-
-
-# im_fixed=load_image("/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz")
-# imm_res=resample_to_spacing(im_fixed, (1.0,2.0,3.0),Linear_en)
-
-# # sitk = pyimport("SimpleITK")
-# # # function create_nii_from_medimage(med_image::MedImage, file_path::String)
-# # #     # Convert voxel_data to a numpy array (Assuming voxel_data is stored in Julia array format)
-# # #     # voxel_data_np = np.array(med_image.voxel_data)
-
-# # #     # Create a SimpleITK image from numpy array
-# # #     image_sitk = sitk.GetImageFromArray(med_image.voxel_data)
-
-# # #     # Set spatial metadata
-# # #     image_sitk.SetOrigin(med_image.origin)
-# # #     image_sitk.SetSpacing(med_image.spacing)
-# # #     image_sitk.SetDirection(med_image.direction)
-
-# # #     # Save the image as .nii.gz
-# # #     sitk.WriteImage(image_sitk, file_path)
-# # # end
-
-
-# voxel_arr=permutedims(imm_res.voxel_data,(3,2,1))
-# image_sitk = sitk.GetImageFromArray(voxel_arr)
-
-# image_sitk.SetOrigin(imm_res.origin)
-# image_sitk.SetSpacing(imm_res.spacing)
-# image_sitk.SetDirection(imm_res.direction)
-# sitk.WriteImage(image_sitk, "/home/jakubmitura/projects/MedImage.jl/test_data/debug/resampled_sitk.nii.gz")
-# create_nii_from_medimage(imm_res,"/home/jakubmitura/projects/MedImage.jl/test_data/debug/resampled_medimage.nii.gz")
-
-# size(imm_res.voxel_data)
-# # range(1, stop=5, length=100,step=0.1)
 end#Spatial_metadata_change
-
-
-
-# using KernelAbstractions, Test
-# @kernel function mul2_kernel(A)
-#     I = @index(Global)
-#     shared_arr=@localmem(Float32, (512,3))
-#     index_local = @index(Local, Linear)
-#     A[index_local] = 2 * A[I]
-#   end
-
-#   dev = CPU()
-# A = ones(1024, 1024)
-# ev = mul2_kernel(dev, 64)(A, ndrange=size(A))
-# synchronize(dev)
-# all(A .== 2.0)
