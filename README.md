@@ -10,27 +10,31 @@ A comprehensive Julia library for GPU-accelerated, differentiable medical image 
 
 ## Table of Contents
 
-- [The Challenge](#the-challenge)
-- [The Solution](#the-solution)
-- [Architecture Overview](#architecture-overview)
-- [MedImage Data Structure](#medimage-data-structure)
-- [Type Enumerations](#type-enumerations)
-- [File I/O Operations](#file-io-operations)
-- [Spatial Coordinate System](#spatial-coordinate-system)
-- [Orientation Codes](#orientation-codes)
-- [Basic Transformations](#basic-transformations)
-- [Interpolation Methods](#interpolation-methods)
-- [Resampling Operations](#resampling-operations)
-- [Cross-Modal Registration](#cross-modal-registration)
-- [GPU Backend](#gpu-backend)
-- [GPU Usage](#gpu-usage)
-- [Differentiability](#differentiability)
-- [Gradient Computation](#gradient-computation)
-- [Complete Pipeline](#complete-pipeline)
-- [API Quick Reference](#api-quick-reference)
-- [Quick Start with Docker](#quick-start-with-docker)
-- [Contributing](#contributing)
-- [References](#references)
+<div align="center">
+
+[![The Challenge](https://img.shields.io/badge/The_Challenge-orange)](#the-challenge)
+[![The Solution](https://img.shields.io/badge/The_Solution-orange)](#the-solution)
+[![Architecture](https://img.shields.io/badge/Architecture-orange)](#architecture-overview)
+[![Data Structure](https://img.shields.io/badge/Data_Structure-orange)](#medimage-data-structure)
+[![Type Enums](https://img.shields.io/badge/Type_Enums-orange)](#type-enumerations)
+[![File I/O](https://img.shields.io/badge/File_I%2FO-orange)](#file-io-operations)
+[![Spatial System](https://img.shields.io/badge/Spatial_System-orange)](#spatial-coordinate-system)
+[![Orientations](https://img.shields.io/badge/Orientations-orange)](#orientation-codes)
+[![Transforms](https://img.shields.io/badge/Transforms-orange)](#basic-transformations)
+[![Interpolation](https://img.shields.io/badge/Interpolation-orange)](#interpolation-methods)
+[![Resampling](https://img.shields.io/badge/Resampling-orange)](#resampling-operations)
+[![Registration](https://img.shields.io/badge/Registration-orange)](#cross-modal-registration)
+[![GPU Backend](https://img.shields.io/badge/GPU_Backend-orange)](#gpu-backend)
+[![GPU Usage](https://img.shields.io/badge/GPU_Usage-orange)](#gpu-usage)
+[![Differentiability](https://img.shields.io/badge/Differentiability-orange)](#differentiability)
+[![Gradients](https://img.shields.io/badge/Gradients-orange)](#gradient-computation)
+[![Pipeline](https://img.shields.io/badge/Pipeline-orange)](#complete-pipeline)
+[![API Reference](https://img.shields.io/badge/API_Reference-orange)](#api-quick-reference)
+[![Docker](https://img.shields.io/badge/Docker-gray)](#quick-start-with-docker)
+[![Contributing](https://img.shields.io/badge/Contributing-gray)](#contributing)
+[![References](https://img.shields.io/badge/References-gray)](#references)
+
+</div>
 
 ---
 
