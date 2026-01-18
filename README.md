@@ -6,6 +6,8 @@
 
 <br clear="all"/>
 
+> **Technical Reference**: See [README.pdf](README.pdf) for comprehensive API documentation with architecture diagrams and code examples.
+
 ## Overview
 
 MedImages.jl provides a standardized framework for handling 3D and 4D medical imaging data. The metadata structure is loosely based on the BIDS format<sup>[1](#references)</sup>.
