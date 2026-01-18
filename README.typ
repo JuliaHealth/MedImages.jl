@@ -12,7 +12,7 @@
 #show: frame-style(styles.boxy)
 
 #set document(title: "MedImages.jl - GPU-Accelerated Medical Image Processing")
-#set page(margin: 2cm)
+#set page(width: 18cm, height: auto, margin: 0.5cm)
 #set text(font: "New Computer Modern", size: 11pt)
 #set heading(numbering: "1.1")
 
