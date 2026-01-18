@@ -2,9 +2,17 @@ module Resample_to_target
 using Interpolations
 using Statistics
 using CUDA
+using ChainRulesCore
 
 using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Spatial_metadata_change, ..Load_and_save
 export resample_to_image, scale
+
+# Helper function to compute extrapolation value - not differentiable
+function compute_extrapolate_value(voxel_data)
+    corners = Utils.extract_corners(voxel_data)
+    return median(corners)
+end
+ChainRulesCore.@non_differentiable compute_extrapolate_value(::Any)
 
 """
 overwriting this function from Interpolations.jl becouse check_ranges giving error
@@ -26,9 +34,8 @@ It require multiple steps some idea of implementation is below
 function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator_enum::Interpolator_enum, value_to_extrapolate=Nothing)::MedImage
 
     if (value_to_extrapolate == Nothing)
-        # Use CUDA-safe corner extraction
-        corners = Utils.extract_corners(im_fixed.voxel_data)
-        value_to_extrapolate = median(corners)
+        # Use helper function marked as non-differentiable
+        value_to_extrapolate = compute_extrapolate_value(im_fixed.voxel_data)
     end
 
 
