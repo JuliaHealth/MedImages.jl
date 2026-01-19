@@ -1,166 +1,150 @@
-<div align="center">
-  <img src="./docs/src/assets/logo.png" alt="MedImages.jl JuliaHealth Logo" width="200" align="left" style="margin-right: 20px"/>
-  <h1>MedImages.jl</h1>
-  <p><em>A comprehensive Julia library for standardized 3D and 4D medical imaging data handling</em></p>
-</div>
+# MedImages.jl
 
-<br clear="all"/>
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://juliahealth.org/MedImages.jl/stable)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://juliahealth.org/MedImages.jl/dev)
+[![Build Status](https://github.com/JuliaHealth/MedImages.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/JuliaHealth/MedImages.jl/actions/workflows/CI.yml)
 
-## Overview
+A comprehensive Julia library for GPU-accelerated, differentiable medical image processing.
 
-MedImages.jl provides a standardized framework for handling 3D and 4D medical imaging data. The metadata structure is loosely based on the BIDS format<sup>[1](#references)</sup>.
+---
 
-This project aims to create a unified approach to medical image processing across various modalities including CT, MRI, and PET scans. Currently, ultrasonography support is not included, and we welcome contributors with expertise in this area.
-
-## Features & Development Roadmap
+## Table of Contents
 
 <div align="center">
 
-| Feature Category | Status | Description |
-|------------------|:------:|-------------|
-| **Data Structure Design** | ✅ | Core data structures for medical imaging standardization |
-| **Data Loading** | ✅ | Support for common medical imaging formats |
-| **Spatial Transformations** | 🚧 | Advanced spatial processing with metadata preservation |
-| **Persistence Layer** | 🚧 | Efficient storage and retrieval mechanisms |
+[![The Challenge](https://img.shields.io/badge/The_Challenge-orange)](#the-challenge)
+[![The Solution](https://img.shields.io/badge/The_Solution-orange)](#the-solution)
+[![Architecture](https://img.shields.io/badge/Architecture-orange)](#architecture-overview)
+[![Data Structure](https://img.shields.io/badge/Data_Structure-orange)](#medimage-data-structure)
+[![Type Enums](https://img.shields.io/badge/Type_Enums-orange)](#type-enumerations)
+[![File I/O](https://img.shields.io/badge/File_I%2FO-orange)](#file-io-operations)
+[![Spatial System](https://img.shields.io/badge/Spatial_System-orange)](#spatial-coordinate-system)
+[![Orientations](https://img.shields.io/badge/Orientations-orange)](#orientation-codes)
+[![Transforms](https://img.shields.io/badge/Transforms-orange)](#basic-transformations)
+[![Interpolation](https://img.shields.io/badge/Interpolation-orange)](#interpolation-methods)
+[![Resampling](https://img.shields.io/badge/Resampling-orange)](#resampling-operations)
+[![Registration](https://img.shields.io/badge/Registration-orange)](#cross-modal-registration)
+[![GPU Backend](https://img.shields.io/badge/GPU_Backend-orange)](#gpu-backend)
+[![GPU Usage](https://img.shields.io/badge/GPU_Usage-orange)](#gpu-usage)
+[![Differentiability](https://img.shields.io/badge/Differentiability-orange)](#differentiability)
+[![Gradients](https://img.shields.io/badge/Gradients-orange)](#gradient-computation)
+[![Pipeline](https://img.shields.io/badge/Pipeline-orange)](#complete-pipeline)
+[![API Reference](https://img.shields.io/badge/API_Reference-orange)](#api-quick-reference)
+[![Docker](https://img.shields.io/badge/Docker-gray)](#quick-start-with-docker)
+[![Contributing](https://img.shields.io/badge/Contributing-gray)](#contributing)
+[![References](https://img.shields.io/badge/References-gray)](#references)
 
 </div>
 
-### Data Structure Design
+---
 
-The core architecture manages these key components:
+## The Challenge
 
-<div align="center">
+![Concept: The Challenge](docs/assets/frame-01.png)
 
-<table>
-  <tr>
-    <th>Component</th>
-    <th>Includes</th>
-  </tr>
-  <tr>
-    <td><strong>Voxel data</strong></td>
-    <td>Multidimensional arrays</td>
-  </tr>
-  <tr>
-    <td><strong>Spatial metadata</strong></td>
-    <td>
-      • Origin coordinates<br>
-      • Orientation information<br>
-      • Spacing/resolution data
-    </td>
-  </tr>
-  <tr>
-    <td><strong>Image classification</strong></td>
-    <td>
-      • Primary type (CT/MRI/PET/label maps)<br>
-      • Subtype (e.g., MRI: ADC/DWI/T2)<br>
-      • Voxel data type (e.g., Float32)
-    </td>
-  </tr>
-  <tr>
-    <td><strong>Study metadata</strong></td>
-    <td>
-      • Acquisition date/time<br>
-      • Patient identifiers<br>
-      • Study/Series UIDs<br>
-      • Study descriptions<br>
-      • Original filenames
-    </td>
-  </tr>
-  <tr>
-    <td><strong>Display properties</strong></td>
-    <td>
-      • Color mappings for labels<br>
-      • Window/level values for CT scans
-    </td>
-  </tr>
-  <tr>
-    <td><strong>Clinical data</strong></td>
-    <td>
-      • Patient demographics<br>
-      • Contrast administration status
-    </td>
-  </tr>
-  <tr>
-    <td><strong>Additional metadata</strong></td>
-    <td>Stored in extensible dictionaries</td>
-  </tr>
-</table>
+---
 
-</div>
+## The Solution
 
-### Data Loading Capabilities
+![Concept: The Solution](docs/assets/frame-02.png)
 
-<div align="center">
+---
 
-| Format | Implementation | Status |
-|--------|---------------|:------:|
-| **NIfTI** | via Nifti.jl | ✅ |
-| **DICOM** | via Dicom.jl | ✅ |
-| **MHA** | direct implementation | 🚧 |
+## Architecture Overview
 
-</div>
+![Architecture: Overview](docs/assets/frame-03.png)
 
-### Spatial Transformations
+---
 
-Our spatial processing framework preserves metadata while enabling:
+## MedImage Data Structure
 
-- **Orientation standardization** to a common reference frame (e.g., RAS)
-- **Spacing/resolution adjustment** with appropriate interpolation methods
-- **Cross-modality resampling** for multi-modal registration
-- **Region-of-interest operations** (cropping, dilation) with origin adjustments
+![Architecture: MedImage Data Structure](docs/assets/frame-04.png)
 
-### Persistence Layer
+---
 
-<div align="center">
+## Type Enumerations
 
-| Feature | Description | Status |
-|---------|-------------|:------:|
-| **HDF5-based storage** | Arrays with metadata attributes | ✅ |
-| **Device-agnostic I/O** | Operations for CPU/GPU | 🚧 |
-| **Format conversion** | Exporting to standard medical formats | 🚧 |
+![Implementation: Type Enumerations](docs/assets/frame-05.png)
 
-</div>
+---
 
-## Development Status
+## File I/O Operations
 
-This project is under active development. The spatial transformation components present the most significant challenges due to numerous edge cases. We're exploring solutions based on packages like [MetaArrays.jl](https://github.com/haberdashPI/MetaArrays.jl).
+![Implementation: File I/O Operations](docs/assets/frame-06.png)
 
-<div align="center">
+---
 
-<table>
-  <tr>
-    <th>Component</th>
-    <th>Status</th>
-    <th>Priority</th>
-  </tr>
-  <tr>
-    <td>Core data structures</td>
-    <td>✅ Complete</td>
-    <td>High</td>
-  </tr>
-  <tr>
-    <td>Format loading/saving</td>
-    <td>✅ Complete</td>
-    <td>High</td>
-  </tr>
-  <tr>
-    <td>Spatial transformations</td>
-    <td>🚧 In progress</td>
-    <td>High</td>
-  </tr>
-  <tr>
-    <td>GPU compatibility</td>
-    <td>🚧 In progress</td>
-    <td>Medium</td>
-  </tr>
-  <tr>
-    <td>Ultrasonography support</td>
-    <td>📋 Planned</td>
-    <td>Low</td>
-  </tr>
-</table>
+## Spatial Coordinate System
 
-</div>
+![Concept: Spatial Coordinate System](docs/assets/frame-07.png)
+
+---
+
+## Orientation Codes
+
+![Architecture: Orientation Codes](docs/assets/frame-08.png)
+
+---
+
+## Basic Transformations
+
+![Implementation: Basic Transformations](docs/assets/frame-09.png)
+
+---
+
+## Interpolation Methods
+
+![Architecture: Interpolation Methods](docs/assets/frame-10.png)
+
+---
+
+## Resampling Operations
+
+![Implementation: Resampling Operations](docs/assets/frame-11.png)
+
+---
+
+## Cross-Modal Registration
+
+![Example: Cross-Modal Registration](docs/assets/frame-12.png)
+
+---
+
+## GPU Backend
+
+![Architecture: GPU Backend](docs/assets/frame-13.png)
+
+---
+
+## GPU Usage
+
+![Example: GPU Usage](docs/assets/frame-14.png)
+
+---
+
+## Differentiability
+
+![Concept: Differentiability](docs/assets/frame-15.png)
+
+---
+
+## Gradient Computation
+
+![Implementation: Gradient Computation](docs/assets/frame-16.png)
+
+---
+
+## Complete Pipeline
+
+![Example: Complete Pipeline](docs/assets/frame-17.png)
+
+---
+
+## API Quick Reference
+
+![Result: API Quick Reference](docs/assets/frame-18.png)
+
+---
 
 ## Quick Start with Docker
 
@@ -223,6 +207,7 @@ make check-python
 ### Test Data
 
 Test data files are expected in `test_data/`:
+
 - `volume-0.nii.gz` - Primary NIfTI test file
 - `synthethic_small.nii.gz` - Synthetic test file
 - `ScalarVolume_0/` - DICOM test directory
@@ -246,9 +231,13 @@ Note: Benchmarks use synthetic data by default (`make benchmark`). Real data dow
 make help  # Show all available commands
 ```
 
+---
+
 ## Contributing
 
 Contributions are welcome! If you have expertise in medical imaging, particularly ultrasonography, or experience with the technical challenges described above, please consider getting involved.
+
+---
 
 ## References
 
