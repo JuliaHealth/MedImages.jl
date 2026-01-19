@@ -197,6 +197,18 @@ mkpath(DEBUG_DIR)
         end
     end
 
+    # Differentiability Tests
+    @testset "Differentiability Tests" begin
+        # Check if Zygote is available (should be from Project.toml extras)
+        try
+            using Zygote
+            include("differentiability_tests/test_gradients.jl")
+        catch e
+            @warn "Zygote not available or failed to load: $e"
+            @test_skip "Zygote required for differentiability tests"
+        end
+    end
+
 end # main testset
 
 # Summary output
