@@ -1,0 +1,35 @@
+[ Info: Module structure verified
+[ Info: Found primary test NIfTI file: /workspaces/MedImages.jl/test/../test_data/volume-0.nii.gz
+[ Info: Found synthetic test file: /workspaces/MedImages.jl/test/../test_data/synthethic_small.nii.gz
+[ Info: Found DICOM test directory: /workspaces/MedImages.jl/test/../test_data/ScalarVolume_0
+[ Info: Python dependencies verified
+[ Info: Upsample: Mean Diff = 3.4820573e-9, Max Diff = 5.9604645e-8
+[ Info: Downsample: Mean Diff = 0.0, Max Diff = 0.0
+[ Info: Mixed: Mean Diff = 1.6823044e-7, Max Diff = 2.026558e-6
+[ Info: Generic Kernel Upsample: Mean Diff = 0.0, Max Diff = 0.0
+[ Info: Generic Kernel Downsample: Mean Diff = 0.0, Max Diff = 0.0
+[ Info: Generic Kernel Mixed: Mean Diff = 2.2577516e-11, Max Diff = 5.9604645e-8
+[ Info: Error changing orientation to RAS: KeyError("RAS")
+[ Info: Error changing orientation to LAS: KeyError("LAS")
+[ Info: Error changing orientation to RPI: KeyError("RPI")
+[ Info: Error changing orientation to LPI: KeyError("LPI")
+[ Info: Error getting orientation vectors: KeyError("RPI")
+[ Info: Error in brute_force_find_from_sitk: KeyError("RPI")
+┌ Info: ==========================================
+│ MedImages.jl Test Suite Completed
+│ ==========================================
+│ 
+│ Test Configuration:
+│ - Test data directory: /workspaces/MedImages.jl/test/../test_data
+│ - Primary test file (volume-0.nii.gz): Found
+│ - Secondary test file (synthethic_small.nii.gz): Found
+│ - DICOM test directory: Found
+│ - HDF5 available: true
+│ - PyCall/SimpleITK available: true
+│ 
+│ Test output directories created in:
+│ /workspaces/MedImages.jl/test/*_tests/outputs
+│ 
+└ ==========================================
+Test Summary:                    | Pass  Broken  Total     Time
+MedImages.jl Complete Test Suite | 1074       6   1080  9m58.9s

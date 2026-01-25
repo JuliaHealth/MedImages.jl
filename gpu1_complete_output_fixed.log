@@ -1,0 +1,24 @@
+ERROR: SystemError: opening file "/workspaces/MedImages.jl/run_gpu_benchmarks.jl": No such file or directory
+Stacktrace:
+  [1] systemerror(p::String, errno::Int32; extrainfo::Nothing)
+    @ Base ./error.jl:176
+  [2] systemerror
+    @ ./error.jl:175 [inlined]
+  [3] open(fname::String; lock::Bool, read::Nothing, write::Nothing, create::Nothing, truncate::Nothing, append::Nothing)
+    @ Base ./iostream.jl:293
+  [4] open
+    @ ./iostream.jl:275 [inlined]
+  [5] open(f::Base.var"#435#436"{String}, args::String; kwargs::@Kwargs{})
+    @ Base ./io.jl:394
+  [6] open
+    @ ./io.jl:393 [inlined]
+  [7] read
+    @ ./io.jl:486 [inlined]
+  [8] _include(mapexpr::Function, mod::Module, _path::String)
+    @ Base ./loading.jl:2202
+  [9] include(mod::Module, _path::String)
+    @ Base ./Base.jl:495
+ [10] exec_options(opts::Base.JLOptions)
+    @ Base ./client.jl:323
+ [11] _start()
+    @ Base ./client.jl:557

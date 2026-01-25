@@ -1,0 +1,605 @@
+=== Benchmark Monitoring Started ===
+Sat Jan 24 15:31:50 UTC 2026
+
+--- Check #1 at Sat Jan 24 15:32:20 UTC 2026 ---
+Log lines: 113, Size: 4.0K
+Status: Running
+Recent output:
+  Throughput: 1.26e+09 voxels/sec
+  Memory: 256.0 MB
+
+Benchmarking resample_to_spacing: CPU backend, downsample 0.50x, Linear interpolation
+  Running benchmark...
+
+--- Check #2 at Sat Jan 24 15:32:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #3 at Sat Jan 24 15:33:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #4 at Sat Jan 24 15:33:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #5 at Sat Jan 24 15:34:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #6 at Sat Jan 24 15:34:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #7 at Sat Jan 24 15:35:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #8 at Sat Jan 24 15:35:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #9 at Sat Jan 24 15:36:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #10 at Sat Jan 24 15:36:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #11 at Sat Jan 24 15:37:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #12 at Sat Jan 24 15:37:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #13 at Sat Jan 24 15:38:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #14 at Sat Jan 24 15:38:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #15 at Sat Jan 24 15:39:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #16 at Sat Jan 24 15:39:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #17 at Sat Jan 24 15:40:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #18 at Sat Jan 24 15:40:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #19 at Sat Jan 24 15:41:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #20 at Sat Jan 24 15:41:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #21 at Sat Jan 24 15:42:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #22 at Sat Jan 24 15:42:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #23 at Sat Jan 24 15:43:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #24 at Sat Jan 24 15:43:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #25 at Sat Jan 24 15:44:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #26 at Sat Jan 24 15:44:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #27 at Sat Jan 24 15:45:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #28 at Sat Jan 24 15:45:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #29 at Sat Jan 24 15:46:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #30 at Sat Jan 24 15:46:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #31 at Sat Jan 24 15:47:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #32 at Sat Jan 24 15:47:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #33 at Sat Jan 24 15:48:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #34 at Sat Jan 24 15:48:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #35 at Sat Jan 24 15:49:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #36 at Sat Jan 24 15:49:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #37 at Sat Jan 24 15:50:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #38 at Sat Jan 24 15:50:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #39 at Sat Jan 24 15:51:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #40 at Sat Jan 24 15:51:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #41 at Sat Jan 24 15:52:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #42 at Sat Jan 24 15:52:50 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #43 at Sat Jan 24 15:53:20 UTC 2026 ---
+Log lines: 140, Size: 8.0K
+Status: Running
+Recent output:
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CPU backend, 90 degrees
+  Running benchmark...
+
+--- Check #44 at Sat Jan 24 15:53:50 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #45 at Sat Jan 24 15:54:20 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #46 at Sat Jan 24 15:54:50 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #47 at Sat Jan 24 15:55:20 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #48 at Sat Jan 24 15:55:51 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #49 at Sat Jan 24 15:56:21 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #50 at Sat Jan 24 15:56:51 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #51 at Sat Jan 24 15:57:21 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #52 at Sat Jan 24 15:57:51 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #53 at Sat Jan 24 15:58:21 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #54 at Sat Jan 24 15:58:51 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #55 at Sat Jan 24 15:59:21 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #56 at Sat Jan 24 15:59:51 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #57 at Sat Jan 24 16:00:21 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #58 at Sat Jan 24 16:00:51 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #59 at Sat Jan 24 16:01:21 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+--- Check #60 at Sat Jan 24 16:01:51 UTC 2026 ---
+Log lines: 1165, Size: 40K
+Status: Process not found
+Recent output:
+End time: 2026-01-24T15:53:37.338
+Results saved to: cpu_gpu_comparison
+  - CSV: cpu_gpu_comparison/results.csv
+  - Report: cpu_gpu_comparison/report.md
+================================================================================
+
+=== Monitoring Complete ===
+Sat Jan 24 16:01:51 UTC 2026

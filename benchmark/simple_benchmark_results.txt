@@ -1,0 +1,13 @@
+Running benchmarks...
+----------------------------------------------------------------
+Operation            |  MedImages |  SimpleITK | Ratio (MI/SITK)
+----------------------------------------------------------------
+Load Image           |     0.2553 s |     0.1267 s | 2.01x
+Rotation             |     2.4663 s |     0.0148 s | 166.79x
+Resampling           |     0.5496 s |     0.0146 s | 37.69x
+
+Running GPU benchmarks...
+Resampling (GPU)     |     0.0014 s |        N/A | N/A
+GPU Speedup vs Native CPU: 395.37x
+----------------------------------------------------------------
+Note: Lower time is better. Ratio < 1.0 means MedImages is faster.

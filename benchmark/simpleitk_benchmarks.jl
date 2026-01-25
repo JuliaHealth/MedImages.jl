@@ -15,9 +15,10 @@ const time_module = pyimport("time")
 
 # Helper to convert Julia arrays to proper Python types
 function to_py_size(v)
-    # SimpleITK expects a Python list of unsigned integers
-    # Use py"[]" to create Python list directly
-    py"[int(x) for x in $v]"
+    # SimpleITK expects a Python list of plain Python ints
+    # Use Python list comprehension to ensure plain Python ints
+    v_ints = collect(Int, v)
+    return py"[int(x) for x in $v_ints]"o
 end
 
 """
@@ -293,12 +294,16 @@ function compare_with_simpleitk_full(medimages_results::Vector, synthetic_data::
 
     all_sitk_results = SimpleITKBenchmarkResult[]
 
-    for (size_name, img) in synthetic_data
-        data = img.voxel_data
-        spacing = img.spacing
+    for (size_name, imgs) in synthetic_data
+        # imgs is a Vector{MedImage}, use the first one
+        if !isempty(imgs)
+            img = first(imgs)
+            data = img.voxel_data
+            spacing = img.spacing
 
-        sitk_results = run_simpleitk_benchmarks(data, spacing, string(size_name))
-        append!(all_sitk_results, sitk_results)
+            sitk_results = run_simpleitk_benchmarks(data, spacing, string(size_name))
+            append!(all_sitk_results, sitk_results)
+        end
     end
 
     return all_sitk_results
@@ -317,16 +322,16 @@ function generate_comparison_table(medimages_results::Vector, sitk_results::Vect
     # Header
     println()
     @printf("%-40s | %-15s | %-15s | %-15s | %-10s\n",
-            "Operation", "MedImages CPU", "MedImages CUDA", "SimpleITK", "Speedup")
+        "Operation", "MedImages CPU", "MedImages CUDA", "SimpleITK", "Speedup")
     println("-"^100)
 
     # Group MedImages results by operation
-    operations = Dict{String, Dict{String, Float64}}()
+    operations = Dict{String,Dict{String,Float64}}()
 
     for r in medimages_results
         op_key = "$(r.operation)_$(r.image_size)"
         if !haskey(operations, op_key)
-            operations[op_key] = Dict{String, Float64}()
+            operations[op_key] = Dict{String,Float64}()
         end
         operations[op_key][r.backend] = r.time_median * 1000  # Convert to ms
     end
@@ -358,11 +363,11 @@ function generate_comparison_table(medimages_results::Vector, sitk_results::Vect
         cuda_speedup = med_cuda_time !== nothing ? sitk_time / med_cuda_time : NaN
 
         push!(comparison_data, (
-            operation = "$op_name ($size_name)",
-            cpu_time = med_cpu_time,
-            cuda_time = med_cuda_time,
-            sitk_time = sitk_time,
-            cuda_speedup = cuda_speedup
+            operation="$op_name ($size_name)",
+            cpu_time=med_cpu_time,
+            cuda_time=med_cuda_time,
+            sitk_time=sitk_time,
+            cuda_speedup=cuda_speedup
         ))
     end
 
@@ -374,8 +379,8 @@ function generate_comparison_table(medimages_results::Vector, sitk_results::Vect
         speedup_str = !isnan(row.cuda_speedup) ? @sprintf("%.1fx", row.cuda_speedup) : "N/A"
 
         @printf("%-40s | %-15s | %-15s | %-15s | %-10s\n",
-                row.operation[1:min(40, length(row.operation))],
-                cpu_str, cuda_str, sitk_str, speedup_str)
+            row.operation[1:min(40, length(row.operation))],
+            cpu_str, cuda_str, sitk_str, speedup_str)
     end
 
     println("-"^100)

@@ -1,0 +1,1108 @@
+   Resolving package versions...
+   Installed RegistryInstances ─────────── v0.1.0
+   Installed JpegTurbo_jll ─────────────── v3.1.4+0
+   Installed LERC_jll ──────────────────── v4.0.1+0
+   Installed LoggingExtras ─────────────── v1.2.0
+   Installed OffsetArrays ──────────────── v1.17.0
+   Installed Enzyme_jll ────────────────── v0.0.238+0
+   Installed Preferences ───────────────── v1.5.1
+   Installed Accessors ─────────────────── v0.1.43
+   Installed LLVMLoopInfo ──────────────── v1.0.0
+   Installed InlineStrings ─────────────── v1.4.5
+   Installed ZipFile ───────────────────── v0.10.1
+   Installed MarchingCubes ─────────────── v0.1.11
+   Installed ConcurrentUtilities ───────── v2.5.0
+   Installed StaticArrays ──────────────── v1.9.16
+   Installed Contour ───────────────────── v0.6.3
+   Installed Git_jll ───────────────────── v2.52.0+0
+   Installed ColorSchemes ──────────────── v3.31.0
+   Installed FiniteDifferences ─────────── v0.12.33
+   Installed Tracy ─────────────────────── v0.1.6
+   Installed NVTX_jll ──────────────────── v3.2.2+0
+   Installed ScopedValues ──────────────── v1.5.0
+   Installed OpenSSL ───────────────────── v1.6.1
+   Installed FileIO ────────────────────── v1.17.1
+   Installed CEnum ─────────────────────── v0.5.0
+   Installed InvertedIndices ───────────── v1.3.1
+   Installed HTTP ──────────────────────── v1.10.19
+   Installed GPUArrays ─────────────────── v11.3.4
+   Installed BFloat16s ─────────────────── v0.6.1
+   Installed DocInventories ────────────── v1.0.0
+   Installed LibTracyClient_jll ────────── v0.13.1+0
+   Installed RandomNumbers ─────────────── v1.6.0
+   Installed DataFrames ────────────────── v1.8.1
+   Installed CUDA_Runtime_jll ──────────── v0.19.2+0
+   Installed ZygoteRules ───────────────── v0.2.7
+   Installed ArgParse ──────────────────── v1.2.0
+   Installed RealDot ───────────────────── v0.1.0
+   Installed Missings ──────────────────── v1.2.0
+   Installed IRTools ───────────────────── v0.4.15
+   Installed demumble_jll ──────────────── v1.3.0+0
+   Installed IrrationalConstants ───────── v0.2.6
+   Installed UnicodePlots ──────────────── v3.8.1
+   Installed LLVM ──────────────────────── v9.4.4
+   Installed Xorg_libpciaccess_jll ─────── v0.18.1+0
+   Installed PtrArrays ─────────────────── v1.3.0
+   Installed H5Zblosc ──────────────────── v0.1.2
+   Installed JSON ──────────────────────── v0.21.4
+   Installed CUDA_Driver_jll ───────────── v13.1.0+2
+   Installed Hwloc_jll ─────────────────── v2.12.2+0
+   Installed SpecialFunctions ──────────── v2.6.1
+   Installed BenchmarkTools ────────────── v1.6.3
+   Installed Enzyme ────────────────────── v0.13.118
+   Installed SimpleBufferStream ────────── v1.2.0
+   Installed XZ_jll ────────────────────── v5.8.2+0
+   Installed MicrosoftMPI_jll ──────────── v10.1.4+3
+   Installed StaticArraysCore ──────────── v1.4.4
+   Installed SentinelArrays ────────────── v1.4.9
+   Installed Zygote ────────────────────── v0.7.10
+   Installed NaNMath ───────────────────── v1.1.3
+   Installed CUDA_Runtime_Discovery ────── v1.0.0
+   Installed CUDA_Compiler_jll ─────────── v0.4.1+1
+   Installed MPIPreferences ────────────── v0.1.11
+   Installed WorkerUtilities ───────────── v1.6.1
+   Installed MbedTLS ───────────────────── v1.1.9
+   Installed Random123 ─────────────────── v1.7.1
+   Installed TranscodingStreams ────────── v0.11.3
+   Installed WeakRefStrings ────────────── v1.4.2
+   Installed Ratios ────────────────────── v0.4.5
+   Installed Lz4_jll ───────────────────── v1.10.1+0
+   Installed MappedArrays ──────────────── v0.4.3
+   Installed CommonSubexpressions ──────── v0.3.1
+   Installed DataStructures ────────────── v0.19.3
+   Installed Colors ────────────────────── v0.13.1
+   Installed ChainRules ────────────────── v1.72.6
+   Installed PaddedViews ───────────────── v0.5.12
+   Installed StatsAPI ──────────────────── v1.8.0
+   Installed ExprTools ─────────────────── v0.1.10
+   Installed ImageTransformations ──────── v0.10.2
+   Installed Compat ────────────────────── v4.18.1
+   Installed HDF5_jll ──────────────────── v1.14.3+3
+   Installed CodecZlib ─────────────────── v0.7.8
+   Installed StatsBase ─────────────────── v0.34.10
+   Installed libpng_jll ────────────────── v1.6.54+0
+   Installed MosaicViews ───────────────── v0.3.4
+   Installed ITKIOWrapper_jll ──────────── v3.0.1+1
+   Installed StructTypes ───────────────── v1.11.0
+   Installed ExceptionUnwrapping ───────── v0.1.11
+   Installed MPICH_jll ─────────────────── v4.3.2+0
+   Installed ANSIColoredPrinters ───────── v0.0.1
+   Installed ImageCore ─────────────────── v0.10.5
+   Installed Scratch ───────────────────── v1.3.0
+   Installed ColorTypes ────────────────── v0.11.5
+   Installed Conda ─────────────────────── v1.10.3
+   Installed DiffRules ─────────────────── v1.15.1
+   Installed TensorCore ────────────────── v0.1.1
+   Installed JSON3 ─────────────────────── v1.14.3
+   Installed PrettyTables ──────────────── v3.1.2
+   Installed Zstd_jll ──────────────────── v1.5.7+1
+   Installed TableTraits ───────────────── v1.0.1
+   Installed CSV ───────────────────────── v0.10.15
+   Installed Expat_jll ─────────────────── v2.7.3+0
+   Installed DiffResults ───────────────── v1.1.0
+   Installed Parsers ───────────────────── v2.8.3
+   Installed PyCall ────────────────────── v1.96.4
+   Installed OpenMPI_jll ───────────────── v4.1.8+1
+   Installed HashArrayMappedTries ──────── v0.2.0
+   Installed PooledArrays ──────────────── v1.4.3
+   Installed Setfield ──────────────────── v1.1.2
+   Installed JLLWrappers ───────────────── v1.7.1
+   Installed AbstractFFTs ──────────────── v1.5.0
+   Installed Libtiff_jll ───────────────── v4.7.2+0
+   Installed ConstructionBase ──────────── v1.6.0
+   Installed ColorVectorSpace ──────────── v0.10.0
+   Installed LLVMExtra_jll ─────────────── v0.0.38+0
+   Installed DataValueInterfaces ───────── v1.0.0
+   Installed AbstractTrees ─────────────── v0.4.5
+   Installed NVTX ──────────────────────── v1.0.3
+   Installed EnzymeCore ────────────────── v0.8.18
+   Installed CoordinateTransformations ─── v0.6.4
+   Installed OrderedCollections ────────── v1.8.1
+   Installed ChainRulesCore ────────────── v1.26.0
+   Installed libcxxwrap_julia_jll ──────── v0.13.4+0
+   Installed Combinatorics ─────────────── v1.1.0
+   Installed Interpolations ────────────── v0.15.1
+   Installed NodeJS_20_jll ─────────────── v20.12.2+0
+   Installed Indexing ──────────────────── v1.1.1
+   Installed HDF5 ──────────────────────── v0.17.2
+   Installed LazilyInitializedFields ───── v1.3.0
+   Installed DocumenterVitepress ───────── v0.2.7
+   Installed LogExpFunctions ───────────── v0.3.29
+   Installed Quaternions ───────────────── v0.7.7
+   Installed StackViews ────────────────── v0.1.2
+   Installed AliasTables ───────────────── v1.1.3
+   Installed KernelAbstractions ────────── v0.9.39
+   Installed Rotations ─────────────────── v1.7.1
+   Installed MacroTools ────────────────── v0.5.16
+   Installed ITK_jll ───────────────────── v5.3.3+0
+   Installed FFTW_jll ──────────────────── v3.3.11+0
+   Installed CompositionsBase ──────────── v0.1.2
+   Installed OpenSpecFun_jll ───────────── v0.5.6+0
+   Installed UnPack ────────────────────── v1.0.2
+   Installed UnsafeAtomics ─────────────── v0.3.0
+   Installed InverseFunctions ──────────── v0.1.17
+   Installed SparseInverseSubset ───────── v0.1.2
+   Installed Git ───────────────────────── v1.5.0
+   Installed DocStringExtensions ───────── v0.9.5
+   Installed GPUArraysCore ─────────────── v0.2.0
+   Installed Blosc_jll ─────────────────── v1.21.7+0
+   Installed Atomix ────────────────────── v1.1.2
+   Installed libaec_jll ────────────────── v1.1.4+0
+   Installed Crayons ───────────────────── v4.1.1
+   Installed Adapt ─────────────────────── v4.4.0
+   Installed XML2_jll ──────────────────── v2.13.9+0
+   Installed ImageBase ─────────────────── v0.1.7
+   Installed MarkdownAST ───────────────── v0.1.2
+   Installed Documenter ────────────────── v1.16.1
+   Installed OpenSSL_jll ───────────────── v3.5.4+0
+   Installed BitFlags ──────────────────── v0.1.9
+   Installed IOCapture ─────────────────── v1.0.0
+   Installed GPUCompiler ───────────────── v1.8.0
+   Installed Tables ────────────────────── v1.12.1
+   Installed CxxWrap ───────────────────── v0.16.2
+   Installed DataAPI ───────────────────── v1.16.0
+   Installed Dictionaries ──────────────── v0.4.6
+   Installed FixedPointNumbers ─────────── v0.8.5
+   Installed Richardson ────────────────── v1.4.2
+   Installed StructIO ──────────────────── v0.3.1
+   Installed ITKIOWrapper ──────────────── v4.0.2
+   Installed Libiconv_jll ──────────────── v1.18.0+0
+   Installed IteratorInterfaceExtensions ─ v1.0.0
+   Installed JLD ───────────────────────── v0.13.5
+   Installed URIs ──────────────────────── v1.6.1
+   Installed PrecompileTools ───────────── v1.2.1
+   Installed VersionParsing ────────────── v1.3.0
+   Installed StructArrays ──────────────── v0.7.2
+   Installed GPUToolbox ────────────────── v1.0.0
+   Installed OpenSSH_jll ───────────────── v10.2.1+0
+   Installed LaTeXStrings ──────────────── v1.4.0
+   Installed ForwardDiff ───────────────── v1.3.1
+   Installed JuliaNVTXCallbacks_jll ────── v0.2.1+0
+   Installed FilePathsBase ─────────────── v0.9.24
+   Installed FillArrays ────────────────── v1.16.0
+   Installed MPItrampoline_jll ─────────── v5.5.4+0
+   Installed ObjectFile ────────────────── v0.5.0
+   Installed AxisAlgorithms ────────────── v1.1.0
+   Installed Git_LFS_jll ───────────────── v3.7.0+0
+   Installed Requires ──────────────────── v1.3.1
+   Installed WoodburyMatrices ──────────── v1.1.0
+   Installed Parameters ────────────────── v0.12.3
+   Installed SortingAlgorithms ─────────── v1.2.2
+   Installed StringManipulation ────────── v0.4.2
+   Installed CUDA ──────────────────────── v5.9.6
+   Installed TextWrap ──────────────────── v1.0.2
+   Installed Blosc ─────────────────────── v0.7.3
+ Downloading artifact: CUDA_Runtime
+  No Changes to `/workspaces/MedImages.jl/benchmark/Project.toml`
+  No Changes to `/workspaces/MedImages.jl/benchmark/Manifest.toml`
+    Building Conda ─→ `/data/scratchspaces/44cfe95a-1eb2-52ea-b672-e2afdf69b78f/8f06b0cfa4c514c7b9546756dbae91fcfbc92dc9/build.log`
+    Building PyCall → `/data/scratchspaces/44cfe95a-1eb2-52ea-b672-e2afdf69b78f/9816a3826b0ebf49ab4926e2b18842ad8b5c8f04/build.log`
+Precompiling packages...
+    343.8 ms  ✓ IOCapture
+    256.5 ms  ✓ LLVMLoopInfo
+    239.6 ms  ✓ IteratorInterfaceExtensions
+    252.9 ms  ✓ StatsAPI
+    251.4 ms  ✓ CEnum
+    265.4 ms  ✓ ExprTools
+    268.3 ms  ✓ Contour
+    274.4 ms  ✓ LaTeXStrings
+    278.9 ms  ✓ TensorCore
+    288.4 ms  ✓ WorkerUtilities
+    334.2 ms  ✓ AbstractFFTs
+    344.0 ms  ✓ VersionParsing
+    458.7 ms  ✓ Combinatorics
+    444.8 ms  ✓ StructTypes
+    236.5 ms  ✓ Richardson
+    247.1 ms  ✓ UnPack
+    274.0 ms  ✓ ANSIColoredPrinters
+    302.6 ms  ✓ InverseFunctions
+    359.9 ms  ✓ ConcurrentUtilities
+    391.4 ms  ✓ Preferences
+    238.1 ms  ✓ TextWrap
+    337.5 ms  ✓ Compat
+    221.1 ms  ✓ DataValueInterfaces
+    238.8 ms  ✓ StructIO
+    765.3 ms  ✓ SentinelArrays
+    483.1 ms  ✓ RandomNumbers
+    274.8 ms  ✓ Requires
+    346.7 ms  ✓ OrderedCollections
+    219.2 ms  ✓ RealDot
+    569.2 ms  ✓ FillArrays
+    498.1 ms  ✓ MbedTLS
+    597.5 ms  ✓ OffsetArrays
+    323.9 ms  ✓ DocStringExtensions
+    237.3 ms  ✓ SimpleBufferStream
+    228.7 ms  ✓ CompositionsBase
+    312.0 ms  ✓ AbstractTrees
+    233.7 ms  ✓ PtrArrays
+   1021.4 ms  ✓ UnsafeAtomics
+    349.6 ms  ✓ InlineStrings
+    278.1 ms  ✓ ExceptionUnwrapping
+    338.6 ms  ✓ URIs
+    263.3 ms  ✓ HashArrayMappedTries
+    276.2 ms  ✓ NaNMath
+    377.0 ms  ✓ BFloat16s
+    257.6 ms  ✓ LazilyInitializedFields
+    343.0 ms  ✓ TranscodingStreams
+    263.1 ms  ✓ InvertedIndices
+    271.5 ms  ✓ DataAPI
+    308.5 ms  ✓ ConstructionBase
+    278.4 ms  ✓ BitFlags
+    270.0 ms  ✓ Scratch
+    233.7 ms  ✓ Indexing
+   1065.5 ms  ✓ MacroTools
+    671.1 ms  ✓ IrrationalConstants
+    317.1 ms  ✓ LoggingExtras
+    386.8 ms  ✓ EnzymeCore
+    598.2 ms  ✓ CUDA_Runtime_Discovery
+    288.4 ms  ✓ StaticArraysCore
+    286.4 ms  ✓ MappedArrays
+    312.1 ms  ✓ SuiteSparse
+    333.6 ms  ✓ ZipFile
+    231.3 ms  ✓ TableTraits
+    250.3 ms  ✓ InverseFunctions → InverseFunctionsDatesExt
+    343.6 ms  ✓ WoodburyMatrices
+    284.5 ms  ✓ JLLWrappers
+    263.4 ms  ✓ PrecompileTools
+    254.2 ms  ✓ Compat → CompatLinearAlgebraExt
+    310.7 ms  ✓ MPIPreferences
+    630.1 ms  ✓ Crayons
+    240.6 ms  ✓ Ratios
+    249.7 ms  ✓ Adapt
+    253.4 ms  ✓ Parameters
+    459.8 ms  ✓ ArgParse
+    245.4 ms  ✓ StackViews
+    296.8 ms  ✓ Quaternions
+    264.1 ms  ✓ PaddedViews
+    500.4 ms  ✓ Random123
+    272.2 ms  ✓ AliasTables
+    621.0 ms  ✓ AbstractFFTs → AbstractFFTsTestExt
+    298.2 ms  ✓ Atomix
+    244.2 ms  ✓ ScopedValues
+    372.4 ms  ✓ FillArrays → FillArraysSparseArraysExt
+    374.2 ms  ✓ MarkdownAST
+    279.9 ms  ✓ CodecZlib
+    232.5 ms  ✓ ConstructionBase → ConstructionBaseLinearAlgebraExt
+    294.0 ms  ✓ PooledArrays
+    278.4 ms  ✓ Missings
+    266.7 ms  ✓ CommonSubexpressions
+    362.3 ms  ✓ RegistryInstances
+    240.3 ms  ✓ DiffResults
+    309.0 ms  ✓ SparseInverseSubset
+    949.5 ms  ✓ ObjectFile
+    403.8 ms  ✓ LogExpFunctions
+    255.3 ms  ✓ CompositionsBase → CompositionsBaseInverseFunctionsExt
+    291.3 ms  ✓ InverseFunctions → InverseFunctionsTestExt
+    510.6 ms  ✓ Dictionaries
+    884.7 ms  ✓ DataStructures
+    420.6 ms  ✓ Tables
+   1160.0 ms  ✓ FixedPointNumbers
+    306.4 ms  ✓ OpenSSL_jll
+    331.0 ms  ✓ AxisAlgorithms
+    321.7 ms  ✓ NodeJS_20_jll
+    343.9 ms  ✓ Lz4_jll
+    340.8 ms  ✓ Xorg_libpciaccess_jll
+    334.6 ms  ✓ libaec_jll
+    325.2 ms  ✓ NVTX_jll
+    328.9 ms  ✓ LibTracyClient_jll
+    308.4 ms  ✓ libpng_jll
+    302.0 ms  ✓ demumble_jll
+    335.6 ms  ✓ LERC_jll
+    378.8 ms  ✓ libcxxwrap_julia_jll
+    329.2 ms  ✓ XZ_jll
+    367.7 ms  ✓ Enzyme_jll
+   1325.7 ms  ✓ FileIO
+    354.3 ms  ✓ JpegTurbo_jll
+    650.4 ms  ✓ CUDA_Driver_jll
+    917.0 ms  ✓ IRTools
+    339.0 ms  ✓ LLVMExtra_jll
+    325.3 ms  ✓ Zstd_jll
+    308.1 ms  ✓ Expat_jll
+    283.7 ms  ✓ MicrosoftMPI_jll
+    303.7 ms  ✓ JuliaNVTXCallbacks_jll
+    299.6 ms  ✓ Git_LFS_jll
+    303.3 ms  ✓ FFTW_jll
+    330.4 ms  ✓ Libiconv_jll
+    290.9 ms  ✓ OpenSpecFun_jll
+    286.3 ms  ✓ MPItrampoline_jll
+    262.3 ms  ✓ GPUArraysCore
+    298.7 ms  ✓ OpenMPI_jll
+    307.3 ms  ✓ Adapt → AdaptSparseArraysExt
+    243.2 ms  ✓ OffsetArrays → OffsetArraysAdaptExt
+    234.4 ms  ✓ EnzymeCore → AdaptExt
+    415.7 ms  ✓ FilePathsBase
+    275.2 ms  ✓ MosaicViews
+    244.3 ms  ✓ LogExpFunctions → LogExpFunctionsInverseFunctionsExt
+    323.5 ms  ✓ FillArrays → FillArraysStatisticsExt
+    283.9 ms  ✓ SortingAlgorithms
+    624.3 ms  ✓ ChainRulesCore
+    303.4 ms  ✓ Ratios → RatiosFixedPointNumbersExt
+    504.8 ms  ✓ DocInventories
+    317.0 ms  ✓ OpenSSH_jll
+    450.3 ms  ✓ StructArrays
+    569.4 ms  ✓ Setfield
+    280.2 ms  ✓ Blosc_jll
+    930.1 ms  ✓ StringManipulation
+    280.3 ms  ✓ Libtiff_jll
+    536.7 ms  ✓ Tracy
+    324.8 ms  ✓ XML2_jll
+    315.5 ms  ✓ Git_jll
+CUDA_Runtime_jll Waiting for background task / IO / timer.
+[pid 10562] waiting for IO to finish:
+ Handle type        uv_handle_t->data
+ process[10713]     0x3a39b3c0->0x74d364882460
+This means that a package has started a background task or event source that has not finished running. For precompilation to complete successfully, the event source needs to be closed explicitly. See the developer documentation on fixing precompilation hangs for more help.
+    238.5 ms  ✓ FilePathsBase → FilePathsBaseMmapExt
+    480.5 ms  ✓ NVTX
+    941.4 ms  ✓ Accessors
+    320.8 ms  ✓ ChainRulesCore → ChainRulesCoreSparseArraysExt
+    895.2 ms  ✓ OpenSSL
+    251.3 ms  ✓ AbstractFFTs → AbstractFFTsChainRulesCoreExt
+    287.0 ms  ✓ EnzymeCore → EnzymeCoreChainRulesCoreExt
+    497.4 ms  ✓ ZygoteRules
+    300.2 ms  ✓ StructArrays → StructArraysLinearAlgebraExt
+   1174.1 ms  ✓ ColorTypes
+   1020.6 ms  ✓ CUDA_Runtime_jll
+    295.4 ms  ✓ Blosc
+    251.1 ms  ✓ Git
+    322.8 ms  ✓ Hwloc_jll
+    292.6 ms  ✓ Accessors → LinearAlgebraExt
+    250.0 ms  ✓ StructArrays → StructArraysAdaptExt
+    622.2 ms  ✓ LogExpFunctions → LogExpFunctionsChainRulesCoreExt
+    422.7 ms  ✓ FilePathsBase → FilePathsBaseTestExt
+    342.4 ms  ✓ StructArrays → StructArraysSparseArraysExt
+   1185.1 ms  ✓ SpecialFunctions
+   1073.1 ms  ✓ StatsBase
+    298.9 ms  ✓ Accessors → StructArraysExt
+    308.2 ms  ✓ Accessors → TestExt
+    352.4 ms  ✓ MPICH_jll
+    343.8 ms  ✓ DiffRules
+    926.6 ms  ✓ CUDA_Compiler_jll
+    501.6 ms  ✓ HDF5_jll
+   1077.6 ms  ✓ ColorVectorSpace
+    840.2 ms  ✓ SpecialFunctions → SpecialFunctionsChainRulesCoreExt
+    375.9 ms  ✓ ColorVectorSpace → SpecialFunctionsExt
+   2518.7 ms  ✓ LLVM
+   3225.3 ms  ✓ StaticArrays
+    280.7 ms  ✓ LLVM → BFloat16sExt
+    308.1 ms  ✓ GPUToolbox
+   1922.8 ms  ✓ Colors
+    362.5 ms  ✓ StaticArrays → StaticArraysChainRulesCoreExt
+    431.9 ms  ✓ CoordinateTransformations
+    447.7 ms  ✓ StaticArrays → StaticArraysStatisticsExt
+    358.8 ms  ✓ FillArrays → FillArraysStaticArraysExt
+    361.6 ms  ✓ ConstructionBase → ConstructionBaseStaticArraysExt
+    354.2 ms  ✓ Adapt → AdaptStaticArraysExt
+    790.0 ms  ✓ UnsafeAtomics → UnsafeAtomicsLLVM
+   1758.9 ms  ✓ ForwardDiff
+    473.2 ms  ✓ NVTX → NVTXColorsExt
+   2389.8 ms  ✓ ChainRules
+    397.2 ms  ✓ StructArrays → StructArraysStaticArraysExt
+    580.9 ms  ✓ FiniteDifferences
+    418.0 ms  ✓ Accessors → StaticArraysExt
+   4563.2 ms  ✓ Parsers
+    997.5 ms  ✓ Rotations
+    421.5 ms  ✓ ForwardDiff → ForwardDiffStaticArraysExt
+    263.7 ms  ✓ InlineStrings → ParsersExt
+    954.3 ms  ✓ Interpolations
+    683.8 ms  ✓ JSON
+    447.1 ms  ✓ WeakRefStrings
+   2761.6 ms  ✓ HDF5
+   1931.8 ms  ✓ MarchingCubes
+    369.4 ms  ✓ Conda
+   1514.5 ms  ✓ KernelAbstractions
+    397.8 ms  ✓ H5Zblosc
+   1982.8 ms  ✓ ColorSchemes
+    373.7 ms  ✓ KernelAbstractions → LinearAlgebraExt
+    781.1 ms  ✓ BenchmarkTools
+    422.5 ms  ✓ KernelAbstractions → EnzymeExt
+    412.0 ms  ✓ StructArrays → StructArraysGPUArraysCoreExt
+    466.4 ms  ✓ KernelAbstractions → SparseArraysExt
+    849.9 ms  ✓ JLD
+   2547.0 ms  ✓ JSON3
+   4566.5 ms  ✓ ITK_jll
+    365.0 ms  ✓ ITKIOWrapper_jll
+   1864.3 ms  ✓ GPUArrays
+   6917.8 ms  ✓ HTTP
+    369.0 ms  ✓ FileIO → HTTPExt
+   4876.1 ms  ✓ PyCall
+  10023.7 ms  ✓ PrettyTables
+   8890.2 ms  ✓ GPUCompiler
+   8581.2 ms  ✓ ImageCore
+   7117.5 ms  ✓ CSV
+   1006.7 ms  ✓ ImageBase
+  13249.3 ms  ✓ CxxWrap
+    935.3 ms  ✓ ImageTransformations
+    836.9 ms  ✓ ITKIOWrapper
+   9971.8 ms  ✓ Documenter
+    655.6 ms  ✓ DocumenterVitepress
+  13133.9 ms  ✓ Zygote
+    687.2 ms  ✓ Zygote → ZygoteColorsExt
+  14280.5 ms  ✓ DataFrames
+  20415.9 ms  ✓ UnicodePlots
+  19342.7 ms  ✓ Enzyme
+    554.6 ms  ✓ Enzyme → EnzymeGPUArraysCoreExt
+    563.2 ms  ✓ Enzyme → EnzymeChainRulesCoreExt
+    604.0 ms  ✓ Enzyme → EnzymeBFloat16sExt
+    646.0 ms  ✓ Enzyme → EnzymeLogExpFunctionsExt
+    861.5 ms  ✓ Enzyme → EnzymeSpecialFunctionsExt
+   6173.5 ms  ✓ Enzyme → EnzymeStaticArraysExt
+  19484.2 ms  ✓ CUDA
+   1929.9 ms  ✓ Atomix → AtomixCUDAExt
+   2106.7 ms  ✓ CUDA → ChainRulesCoreExt
+   2109.5 ms  ✓ CUDA → SpecialFunctionsExt
+   2229.5 ms  ✓ CUDA → EnzymeCoreExt
+  11904.9 ms  ✓ MedImages
+  250 dependencies successfully precompiled in 65 seconds. 13 already precompiled.
+  1 dependency had output during precompilation:
+┌ CUDA_Runtime_jll
+│  [pid 10562] waiting for IO to finish:
+│   Handle type        uv_handle_t->data
+│   process[10713]     0x3a39b3c0->0x74d364882460
+│  This means that a package has started a background task or event source that has not finished running. For precompilation to complete successfully, the event source needs to be closed explicitly. See the developer documentation on fixing precompilation hangs for more help.
+└  
+   Resolving package versions...
+  No Changes to `/workspaces/MedImages.jl/benchmark/Project.toml`
+  No Changes to `/workspaces/MedImages.jl/benchmark/Manifest.toml`
+   Resolving package versions...
+  No Changes to `/workspaces/MedImages.jl/benchmark/Project.toml`
+  No Changes to `/workspaces/MedImages.jl/benchmark/Manifest.toml`
+  Activating project at `/workspaces/MedImages.jl`
+  Activating project at `/workspaces/MedImages.jl/benchmark`
+CUDA available: NVIDIA GeForce RTX 3090
+CUDA memory: 23 GB
+================================================================================
+MedImages.jl GPU Benchmark Suite
+================================================================================
+Start time: 2026-01-24T15:24:33.037
+
+================================================================================
+Benchmark Configuration
+================================================================================
+
+Image Sizes:
+  xlarge: 1024 x 1024 x 512
+  large: 512 x 512 x 256
+  small: 128 x 128 x 64
+  medium: 256 x 256 x 128
+
+Interpolation Methods:
+  - Nearest Neighbor
+  - Linear
+
+Spacing Configurations:
+  anisotropic_ct: 0.7 x 0.7 x 5.0 mm
+  anisotropic_mri: 1.0 x 1.0 x 3.0 mm
+  isotropic: 1.0 x 1.0 x 1.0 mm
+
+Resampling Factors:
+  downsample_2x: 0.5x
+  upsample_1_5x: 1.5x
+  downsample_4x: 0.25x
+
+Point Counts: 100000, 1000000
+
+Backends:
+  - CPU (GPU: false)
+  - CUDA (GPU: true)
+
+Benchmark Settings:
+  Samples: 10
+  Min time: 2.0s
+  Warmup iterations: 3
+
+Output:
+  Results directory: benchmark_results
+  Compare SimpleITK: true
+================================================================================
+Creating synthetic test images...
+  Creating xlarge image: 1024x1024x512
+  Creating large image: 512x512x256
+  Creating medium image: 256x256x128
+
+================================================================================
+Starting Benchmark Suite
+================================================================================
+Operations: all
+Backends: cuda
+================================================================================
+
+================================================================================
+Image Size: xlarge (1024x1024x512)
+================================================================================
+
+--------------------------------------------------------------------------------
+Backend: CUDA
+--------------------------------------------------------------------------------
+
+### Interpolation Kernel Benchmarks ###
+
+Benchmarking interpolate_kernel: CUDA backend, 100000 points, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.026 ms (median), 0.039 ms (mean), 0.028 ms (std)
+  Throughput: 3.79e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 100000 points, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.107 ms (median), 0.180 ms (mean), 0.154 ms (std)
+  Throughput: 9.30e+08 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 1000000 points, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.166 ms (median), 0.195 ms (mean), 0.063 ms (std)
+  Throughput: 6.04e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 1000000 points, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.905 ms (median), 0.917 ms (mean), 0.053 ms (std)
+  Throughput: 1.11e+09 points/sec
+  Memory: 0.0 MB
+
+### Resampling Benchmarks ###
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.50x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 1024x1024x512
+  Output dims: 512x512x256
+  Time: 3.012 ms (median), 3.008 ms (mean), 0.060 ms (std)
+  Throughput: 1.78e+11 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.50x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 1024x1024x512
+  Output dims: 512x512x256
+  Time: 4.487 ms (median), 4.455 ms (mean), 0.062 ms (std)
+  Throughput: 1.20e+11 voxels/sec
+  Memory: 0.0 MB
+  Skipping upsampling (upsample_1_5x) for xlarge to avoid OOM
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.25x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 1024x1024x512
+  Output dims: 256x256x128
+  Time: 0.381 ms (median), 0.421 ms (mean), 0.083 ms (std)
+  Throughput: 1.41e+12 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.25x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 1024x1024x512
+  Output dims: 256x256x128
+  Time: 0.688 ms (median), 0.703 ms (mean), 0.037 ms (std)
+  Throughput: 7.81e+11 voxels/sec
+  Memory: 0.0 MB
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CUDA backend, 90 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 57421.778 ms (median), 57421.778 ms (mean), 0.000 ms (std)
+  Throughput: 9.35e+06 voxels/sec
+  Memory: 83968.0 MB
+
+Benchmarking rotate_mi: CUDA backend, 180 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 60029.138 ms (median), 60029.138 ms (mean), 0.000 ms (std)
+  Throughput: 8.94e+06 voxels/sec
+  Memory: 83968.0 MB
+
+Benchmarking rotate_mi: CUDA backend, 270 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 60287.652 ms (median), 60287.652 ms (mean), 0.000 ms (std)
+  Throughput: 8.91e+06 voxels/sec
+  Memory: 83968.0 MB
+
+### Crop Benchmarks ###
+
+Benchmarking crop_mi: CUDA backend, 10.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 6.27e+14 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking crop_mi: CUDA backend, 50.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 4.15e+14 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking crop_mi: CUDA backend, 30.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 6.04e+14 voxels/sec
+  Memory: 0.0 MB
+
+### Pad Benchmarks (skipped - CUDA scalar indexing not supported) ###
+
+### Orientation Change Benchmarks ###
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_LAS
+  Running benchmark...
+  Time: 5.488 ms (median), 5.644 ms (mean), 0.230 ms (std)
+  Throughput: 9.78e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_RAS
+  Running benchmark...
+  Time: 5.732 ms (median), 5.736 ms (mean), 0.192 ms (std)
+  Throughput: 9.37e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_RPI
+  Running benchmark...
+  Time: 5.765 ms (median), 5.758 ms (mean), 0.248 ms (std)
+  Throughput: 9.31e+10 voxels/sec
+  Memory: 0.0 MB
+
+================================================================================
+Image Size: large (512x512x256)
+================================================================================
+
+--------------------------------------------------------------------------------
+Backend: CUDA
+--------------------------------------------------------------------------------
+
+### Interpolation Kernel Benchmarks ###
+
+Benchmarking interpolate_kernel: CUDA backend, 100000 points, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.028 ms (median), 0.041 ms (mean), 0.039 ms (std)
+  Throughput: 3.61e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 100000 points, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.138 ms (median), 0.159 ms (mean), 0.072 ms (std)
+  Throughput: 7.22e+08 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 1000000 points, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.164 ms (median), 0.201 ms (mean), 0.075 ms (std)
+  Throughput: 6.11e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 1000000 points, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.808 ms (median), 0.821 ms (mean), 0.074 ms (std)
+  Throughput: 1.24e+09 points/sec
+  Memory: 0.0 MB
+
+### Resampling Benchmarks ###
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.50x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 512x512x256
+  Output dims: 256x256x128
+  Time: 0.382 ms (median), 0.391 ms (mean), 0.029 ms (std)
+  Throughput: 1.76e+11 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.50x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 512x512x256
+  Output dims: 256x256x128
+  Time: 0.565 ms (median), 0.584 ms (mean), 0.039 ms (std)
+  Throughput: 1.19e+11 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, upsample 1.50x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 512x512x256
+  Output dims: 768x768x384
+  Time: 9.936 ms (median), 9.936 ms (mean), 0.072 ms (std)
+  Throughput: 6.75e+09 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, upsample 1.50x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 512x512x256
+  Output dims: 768x768x384
+  Time: 14.699 ms (median), 14.725 ms (mean), 0.105 ms (std)
+  Throughput: 4.57e+09 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.25x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 512x512x256
+  Output dims: 128x128x64
+  Time: 0.057 ms (median), 0.073 ms (mean), 0.048 ms (std)
+  Throughput: 1.18e+12 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.25x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 512x512x256
+  Output dims: 128x128x64
+  Time: 0.159 ms (median), 0.191 ms (mean), 0.103 ms (std)
+  Throughput: 4.23e+11 voxels/sec
+  Memory: 0.0 MB
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CUDA backend, 90 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 7860.819 ms (median), 7860.819 ms (mean), 0.000 ms (std)
+  Throughput: 8.54e+06 voxels/sec
+  Memory: 10496.0 MB
+
+Benchmarking rotate_mi: CUDA backend, 180 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 7910.152 ms (median), 7910.152 ms (mean), 0.000 ms (std)
+  Throughput: 8.48e+06 voxels/sec
+  Memory: 10496.0 MB
+
+Benchmarking rotate_mi: CUDA backend, 270 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 7858.004 ms (median), 7858.004 ms (mean), 0.000 ms (std)
+  Throughput: 8.54e+06 voxels/sec
+  Memory: 10496.0 MB
+
+### Crop Benchmarks ###
+
+Benchmarking crop_mi: CUDA backend, 10.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 7.29e+13 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking crop_mi: CUDA backend, 50.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 7.39e+13 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking crop_mi: CUDA backend, 30.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 7.41e+13 voxels/sec
+  Memory: 0.0 MB
+
+### Pad Benchmarks (skipped - CUDA scalar indexing not supported) ###
+
+### Orientation Change Benchmarks ###
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_LAS
+  Running benchmark...
+  Time: 0.705 ms (median), 0.730 ms (mean), 0.051 ms (std)
+  Throughput: 9.51e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_RAS
+  Running benchmark...
+  Time: 0.693 ms (median), 0.703 ms (mean), 0.031 ms (std)
+  Throughput: 9.68e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_RPI
+  Running benchmark...
+  Time: 0.696 ms (median), 0.709 ms (mean), 0.028 ms (std)
+  Throughput: 9.65e+10 voxels/sec
+  Memory: 0.0 MB
+
+================================================================================
+Image Size: medium (256x256x128)
+================================================================================
+
+--------------------------------------------------------------------------------
+Backend: CUDA
+--------------------------------------------------------------------------------
+
+### Interpolation Kernel Benchmarks ###
+
+Benchmarking interpolate_kernel: CUDA backend, 100000 points, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.023 ms (median), 0.054 ms (mean), 0.094 ms (std)
+  Throughput: 4.28e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 100000 points, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.073 ms (median), 0.103 ms (mean), 0.077 ms (std)
+  Throughput: 1.38e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 1000000 points, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.137 ms (median), 0.179 ms (mean), 0.071 ms (std)
+  Throughput: 7.29e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 1000000 points, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.577 ms (median), 0.599 ms (mean), 0.048 ms (std)
+  Throughput: 1.73e+09 points/sec
+  Memory: 0.0 MB
+
+### Resampling Benchmarks ###
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.50x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 256x256x128
+  Output dims: 128x128x64
+  Time: 0.056 ms (median), 0.075 ms (mean), 0.058 ms (std)
+  Throughput: 1.50e+11 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.50x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 256x256x128
+  Output dims: 128x128x64
+  Time: 0.116 ms (median), 1.085 ms (mean), 2.079 ms (std)
+  Throughput: 7.24e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, upsample 1.50x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 256x256x128
+  Output dims: 384x384x192
+  Time: 1.377 ms (median), 1.371 ms (mean), 0.065 ms (std)
+  Throughput: 6.09e+09 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, upsample 1.50x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 256x256x128
+  Output dims: 384x384x192
+  Time: 1.914 ms (median), 1.931 ms (mean), 0.083 ms (std)
+  Throughput: 4.38e+09 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.25x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 256x256x128
+  Output dims: 64x64x32
+  Time: 0.017 ms (median), 0.033 ms (mean), 0.034 ms (std)
+  Throughput: 4.90e+11 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.25x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 256x256x128
+  Output dims: 64x64x32
+  Time: 0.023 ms (median), 0.053 ms (mean), 0.092 ms (std)
+  Throughput: 3.63e+11 voxels/sec
+  Memory: 0.0 MB
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CUDA backend, 90 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 1045.165 ms (median), 1042.311 ms (mean), 15.632 ms (std)
+  Throughput: 8.03e+06 voxels/sec
+  Memory: 1312.0 MB
+
+Benchmarking rotate_mi: CUDA backend, 180 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 1051.356 ms (median), 1050.198 ms (mean), 10.527 ms (std)
+  Throughput: 7.98e+06 voxels/sec
+  Memory: 1312.0 MB
+
+Benchmarking rotate_mi: CUDA backend, 270 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 1030.205 ms (median), 1027.095 ms (mean), 5.473 ms (std)
+  Throughput: 8.14e+06 voxels/sec
+  Memory: 1312.0 MB
+
+### Crop Benchmarks ###
+
+Benchmarking crop_mi: CUDA backend, 10.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 9.84e+12 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking crop_mi: CUDA backend, 50.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 8.91e+12 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking crop_mi: CUDA backend, 30.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 9.84e+12 voxels/sec
+  Memory: 0.0 MB
+
+### Pad Benchmarks (skipped - CUDA scalar indexing not supported) ###
+
+### Orientation Change Benchmarks ###
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_LAS
+  Running benchmark...
+  Time: 0.171 ms (median), 0.177 ms (mean), 0.082 ms (std)
+  Throughput: 4.91e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_RAS
+  Running benchmark...
+  Time: 0.099 ms (median), 0.115 ms (mean), 0.050 ms (std)
+  Throughput: 8.51e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_RPI
+  Running benchmark...
+  Time: 0.098 ms (median), 0.144 ms (mean), 0.084 ms (std)
+  Throughput: 8.52e+10 voxels/sec
+  Memory: 0.0 MB
+
+================================================================================
+Memory Transfer Benchmarks
+================================================================================
+
+Benchmarking memory transfer: (1024, 1024, 512)
+  CPU -> GPU transfer...
+    Time: 179.120 ms (median)
+    Transfer rate: 11433.67 MB/s
+  GPU -> CPU transfer...
+    Time: 754.278 ms (median)
+    Transfer rate: 2715.18 MB/s
+
+================================================================================
+Generating Reports
+================================================================================
+Results saved to: gpu1_final_complete/results.csv
+Report saved to: gpu1_final_complete/report.md
+
+================================================================================
+Benchmark Summary
+================================================================================
+
+Total benchmarks run: 55
+  Interpolation: 12
+  Resampling: 16
+  Rotation: 9
+  Crop: 9
+  Orientation: 9
+
+Average CUDA Speedups:
+================================================================================
+
+================================================================================
+Benchmark Visualization
+================================================================================
+
+================================================================================
+SimpleITK Comparison
+================================================================================
+┌ Warning: SimpleITK comparison failed
+│   exception =
+│    LoadError: PyError (PyImport_ImportModule
+│    
+│    The Python package SimpleITK could not be imported by pyimport. Usually this means
+│    that you did not install SimpleITK in the Python version being used by PyCall.
+│    
+│    PyCall is currently configured to use the Python version at:
+│    
+│    /usr/bin/python3
+│    
+│    and you should use whatever mechanism you usually use (apt-get, pip, conda,
+│    etcetera) to install the Python package containing the SimpleITK module.
+│    
+│    One alternative is to re-configure PyCall to use a different Python
+│    version on your system: set ENV["PYTHON"] to the path/name of the python
+│    executable you want to use, run Pkg.build("PyCall"), and re-launch Julia.
+│    
+│    Another alternative is to configure PyCall to use a Julia-specific Python
+│    distribution via the Conda.jl package (which installs a private Anaconda
+│    Python distribution), which has the advantage that packages can be installed
+│    and kept up-to-date via Julia.  As explained in the PyCall documentation,
+│    set ENV["PYTHON"]="", run Pkg.build("PyCall"), and re-launch Julia. Then,
+│    To install the SimpleITK module, you can use `pyimport_conda("SimpleITK", PKG)`,
+│    where PKG is the Anaconda package that contains the module SimpleITK,
+│    or alternatively you can use the Conda package directly (via
+│    `using Conda` followed by `Conda.add` etcetera).
+│    
+│    ) <class 'ModuleNotFoundError'>
+│    ModuleNotFoundError("No module named 'SimpleITK'")
+│    
+│    in expression starting at /workspaces/MedImages.jl/benchmark/simpleitk_benchmarks.jl:12
+└ @ Main /workspaces/MedImages.jl/benchmark/benchmark_utils.jl:336
+SimpleITK comparison skipped due to error
+
+================================================================================
+Benchmark Complete!
+================================================================================
+End time: 2026-01-24T15:34:39.188
+Results saved to: gpu1_final_complete
+  - CSV: gpu1_final_complete/results.csv
+  - Report: gpu1_final_complete/report.md
+================================================================================

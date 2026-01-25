@@ -36,16 +36,16 @@ function save_results_csv(results::Vector, output_file::String)
 
     # Convert to DataFrame
     df = DataFrame(
-        name = [r.name for r in results],
-        operation = [r.operation for r in results],
-        backend = [r.backend for r in results],
-        image_size = [r.image_size for r in results],
-        time_mean_ms = [r.time_mean * 1000 for r in results],
-        time_median_ms = [r.time_median * 1000 for r in results],
-        time_std_ms = [r.time_std * 1000 for r in results],
-        memory_mb = [r.memory_bytes / 1024^2 for r in results],
-        throughput = [r.throughput for r in results],
-        timestamp = [r.timestamp for r in results]
+        name=[r.name for r in results],
+        operation=[r.operation for r in results],
+        backend=[r.backend for r in results],
+        image_size=[r.image_size for r in results],
+        time_mean_ms=[r.time_mean * 1000 for r in results],
+        time_median_ms=[r.time_median * 1000 for r in results],
+        time_std_ms=[r.time_std * 1000 for r in results],
+        memory_mb=[r.memory_bytes / 1024^2 for r in results],
+        throughput=[r.throughput for r in results],
+        timestamp=[r.timestamp for r in results]
     )
 
     # Collect all parameter keys first
@@ -59,7 +59,7 @@ function save_results_csv(results::Vector, output_file::String)
     # Add parameter columns initialized with missing
     for key in all_keys
         col_name = Symbol("param_$key")
-        df[!, col_name] = Vector{Union{Missing, Any}}(missing, nrow(df))
+        df[!, col_name] = Vector{Union{Missing,Any}}(missing, nrow(df))
     end
 
     # Fill parameter values
@@ -173,16 +173,16 @@ function generate_markdown_report(results::Vector, output_file::String; memory_s
 
             if haskey(memory_stats, "cpu_to_gpu_time")
                 @printf(io, "| CPU → GPU | %.2f | %.2f | %.1f |\n",
-                        memory_stats["cpu_to_gpu_time"] * 1000,
-                        memory_stats["cpu_to_gpu_rate_mbs"],
-                        memory_stats["data_size_mb"])
+                    memory_stats["cpu_to_gpu_time"] * 1000,
+                    memory_stats["cpu_to_gpu_rate_mbs"],
+                    memory_stats["data_size_mb"])
             end
 
             if haskey(memory_stats, "gpu_to_cpu_time")
                 @printf(io, "| GPU → CPU | %.2f | %.2f | %.1f |\n",
-                        memory_stats["gpu_to_cpu_time"] * 1000,
-                        memory_stats["gpu_to_cpu_rate_mbs"],
-                        memory_stats["data_size_mb"])
+                    memory_stats["gpu_to_cpu_time"] * 1000,
+                    memory_stats["gpu_to_cpu_rate_mbs"],
+                    memory_stats["data_size_mb"])
             end
 
             println(io)
@@ -298,7 +298,7 @@ function plot_benchmark_results(results::Vector)
         end
 
     catch e
-        @warn "Failed to generate plots (UnicodePlots may not be available)" exception=e
+        @warn "Failed to generate plots (UnicodePlots may not be available)" exception = e
     end
 end
 
@@ -324,14 +324,16 @@ function compare_with_simpleitk(results::Vector, images::Dict=Dict())
         include(joinpath(@__DIR__, "simpleitk_benchmarks.jl"))
 
         # Run SimpleITK benchmarks
-        sitk_results = compare_with_simpleitk_full(results, images)
+        # compare_with_simpleitk_full is defined by the include above; use
+        # invokelatest to avoid world-age issues when the method is first loaded
+        sitk_results = Base.invokelatest(compare_with_simpleitk_full, results, images)
 
         # Generate comparison table
         comparison_data = generate_comparison_table(results, sitk_results)
 
         return sitk_results, comparison_data
     catch e
-        @warn "SimpleITK comparison failed" exception=e
+        @warn "SimpleITK comparison failed" exception = e
         println("SimpleITK comparison skipped due to error")
         return nothing
     end
@@ -375,8 +377,8 @@ function print_summary(results::Vector)
                 max_speedup = maximum(speedups)
 
                 @printf("  %s: %.2fx (min: %.2fx, max: %.2fx)\n",
-                        titlecase(replace(op, "_" => " ")),
-                        avg_speedup, min_speedup, max_speedup)
+                    titlecase(replace(op, "_" => " ")),
+                    avg_speedup, min_speedup, max_speedup)
             end
         end
     end

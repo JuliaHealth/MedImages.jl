@@ -3,8 +3,8 @@
 FROM nvidia/cudagl:11.3.0-devel
 
 
-ARG JULIA_RELEASE=1.9
-ARG JULIA_VERSION=1.9.0-rc3
+ARG JULIA_RELEASE=1.10
+ARG JULIA_VERSION=1.10.10
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -24,118 +24,110 @@ RUN curl -s -L https://julialang-s3.julialang.org/bin/linux/x64/${JULIA_RELEASE}
 
 
 RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt install -y python3.10 && \
-    apt-get install -y  python3.10-dev
-    
-RUN curl -fSsL -O https://bootstrap.pypa.io/get-pip.py && \
-    python3.10 get-pip.py && \
-    rm get-pip.py
+    apt-get install -y --no-install-recommends \
+    python3.9 \
+    python3.9-dev \
+    python3-pip \
+    build-essential && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1 && \
+    python3 -m pip --no-cache-dir install --upgrade pip setuptools wheel
+
+RUN python3 -m pip --no-cache-dir install monai requests
 
 
 
 RUN apt-get update -q -y && \
-        DEBIAN_FRONTEND=noninteractive \
-        apt-get install -q -y --allow-change-held-packages\
-        vim net-tools curl \
-        libgl1-mesa-glx \
-        xserver-xorg-video-dummy \
-        libxrender1 \
-        libpulse0 \
-        libpulse-mainloop-glib0  \
-        libnss3  \
-        libxcomposite1 \
-        libxcursor1 \
-        libfontconfig1 \
-        libxrandr2 \
-        libasound2 \
-        libglu1 \
-        x11vnc \
-        awesome \
-        jq \
-        nautilus\
-        jupyter-core\
-        zip\
-        p7zip-full\
-        apt-utils\
-        octave\
-        kmod\
-        zlib1g\
-        python-dev\
-        bzip2\
-        cmake\
-        cuda-command-line-tools-11.3 \
-        libcublas-11.3 \
-        cuda-nvrtc-11.3\
-        libcufft-11.3 \
-        libcurand-11.3 \
-        libcusolver-11.3 \
-        libcusparse-11.3 \
-        libfreetype6-dev \
-        curl\
-        libzmq3-dev \
-        software-properties-common\
-        libhdf5-serial-dev\
-        git \
-        at-spi2-core \
-        libgtk-3-dev \
-        xauth \
-        xvfb \
-        ninja-build \
-        python3 \
-        python3-pip \
-        python3-setuptools \
-        python3-wheel \
-        ninja-build \
-        wget \
-        doxygen \
-        autoconf \
-        automake \
-        cmake \
-        g++ \
-        gcc \
-        make \
-        nasm \
-        xxd \
-        yasm \
-        libglfw3 \
-        libglfw3-dev \
-        freeglut3-dev \
-                make \
-        pkgconf \
-        xz-utils \
-        xorg-dev \
-        libgl1-mesa-dev \
-        libglu1-mesa-dev \
-        libxrandr-dev \
-        libxinerama-dev \
-        libxcursor-dev \
-        libxi-dev \
-        libxxf86vm-dev \
-        libglfw3 libglfw3-dev xorg-dev libxkbcommon-dev meson clang git cmake libssl-dev cmake \
-        ffmpeg && \
-        apt-get install -q -y --reinstall ca-certificates
+    DEBIAN_FRONTEND=noninteractive \
+    apt-get install -q -y --no-install-recommends --allow-change-held-packages \
+    vim net-tools curl \
+    libgl1-mesa-glx \
+    xserver-xorg-video-dummy \
+    libxrender1 \
+    libpulse0 \
+    libpulse-mainloop-glib0 \
+    libnss3 \
+    libxcomposite1 \
+    libxcursor1 \
+    libfontconfig1 \
+    libxrandr2 \
+    libasound2 \
+    libglu1 \
+    x11vnc \
+    awesome \
+    jq \
+    nautilus \
+    jupyter-core \
+    zip \
+    p7zip-full \
+    apt-utils \
+    octave \
+    kmod \
+    zlib1g \
+    bzip2 \
+    cmake \
+    cuda-command-line-tools-11.3 \
+    libcublas-11.3 \
+    cuda-nvrtc-11.3 \
+    libcufft-11.3 \
+    libcurand-11.3 \
+    libcusolver-11.3 \
+    libcusparse-11.3 \
+    libfreetype6-dev \
+    libzmq3-dev \
+    libhdf5-serial-dev \
+    git \
+    at-spi2-core \
+    libgtk-3-dev \
+    xauth \
+    xvfb \
+    ninja-build \
+    \
+    wget \
+    doxygen \
+    autoconf \
+    automake \
+    g++ \
+    gcc \
+    make \
+    nasm \
+    xxd \
+    yasm \
+    libglfw3 \
+    libglfw3-dev \
+    freeglut3-dev \
+    pkgconf \
+    xz-utils \
+    xorg-dev \
+    libgl1-mesa-dev \
+    libglu1-mesa-dev \
+    libxrandr-dev \
+    libxinerama-dev \
+    libxcursor-dev \
+    libxi-dev \
+    libxxf86vm-dev \
+    libxkbcommon-dev \
+    meson \
+    clang \
+    libssl-dev \
+    ffmpeg \
+    ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-
-RUN python3 -m pip  --no-cache-dir install monai
-
-RUN apt-get install --yes --no-install-recommends wget build-essential libcurl4 && \
+RUN apt-get update && \
+    apt-get install --yes --no-install-recommends wget build-essential libcurl4 && \
     wget https://curl.se/download/curl-7.81.0.tar.gz && \
     tar -xvf curl-7.81.0.tar.gz && cd curl-7.81.0 && \
     ./configure --with-openssl && make && make install
 
 
-COPY Project.toml Manifest.toml LocalPreferences.toml /usr/local/share/julia/environments/v${JULIA_RELEASE}/
+COPY Project.toml Manifest.toml /usr/local/share/julia/environments/v${JULIA_RELEASE}/
 
-RUN JULIA_DEPOT_PATH=/usr/local/share/julia \ 
+RUN JULIA_DEPOT_PATH=/usr/local/share/julia \
     julia -e 'using Pkg; Pkg.instantiate(); Pkg.API.precompile()'
-
-# generate the device runtime library for all known and supported devices
-# XXX: this doesn't precompile into the system depot anymore
-RUN JULIA_DEPOT_PATH=/usr/local/share/julia \ 
-    julia -e 'using CUDA; CUDA.precompile_runtime()'
 
 # the system depot contains precompiled packages, but its global environment cannot be
 # active at the same time of the user environment. we solve this by using a startup script

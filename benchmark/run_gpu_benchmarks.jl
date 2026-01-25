@@ -18,12 +18,18 @@ Options:
 """
 
 # First load packages from benchmark project
+
+using Pkg
+Pkg.add("ArgParse")
+Pkg.add("Enzyme")
+Pkg.add("CUDA")
+
 using Printf
 using Dates
 using ArgParse
 
 # Now activate parent MedImages.jl project to access MedImages
-using Pkg
+
 Pkg.activate(joinpath(@__DIR__, ".."))
 using MedImages
 

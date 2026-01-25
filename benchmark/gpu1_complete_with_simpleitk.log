@@ -1,0 +1,615 @@
+   Resolving package versions...
+  No Changes to `/workspaces/MedImages.jl/benchmark/Project.toml`
+  No Changes to `/workspaces/MedImages.jl/benchmark/Manifest.toml`
+   Resolving package versions...
+  No Changes to `/workspaces/MedImages.jl/benchmark/Project.toml`
+  No Changes to `/workspaces/MedImages.jl/benchmark/Manifest.toml`
+   Resolving package versions...
+  No Changes to `/workspaces/MedImages.jl/benchmark/Project.toml`
+  No Changes to `/workspaces/MedImages.jl/benchmark/Manifest.toml`
+  Activating project at `/workspaces/MedImages.jl`
+  Activating project at `/workspaces/MedImages.jl/benchmark`
+CUDA available: NVIDIA GeForce RTX 3090
+CUDA memory: 23 GB
+================================================================================
+MedImages.jl GPU Benchmark Suite
+================================================================================
+Start time: 2026-01-23T14:11:16.700
+
+================================================================================
+Benchmark Configuration
+================================================================================
+
+Image Sizes:
+  xlarge: 1024 x 1024 x 512
+  large: 512 x 512 x 256
+  small: 128 x 128 x 64
+  medium: 256 x 256 x 128
+
+Interpolation Methods:
+  - Nearest Neighbor
+  - Linear
+
+Spacing Configurations:
+  anisotropic_ct: 0.7 x 0.7 x 5.0 mm
+  anisotropic_mri: 1.0 x 1.0 x 3.0 mm
+  isotropic: 1.0 x 1.0 x 1.0 mm
+
+Resampling Factors:
+  downsample_2x: 0.5x
+  upsample_1_5x: 1.5x
+  downsample_4x: 0.25x
+
+Point Counts: 100000, 1000000
+
+Backends:
+  - CPU (GPU: false)
+  - CUDA (GPU: true)
+
+Benchmark Settings:
+  Samples: 10
+  Min time: 2.0s
+  Warmup iterations: 3
+
+Output:
+  Results directory: benchmark_results
+  Compare SimpleITK: true
+================================================================================
+Creating synthetic test images...
+  Creating xlarge image: 1024x1024x512
+  Creating large image: 512x512x256
+  Creating medium image: 256x256x128
+
+================================================================================
+Starting Benchmark Suite
+================================================================================
+Operations: all
+Backends: cuda
+================================================================================
+
+================================================================================
+Image Size: xlarge (1024x1024x512)
+================================================================================
+
+--------------------------------------------------------------------------------
+Backend: CUDA
+--------------------------------------------------------------------------------
+
+### Interpolation Kernel Benchmarks ###
+
+Benchmarking interpolate_kernel: CUDA backend, 100000 points, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.027 ms (median), 0.041 ms (mean), 0.029 ms (std)
+  Throughput: 3.65e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 100000 points, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.150 ms (median), 0.199 ms (mean), 0.164 ms (std)
+  Throughput: 6.67e+08 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 1000000 points, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.175 ms (median), 0.194 ms (mean), 0.058 ms (std)
+  Throughput: 5.70e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 1000000 points, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.881 ms (median), 0.906 ms (mean), 0.046 ms (std)
+  Throughput: 1.14e+09 points/sec
+  Memory: 0.0 MB
+
+### Resampling Benchmarks ###
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.50x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 1024x1024x512
+  Output dims: 512x512x256
+  Time: 2.974 ms (median), 2.977 ms (mean), 0.077 ms (std)
+  Throughput: 1.81e+11 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.50x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 1024x1024x512
+  Output dims: 512x512x256
+  Time: 4.466 ms (median), 4.465 ms (mean), 0.049 ms (std)
+  Throughput: 1.20e+11 voxels/sec
+  Memory: 0.0 MB
+  Skipping upsampling (upsample_1_5x) for xlarge to avoid OOM
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.25x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 1024x1024x512
+  Output dims: 256x256x128
+  Time: 0.392 ms (median), 0.400 ms (mean), 0.031 ms (std)
+  Throughput: 1.37e+12 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.25x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 1024x1024x512
+  Output dims: 256x256x128
+  Time: 0.849 ms (median), 0.849 ms (mean), 0.079 ms (std)
+  Throughput: 6.32e+11 voxels/sec
+  Memory: 0.0 MB
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CUDA backend, 90 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 58544.922 ms (median), 58544.922 ms (mean), NaN ms (std)
+  Throughput: 9.17e+06 voxels/sec
+  Memory: 83968.0 MB
+
+Benchmarking rotate_mi: CUDA backend, 180 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 58653.380 ms (median), 58653.380 ms (mean), NaN ms (std)
+  Throughput: 9.15e+06 voxels/sec
+  Memory: 83968.0 MB
+
+Benchmarking rotate_mi: CUDA backend, 270 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 57897.365 ms (median), 57897.365 ms (mean), NaN ms (std)
+  Throughput: 9.27e+06 voxels/sec
+  Memory: 83968.0 MB
+
+### Crop Benchmarks ###
+
+Benchmarking crop_mi: CUDA backend, 10.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 6.41e+14 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking crop_mi: CUDA backend, 50.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 6.38e+14 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking crop_mi: CUDA backend, 30.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 6.43e+14 voxels/sec
+  Memory: 0.0 MB
+
+### Pad Benchmarks (skipped - CUDA scalar indexing not supported) ###
+
+### Orientation Change Benchmarks ###
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_LAS
+  Running benchmark...
+  Time: 5.538 ms (median), 5.633 ms (mean), 0.186 ms (std)
+  Throughput: 9.69e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_RAS
+  Running benchmark...
+  Time: 5.530 ms (median), 5.645 ms (mean), 0.241 ms (std)
+  Throughput: 9.71e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_RPI
+  Running benchmark...
+  Time: 5.651 ms (median), 5.743 ms (mean), 0.246 ms (std)
+  Throughput: 9.50e+10 voxels/sec
+  Memory: 0.0 MB
+
+================================================================================
+Image Size: large (512x512x256)
+================================================================================
+
+--------------------------------------------------------------------------------
+Backend: CUDA
+--------------------------------------------------------------------------------
+
+### Interpolation Kernel Benchmarks ###
+
+Benchmarking interpolate_kernel: CUDA backend, 100000 points, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.026 ms (median), 0.043 ms (mean), 0.048 ms (std)
+  Throughput: 3.85e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 100000 points, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.116 ms (median), 0.141 ms (mean), 0.050 ms (std)
+  Throughput: 8.59e+08 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 1000000 points, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.217 ms (median), 0.224 ms (mean), 0.088 ms (std)
+  Throughput: 4.60e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 1000000 points, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.865 ms (median), 0.861 ms (mean), 0.079 ms (std)
+  Throughput: 1.16e+09 points/sec
+  Memory: 0.0 MB
+
+### Resampling Benchmarks ###
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.50x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 512x512x256
+  Output dims: 256x256x128
+  Time: 0.376 ms (median), 0.401 ms (mean), 0.060 ms (std)
+  Throughput: 1.78e+11 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.50x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 512x512x256
+  Output dims: 256x256x128
+  Time: 0.569 ms (median), 0.588 ms (mean), 0.054 ms (std)
+  Throughput: 1.18e+11 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, upsample 1.50x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 512x512x256
+  Output dims: 768x768x384
+  Time: 9.855 ms (median), 9.859 ms (mean), 0.031 ms (std)
+  Throughput: 6.81e+09 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, upsample 1.50x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 512x512x256
+  Output dims: 768x768x384
+  Time: 14.692 ms (median), 14.679 ms (mean), 0.051 ms (std)
+  Throughput: 4.57e+09 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.25x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 512x512x256
+  Output dims: 128x128x64
+  Time: 0.057 ms (median), 0.073 ms (mean), 0.046 ms (std)
+  Throughput: 1.17e+12 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.25x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 512x512x256
+  Output dims: 128x128x64
+  Time: 0.169 ms (median), 0.194 ms (mean), 0.097 ms (std)
+  Throughput: 3.98e+11 voxels/sec
+  Memory: 0.0 MB
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CUDA backend, 90 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 7540.566 ms (median), 7540.566 ms (mean), NaN ms (std)
+  Throughput: 8.90e+06 voxels/sec
+  Memory: 10496.0 MB
+
+Benchmarking rotate_mi: CUDA backend, 180 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 7618.283 ms (median), 7618.283 ms (mean), NaN ms (std)
+  Throughput: 8.81e+06 voxels/sec
+  Memory: 10496.0 MB
+
+Benchmarking rotate_mi: CUDA backend, 270 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 7567.895 ms (median), 7567.895 ms (mean), NaN ms (std)
+  Throughput: 8.87e+06 voxels/sec
+  Memory: 10496.0 MB
+
+### Crop Benchmarks ###
+
+Benchmarking crop_mi: CUDA backend, 10.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 7.85e+13 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking crop_mi: CUDA backend, 50.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 7.83e+13 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking crop_mi: CUDA backend, 30.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 7.80e+13 voxels/sec
+  Memory: 0.0 MB
+
+### Pad Benchmarks (skipped - CUDA scalar indexing not supported) ###
+
+### Orientation Change Benchmarks ###
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_LAS
+  Running benchmark...
+  Time: 0.799 ms (median), 0.775 ms (mean), 0.070 ms (std)
+  Throughput: 8.40e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_RAS
+  Running benchmark...
+  Time: 0.826 ms (median), 0.822 ms (mean), 0.081 ms (std)
+  Throughput: 8.12e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_RPI
+  Running benchmark...
+  Time: 0.805 ms (median), 0.800 ms (mean), 0.059 ms (std)
+  Throughput: 8.34e+10 voxels/sec
+  Memory: 0.0 MB
+
+================================================================================
+Image Size: medium (256x256x128)
+================================================================================
+
+--------------------------------------------------------------------------------
+Backend: CUDA
+--------------------------------------------------------------------------------
+
+### Interpolation Kernel Benchmarks ###
+
+Benchmarking interpolate_kernel: CUDA backend, 100000 points, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.024 ms (median), 0.047 ms (mean), 0.072 ms (std)
+  Throughput: 4.24e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 100000 points, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.074 ms (median), 0.109 ms (mean), 0.069 ms (std)
+  Throughput: 1.36e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 1000000 points, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.168 ms (median), 0.197 ms (mean), 0.119 ms (std)
+  Throughput: 5.96e+09 points/sec
+  Memory: 0.0 MB
+
+Benchmarking interpolate_kernel: CUDA backend, 1000000 points, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 0.715 ms (median), 0.709 ms (mean), 0.094 ms (std)
+  Throughput: 1.40e+09 points/sec
+  Memory: 0.0 MB
+
+### Resampling Benchmarks ###
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.50x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 256x256x128
+  Output dims: 128x128x64
+  Time: 0.056 ms (median), 0.066 ms (mean), 0.029 ms (std)
+  Throughput: 1.49e+11 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.50x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 256x256x128
+  Output dims: 128x128x64
+  Time: 0.104 ms (median), 0.131 ms (mean), 0.061 ms (std)
+  Throughput: 8.08e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, upsample 1.50x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 256x256x128
+  Output dims: 384x384x192
+  Time: 1.434 ms (median), 1.433 ms (mean), 0.055 ms (std)
+  Throughput: 5.85e+09 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, upsample 1.50x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 256x256x128
+  Output dims: 384x384x192
+  Time: 2.011 ms (median), 2.023 ms (mean), 0.029 ms (std)
+  Throughput: 4.17e+09 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.25x, Nearest interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 256x256x128
+  Output dims: 64x64x32
+  Time: 0.017 ms (median), 0.041 ms (mean), 0.074 ms (std)
+  Throughput: 4.96e+11 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking resample_to_spacing: CUDA backend, downsample 0.25x, Linear interpolation
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Input dims: 256x256x128
+  Output dims: 64x64x32
+  Time: 0.023 ms (median), 0.081 ms (mean), 0.132 ms (std)
+  Throughput: 3.63e+11 voxels/sec
+  Memory: 0.0 MB
+
+### Rotation Benchmarks ###
+
+Benchmarking rotate_mi: CUDA backend, 90 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 1048.150 ms (median), 1048.150 ms (mean), 7.883 ms (std)
+  Throughput: 8.00e+06 voxels/sec
+  Memory: 1312.0 MB
+
+Benchmarking rotate_mi: CUDA backend, 180 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 1062.804 ms (median), 1062.804 ms (mean), 28.852 ms (std)
+  Throughput: 7.89e+06 voxels/sec
+  Memory: 1312.0 MB
+
+Benchmarking rotate_mi: CUDA backend, 270 degrees
+Warming up GPU...
+  GPU warmed up
+  Running benchmark...
+  Time: 1039.582 ms (median), 1039.582 ms (mean), 14.715 ms (std)
+  Throughput: 8.07e+06 voxels/sec
+  Memory: 1312.0 MB
+
+### Crop Benchmarks ###
+
+Benchmarking crop_mi: CUDA backend, 10.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 9.52e+12 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking crop_mi: CUDA backend, 50.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 9.28e+12 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking crop_mi: CUDA backend, 30.0% crop
+  Running benchmark...
+  Time: 0.001 ms (median), 0.001 ms (mean), 0.000 ms (std)
+  Throughput: 9.70e+12 voxels/sec
+  Memory: 0.0 MB
+
+### Pad Benchmarks (skipped - CUDA scalar indexing not supported) ###
+
+### Orientation Change Benchmarks ###
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_LAS
+  Running benchmark...
+  Time: 0.099 ms (median), 0.142 ms (mean), 0.078 ms (std)
+  Throughput: 8.51e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_RAS
+  Running benchmark...
+  Time: 0.121 ms (median), 0.143 ms (mean), 0.050 ms (std)
+  Throughput: 6.93e+10 voxels/sec
+  Memory: 0.0 MB
+
+Benchmarking change_orientation: CUDA backend, target: ORIENTATION_RPI
+  Running benchmark...
+  Time: 0.108 ms (median), 0.157 ms (mean), 0.100 ms (std)
+  Throughput: 7.77e+10 voxels/sec
+  Memory: 0.0 MB
+
+================================================================================
+Memory Transfer Benchmarks
+================================================================================
+
+Benchmarking memory transfer: (1024, 1024, 512)
+  CPU -> GPU transfer...
+    Time: 172.230 ms (median)
+    Transfer rate: 11891.10 MB/s
+  GPU -> CPU transfer...
+    Time: 849.635 ms (median)
+    Transfer rate: 2410.45 MB/s
+
+================================================================================
+Generating Reports
+================================================================================
+Results saved to: gpu1_with_simpleitk/results.csv
+Report saved to: gpu1_with_simpleitk/report.md
+
+================================================================================
+Benchmark Summary
+================================================================================
+
+Total benchmarks run: 55
+  Interpolation: 12
+  Resampling: 16
+  Rotation: 9
+  Crop: 9
+  Orientation: 9
+
+Average CUDA Speedups:
+================================================================================
+
+================================================================================
+Benchmark Visualization
+================================================================================
+
+================================================================================
+SimpleITK Comparison
+================================================================================
+
+================================================================================
+SimpleITK Comparison Benchmarks
+================================================================================
+
+### SimpleITK Benchmarks for xlarge ###
+
+  Resampling benchmarks:
+    Resample (downsample 2x, Nearest): 26.320 ms (median)
+    Resample (downsample 2x, Linear): 34.022 ms (median)

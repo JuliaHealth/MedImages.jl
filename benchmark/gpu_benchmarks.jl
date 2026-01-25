@@ -23,7 +23,7 @@ try
         println("CUDA memory: $(CUDA.totalmem(dev) ÷ 1024^3) GB")
     end
 catch e
-    @warn "CUDA.jl not available or non-functional" exception=e
+    @warn "CUDA.jl not available or non-functional" exception = e
 end
 
 # benchmark_config.jl is included by run_gpu_benchmarks.jl
@@ -36,13 +36,23 @@ struct BenchmarkResult
     operation::String
     backend::String
     image_size::String
-    parameters::Dict{String, Any}
+    parameters::Dict{String,Any}
     time_mean::Float64     # seconds
     time_median::Float64
     time_std::Float64
     memory_bytes::Int64
     throughput::Float64    # operation-specific (voxels/sec, points/sec, etc.)
     timestamp::DateTime
+end
+
+# Guard against NaN/Inf std when there are too few samples
+@inline function safe_std_ns(b)
+    s = try
+        std(b).time
+    catch
+        NaN
+    end
+    return isnan(s) || !isfinite(s) ? 0.0 : s
 end
 
 """
@@ -67,7 +77,7 @@ function warmup_gpu(image::MedImage, iterations::Int=WARMUP_ITERATIONS)
             )
             CUDA.@sync nothing  # Ensure completion
         catch e
-            @warn "Warmup iteration failed" iteration=i exception=e
+            @warn "Warmup iteration failed" iteration = i exception = e
         end
     end
 
@@ -99,13 +109,13 @@ Benchmark the core interpolation kernel.
 """
 function benchmark_interpolate_kernel(image::MedImage, point_count::Int, interpolator::MedImages.Interpolator_enum, backend::String)
     @printf("\nBenchmarking interpolate_kernel: %s backend, %d points, %s interpolation\n",
-            backend, point_count, interpolator == MedImages.Nearest_neighbour_en ? "Nearest" : "Linear")
+        backend, point_count, interpolator == MedImages.Nearest_neighbour_en ? "Nearest" : "Linear")
 
     dims = size(image.voxel_data)
 
     # Generate random interpolation points within image bounds
     # Scale factors for each dimension (as column vector for proper broadcasting)
-    scale = Float32.([dims[1]-1, dims[2]-1, dims[3]-1])
+    scale = Float32.([dims[1] - 1, dims[2] - 1, dims[3] - 1])
     points = rand(Float32, 3, point_count) .* scale .+ 1.0f0
 
     # Transfer to GPU if needed
@@ -132,13 +142,14 @@ function benchmark_interpolate_kernel(image::MedImage, point_count::Int, interpo
         if $backend == "CUDA"
             CUDA.@sync nothing
         end
-    end samples=BENCHMARK_SAMPLES seconds=BENCHMARK_SECONDS
+    end samples = BENCHMARK_SAMPLES seconds = BENCHMARK_SECONDS
 
     # Calculate throughput (points per second)
     throughput = point_count / (median(b).time * 1e-9)
+    time_std = safe_std_ns(b)
 
     @printf("  Time: %.3f ms (median), %.3f ms (mean), %.3f ms (std)\n",
-            median(b).time * 1e-6, mean(b).time * 1e-6, std(b).time * 1e-6)
+        median(b).time * 1e-6, mean(b).time * 1e-6, time_std * 1e-6)
     @printf("  Throughput: %.2e points/sec\n", throughput)
     @printf("  Memory: %.1f MB\n", b.memory / 1024^2)
 
@@ -150,7 +161,7 @@ function benchmark_interpolate_kernel(image::MedImage, point_count::Int, interpo
         Dict("point_count" => point_count, "interpolator" => string(interpolator)),
         mean(b).time * 1e-9,
         median(b).time * 1e-9,
-        std(b).time * 1e-9,
+        time_std * 1e-9,
         b.memory,
         throughput,
         now()
@@ -165,7 +176,7 @@ Benchmark resampling to different spacing.
 function benchmark_resample_to_spacing(image::MedImage, factor::Float64, interpolator::MedImages.Interpolator_enum, backend::String)
     factor_name = factor > 1.0 ? "upsample" : "downsample"
     @printf("\nBenchmarking resample_to_spacing: %s backend, %s %.2fx, %s interpolation\n",
-            backend, factor_name, factor, interpolator == MedImages.Nearest_neighbour_en ? "Nearest" : "Linear")
+        backend, factor_name, factor, interpolator == MedImages.Nearest_neighbour_en ? "Nearest" : "Linear")
 
     dims = size(image.voxel_data)
     new_spacing = (image.spacing[1] / factor, image.spacing[2] / factor, image.spacing[3] / factor)
@@ -189,16 +200,17 @@ function benchmark_resample_to_spacing(image::MedImage, factor::Float64, interpo
         if $backend == "CUDA"
             CUDA.@sync nothing
         end
-    end samples=BENCHMARK_SAMPLES seconds=BENCHMARK_SECONDS
+    end samples = BENCHMARK_SAMPLES seconds = BENCHMARK_SECONDS
 
     # Calculate throughput (input voxels per second)
     voxel_count = prod(dims)
     throughput = voxel_count / (median(b).time * 1e-9)
+    time_std = safe_std_ns(b)
 
     @printf("  Input dims: %dx%dx%d\n", dims...)
     @printf("  Output dims: %dx%dx%d\n", new_dims...)
     @printf("  Time: %.3f ms (median), %.3f ms (mean), %.3f ms (std)\n",
-            median(b).time * 1e-6, mean(b).time * 1e-6, std(b).time * 1e-6)
+        median(b).time * 1e-6, mean(b).time * 1e-6, time_std * 1e-6)
     @printf("  Throughput: %.2e voxels/sec\n", throughput)
     @printf("  Memory: %.1f MB\n", b.memory / 1024^2)
 
@@ -210,7 +222,7 @@ function benchmark_resample_to_spacing(image::MedImage, factor::Float64, interpo
         Dict("factor" => factor, "interpolator" => string(interpolator), "new_spacing" => new_spacing),
         mean(b).time * 1e-9,
         median(b).time * 1e-9,
-        std(b).time * 1e-9,
+        time_std * 1e-9,
         b.memory,
         throughput,
         now()
@@ -224,7 +236,7 @@ Benchmark cross-image resampling (includes orientation changes).
 """
 function benchmark_resample_to_image(source_image::MedImage, target_image::MedImage, interpolator::MedImages.Interpolator_enum, backend::String)
     @printf("\nBenchmarking resample_to_image: %s backend, %s interpolation\n",
-            backend, interpolator == MedImages.Nearest_neighbour_en ? "Nearest" : "Linear")
+        backend, interpolator == MedImages.Nearest_neighbour_en ? "Nearest" : "Linear")
 
     dims = size(source_image.voxel_data)
 
@@ -244,14 +256,18 @@ function benchmark_resample_to_image(source_image::MedImage, target_image::MedIm
         if $backend == "CUDA"
             CUDA.@sync nothing
         end
-    end samples=BENCHMARK_SAMPLES seconds=BENCHMARK_SECONDS
+    end samples = BENCHMARK_SAMPLES seconds = BENCHMARK_SECONDS
 
     # Calculate throughput
     voxel_count = prod(dims)
     throughput = voxel_count / (median(b).time * 1e-9)
+    time_std = safe_std_ns(b)
+    time_std = safe_std_ns(b)
+    time_std = safe_std_ns(b)
+    time_std = safe_std_ns(b)
 
     @printf("  Time: %.3f ms (median), %.3f ms (mean), %.3f ms (std)\n",
-            median(b).time * 1e-6, mean(b).time * 1e-6, std(b).time * 1e-6)
+        median(b).time * 1e-6, mean(b).time * 1e-6, time_std * 1e-6)
     @printf("  Throughput: %.2e voxels/sec\n", throughput)
     @printf("  Memory: %.1f MB\n", b.memory / 1024^2)
 
@@ -263,7 +279,7 @@ function benchmark_resample_to_image(source_image::MedImage, target_image::MedIm
         Dict("interpolator" => string(interpolator)),
         mean(b).time * 1e-9,
         median(b).time * 1e-9,
-        std(b).time * 1e-9,
+        time_std * 1e-9,
         b.memory,
         throughput,
         now()
@@ -292,20 +308,22 @@ function benchmark_rotation(image::MedImage, angle::Int, backend::String)
     end
 
     # Benchmark
+    # Note: Rotation is very slow, so we limit to 3 samples to avoid excessive runtime
     println("  Running benchmark...")
     b = @benchmark begin
         result = MedImages.rotate_mi($test_image, $axis, Float64($angle), MedImages.Linear_en)
         if $backend == "CUDA"
             CUDA.@sync nothing
         end
-    end samples=BENCHMARK_SAMPLES seconds=BENCHMARK_SECONDS
+    end samples = 3 evals = 1
 
     # Calculate throughput
     voxel_count = prod(dims)
     throughput = voxel_count / (median(b).time * 1e-9)
+    time_std = safe_std_ns(b)
 
     @printf("  Time: %.3f ms (median), %.3f ms (mean), %.3f ms (std)\n",
-            median(b).time * 1e-6, mean(b).time * 1e-6, std(b).time * 1e-6)
+        median(b).time * 1e-6, mean(b).time * 1e-6, time_std * 1e-6)
     @printf("  Throughput: %.2e voxels/sec\n", throughput)
     @printf("  Memory: %.1f MB\n", b.memory / 1024^2)
 
@@ -317,7 +335,7 @@ function benchmark_rotation(image::MedImage, angle::Int, backend::String)
         Dict("angle" => angle, "axis" => axis),
         mean(b).time * 1e-9,
         median(b).time * 1e-9,
-        std(b).time * 1e-9,
+        time_std * 1e-9,
         b.memory,
         throughput,
         now()
@@ -349,14 +367,15 @@ function benchmark_crop(image::MedImage, ratio::Float64, backend::String)
         if $backend == "CUDA"
             CUDA.@sync nothing
         end
-    end samples=BENCHMARK_SAMPLES seconds=BENCHMARK_SECONDS
+    end samples = BENCHMARK_SAMPLES seconds = BENCHMARK_SECONDS
 
     # Calculate throughput
     voxel_count = prod(dims)
     throughput = voxel_count / (median(b).time * 1e-9)
+    time_std = safe_std_ns(b)
 
     @printf("  Time: %.3f ms (median), %.3f ms (mean), %.3f ms (std)\n",
-            median(b).time * 1e-6, mean(b).time * 1e-6, std(b).time * 1e-6)
+        median(b).time * 1e-6, mean(b).time * 1e-6, time_std * 1e-6)
     @printf("  Throughput: %.2e voxels/sec\n", throughput)
     @printf("  Memory: %.1f MB\n", b.memory / 1024^2)
 
@@ -368,7 +387,7 @@ function benchmark_crop(image::MedImage, ratio::Float64, backend::String)
         Dict("ratio" => ratio, "crop_offset" => crop_offset, "crop_size" => crop_size),
         mean(b).time * 1e-9,
         median(b).time * 1e-9,
-        std(b).time * 1e-9,
+        time_std * 1e-9,
         b.memory,
         throughput,
         now()
@@ -399,14 +418,15 @@ function benchmark_pad(image::MedImage, ratio::Float64, backend::String)
         if $backend == "CUDA"
             CUDA.@sync nothing
         end
-    end samples=BENCHMARK_SAMPLES seconds=BENCHMARK_SECONDS
+    end samples = BENCHMARK_SAMPLES seconds = BENCHMARK_SECONDS
 
     # Calculate throughput
     voxel_count = prod(dims)
     throughput = voxel_count / (median(b).time * 1e-9)
+    time_std = safe_std_ns(b)
 
     @printf("  Time: %.3f ms (median), %.3f ms (mean), %.3f ms (std)\n",
-            median(b).time * 1e-6, mean(b).time * 1e-6, std(b).time * 1e-6)
+        median(b).time * 1e-6, mean(b).time * 1e-6, time_std * 1e-6)
     @printf("  Throughput: %.2e voxels/sec\n", throughput)
     @printf("  Memory: %.1f MB\n", b.memory / 1024^2)
 
@@ -418,7 +438,7 @@ function benchmark_pad(image::MedImage, ratio::Float64, backend::String)
         Dict("ratio" => ratio, "pad_amount" => pad_amount),
         mean(b).time * 1e-9,
         median(b).time * 1e-9,
-        std(b).time * 1e-9,
+        time_std * 1e-9,
         b.memory,
         throughput,
         now()
@@ -445,14 +465,15 @@ function benchmark_change_orientation(image::MedImage, target_orientation::MedIm
         if $backend == "CUDA"
             CUDA.@sync nothing
         end
-    end samples=BENCHMARK_SAMPLES seconds=BENCHMARK_SECONDS
+    end samples = BENCHMARK_SAMPLES seconds = BENCHMARK_SECONDS
 
     # Calculate throughput
     voxel_count = prod(dims)
     throughput = voxel_count / (median(b).time * 1e-9)
+    time_std = safe_std_ns(b)
 
     @printf("  Time: %.3f ms (median), %.3f ms (mean), %.3f ms (std)\n",
-            median(b).time * 1e-6, mean(b).time * 1e-6, std(b).time * 1e-6)
+        median(b).time * 1e-6, mean(b).time * 1e-6, time_std * 1e-6)
     @printf("  Throughput: %.2e voxels/sec\n", throughput)
     @printf("  Memory: %.1f MB\n", b.memory / 1024^2)
 
@@ -464,7 +485,7 @@ function benchmark_change_orientation(image::MedImage, target_orientation::MedIm
         Dict("target_orientation" => string(target_orientation)),
         mean(b).time * 1e-9,
         median(b).time * 1e-9,
-        std(b).time * 1e-9,
+        time_std * 1e-9,
         b.memory,
         throughput,
         now()
@@ -495,7 +516,7 @@ function benchmark_memory_transfer(image::MedImage)
     b_to_gpu = @benchmark begin
         gpu_data = CuArray($cpu_data)
         CUDA.@sync nothing
-    end samples=BENCHMARK_SAMPLES
+    end samples = BENCHMARK_SAMPLES
 
     transfer_rate_to_gpu = data_size / (median(b_to_gpu).time * 1e-9)
     @printf("    Time: %.3f ms (median)\n", median(b_to_gpu).time * 1e-6)
@@ -512,7 +533,7 @@ function benchmark_memory_transfer(image::MedImage)
     b_to_cpu = @benchmark begin
         cpu_result = Array($gpu_data)
         CUDA.@sync nothing
-    end samples=BENCHMARK_SAMPLES
+    end samples = BENCHMARK_SAMPLES
 
     transfer_rate_to_cpu = data_size / (median(b_to_cpu).time * 1e-9)
     @printf("    Time: %.3f ms (median)\n", median(b_to_cpu).time * 1e-6)
