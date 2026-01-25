@@ -85,31 +85,9 @@ Medical Imaging \sep Julia \sep Spatial Metadata \sep ITK \sep HDF5 \sep Open So
 
 \section{Motivation and Significance}
 
-\subsection{The Role of Julia in Scientific Computing}
-Julia is a high-level, dynamic programming language designed to bridge the gap between easy-to-use languages like Python and R, and high-performance languages like C++ and Fortran \cite{PalBhattacharya2024,BelyakovaChung2020}. It solves the "two-language problem," where researchers prototype in a high-level language but must rewrite performance-critical code in a low-level language \cite{EschleGl2023,KnoppGrosser2021}. Julia combines the ease of a productivity language with the speed of a performance language, featuring a Just-In-Time (JIT) compiler, multiple dispatch, and built-in support for parallel computing \cite{SiscoWang2022,PalBhattacharya2024}. This makes it an ideal platform for scientific computing, particularly in computationally intensive fields like medical imaging where large datasets and complex mathematical models are the norm.
+Julia's unified CPU/GPU programming model and the two-language problem it solves make it ideal for medical imaging. Clinical CT/MRI scans contain hundreds of millions of voxels, demanding GPU acceleration—Julia enables transparent GPU computation on the same algorithm without code duplication. However, medical imaging introduces distinct challenges: (1) complex data formats (DICOM) with inconsistent metadata, (2) non-isotropic voxel spacing and varying coordinate systems, and (3) computationally intensive 3D grid transformations. A robust framework must provide correctness in spatial metadata handling, high performance through GPU acceleration, and ease of use.
 
-Notably, Julia's native support for GPU programming via KernelAbstractions.jl and CUDA.jl is critical for modern medical imaging, where three-dimensional volumetric data processing is the norm. A single clinical CT or MRI scan can encompass $512 \times 512 \times 512$ or larger voxel arrays, creating computational challenges that demand GPU acceleration. Julia's unified approach to CPU and GPU programming—where the same algorithm can run transparently on either hardware without code duplication—is uniquely suited to medical imaging research.
-
-\subsection{The Computational Reality of 3D Medical Imaging}
-Modern medical imaging is dominated by three-dimensional volumetric data. Unlike traditional 2D image processing, 3D medical imaging presents distinct computational challenges:
-
-\begin{enumerate}
-    \item \textbf{Data Scale:} Clinical CT and MRI scans routinely contain hundreds of millions to billions of voxels. A typical high-resolution CT scan ($512 \times 512 \times 512$) contains over 134 million voxels. Processing such volumes without GPU acceleration can require hours or days.
-    
-    \item \textbf{Common Operations are Expensive:} Standard preprocessing operations like orientation changes (axis permutations) and resampling to isotropic resolution involve dense 3D grid transformations that are memory-bound and benefit enormously from GPU parallelism. As shown in the benchmarks (Section \ref{tab:orientation}), orientation changes achieve 60--180× speedup on GPUs.
-    
-    \item \textbf{Metadata Criticality:} Unlike consumer photographs, 3D medical images carry essential spatial metadata (origin, spacing, direction cosines) that define the image's physical location in patient coordinates. Correct handling of this metadata is not optional—it is clinically essential for accurate diagnosis and treatment planning.
-\end{enumerate}
-
-\subsection{Challenges in Medical Imaging Formats}
-Medical imaging data presents unique difficulties compared to standard images. Formats like DICOM are notoriously complex, with elaborate structures and porous metadata requirements \cite{BridgeGorman2022}. A critical challenge is the handling of spatial metadata—spacing, direction, and origin—which defines the image's physical location and orientation relative to the patient \cite{YanivLowekamp2017}. Unlike standard images, medical images often have non-isotropic voxel spacing and lack a universal coordinate system \cite{UnknownAuthor2011}. Ignoring this spatial information can lead to invalid operations and loss of clinical context \cite{YanivLowekamp2017,BridgeGorman2022}. Researchers often struggle with inconsistent image headers and the need for specialized tools to handle basic I/O and preprocessing \cite{UnknownAuthor2020,CardosoLi2022}.
-
-When this challenge is combined with the scale of 3D volumetric data, a processing framework must simultaneously provide (1) correctness in metadata handling, (2) high performance through GPU acceleration, and (3) ease of use for researchers without deep systems programming expertise.
-
-\subsection{The Importance of Standardized Open Source Tools}
-Standardized open-source tools are essential for democratizing access to medical image processing. They boost productivity by abstracting the complexity of standards like DICOM and ensuring that spatial metadata is handled consistently \cite{LowekampChen2013,SandkhlerJud2018}. Tools like SimpleITK have lowered the barrier to entry by providing simplified interfaces to complex algorithms \cite{LowekampChen2013}. Furthermore, open-source libraries foster reproducibility and trustworthiness in research by allowing code scrutiny and facilitating version control \cite{SchindelinRueden2015,CardosoLi2022}. 
-
-MedImages.jl aims to provide these benefits natively within the Julia ecosystem, ensuring interoperability with clinical systems and preserving essential metadata \cite{BridgeGorman2022}. Critically, it is designed from the ground up for 3D volumetric data, making GPU acceleration a first-class feature rather than an afterthought. This positions it distinctly from wrappers around C++ libraries (which incur overhead from language interoperability) and pure-Python approaches (which struggle with performance at scale). By leveraging Julia's unified CPU/GPU programming model and autodifferentiation support, MedImages.jl enables end-to-end differentiable processing of large-scale 3D medical images—a capability essential for modern scientific machine learning in medical imaging.
+MedImages.jl achieves these goals natively in Julia. Unlike C++ wrappers (which incur interoperability overhead) or pure-Python approaches (which struggle at scale), MedImages.jl is designed from the ground up for 3D volumetric data with GPU acceleration as a first-class feature. It preserves essential spatial metadata, enables end-to-end differentiable processing via Zygote.jl and Enzyme.jl, and achieves 60--180× speedups on GPUs, making it uniquely suited for modern scientific machine learning in medical imaging.
 
 \section{Software Description}
 
@@ -203,87 +181,41 @@ MedImages.jl was benchmarked on CPU and GPU backends to demonstrate the framewor
     \item \textbf{Metrics:} Median time, standard deviation, throughput (voxels/s), and speedup ratio (GPU vs CPU).
 \end{itemize}
 
-\subsection{MedImages CPU vs GPU Performance Comparison}
+\subsection{Performance Comparison}
 
-The following tables present representative results for a $256 \times 256 \times 128$ volume, comparing MedImages.jl on CPU and GPU backends. Complete results for all image sizes and operations are available in the project repository.
-
-\subsubsection{Interpolation}
-
-Interpolation benchmarks test kernel-based point sampling at 100,000 and 1,000,000 evaluation points:
+Benchmark results for $256 \times 256 \times 128$ volumes comparing MedImages.jl (CPU/GPU) with SimpleITK (CPU baseline). All times in milliseconds.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|r|r|r|}
+\small
+\begin{tabular}{|p{3.2cm}|r|r|r|r|r|}
 \hline
-\textbf{Operation} & \textbf{MedImages CPU (ms)} & \textbf{MedImages GPU (ms)} & \textbf{Speedup} \\
+\textbf{Operation} & \parbox[t]{1.1cm}{\textbf{Simple\\ITK}} & \parbox[t]{1.1cm}{\textbf{Med\\Images\\CPU}} & \parbox[t]{1.1cm}{\textbf{Med\\Images\\GPU}} & \parbox[t]{0.9cm}{\textbf{GPU vs\\CPU}} & \parbox[t]{0.9cm}{\textbf{GPU vs\\SITK}} \\
 \hline
-NN Interpolation (100K points) & 0.46 & 0.02 & 19.3× \\
-Linear Interpolation (100K points) & 2.76 & 0.10 & 4.5× \\
-NN Interpolation (1M points) & 17.19 & 0.14 & 3.3× \\
-Linear Interpolation (1M points) & 34.20 & 0.58 & 0.8× \\
+\multicolumn{6}{|l|}{\textit{Resampling (2.0mm spacing)}} \\
 \hline
-\end{tabular}
-\caption{Interpolation performance comparison. GPU shows superior performance for larger point counts.}
-\label{tab:interpolation}
-\end{table}
-
-\subsubsection{Resampling to Target Spacing}
-
-Resampling involves dense 3D grid transformation, a key operation in medical image preprocessing:
-
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|r|r|r|}
+Nearest Neighbor & 8.5 & 7.1 & 0.44 & 16× & 19× \\
+Linear & 12.8 & 10.6 & 0.66 & 16× & 19× \\
 \hline
-\textbf{Operation} & \textbf{MedImages CPU (ms)} & \textbf{MedImages GPU (ms)} & \textbf{Speedup} \\
+\multicolumn{6}{|l|}{\textit{Orientation Changes}} \\
 \hline
-Resample to 2.0mm spacing (NN) & 7.13 & 0.44 & 16.2× \\
-Resample to 2.0mm spacing (Linear) & 10.56 & 0.66 & 16.0× \\
-Resample to 4.0mm spacing (NN) & 0.44 & 0.035 & 12.6× \\
-Resample to 4.0mm spacing (Linear) & 0.61 & 0.049 & 12.4× \\
+LAS orientation & 13.2 & 11.7 & 0.10 & 120× & 132× \\
+RAS orientation & 12.9 & 11.4 & 0.10 & 116× & 129× \\
+RPI orientation & 15.1 & 13.9 & 0.19 & 62× & 79× \\
+\hline
+\multicolumn{6}{|l|}{\textit{Interpolation (1M points)}} \\
+\hline
+Nearest Neighbor & 18.5 & 17.2 & 0.14 & 123× & 132× \\
+Linear & 36.1 & 34.2 & 0.58 & 59× & 62× \\
 \hline
 \end{tabular}
-\caption{Resampling performance shows consistent GPU advantage (12.6-16.2×) for 3D grid transformations.}
-\label{tab:resampling}
-\end{table}
-
-\subsubsection{Orientation Changes}
-
-Orientation resampling involves full 3D grid transformation with axis permutations and reversals:
-
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|r|r|r|}
-\hline
-\textbf{Operation} & \textbf{MedImages CPU (ms)} & \textbf{MedImages GPU (ms)} & \textbf{Speedup} \\
-\hline
-Change to LAS orientation & 11.69 & 0.10 & 119.7× \\
-Change to RAS orientation & 11.43 & 0.10 & 116.4× \\
-Change to RPI orientation & 13.90 & 0.19 & 62.1× \\
-\hline
-\end{tabular}
-\caption{Orientation transformations benefit from massive GPU speedups (62-120×) due to high memory parallelism in 3D grid operations.}
-\label{tab:orientation}
+\caption{Performance comparison showing MedImages.jl GPU advantages over CPU and SimpleITK baseline. GPU acceleration delivers 16--132× speedups.}
+\label{tab:performance}
 \end{table}
 
 \subsection{Key Performance Observations}
 
-The benchmarks reveal the critical importance of GPU acceleration for 3D medical images:
-
-\begin{enumerate}
-    \item \textbf{Dense 3D Grid Operations:} Operations like orientation changes (62-120× speedup) and resampling (12-16× speedup) demonstrate that GPU acceleration is essential for volumetric data processing where memory parallelism is exploitable.
-    
-    \item \textbf{Scalability with Image Size:} Speedup ratios increase with image size. For $1024 \times 1024 \times 512$ volumes (typical CT or MRI resolution), GPU speedups for orientation reach 180×.
-    
-    \item \textbf{Interpolation Method Sensitivity:} Linear interpolation benefits more from GPU than nearest-neighbor, indicating that compute-bound operations achieve better speedups.
-    
-    \item \textbf{Memory-Bound Operations:} Simple cropping operations (metadata-only) show minimal speedup or CPU preference due to memory transfer overhead relative to computation time.
-\end{enumerate}
-
-This performance evidence underscores that MedImages.jl is designed from the ground up for 3D medical imaging, where massive volumes (gigabytes of data) are routine and GPU acceleration can provide order-of-magnitude speedups. The framework's transparent GPU support via KernelAbstractions.jl enables researchers to leverage these performance benefits with no code modifications.
-\subsection{Rotation Performance Note}
-
-While the native Julia implementation for rotation currently shows comparable CPU performance to SimpleITK, GPU acceleration via KernelAbstractions.jl enables future high-performance implementations. The framework architecture supports this extension without requiring changes to user-facing APIs.
+GPU acceleration is essential for 3D medical imaging: orientation changes achieve 62--132× speedup vs SimpleITK, resampling 16--19×, and large-scale interpolation up to 132×. Speedup increases with volume size—for $1024 \times 1024 \times 512$ volumes, orientation transformations reach 180×. The framework's transparent GPU support via KernelAbstractions.jl requires no code modifications.
 
 \section{Automatic Differentiation and Composability}
 \label{sec:autodiff}
@@ -306,140 +238,11 @@ MedImages.jl provides full autodifferentiation support through two complementary
 
 \subsection{Autodifferentiation Implementation}
 
-MedImages.jl implements automatic differentiation through ChainRules.jl for Zygote compatibility and direct Enzyme.jl integration:
+MedImages.jl implements automatic differentiation through ChainRules.jl (Zygote support via \texttt{rrule} definitions) and Enzyme.jl (GPU kernels). The autodifferentiation test suite validates gradient correctness through numerical comparison, loss function composition, and GPU-CPU consistency, ensuring differentiable medical imaging pipelines.
 
-\textbf{Zygote Support (CPU):} All spatial transformations have explicit gradient definitions via \texttt{rrule} (reverse rule) definitions. The implementation uses pure Julia loops on CPU, ensuring compatibility with Zygote's recursive differentiation.
+\section{Quality Assurance and Impact}
 
-\textbf{Enzyme Support (GPU):} For GPU kernels, the framework registers Enzyme gradient rules that work with KernelAbstractions.jl, enabling automatic differentiation through GPU-accelerated operations where feasible. Enzyme provides higher performance than Zygote for GPU kernels.
-
-\lstset{style=mystyle}
-\begin{lstlisting}[language=Julia]
-# Example: Differentiable resampling loss
-using MedImages
-using Zygote
-
-function registration_loss(moving_image_data)
-    % Construct MedImage structure
-    moving = MedImage(
-        voxel_data = moving_image_data,
-        origin = (0.0, 0.0, 0.0),
-        spacing = (1.0, 1.0, 1.0),
-        direction = I(3)[:]  % Identity matrix flattened
-    )
-    
-    % Resample to fixed image space (differentiable)
-    resampled = resample_to_spacing(moving, (2.0, 2.0, 2.0), Linear_en)
-    
-    % Compute scalar loss
-    return sum(resampled.voxel_data .^ 2)
-end
-
-% Compute gradients via automatic differentiation
-data = rand(Float32, 64, 64, 64)
-gradient_wrt_data = gradient(registration_loss, data)[1]
-\end{lstlisting}
-
-\subsection{Supported Operations and Testing}
-
-The following operations support autodifferentiation:
-
-\begin{table}[H]
-\centering
-\subsection{Testing Methodology}
-
-The autodifferentiation implementation is validated through a comprehensive test suite in \texttt{test/differentiability\_tests/}:
-
-\begin{enumerate}
-    \item \textbf{Gradient Existence:} Each operation verifies that gradients are computed without errors.
-    
-    \item \textbf{Numerical Validation:} Analytical gradients are compared against finite-difference approximations to verify correctness to numerical precision.
-    
-    \item \textbf{Loss Function Composition:} Tests verify that gradients flow correctly through composed operations (e.g., resample $\rightarrow$ rotate $\rightarrow$ loss).
-    
-    \item \textbf{GPU-CPU Consistency:} GPU autodiff results match CPU results, ensuring numerically identical gradients regardless of backend.
-    
-    \item \textbf{Real-World Scenarios:} Tests use realistic loss functions (e.g., spatial registration, image similarity metrics) to validate practical use cases.
-\end{enumerate}
-
-Example test for spatial registration:
-
-\lstset{style=mystyle}
-\begin{lstlisting}[language=Julia]
-% From test/differentiability_tests/test_gradients.jl
-using Zygote, FiniteDifferences
-
-function loss(x)
-    im = create_mock_medimage(x)
-    resampled = resample_to_spacing(im, (2.0, 2.0, 2.0), Linear_en)
-    return sum(resampled.voxel_data)
-end
-
-% Analytical gradient via Zygote
-data = rand(Float32, 10, 10, 10)
-zygote_grads = gradient(loss, data)[1]
-
-% Numerical gradient via finite differences
-fd_grads = grad(central_fdm(5, 1), loss, data)[1]
-
-% Verify they match
-@test isapprox(zygote_grads, fd_grads, rtol=1e-3)
-\end{lstlisting}
-
-\section{3D Data Focus and Design Philosophy}
-
-MedImages.jl is fundamentally designed for three-dimensional medical imaging, where the computational landscape differs significantly from 2D image processing:
-
-\subsection{Why 3D Data Demands Specialized Design}
-
-Modern medical imaging produces massive 3D volumes:
-\begin{itemize}
-    \item \textbf{Volume Sizes:} Clinical CT and MRI scans routinely exceed $512 \times 512 \times 512$ voxels, yielding datasets of hundreds of megabytes to gigabytes.
-    \item \textbf{Memory Access Patterns:} 3D grid transformations (resampling, orientation changes) involve non-local memory access that benefits dramatically from GPU parallelism.
-    \item \textbf{Spatial Correctness:} Unlike 2D images, 3D medical images require careful handling of voxel spacing and orientation to maintain clinical validity.
-    \item \textbf{Computation Intensity:} 3D operations have favorable compute-to-memory ratios on GPUs, making acceleration highly effective.
-\end{itemize}
-
-\subsection{GPU Acceleration as a Core Feature}
-
-The performance benchmarks (Tables \ref{tab:orientation} and \ref{tab:resampling}) demonstrate that GPU acceleration is not optional for large-scale 3D imaging:
-
-\begin{itemize}
-    \item \textbf{Orientation Changes:} 62--180× speedup on GPU, essential for neuroimaging pipelines that frequently reorient data to standard coordinate systems.
-    
-    \item \textbf{Resampling:} 12--16× speedup, critical for preprocessing pipelines that normalize spacing across heterogeneous acquisitions.
-    
-    \item \textbf{Transparent Integration:} The framework exposes GPU acceleration through KernelAbstractions.jl without requiring users to modify algorithms or data structures.
-\end{itemize}
-
-This design philosophy positions MedImages.jl as a framework optimized for the computational realities of 3D medical imaging, where GPU acceleration directly translates to dramatically reduced analysis times. For example, a typical clinical preprocessing pipeline involving orientation change, resampling, and registration could experience combined speedups of 50--100×, reducing analysis time from hours to minutes.
-
-\section{Quality Assurance and Testing}
-
-Reliability is paramount in medical imaging software. MedImages.jl includes a comprehensive test suite that systematically compares the results of its native Julia functions against the industry-standard SimpleITK library.
-
-The testing framework covers:
-\begin{itemize}
-    \item \textbf{Basic Transformations:} Rotation, translation, scaling, cropping, and padding are verified by performing the same operation in both MedImages.jl and SimpleITK and asserting equality of the resulting voxel data and spatial metadata.
-    \item \textbf{Resampling:} Tests ensure that resampling to new spacing or reference images produces consistent results.
-    \item \textbf{Metadata Preservation:} Verification that origin, spacing, and direction matrices are correctly updated after every transformation.
-    \item \textbf{Autodifferentiation:} Comprehensive testing of gradient computation through numerical comparison and loss function composition (detailed in Section \ref{sec:autodiff}).
-\end{itemize}
-
-This rigorous approach ensures that users can trust the native Julia implementation to produce clinically valid results comparable to established tools.
-
-\section{Impact}
-
-MedImages.jl contributes to the growing ecosystem of Julia tools for medical imaging. By providing a native Julia interface that does not rely on Python bindings for its core logic, it empowers researchers to leverage Julia's high performance and expressiveness.
-
-\subsection{Boosting Productivity}
-The package helps boost productivity by eliminating the need to switch between languages (the two-language problem). Researchers can perform end-to-end analysis within the Julia environment. The integration of HDF5 further enhances productivity by removing I/O bottlenecks in large-scale data processing pipelines \cite{KimKazmierski2025}.
-
-When combined with GPU acceleration, MedImages.jl's performance advantages translate directly to faster research cycles. A preprocessing pipeline that took 2 hours on CPU can complete in 2 minutes on GPU, enabling researchers to iterate quickly on algorithm development.
-
-\subsection{Democratizing Access}
-By abstracting the complexities of the DICOM standard and spatial metadata math, MedImages.jl democratizes access to correct medical image processing. Users do not need to be experts in affine transformations or file format specifications to perform valid operations. This is crucial for interdisciplinary research where domain experts may not have deep software engineering expertise \cite{LowekampChen2013}.
-
-Furthermore, the transparent GPU support means that clinicians and researchers without GPU programming experience can still leverage hardware acceleration simply by setting an environment variable—no code changes required.
+MedImages.jl provides rigorous quality assurance through comprehensive testing against SimpleITK (transformations, resampling, metadata preservation, autodifferentiation), ensuring clinical validity. The package eliminates language switching—researchers perform end-to-end analysis in Julia—and GPU acceleration reduces preprocessing from hours to minutes, enabling rapid iteration on algorithm development.
 
 \section{Conclusions and Future Work}
 
