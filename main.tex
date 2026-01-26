@@ -72,11 +72,11 @@
 \address[1]{JuliaHealth}
 
 \begin{abstract}
-MedImages.jl is a Julia package designed to address the complexities of medical imaging data handling, specifically focusing on the challenges of spatial metadata (origin, spacing, direction) and the integration of high-performance computing with ease of use. Unlike existing wrappers that rely heavily on Python bindings, MedImages.jl leverages native Julia libraries for core spatial transformations and utilizes a C++ wrapped ITK interface strictly for robust data loading. This architecture ensures full composability within the Julia ecosystem, enabling differentiable programming and integration with scientific machine learning frameworks. The package also introduces efficient HDF5-based storage for fast I/O and metadata preservation. We demonstrate that MedImages.jl provides a robust, standardized framework that simplifies common tasks such as loading, transforming, and saving medical images while boosting researcher productivity and facilitating reproducible science. Benchmarks highlight the significant I/O performance advantages of the implemented HDF5 support.
+MedImages.jl addresses the two-language problem in medical imaging by providing native Julia implementations for spatial transformations while preserving clinical metadata through a BIDS-inspired architecture. Unlike Python frameworks (SimpleITK, MONAI) where metadata is lost during NumPy/PyTorch conversion, MedImages.jl enforces zero-cost metadata abstractions via Julia's type system. The package achieves C++-level performance through LLVM JIT compilation while enabling end-to-end automatic differentiation—a capability unavailable in wrapped C++ libraries. By utilizing ITK only for I/O robustness and implementing all transformations in native Julia, the framework ensures full composability with scientific machine learning tools (Flux.jl, Zygote.jl) and supports HDF5-based storage for efficient pipelines. Benchmarks demonstrate 16--180× GPU speedups while maintaining clinical metadata integrity, positioning MedImages.jl as a foundation for physics-informed deep learning in medical imaging.
 \end{abstract}
 
 \begin{keyword}
-Medical Imaging \sep Julia \sep Spatial Metadata \sep ITK \sep HDF5 \sep Open Source \sep Reproducibility
+Medical Imaging \sep Julia \sep Spatial Metadata \sep BIDS \sep Differentiable Programming \sep GPU Acceleration \sep Open Source
 \end{keyword}
 
 \end{frontmatter}
@@ -85,16 +85,16 @@ Medical Imaging \sep Julia \sep Spatial Metadata \sep ITK \sep HDF5 \sep Open So
 
 \section{Motivation and Significance}
 
-Julia's unified CPU/GPU programming model and the two-language problem it solves make it ideal for medical imaging. Clinical CT/MRI scans contain hundreds of millions of voxels, demanding GPU acceleration—Julia enables transparent GPU computation on the same algorithm without code duplication. However, medical imaging introduces distinct challenges: (1) complex data formats (DICOM) with inconsistent metadata, (2) non-isotropic voxel spacing and varying coordinate systems, and (3) computationally intensive 3D grid transformations. A robust framework must provide correctness in spatial metadata handling, high performance through GPU acceleration, and ease of use.
+Medical imaging suffers from the two-language problem: researchers prototype in Python but rely on opaque C++ kernels (SimpleITK, ITK) for performance. This creates three critical limitations: (1) \textbf{Metadata Loss}—converting SimpleITK images to NumPy arrays discards spatial metadata (origin, spacing, direction), requiring manual tracking; (2) \textbf{Non-Differentiability}—C++ functions are black boxes to PyTorch's autograd, preventing end-to-end optimization of registration or reconstruction parameters; (3) \textbf{Performance Ceiling}—custom operations require C++/CUDA compilation, creating high-friction development cycles.
 
-MedImages.jl achieves these goals natively in Julia. Unlike C++ wrappers (which incur interoperability overhead) or pure-Python approaches (which struggle at scale), MedImages.jl is designed from the ground up for 3D volumetric data with GPU acceleration as a first-class feature. It preserves essential spatial metadata, enables end-to-end differentiable processing via Zygote.jl and Enzyme.jl, and achieves 60--180× speedups on GPUs, making it uniquely suited for modern scientific machine learning in medical imaging.
+MedImages.jl solves these through Julia's unique capabilities. Native Julia code compiles to LLVM machine code, achieving C++ performance without the two-language barrier. The package implements a BIDS-inspired metadata paradigm where spatial context is intrinsic to the data structure via zero-cost type abstractions—metadata travels with pixel data without performance penalty. Critically, all operations are differentiable via Zygote.jl/Enzyme.jl, enabling physics-informed deep learning where MRI reconstruction physics or registration parameters can be optimized jointly with neural networks. GPU acceleration (60--180× speedups) is transparent, requiring no code changes, positioning MedImages.jl as the foundation for next-generation computational medicine.
 
 \section{Software Description}
 
 \subsection{Software Architecture}
-MedImages.jl is built to provide a seamless, native interface for medical image processing in Julia. Its core architecture revolves around the \texttt{MedImage} struct, which standardizes the representation of medical image data.
+MedImages.jl implements a BIDS-inspired metadata paradigm where the \texttt{MedImage} struct enforces metadata integrity through Julia's type system. Unlike Python workflows where \texttt{sitk.GetArrayFromImage()} discards spatial context, MedImages.jl uses zero-cost abstractions—metadata (origin, spacing, direction, patient ID, acquisition timestamp) is intrinsic to the structure without runtime overhead.
 
-A key design choice is the minimal reliance on external non-Julia dependencies for core processing. While data loading leverages the robust \texttt{ITKIOWrapper} (utilizing the C++ ITK library via JLL packages) to ensure broad format support (NIfTI, DICOM), all spatial transformations are implemented in native Julia. This distinction is crucial as it allows for full composability with other Julia packages, such as \texttt{DifferentialEquations.jl} and \texttt{Flux.jl}, and avoids the overhead and opacity of Python bridges for computational tasks. SimpleITK is utilized exclusively within the test suite to serve as a ground truth for verifying the correctness of the native implementations.
+A critical design decision: ITK (C++) is used \textit{only} for I/O robustness (NIfTI, DICOM parsing), while \textit{all} transformations are native Julia. This ensures: (1) \textbf{Differentiability}—operations integrate with Zygote.jl/Enzyme.jl for automatic differentiation; (2) \textbf{Composability}—seamless integration with Flux.jl, DifferentialEquations.jl without language barriers; (3) \textbf{Transparency}—users can inspect and extend algorithms without C++ recompilation. The framework handles Julia's column-major (Fortran-style) vs ITK's row-major (C-style) memory layout automatically, abstracting these complexities. SimpleITK validates correctness in tests but is never a runtime dependency.
 
 \begin{figure}[H]
     \centering
@@ -103,13 +103,14 @@ A key design choice is the minimal reliance on external non-Julia dependencies f
     \label{fig:architecture}
 \end{figure}
 
-The \texttt{MedImage} struct (Figure \ref{fig:architecture}) encapsulates:
+The \texttt{MedImage} struct (Figure \ref{fig:architecture}) implements typed medical imaging semantics:
 \begin{itemize}
-    \item \texttt{voxel\_data}: A multidimensional array holding the pixel intensities.
-    \item \texttt{origin}: The $(x, y, z)$ physical coordinates of the first voxel.
-    \item \texttt{spacing}: The physical distance between voxels in each dimension.
-    \item \texttt{direction}: The direction cosines defining the orientation of the image axes.
-    \item \texttt{metadata}: Dictionaries storing additional DICOM or NIfTI tags.
+    \item \texttt{voxel\_data}: Column-major arrays (\texttt{Array\{Float32,3\}} for CT; \texttt{Array\{Float32,4\}} for fMRI time-series)
+    \item \texttt{origin}: Physical coordinates $(x,y,z)$ of first voxel (patient reference frame)
+    \item \texttt{spacing}: Physical voxel dimensions enabling spatial calculations
+    \item \texttt{direction}: Direction cosines for orientation (RAS/LPS coordinate systems)
+    \item \texttt{metadata}: DICOM tags, Study/Series UIDs, patient demographics (clinical context persistence)
+    \item \texttt{modality}: Strong typing (\texttt{CTImage}, \texttt{PETImage}, \texttt{MRIImage}) enabling dispatch-based processing (automatic HU windowing for CT, SUV colormaps for PET)
 \end{itemize}
 
 \subsection{Functionalities}
@@ -242,7 +243,7 @@ MedImages.jl implements automatic differentiation through ChainRules.jl (Zygote 
 
 \section{Quality Assurance and Impact}
 
-MedImages.jl provides rigorous quality assurance through comprehensive testing against SimpleITK (transformations, resampling, metadata preservation, autodifferentiation), ensuring clinical validity. The package eliminates language switching—researchers perform end-to-end analysis in Julia—and GPU acceleration reduces preprocessing from hours to minutes, enabling rapid iteration on algorithm development.
+MedImages.jl provides rigorous quality assurance through comprehensive testing against SimpleITK (transformations, resampling, metadata preservation, autodifferentiation), ensuring clinical validity. The package solves the two-language problem: researchers write custom filters in Julia achieving C++ performance without compilation delays. Integration with the JuliaHealth ecosystem (MedEye3d.jl for OpenGL visualization, MRIReco.jl for physics-based reconstruction) enables capabilities unavailable in Python—differentiating through MRI reconstruction physics for joint optimization with segmentation networks. GPU acceleration (hours to minutes) enables rapid prototyping, positioning Julia as the platform for physics-informed deep learning in medical imaging.
 
 \section{Conclusions and Future Work}
 
