@@ -59,22 +59,72 @@ MedImages.jl addresses each of these with a unified design:
 
 ## Architecture Overview
 
-```
-Input Formats          MedImage Struct           Operations
-+-----------+                                   +------------------+
-| NIfTI     |--+                            +-->| Rotate           |
-| DICOM     |--+--> MedImage(voxel_data,    |   | Crop / Pad       |
-| HDF5      |--+      origin, spacing,   --+-->| Scale / Translate|
-| MHA       |--+      direction, ...)       |   | Resample         |
-+-----------+                               |   | Change orient.   |
-                                            |   +------------------+
-                Output Formats              |
-                +-----------+               |   Backends
-                | NIfTI     |<--+           |   +------------------+
-                | HDF5      |<--+           +-->| CPU (default)    |
-                +-----------+                   | CUDA             |
-                                                | AMD / oneAPI     |
-                                                +------------------+
+```mermaid
+graph LR
+    subgraph Input["Input Formats"]
+        NIfTI_in["NIfTI"]
+        DICOM["DICOM"]
+        HDF5_in["HDF5"]
+        MHA["MHA"]
+    end
+
+    subgraph Core["MedImage"]
+        MI["voxel_data\norigin\nspacing\ndirection\nmetadata"]
+    end
+
+    subgraph Ops["Operations"]
+        Rotate
+        Crop
+        Pad
+        Scale
+        Translate
+        Resample
+        Reorient["Change Orientation"]
+    end
+
+    subgraph Backends
+        CPU
+        CUDA
+        AMD
+        oneAPI
+    end
+
+    subgraph Output["Output Formats"]
+        NIfTI_out["NIfTI"]
+        HDF5_out["HDF5"]
+    end
+
+    subgraph AD["Autodiff"]
+        Zygote
+        Enzyme
+    end
+
+    NIfTI_in --> MI
+    DICOM --> MI
+    HDF5_in --> MI
+    MHA --> MI
+
+    MI --> Rotate
+    MI --> Crop
+    MI --> Pad
+    MI --> Scale
+    MI --> Translate
+    MI --> Resample
+    MI --> Reorient
+
+    Rotate --> MI
+    Crop --> MI
+    Pad --> MI
+    Scale --> MI
+    Translate --> MI
+    Resample --> MI
+    Reorient --> MI
+
+    MI --> NIfTI_out
+    MI --> HDF5_out
+
+    Backends -.- MI
+    AD -.- Ops
 ```
 
 ---
