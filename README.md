@@ -4,241 +4,143 @@
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://juliahealth.org/MedImages.jl/dev)
 [![Build Status](https://github.com/JuliaHealth/MedImages.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/JuliaHealth/MedImages.jl/actions/workflows/CI.yml)
 
-A comprehensive Julia library for GPU-accelerated, differentiable medical image processing.
+GPU-accelerated, differentiable medical image processing in Julia. Unified I/O for NIfTI, DICOM, HDF5, and MHA with automatic spatial metadata management.
 
 ---
 
-## Table of Contents
+## Architecture
 
-<div align="center">
-
-[![The Challenge](https://img.shields.io/badge/The_Challenge-orange)](#the-challenge)
-[![The Solution](https://img.shields.io/badge/The_Solution-orange)](#the-solution)
-[![Architecture](https://img.shields.io/badge/Architecture-orange)](#architecture-overview)
-[![Data Structure](https://img.shields.io/badge/Data_Structure-orange)](#medimage-data-structure)
-[![Type Enums](https://img.shields.io/badge/Type_Enums-orange)](#type-enumerations)
-[![File I/O](https://img.shields.io/badge/File_I%2FO-orange)](#file-io-operations)
-[![Spatial System](https://img.shields.io/badge/Spatial_System-orange)](#spatial-coordinate-system)
-[![Orientations](https://img.shields.io/badge/Orientations-orange)](#orientation-codes)
-[![Transforms](https://img.shields.io/badge/Transforms-orange)](#basic-transformations)
-[![Interpolation](https://img.shields.io/badge/Interpolation-orange)](#interpolation-methods)
-[![Resampling](https://img.shields.io/badge/Resampling-orange)](#resampling-operations)
-[![Registration](https://img.shields.io/badge/Registration-orange)](#cross-modal-registration)
-[![GPU Backend](https://img.shields.io/badge/GPU_Backend-orange)](#gpu-backend)
-[![GPU Usage](https://img.shields.io/badge/GPU_Usage-orange)](#gpu-usage)
-[![Differentiability](https://img.shields.io/badge/Differentiability-orange)](#differentiability)
-[![Gradients](https://img.shields.io/badge/Gradients-orange)](#gradient-computation)
-[![Pipeline](https://img.shields.io/badge/Pipeline-orange)](#complete-pipeline)
-[![API Reference](https://img.shields.io/badge/API_Reference-orange)](#api-quick-reference)
-[![Docker](https://img.shields.io/badge/Docker-gray)](#quick-start-with-docker)
-[![Contributing](https://img.shields.io/badge/Contributing-gray)](#contributing)
-[![References](https://img.shields.io/badge/References-gray)](#references)
-
-</div>
+![Architecture](docs/assets/architecture.png)
 
 ---
 
-## The Challenge
+## Quick Start
 
-![Concept: The Challenge](docs/assets/frame-01.png)
-
----
-
-## The Solution
-
-![Concept: The Solution](docs/assets/frame-02.png)
-
----
-
-## Architecture Overview
-
-![Architecture: Overview](docs/assets/frame-03.png)
+```julia
+using MedImages
+ct = load_image("scan.nii.gz", "CT")
+resampled = resample_to_spacing(ct, (1.0, 1.0, 1.0), Linear_en)
+create_nii_from_medimage(resampled, "output.nii.gz")
+```
 
 ---
 
 ## MedImage Data Structure
 
-![Architecture: MedImage Data Structure](docs/assets/frame-04.png)
+All fields travel with the voxel data through every operation.
+
+![MedImage Data Structure](docs/assets/table-datastructure.png)
+
+Additional fields: `date_of_saving`, `acquistion_time`, `study_uid`, `patient_uid`, `series_uid`, `study_description`, `legacy_file_name`, `display_data`, `clinical_data`, `is_contrast_administered`, `metadata`.
 
 ---
 
-## Type Enumerations
+## I/O
 
-![Implementation: Type Enumerations](docs/assets/frame-05.png)
-
----
-
-## File I/O Operations
-
-![Implementation: File I/O Operations](docs/assets/frame-06.png)
-
----
-
-## Spatial Coordinate System
-
-![Concept: Spatial Coordinate System](docs/assets/frame-07.png)
+```julia
+ct  = load_image("scan.nii.gz", "CT")          # NIfTI
+mri = load_image("dicom_dir/", "MRI")           # DICOM
+create_nii_from_medimage(ct, "out.nii.gz")       # Export NIfTI
+save_med_image(ct, "scan.h5")                    # Save HDF5
+```
 
 ---
 
-## Orientation Codes
+## Transformations
 
-![Architecture: Orientation Codes](docs/assets/frame-08.png)
+All transforms preserve spatial metadata and are differentiable.
 
----
-
-## Basic Transformations
-
-![Implementation: Basic Transformations](docs/assets/frame-09.png)
-
----
-
-## Interpolation Methods
-
-![Architecture: Interpolation Methods](docs/assets/frame-10.png)
+```julia
+rotated    = rotate_mi(im, 1, 45.0, Linear_en)
+cropped    = crop_mi(im, (10,10,5), (100,100,50), Linear_en)
+padded     = pad_mi(im, (5,5,5), (5,5,5), 0.0, Linear_en)
+translated = translate_mi(im, 10, 2, Linear_en)
+```
 
 ---
 
-## Resampling Operations
+## Resampling and Orientation
 
-![Implementation: Resampling Operations](docs/assets/frame-11.png)
+```julia
+isotropic = resample_to_spacing(ct, (1.0, 1.0, 1.0), Linear_en)
+ras       = change_orientation(ct, ORIENTATION_RAS)
+aligned   = resample_to_image(ct, pet, Linear_en)
+```
 
----
-
-## Cross-Modal Registration
-
-![Example: Cross-Modal Registration](docs/assets/frame-12.png)
-
----
-
-## GPU Backend
-
-![Architecture: GPU Backend](docs/assets/frame-13.png)
+`resample_to_image` aligns a moving image to a fixed image's geometry (grid dimensions, origin, spacing, direction). Essential for multi-modal fusion and deep learning data preparation.
 
 ---
 
-## GPU Usage
+## Interpolation
 
-![Example: GPU Usage](docs/assets/frame-14.png)
+![Interpolation Methods](docs/assets/table-interpolation.png)
+
+Always use `Nearest_neighbour_en` for segmentation masks to preserve label integrity.
+
+---
+
+## Spatial Coordinates
+
+Voxel-to-world mapping: `world = origin + direction * diag(spacing) * (index - 1)`
+
+Orientation codes follow the three-letter anatomical convention. `ORIENTATION_RAS` (NIfTI standard) and `ORIENTATION_LPS` (DICOM standard) are the most common. All eight combinations of R/L, A/P, S/I are supported.
+
+---
+
+## GPU
+
+Backend selection is automatic via KernelAbstractions.jl. The same functions work on CPU and GPU.
+
+```julia
+using CUDA
+gpu_ct = deepcopy(ct)
+gpu_ct.voxel_data = CuArray(Float32.(ct.voxel_data))
+rotated = rotate_mi(gpu_ct, :z, 45.0, Linear_en)
+```
 
 ---
 
 ## Differentiability
 
-![Concept: Differentiability](docs/assets/frame-15.png)
+All resampling and interpolation operations define ChainRulesCore rrules, enabling end-to-end gradient computation through geometric transforms.
+
+- **Zygote.jl** -- reverse-mode AD, integrates with Flux.jl
+- **Enzyme.jl** -- high-performance AD for GPU kernels
+
+```julia
+using Zygote
+grads = Zygote.gradient(data) do x
+    sum(resample_to_spacing(make_medimage(x), (2.0,2.0,2.0), Linear_en).voxel_data)
+end
+```
 
 ---
 
-## Gradient Computation
+## API Reference
 
-![Implementation: Gradient Computation](docs/assets/frame-16.png)
-
----
-
-## Complete Pipeline
-
-![Example: Complete Pipeline](docs/assets/frame-17.png)
+![API Reference](docs/assets/table-api.png)
 
 ---
 
-## API Quick Reference
-
-![Result: API Quick Reference](docs/assets/frame-18.png)
-
----
-
-## Quick Start with Docker
-
-The easiest way to get started is using Docker with GPU support for benchmarks.
-
-### Prerequisites
-
-- Docker with NVIDIA GPU support (for GPU benchmarks)
-- Or Docker without GPU (CPU-only mode available)
-
-### Build and Run
+## Docker
 
 ```bash
-# Build the Docker image
-make build
-
-# Start interactive Julia REPL (with GPU)
-make shell
-
-# Start interactive Julia REPL (CPU only)
-make shell-cpu
+make build       # Build image
+make shell       # Julia REPL with GPU
+make shell-cpu   # Julia REPL, CPU only
+make test        # Run test suite
+make benchmark   # GPU benchmarks (synthetic data)
+make help        # All commands
 ```
 
-### Run Tests
-
-```bash
-# Run the full test suite
-make test
-
-# Run tests in CPU-only mode
-make test-cpu
-```
-
-### Run Benchmarks
-
-```bash
-# Run GPU benchmarks (uses synthetic data)
-make benchmark
-
-# Run CPU-only benchmarks
-make benchmark-cpu
-
-# Custom benchmark options
-make benchmark-custom ARGS="--size 64 --iterations 5"
-```
-
-### Verify Setup
-
-```bash
-# Check CUDA/GPU availability
-make check-cuda
-
-# Check Python/SimpleITK setup
-make check-python
-
-# Run quick start verification
-./scripts/quick-start.sh
-```
-
-### Test Data
-
-Test data files are expected in `test_data/`:
-
-- `volume-0.nii.gz` - Primary NIfTI test file
-- `synthethic_small.nii.gz` - Synthetic test file
-- `ScalarVolume_0/` - DICOM test directory
-
-```bash
-# Check test data availability
-./scripts/check-test-data.sh
-
-# Download benchmark data from TCIA
-make download-data
-
-# Convert DICOM to NIfTI for benchmarks
-make convert-data
-```
-
-Note: Benchmarks use synthetic data by default (`make benchmark`). Real data download is only needed for `make benchmark-full`.
-
-### All Make Commands
-
-```bash
-make help  # Show all available commands
-```
+Test data goes in `test_data/`. Run `make download-data` for real benchmark data.
 
 ---
 
 ## Contributing
 
-Contributions are welcome! If you have expertise in medical imaging, particularly ultrasonography, or experience with the technical challenges described above, please consider getting involved.
-
----
+Contributions are welcome, particularly from those with medical imaging or ultrasonography expertise.
 
 ## References
 
-[1] Gorgolewski, K.J., Auer, T., Calhoun, V.D. et al. The brain imaging data structure, a format for organizing and describing outputs of neuroimaging experiments. Sci Data 3, 160044 (2016). https://www.nature.com/articles/sdata201644
+[1] Gorgolewski et al. The brain imaging data structure. Sci Data 3, 160044 (2016). https://www.nature.com/articles/sdata201644
