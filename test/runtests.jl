@@ -209,6 +209,11 @@ mkpath(DEBUG_DIR)
         end
     end
 
+    # Batched Processing Tests
+    @testset "Batched Processing Tests" begin
+        include("test_batched.jl")
+    end
+
 end # main testset
 
 # Summary output
