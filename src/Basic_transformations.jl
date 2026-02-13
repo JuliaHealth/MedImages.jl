@@ -63,8 +63,8 @@ ChainRulesCore.@non_differentiable get_real_center_Julia(::Any)
 ChainRulesCore.@non_differentiable computeIndexToPhysicalPointMatrices_Julia(::Any)
 ChainRulesCore.@non_differentiable transformIndexToPhysicalPoint_Julia(::Any, ::Any)
 
-function Rodrigues_rotation_matrix(image::MedImage, axis::Int, angle::Float64)::Matrix{Float64}
-  img_direction = image.direction
+function Rodrigues_rotation_matrix(direction::NTuple{9,Float64}, axis::Int, angle::Float64)::Matrix{Float64}
+  img_direction = direction
   axis_angle = if axis == 3
     (img_direction[9], img_direction[6], img_direction[3])
   elseif axis == 2
@@ -83,6 +83,10 @@ function Rodrigues_rotation_matrix(image::MedImage, axis::Int, angle::Float64)::
     ci*uy*ux+uz*s ci*uy*uy+c ci*uy*uz-ux*s;
     ci*uz*ux-uy*s ci*uz*uy+ux*s ci*uz*uz+c]
   return R
+end
+
+function Rodrigues_rotation_matrix(image::MedImage, axis::Int, angle::Float64)::Matrix{Float64}
+    return Rodrigues_rotation_matrix(image.direction, axis, angle)
 end
 
 ChainRulesCore.@non_differentiable Rodrigues_rotation_matrix(::Any, ::Any, ::Any)
@@ -227,6 +231,167 @@ function scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Floa
 
   new_im = update_voxel_and_spatial_data(im, new_data, im.origin, im.spacing, im.direction)
 
+  return new_im
+end
+
+# Batched implementations
+
+function rotate_mi(image::BatchedMedImage, axis::Int, angle::Union{Float64, AbstractVector{Float64}}, Interpolator::Interpolator_enum, crop::Bool=true)::BatchedMedImage
+    if !crop
+         error("rotate_mi with crop=false is not fully supported in this patch")
+    end
+
+    batch_size = size(image.voxel_data, 4)
+    if angle isa AbstractVector && length(angle) != batch_size
+        error("Angle vector length must match batch size")
+    end
+
+    spatial_size = size(image.voxel_data)[1:3]
+    indices = CartesianIndices(spatial_size)
+    indices_vec = vec(collect(indices))
+    n_points = length(indices_vec)
+
+    points_to_interpolate = zeros(Float64, 3, n_points, batch_size)
+
+    v_center = [(spatial_size[i] + 0.0)/2.0 for i in 1:3]
+
+    for b in 1:batch_size
+        current_angle = (angle isa AbstractVector) ? angle[b] : angle
+        current_direction = image.direction[b]
+
+        R = Rodrigues_rotation_matrix(current_direction, axis, current_angle)
+
+        # Optimized loop
+        @inbounds for i in 1:n_points
+             idx = indices_vec[i]
+
+             # Shift
+             px = Float64(idx[1]) - v_center[1]
+             py = Float64(idx[2]) - v_center[2]
+             pz = Float64(idx[3]) - v_center[3]
+
+             # Rotate
+             rx = R[1,1]*px + R[1,2]*py + R[1,3]*pz
+             ry = R[2,1]*px + R[2,2]*py + R[2,3]*pz
+             rz = R[3,1]*px + R[3,2]*py + R[3,3]*pz
+
+             # Shift back
+             points_to_interpolate[1, i, b] = rx + v_center[1]
+             points_to_interpolate[2, i, b] = ry + v_center[2]
+             points_to_interpolate[3, i, b] = rz + v_center[3]
+        end
+    end
+
+    spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
+
+    resampled_flat = interpolate_my(points_to_interpolate, image.voxel_data, spacing_arg, Interpolator, false, 0.0, true)
+
+    new_data = reshape(resampled_flat, spatial_size[1], spatial_size[2], spatial_size[3], batch_size)
+
+    new_image = deepcopy(image)
+    new_image.voxel_data = new_data
+    return new_image
+end
+
+function scale_mi(image::BatchedMedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::BatchedMedImage
+  scale_tuple = scale isa Float64 ? (scale, scale, scale) : scale
+  # Use size of the first 3 dims
+  old_size = size(image.voxel_data)[1:3]
+
+  points_to_interpolate, new_size = build_scale_points(old_size, scale_tuple)
+  # points_to_interpolate is (3, N)
+
+  batch_size = size(image.voxel_data, 4)
+  spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
+
+  # interpolate_my handles broadcasting of points if 3xN and input 4D
+  resampled_flat = interpolate_my(points_to_interpolate, image.voxel_data, spacing_arg, Interpolator, false, 0.0, true)
+
+  new_data = reshape(resampled_flat, new_size[1], new_size[2], new_size[3], batch_size)
+
+  new_image = deepcopy(image)
+  new_image.voxel_data = new_data
+  return new_image
+end
+
+function translate_mi(im::BatchedMedImage, translate_by::Union{Int64, Vector{Int64}}, translate_in_axis::Int64, Interpolator::Interpolator_enum)::BatchedMedImage
+  # Translate changes origin. Voxel data stays same (no interpolation needed for integer translation if we just move origin).
+  # But existing translate_mi implementation:
+  # origin_val = im.origin[translate_in_axis] + translate_by * im.spacing[translate_in_axis]
+  # It updates spatial metadata only.
+
+  batch_size = size(im.voxel_data, 4)
+  new_im = deepcopy(im)
+
+  for b in 1:batch_size
+      t_by = (translate_by isa Vector) ? translate_by[b] : translate_by
+
+      origin_val = new_im.origin[b][translate_in_axis] + t_by * new_im.spacing[b][translate_in_axis]
+      translated_origin = ntuple(i -> i == translate_in_axis ? origin_val : new_im.origin[b][i], 3)
+      new_im.origin[b] = translated_origin
+  end
+  return new_im
+end
+
+function crop_mi(im::BatchedMedImage, crop_beg::Union{Tuple{Int64,Int64,Int64}, Vector{Tuple{Int64,Int64,Int64}}}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::BatchedMedImage
+    # Output size is fixed by crop_size
+    batch_size = size(im.voxel_data, 4)
+
+    # Check if we can use a view or need to copy. Since offsets might vary, we can't create a simple 4D view if offsets vary.
+    # We must construct a new array.
+
+    new_voxel_data = similar(im.voxel_data, crop_size[1], crop_size[2], crop_size[3], batch_size)
+    new_origins = deepcopy(im.origin)
+
+    for b in 1:batch_size
+        cb = (crop_beg isa Vector) ? crop_beg[b] : crop_beg
+
+        julia_beg = cb .+ 1
+        # Extract slice
+        # Verify bounds?
+        # Assuming valid
+        slice = view(im.voxel_data,
+            julia_beg[1]:(julia_beg[1]+crop_size[1]-1),
+            julia_beg[2]:(julia_beg[2]+crop_size[2]-1),
+            julia_beg[3]:(julia_beg[3]+crop_size[3]-1),
+            b)
+
+        new_voxel_data[:, :, :, b] .= slice
+
+        dir_diag = (im.direction[b][1], im.direction[b][5], im.direction[b][9])
+        new_origins[b] = im.origin[b] .+ (im.spacing[b] .* cb .* dir_diag)
+    end
+
+    new_im = deepcopy(im)
+    new_im.voxel_data = new_voxel_data
+    new_im.origin = new_origins
+    return new_im
+end
+
+function pad_mi(im::BatchedMedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64}, pad_val, Interpolator::Interpolator_enum)::BatchedMedImage
+  # Pad params shared
+  batch_size = size(im.voxel_data, 4)
+
+  # Process each channel? Or treat batch dim as channel?
+  # pad_dim only handles 3D array?
+  # function pad_dim(arr, dim, l, r, val)
+  # It takes arr.
+  # We can pad 4D array in dims 1, 2, 3.
+
+  data = im.voxel_data
+  data = pad_dim(data, 1, pad_beg[1], pad_end[1], pad_val)
+  data = pad_dim(data, 2, pad_beg[2], pad_end[2], pad_val)
+  data = pad_dim(data, 3, pad_beg[3], pad_end[3], pad_val)
+
+  new_origins = deepcopy(im.origin)
+  for b in 1:batch_size
+      dir_diag = (im.direction[b][1], im.direction[b][5], im.direction[b][9])
+      new_origins[b] = im.origin[b] .- (im.spacing[b] .* pad_beg .* dir_diag)
+  end
+
+  new_im = deepcopy(im)
+  new_im.voxel_data = data
+  new_im.origin = new_origins
   return new_im
 end
 

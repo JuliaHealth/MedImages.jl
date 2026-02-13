@@ -16,8 +16,9 @@ export ensure_tuple
 export create_nii_from_medimage
 export resample_kernel_launch
 export is_cuda_array, extract_corners
+export create_batched_medimage, unbatch_medimage
 
-import ..MedImage_data_struct: MedImage, Interpolator_enum, Mode_mi, Orientation_code, Nearest_neighbour_en, Linear_en, B_spline_en
+import ..MedImage_data_struct: MedImage, BatchedMedImage, Interpolator_enum, Mode_mi, Orientation_code, Nearest_neighbour_en, Linear_en, B_spline_en
 
 # CUDA detection utilities
 """
@@ -182,6 +183,102 @@ end#interpolate_point
     end
 end
 
+@kernel function interpolate_kernel_4d(out_res, @Const(source_arr_shape), @Const(source_arr), @Const(points_to_interpolate), @Const(spacing_arr), keep_begining_same, extrapolate_value, is_nearest_neighbour, @Const(points_batch_stride))
+    # Map index to point and batch
+    # out_res is (N_points, BatchSize)
+    # We iterate linearly over output
+    I = @index(Global)
+
+    # Calculate batch index and point index
+    # Note: ndrange passed is length(out_res) = N_points * BatchSize
+    n_points = size(out_res, 1)
+
+    # 1-based indexing
+    idx_point = (I - 1) % n_points + 1
+    idx_batch = (I - 1) ÷ n_points + 1
+
+    # Access point coordinates
+    # points_to_interpolate is (3, N_points, BatchSize) or (3, N_points)
+    # If 2D (shared points), points_batch_stride should be 0
+    # If 3D (unique points), points_batch_stride should be 1
+
+    # Linear index for points
+    # If stride=0: index is (idx_point) for col access
+    # If stride=1: index is (idx_point, idx_batch)
+
+    # To handle both via linear indexing or 3D indexing:
+    # If points is 3D: points[dim, idx_point, idx_batch]
+    # If points is 2D: points[dim, idx_point]
+    # We use explicit calc:
+    # point_linear_base = (idx_point - 1) * 3 + 1 + (idx_batch - 1) * points_batch_stride * n_points * 3
+    # Wait, points is usually (3, N). Memory layout: 3 varies fastest.
+
+    # Let's trust KA accessors if we index carefully
+    # We can use @Const points array.
+
+    # Simple logic:
+    # real_px = points[1, idx_point, 1 + (idx_batch-1)*stride]
+    # But 2D array cannot be indexed with 3 indices.
+    # So we must rely on flat indexing or assume 3D with dim 1 for shared.
+    # WE ASSUME caller reshapes points to (3, N, 1) if shared!
+
+    px = points_to_interpolate[1, idx_point, 1 + (idx_batch - 1) * points_batch_stride]
+    py = points_to_interpolate[2, idx_point, 1 + (idx_batch - 1) * points_batch_stride]
+    pz = points_to_interpolate[3, idx_point, 1 + (idx_batch - 1) * points_batch_stride]
+
+    # Spacing
+    sx = spacing_arr[1, idx_batch]
+    sy = spacing_arr[2, idx_batch]
+    sz = spacing_arr[3, idx_batch]
+
+    # Convert physical coordinates to index space
+    real_x = (px - 1.0f0) / Float32(sx) + 1.0f0
+    real_y = (py - 1.0f0) / Float32(sy) + 1.0f0
+    real_z = (pz - 1.0f0) / Float32(sz) + 1.0f0
+
+    # Bounds check
+    # source_arr_shape is (X, Y, Z, Batch)
+    if real_x < 1.0f0 || real_y < 1.0f0 || real_z < 1.0f0 || real_x > Float32(source_arr_shape[1]) || real_y > Float32(source_arr_shape[2]) || real_z > Float32(source_arr_shape[3])
+        out_res[I] = extrapolate_value
+    else
+        # Handle keep_beginning_same logic
+        if keep_begining_same
+            real_x = max(real_x, 1.0f0)
+            real_y = max(real_y, 1.0f0)
+            real_z = max(real_z, 1.0f0)
+        end
+
+        if is_nearest_neighbour
+            # Nearest Neighbor
+            out_res[I] = source_arr[Int(round(real_x)), Int(round(real_y)), Int(round(real_z)), idx_batch]
+        else
+            # Trilinear Interpolation (Optimized)
+            x0 = floor(Int, real_x)
+            y0 = floor(Int, real_y)
+            z0 = floor(Int, real_z)
+
+            x1 = min(x0 + 1, source_arr_shape[1])
+            y1 = min(y0 + 1, source_arr_shape[2])
+            z1 = min(z0 + 1, source_arr_shape[3])
+
+            xd = real_x - x0
+            yd = real_y - y0
+            zd = real_z - z0
+
+            @inbounds begin
+                # Interpolate inline to minimize variables
+                out_res[I] = (1.0f0 - zd) * (
+                    (1.0f0 - yd) * (Float32(source_arr[x0, y0, z0, idx_batch]) * (1.0f0 - xd) + Float32(source_arr[x1, y0, z0, idx_batch]) * xd) +
+                    yd * (Float32(source_arr[x0, y1, z0, idx_batch]) * (1.0f0 - xd) + Float32(source_arr[x1, y1, z0, idx_batch]) * xd)
+                ) + zd * (
+                    (1.0f0 - yd) * (Float32(source_arr[x0, y0, z1, idx_batch]) * (1.0f0 - xd) + Float32(source_arr[x1, y0, z1, idx_batch]) * xd) +
+                    yd * (Float32(source_arr[x0, y1, z1, idx_batch]) * (1.0f0 - xd) + Float32(source_arr[x1, y1, z1, idx_batch]) * xd)
+                )
+            end
+        end
+    end
+end
+
 # Pure Julia CPU interpolation without KernelAbstractions (for Enzyme compatibility)
 function interpolate_cpu_loop!(out_res, source_arr_shape, source_arr, points_to_interpolate, spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour)
     n_points = size(points_to_interpolate, 2)
@@ -232,20 +329,140 @@ function interpolate_cpu_loop!(out_res, source_arr_shape, source_arr, points_to_
     return nothing
 end
 
-function interpolate_pure(points_to_interpolate, input_array, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour)
-    out_res = similar(points_to_interpolate, eltype(points_to_interpolate), size(points_to_interpolate, 2))
-    backend = get_backend(points_to_interpolate)
-    source_arr_shape = size(input_array)
+function interpolate_cpu_loop_4d!(out_res, source_arr_shape, source_arr, points_to_interpolate, spacing_arr, keep_begining_same, extrapolate_value, is_nearest_neighbour, points_batch_stride)
+    n_points = size(out_res, 1)
+    batch_size = size(out_res, 2)
 
-    if backend isa KernelAbstractions.CPU
-        # Use pure Julia loop on CPU for better Enzyme compatibility
-        interpolate_cpu_loop!(out_res, source_arr_shape, input_array, points_to_interpolate, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour)
-    else
-        # Use KA kernel on GPU
-        interpolate_kernel(backend, 512)(out_res, source_arr_shape, input_array, points_to_interpolate, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour, ndrange=size(out_res))
-        synchronize(backend)
+    @inbounds for b in 1:batch_size
+        sx = spacing_arr[1, b]
+        sy = spacing_arr[2, b]
+        sz = spacing_arr[3, b]
+
+        point_offset_idx = 1 + (b - 1) * points_batch_stride
+
+        for i in 1:n_points
+            # Read point
+            px = points_to_interpolate[1, i, point_offset_idx]
+            py = points_to_interpolate[2, i, point_offset_idx]
+            pz = points_to_interpolate[3, i, point_offset_idx]
+
+            # Convert physical coordinates to index space
+            real_x = (px - 1.0f0) / Float32(sx) + 1.0f0
+            real_y = (py - 1.0f0) / Float32(sy) + 1.0f0
+            real_z = (pz - 1.0f0) / Float32(sz) + 1.0f0
+
+            # Bounds check
+            if real_x < 1.0f0 || real_y < 1.0f0 || real_z < 1.0f0 || real_x > Float32(source_arr_shape[1]) || real_y > Float32(source_arr_shape[2]) || real_z > Float32(source_arr_shape[3])
+                out_res[i, b] = extrapolate_value
+            else
+                # Handle keep_beginning_same logic
+                if keep_begining_same
+                    real_x = max(real_x, 1.0f0)
+                    real_y = max(real_y, 1.0f0)
+                    real_z = max(real_z, 1.0f0)
+                end
+
+                if is_nearest_neighbour
+                    # Nearest Neighbor
+                    out_res[i, b] = source_arr[Int(round(real_x)), Int(round(real_y)), Int(round(real_z)), b]
+                else
+                    # Trilinear Interpolation
+                    x0 = floor(Int, real_x)
+                    y0 = floor(Int, real_y)
+                    z0 = floor(Int, real_z)
+
+                    x1 = min(x0 + 1, source_arr_shape[1])
+                    y1 = min(y0 + 1, source_arr_shape[2])
+                    z1 = min(z0 + 1, source_arr_shape[3])
+
+                    xd = real_x - x0
+                    yd = real_y - y0
+                    zd = real_z - z0
+
+                    out_res[i, b] = (1.0f0 - zd) * (
+                        (1.0f0 - yd) * (Float32(source_arr[x0, y0, z0, b]) * (1.0f0 - xd) + Float32(source_arr[x1, y0, z0, b]) * xd) +
+                        yd * (Float32(source_arr[x0, y1, z0, b]) * (1.0f0 - xd) + Float32(source_arr[x1, y1, z0, b]) * xd)
+                    ) + zd * (
+                        (1.0f0 - yd) * (Float32(source_arr[x0, y0, z1, b]) * (1.0f0 - xd) + Float32(source_arr[x1, y0, z1, b]) * xd) +
+                        yd * (Float32(source_arr[x0, y1, z1, b]) * (1.0f0 - xd) + Float32(source_arr[x1, y1, z1, b]) * xd)
+                    )
+                end
+            end
+        end
     end
-    return out_res
+    return nothing
+end
+
+function interpolate_pure(points_to_interpolate, input_array, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour)
+    if ndims(input_array) == 4
+        # Batched mode
+        n_points = size(points_to_interpolate, 2)
+        batch_size = size(input_array, 4)
+
+        # Prepare output
+        out_res = similar(points_to_interpolate, Float32, (n_points, batch_size))
+        backend = get_backend(points_to_interpolate)
+        source_arr_shape = size(input_array)
+
+        # Determine stride for points
+        # points_to_interpolate can be (3, N) or (3, N, B)
+        # If (3, N), we reshape to (3, N, 1) to unify kernel logic and set stride 0
+
+        points_batch_stride = 0
+        if ndims(points_to_interpolate) == 3 && size(points_to_interpolate, 3) == batch_size
+             points_batch_stride = 1
+        elseif ndims(points_to_interpolate) == 2
+             points_batch_stride = 0
+             # Reshape to 3D for kernel indexing if needed?
+             # My kernel logic assumes it can index [1, i, 1].
+             # On CPU normal arrays support this if we reshape.
+             # On GPU, KA allows it if we view.
+             # Actually, simpler to just reshape in place or view.
+             points_to_interpolate = reshape(points_to_interpolate, size(points_to_interpolate, 1), size(points_to_interpolate, 2), 1)
+        end
+
+        # Spacing: assumed to be passed as Matrix (3, Batch) or Vector of Tuples
+        # We need it as Matrix (3, Batch) for kernel
+        if isa(input_array_spacing, Vector)
+            # Convert to matrix
+            spacing_mat = Matrix{Float32}(undef, 3, batch_size)
+            for b in 1:batch_size
+                spacing_mat[1, b] = Float32(input_array_spacing[b][1])
+                spacing_mat[2, b] = Float32(input_array_spacing[b][2])
+                spacing_mat[3, b] = Float32(input_array_spacing[b][3])
+            end
+
+            # Move to device if needed
+            if backend isa KernelAbstractions.GPU
+                 spacing_mat = CuArray(spacing_mat)
+            end
+            input_array_spacing = spacing_mat
+        end
+
+        if backend isa KernelAbstractions.CPU
+            interpolate_cpu_loop_4d!(out_res, source_arr_shape, input_array, points_to_interpolate, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour, points_batch_stride)
+        else
+            # GPU
+             interpolate_kernel_4d(backend, 512)(out_res, source_arr_shape, input_array, points_to_interpolate, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour, points_batch_stride, ndrange=length(out_res))
+             synchronize(backend)
+        end
+        return out_res
+    else
+        # Original 3D mode
+        out_res = similar(points_to_interpolate, eltype(points_to_interpolate), size(points_to_interpolate, 2))
+        backend = get_backend(points_to_interpolate)
+        source_arr_shape = size(input_array)
+
+        if backend isa KernelAbstractions.CPU
+            # Use pure Julia loop on CPU for better Enzyme compatibility
+            interpolate_cpu_loop!(out_res, source_arr_shape, input_array, points_to_interpolate, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour)
+        else
+            # Use KA kernel on GPU
+            interpolate_kernel(backend, 512)(out_res, source_arr_shape, input_array, points_to_interpolate, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour, ndrange=size(out_res))
+            synchronize(backend)
+        end
+        return out_res
+    end
 end
 
 function ChainRulesCore.rrule(::typeof(interpolate_pure), points_to_interpolate, input_array, input_array_spacing, keep_begining_same, extrapolate_value, is_nearest_neighbour)
@@ -675,6 +892,81 @@ function resample_kernel_launch(image_data, old_spacing, new_spacing, new_dims, 
     end
 
     return output
+end
+
+function create_batched_medimage(med_images::Vector{MedImage})::BatchedMedImage
+    if isempty(med_images)
+        error("Input vector of MedImages is empty")
+    end
+
+    # Check for consistency in image size (spatial dimensions must match for stacking)
+    first_size = size(med_images[1].voxel_data)
+    for i in 2:length(med_images)
+        if size(med_images[i].voxel_data) != first_size
+            error("All images in the batch must have the same spatial dimensions. Image 1 has $first_size, Image $i has $(size(med_images[i].voxel_data))")
+        end
+    end
+
+    # Stack voxel data
+    # Assuming voxel_data is 3D (x, y, z), stacking along 4th dim
+    voxel_data_batch = cat([img.voxel_data for img in med_images]...; dims=4)
+
+    return BatchedMedImage(
+        voxel_data = voxel_data_batch,
+        origin = [img.origin for img in med_images],
+        spacing = [img.spacing for img in med_images],
+        direction = [img.direction for img in med_images],
+        image_type = [img.image_type for img in med_images],
+        image_subtype = [img.image_subtype for img in med_images],
+        date_of_saving = [img.date_of_saving for img in med_images],
+        acquistion_time = [img.acquistion_time for img in med_images],
+        patient_id = [img.patient_id for img in med_images],
+        current_device = med_images[1].current_device, # Assume all on same device
+        study_uid = [img.study_uid for img in med_images],
+        patient_uid = [img.patient_uid for img in med_images],
+        series_uid = [img.series_uid for img in med_images],
+        study_description = [img.study_description for img in med_images],
+        legacy_file_name = [img.legacy_file_name for img in med_images],
+        display_data = [img.display_data for img in med_images],
+        clinical_data = [img.clinical_data for img in med_images],
+        is_contrast_administered = [img.is_contrast_administered for img in med_images],
+        metadata = [img.metadata for img in med_images]
+    )
+end
+
+function unbatch_medimage(batched_image::BatchedMedImage)::Vector{MedImage}
+    batch_size = size(batched_image.voxel_data, 4)
+    med_images = Vector{MedImage}(undef, batch_size)
+
+    for i in 1:batch_size
+        # Extract 3D slice
+        voxel_slice = selectdim(batched_image.voxel_data, 4, i)
+        # Copy to ensure it's standard array and owns its memory (not just a view)
+        voxel_slice = copy(voxel_slice)
+
+        med_images[i] = MedImage(
+            voxel_data = voxel_slice,
+            origin = batched_image.origin[i],
+            spacing = batched_image.spacing[i],
+            direction = batched_image.direction[i],
+            image_type = batched_image.image_type[i],
+            image_subtype = batched_image.image_subtype[i],
+            date_of_saving = batched_image.date_of_saving[i],
+            acquistion_time = batched_image.acquistion_time[i],
+            patient_id = batched_image.patient_id[i],
+            current_device = batched_image.current_device,
+            study_uid = batched_image.study_uid[i],
+            patient_uid = batched_image.patient_uid[i],
+            series_uid = batched_image.series_uid[i],
+            study_description = batched_image.study_description[i],
+            legacy_file_name = batched_image.legacy_file_name[i],
+            display_data = batched_image.display_data[i],
+            clinical_data = batched_image.clinical_data[i],
+            is_contrast_administered = batched_image.is_contrast_administered[i],
+            metadata = batched_image.metadata[i]
+        )
+    end
+    return med_images
 end
 
 function ChainRulesCore.rrule(::typeof(resample_kernel_launch), image_data, old_spacing, new_spacing, new_dims, interpolator_enum)

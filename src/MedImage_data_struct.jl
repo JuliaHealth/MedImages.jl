@@ -4,7 +4,7 @@ using Dictionaries
 using Parameters
 using UUIDs
 
-export MedImage, Image_type, Image_subtype, current_device_enum, Interpolator_enum, Mode_mi, CoordinateTerms, CoordinateMajornessTerms, Orientation_code
+export MedImage, BatchedMedImage, Image_type, Image_subtype, current_device_enum, Interpolator_enum, Mode_mi, CoordinateTerms, CoordinateMajornessTerms, Orientation_code
 export ORIENTATION_RPI, ORIENTATION_LPI, ORIENTATION_RAI, ORIENTATION_LAI
 export ORIENTATION_RPS, ORIENTATION_LPS, ORIENTATION_RAS, ORIENTATION_LAS
 
@@ -164,6 +164,34 @@ A standardized structure for storing medical image data and metadata.
     metadata::Dict{Any,Any} = Dict() #dictionary for any other relevant metadata from individual data file
 end
 
+
+"""
+    mutable struct BatchedMedImage
+
+A structure for storing a batch of medical images.
+It holds 4D voxel data (x, y, z, batch) and arrays of metadata for each image in the batch.
+"""
+@with_kw mutable struct BatchedMedImage
+    voxel_data # multidimensional array (x, y, z, batch)
+    origin::Vector{Tuple{Float64,Float64,Float64}}
+    spacing::Vector{Tuple{Float64,Float64,Float64}}
+    direction::Vector{NTuple{9,Float64}}
+    image_type::Vector{Image_type}
+    image_subtype::Vector{Image_subtype}
+    date_of_saving::Vector{DateTime} = [Dates.today()]
+    acquistion_time::Vector{DateTime} = [Dates.now()]
+    patient_id::Vector{String}
+    current_device::current_device_enum = CPU_current_device
+    study_uid::Vector{String} = [string(UUIDs.uuid4())]
+    patient_uid::Vector{String} = [string(UUIDs.uuid4())]
+    series_uid::Vector{String} = [string(UUIDs.uuid4())]
+    study_description::Vector{String} = [" "]
+    legacy_file_name::Vector{String} = [" "]
+    display_data::Vector{Dict{Any,Any}} = [Dict()]
+    clinical_data::Vector{Dict{Any,Any}} = [Dict()]
+    is_contrast_administered::Vector{Bool} = [false]
+    metadata::Vector{Dict{Any,Any}} = [Dict()]
+end
 
 #constructor function for MedImage
 # function MedImage(MedImage_struct_attribute_values::Array{Any})::MedImage
