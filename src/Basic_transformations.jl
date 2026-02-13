@@ -10,6 +10,7 @@ using ..Load_and_save: update_voxel_data, update_voxel_and_spatial_data
 using ..Utils: interpolate_my
 
 export rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, computeIndexToPhysicalPointMatrices_Julia, transformIndexToPhysicalPoint_Julia, get_voxel_center_Julia, get_real_center_Julia, Rodrigues_rotation_matrix, crop_image_around_center
+export affine_transform_mi, create_affine_matrix, compose_affine_matrices
 
 function computeIndexToPhysicalPointMatrices_Julia(im::MedImage)::Matrix{Float64}
   VImageDimension = length(im.spacing)
@@ -393,6 +394,137 @@ function pad_mi(im::BatchedMedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end:
   new_im.voxel_data = data
   new_im.origin = new_origins
   return new_im
+end
+
+# --- Affine Transformation ---
+
+"""
+    create_affine_matrix(translation=(0,0,0), rotation=(0,0,0), scale=(1,1,1), shear=(0,0,0))
+
+Creates a 4x4 homogeneous affine transformation matrix.
+Order of operations: Scale * Shear * Rotation * Translation
+(Points are transformed as M * p)
+Rotation angles are in degrees.
+"""
+function create_affine_matrix(; translation=(0.0,0.0,0.0), rotation=(0.0,0.0,0.0), scale=(1.0,1.0,1.0), shear=(0.0,0.0,0.0))
+    # Translation Matrix
+    T = Matrix{Float64}(I, 4, 4)
+    T[1:3, 4] .= translation
+
+    # Rotation Matrix (Z * Y * X)
+    rx, ry, rz = deg2rad.(rotation)
+    Rx = [1 0 0; 0 cos(rx) -sin(rx); 0 sin(rx) cos(rx)]
+    Ry = [cos(ry) 0 sin(ry); 0 1 0; -sin(ry) 0 cos(ry)]
+    Rz = [cos(rz) -sin(rz) 0; sin(rz) cos(rz) 0; 0 0 1]
+    R_mat = Rz * Ry * Rx
+
+    R = Matrix{Float64}(I, 4, 4)
+    R[1:3, 1:3] = R_mat
+
+    # Scale Matrix
+    S = Matrix{Float64}(I, 4, 4)
+    S[1,1] = scale[1]
+    S[2,2] = scale[2]
+    S[3,3] = scale[3]
+
+    # Shear Matrix (simplified for now, xy, xz, yz, etc.)
+    # Shear can be complex. Typically:
+    # [1 xy xz 0]
+    # [yx 1 yz 0]
+    # [zx zy 1 0]
+    # [0 0 0 1]
+    # Here we assume shear=(xy, xz, yz) for upper triangular part, or symmetric?
+    # Let's support 3 shear components: xy (shear x w.r.t y), xz, yz
+    Sh = Matrix{Float64}(I, 4, 4)
+    Sh[1,2] = shear[1]
+    Sh[1,3] = shear[2]
+    Sh[2,3] = shear[3]
+
+    # Combine: Translation * Rotation * Shear * Scale
+    # Applied right to left on point column vector: p' = T * R * Sh * S * p
+    return T * R * Sh * S
+end
+
+function compose_affine_matrices(matrices...)
+    result = Matrix{Float64}(I, 4, 4)
+    for m in matrices
+        result = m * result # Pre-multiply? Or post? Composition: M2 * M1 * p
+        # If input order is (M1, M2), and we want M2(M1(p)), then result = M2 * M1
+        # The loop does: M * result. So if we pass (M2, M1), we get M1 * M2?
+        # Wait. result starts as I.
+        # 1. result = m1 * I = m1
+        # 2. result = m2 * m1
+        # So matrices should be passed in order of application from right to left?
+        # Typically compose(A, B) means A(B(x)) -> A * B.
+        # So we update result = m * result.
+    end
+    return result
+end
+
+"""
+    affine_transform_mi(image::BatchedMedImage, affine_matrix, Interpolator::Interpolator_enum)
+
+Applies an affine transformation to a batch of images.
+`affine_matrix` can be a single 4x4 matrix (shared) or a Vector of 4x4 matrices (unique per batch).
+Transform is applied in index space relative to the image center.
+"""
+function affine_transform_mi(image::BatchedMedImage, affine_matrix::Union{Matrix{Float64}, Vector{Matrix{Float64}}}, Interpolator::Interpolator_enum)::BatchedMedImage
+    batch_size = size(image.voxel_data, 4)
+
+    spatial_size = size(image.voxel_data)[1:3]
+    indices = CartesianIndices(spatial_size)
+    indices_vec = vec(collect(indices))
+    n_points = length(indices_vec)
+
+    # Pre-allocate points array: 3 x N x Batch
+    points_to_interpolate = zeros(Float64, 3, n_points, batch_size)
+
+    # Image center in index space
+    v_center = [(spatial_size[i] + 0.0)/2.0 for i in 1:3]
+
+    for b in 1:batch_size
+        M = (affine_matrix isa Vector) ? affine_matrix[b] : affine_matrix
+
+        # Inverse transform is needed because we map OUTPUT points to INPUT points
+        # If M is the transform we want to APPLY (e.g. rotate 90 deg), then to find the value at new pixel x',
+        # we need to look up source pixel x = M^-1 * x'.
+        M_inv = try
+            inv(M)
+        catch
+            error("Affine matrix is singular and cannot be inverted.")
+        end
+
+        @inbounds for i in 1:n_points
+             idx = indices_vec[i]
+
+             # Center shift (to origin)
+             px = Float64(idx[1]) - v_center[1]
+             py = Float64(idx[2]) - v_center[2]
+             pz = Float64(idx[3]) - v_center[3]
+
+             # Apply inverse affine transform
+             # M_inv is 4x4. We use [px, py, pz, 1]
+
+             new_px = M_inv[1,1]*px + M_inv[1,2]*py + M_inv[1,3]*pz + M_inv[1,4]
+             new_py = M_inv[2,1]*px + M_inv[2,2]*py + M_inv[2,3]*pz + M_inv[2,4]
+             new_pz = M_inv[3,1]*px + M_inv[3,2]*py + M_inv[3,3]*pz + M_inv[3,4]
+
+             # Shift back
+             points_to_interpolate[1, i, b] = new_px + v_center[1]
+             points_to_interpolate[2, i, b] = new_py + v_center[2]
+             points_to_interpolate[3, i, b] = new_pz + v_center[3]
+        end
+    end
+
+    spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
+
+    resampled_flat = interpolate_my(points_to_interpolate, image.voxel_data, spacing_arg, Interpolator, false, 0.0, true)
+
+    new_data = reshape(resampled_flat, spatial_size[1], spatial_size[2], spatial_size[3], batch_size)
+
+    new_image = deepcopy(image)
+    new_image.voxel_data = new_data
+    return new_image
 end
 
 end#Basic_transformations
