@@ -53,8 +53,6 @@ function main()
 
     # 1. Rotate (Unique Angles)
     println("Applying Batched Rotation (Unique: 0 and 45 degrees)...")
-    # Image 1: 0 degrees (should be unchanged)
-    # Image 2: 45 degrees around Z (axis 3)
     angles = [0.0, 45.0]
     batch_rot = rotate_mi(batch, 3, angles, Linear_en)
 
@@ -68,6 +66,38 @@ function main()
     res_scale = unbatch_medimage(batch_scale)
     create_nii_from_medimage(res_scale[1], joinpath(OUTPUT_DIR, "scaled_0.5x_1"))
     create_nii_from_medimage(res_scale[2], joinpath(OUTPUT_DIR, "scaled_0.5x_2"))
+
+    # 3. Translate (Shared)
+    println("Applying Batched Translation (10 units X)...")
+    # Translate by 10 voxels in axis 1
+    batch_trans = translate_mi(batch, 10, 1, Linear_en)
+    res_trans = unbatch_medimage(batch_trans)
+    create_nii_from_medimage(res_trans[1], joinpath(OUTPUT_DIR, "translated_1"))
+    create_nii_from_medimage(res_trans[2], joinpath(OUTPUT_DIR, "translated_2"))
+
+    # 4. Crop (Shared)
+    println("Applying Batched Cropping (Center Crop to 32x32x32)...")
+    # Original 64x64x64. Crop start at 16 (0-based? Basic_transformations uses 0-based for crop_mi arg? Let's check signatures)
+    # crop_mi signature: crop_beg::Tuple, crop_size::Tuple
+    # 1-based indexing in Julia, but MedImages usually takes 0-based indices for beg?
+    # `julia_beg = crop_beg .+ 1` inside crop_mi implies crop_beg is 0-based index.
+    # To center crop 32 size from 64 size: start at (64-32)/2 = 16.
+    crop_beg = (16, 16, 16)
+    crop_size = (32, 32, 32)
+    batch_crop = crop_mi(batch, crop_beg, crop_size, Linear_en)
+    res_crop = unbatch_medimage(batch_crop)
+    create_nii_from_medimage(res_crop[1], joinpath(OUTPUT_DIR, "cropped_1"))
+    create_nii_from_medimage(res_crop[2], joinpath(OUTPUT_DIR, "cropped_2"))
+
+    # 5. Pad (Shared)
+    println("Applying Batched Padding (5 voxels all sides)...")
+    pad_beg = (5, 5, 5)
+    pad_end = (5, 5, 5)
+    pad_val = 0.0
+    batch_pad = pad_mi(batch, pad_beg, pad_end, pad_val, Linear_en)
+    res_pad = unbatch_medimage(batch_pad)
+    create_nii_from_medimage(res_pad[1], joinpath(OUTPUT_DIR, "padded_1"))
+    create_nii_from_medimage(res_pad[2], joinpath(OUTPUT_DIR, "padded_2"))
 
     println("Done! Check $OUTPUT_DIR for results.")
 end
