@@ -155,7 +155,17 @@ function resample_to_spacing(im::BatchedMedImage, new_spacing::Union{Tuple{Float
         image_subtype = im.image_subtype,
         patient_id = im.patient_id,
         current_device = im.current_device,
-        # ...
+        date_of_saving = im.date_of_saving,
+        acquistion_time = im.acquistion_time,
+        study_uid = im.study_uid,
+        patient_uid = im.patient_uid,
+        series_uid = im.series_uid,
+        study_description = im.study_description,
+        legacy_file_name = im.legacy_file_name,
+        display_data = im.display_data,
+        clinical_data = im.clinical_data,
+        is_contrast_administered = im.is_contrast_administered,
+        metadata = im.metadata
     )
 end
 
