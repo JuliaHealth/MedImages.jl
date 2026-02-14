@@ -182,6 +182,76 @@ end
 
             # Verify dimensionality
             @test size(unbatched[1].voxel_data) == (32, 32, 32)
+
+            # --- Unique Rotations Verification ---
+            # Image 1 -> 0 deg, Image 2 -> 90 deg (around Z)
+            angles_unique = [0.0, 90.0]
+            rot_unique_batch = rotate_mi(batch, 3, angles_unique, Linear_en)
+            unbatched_unique = unbatch_medimage(rot_unique_batch)
+
+            # SITK Reference for Image 1 (0 deg) - Should match original
+            # Note: SITK resample with identity transform might introduce small interpolation noise if not perfectly aligned?
+            # 0 deg is identity.
+            res1_unique = permutedims(unbatched_unique[1].voxel_data, (3, 2, 1))
+            ref1_unique = sitk.GetArrayFromImage(sitk_img1) # Original
+
+            # Allow small diff for implementation details or just assert closeness
+            @test mean(abs.(res1_unique - ref1_unique)) < 1e-4
+
+            # SITK Reference for Image 2 (90 deg)
+            # Use rotation logic from visual test (manual Euler transform)
+            # Reimplement here briefly
+            function get_sitk_rotated_90_z(image)
+                # Center
+                size_arr = image.GetSize()
+                idx_center = [ (sz-1)/2.0 for sz in size_arr ]
+                phys_center = image.TransformContinuousIndexToPhysicalPoint(idx_center)
+
+                radians = 90.0 * π / 180.0
+                transform = sitk.Euler3DTransform()
+                transform.SetCenter(phys_center)
+                transform.SetRotation(0.0, 0.0, radians)
+
+                resampler = sitk.ResampleImageFilter()
+                resampler.SetReferenceImage(image)
+                resampler.SetTransform(transform)
+                resampler.SetInterpolator(sitk.sitkLinear)
+                resampler.SetDefaultPixelValue(0.0)
+                return resampler.Execute(image)
+            end
+
+            sitk_rot_90 = get_sitk_rotated_90_z(sitk_img2)
+            res2_unique = permutedims(unbatched_unique[2].voxel_data, (3, 2, 1))
+            ref2_unique = sitk.GetArrayFromImage(sitk_rot_90)
+
+            # Check for rough equivalence (interpolation methods differ slightly)
+            @test size(res2_unique) == size(ref2_unique)
+            # Check center region to avoid edge artifacts
+            center_slice_res = res2_unique[16, :, :]
+            center_slice_ref = ref2_unique[16, :, :]
+            # Correlation or mean diff
+            @test mean(abs.(center_slice_res - center_slice_ref)) < 0.2
+
+            # --- Unique Translation Verification ---
+            # Image 1 -> 10.0, Image 2 -> 20.0 (Axis 1 = X)
+            shifts = [10, 20]
+            trans_unique_batch = translate_mi(batch, shifts, 1, Linear_en)
+            unbatched_trans = unbatch_medimage(trans_unique_batch)
+
+            # Verify Origin update matches expectation
+            # MedImages translate_mi updates Origin metadata.
+            # SITK image origin should match calculated expected origin.
+
+            # Image 1: Origin X + 10.0
+            expected_origin1 = collect(sitk_img1.GetOrigin())
+            expected_origin1[1] += 10.0 * spacing1[1] # shift * spacing
+            @test isapprox(collect(unbatched_trans[1].origin), expected_origin1; atol=1e-3)
+
+            # Image 2: Origin X + 20.0
+            expected_origin2 = collect(sitk_img2.GetOrigin())
+            expected_origin2[1] += 20.0 * spacing2[1]
+            @test isapprox(collect(unbatched_trans[2].origin), expected_origin2; atol=1e-3)
+
         end
     catch e
         @info "Skipping SimpleITK verification: $e"
