@@ -294,25 +294,100 @@ function rotate_mi(image::BatchedMedImage, axis::Int, angle::Union{Float64, Abst
     return new_image
 end
 
-function scale_mi(image::BatchedMedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::BatchedMedImage
-  scale_tuple = scale isa Float64 ? (scale, scale, scale) : scale
-  # Use size of the first 3 dims
+function scale_mi(image::BatchedMedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}, Vector{<:Union{Float64, Tuple{Float64,Float64,Float64}}}}, Interpolator::Interpolator_enum)::BatchedMedImage
+  batch_size = size(image.voxel_data, 4)
   old_size = size(image.voxel_data)[1:3]
 
-  points_to_interpolate, new_size = build_scale_points(old_size, scale_tuple)
-  # points_to_interpolate is (3, N)
+  if scale isa Vector
+      if length(scale) != batch_size
+          error("Scale vector length must match batch size")
+      end
 
-  batch_size = size(image.voxel_data, 4)
-  spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
+      # For unique scaling, output size might differ?
+      # Usually batched operations imply consistent output tensor size.
+      # If scaling factors differ, the resulting image sizes in voxels might differ.
+      # We must enforce a consistent output grid or this operation is ill-defined for a single 4D array output.
+      # Strategy:
+      # 1. Determine a target output size (e.g. based on the first scale, or max scale?).
+      # 2. Or assume the user wants the *same* output geometry (e.g. just resampling), but "scale" usually implies changing spacing or field of view.
+      # "scale_mi" implementation for single image:
+      # points_to_interpolate, new_size = build_scale_points(old_size, scale_tuple)
+      # It changes the voxel grid dimensions!
 
-  # interpolate_my handles broadcasting of points if 3xN and input 4D
-  resampled_flat = interpolate_my(points_to_interpolate, image.voxel_data, spacing_arg, Interpolator, false, 0.0, true)
+      # If we have different scales, we get different new_sizes. We cannot stack them into a 4D array.
+      # UNLESS: We treat "scale" as "resample into a shared field of view with different zoom"?
+      # OR: We require that the resulting integer grid dimensions are identical?
+      # If scale is (0.5, 0.5, 0.5) vs (0.5, 0.5, 0.5), it works.
+      # If scale is (0.5, ...) vs (0.6, ...), sizes mismatch.
 
-  new_data = reshape(resampled_flat, new_size[1], new_size[2], new_size[3], batch_size)
+      # Constraint: Batched operations usually require consistent output tensor shape.
+      # If the user provides different scales that result in different shapes, we should error or pad?
+      # Standard Deep Learning behavior: Affine transform usually resamples into a fixed target grid.
+      # "scale_mi" here seems to calculate target grid based on scale.
 
-  new_image = deepcopy(image)
-  new_image.voxel_data = new_data
-  return new_image
+      # Compromise:
+      # If unique scales are provided, we check if they result in the same integer grid dimensions.
+      # If not, we error.
+
+      # Calculate new sizes
+      new_sizes = []
+      for b in 1:batch_size
+          s = scale[b]
+          st = s isa Float64 ? (s, s, s) : s
+          push!(new_sizes, Tuple(round.(Int, old_size .* st)))
+      end
+
+      if !all(x -> x == new_sizes[1], new_sizes)
+          error("Batched scaling with different factors must result in the same output voxel dimensions. Got: $new_sizes")
+      end
+
+      final_new_size = new_sizes[1]
+      n_points = prod(final_new_size)
+      points_to_interpolate = zeros(Float64, 3, n_points, batch_size)
+
+      # Generate points for each batch
+      for b in 1:batch_size
+          s = scale[b]
+          st = s isa Float64 ? (s, s, s) : s
+
+          # build_scale_points returns 3xN. We need to fill slice b.
+          # Note: build_scale_points logic:
+          # points_to_interpolate[1, idx] = (i - 1.0) / scale_tuple[1] + 1.0
+
+          # Re-implement loop here or call helper? Helper creates new matrix.
+          # Optimization: Avoid alloc.
+
+          idx = 1
+          for k in 1:final_new_size[3], j in 1:final_new_size[2], i in 1:final_new_size[1]
+             points_to_interpolate[1, idx, b] = (i - 1.0) / st[1] + 1.0
+             points_to_interpolate[2, idx, b] = (j - 1.0) / st[2] + 1.0
+             points_to_interpolate[3, idx, b] = (k - 1.0) / st[3] + 1.0
+             idx += 1
+          end
+      end
+
+      spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
+      resampled_flat = interpolate_my(points_to_interpolate, image.voxel_data, spacing_arg, Interpolator, false, 0.0, true)
+      new_data = reshape(resampled_flat, final_new_size[1], final_new_size[2], final_new_size[3], batch_size)
+
+      new_image = deepcopy(image)
+      new_image.voxel_data = new_data
+      return new_image
+
+  else
+      # Shared scaling
+      scale_tuple = scale isa Float64 ? (scale, scale, scale) : scale
+      points_to_interpolate, new_size = build_scale_points(old_size, scale_tuple)
+
+      spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
+
+      resampled_flat = interpolate_my(points_to_interpolate, image.voxel_data, spacing_arg, Interpolator, false, 0.0, true)
+      new_data = reshape(resampled_flat, new_size[1], new_size[2], new_size[3], batch_size)
+
+      new_image = deepcopy(image)
+      new_image.voxel_data = new_data
+      return new_image
+  end
 end
 
 function translate_mi(im::BatchedMedImage, translate_by::Union{Int64, Vector{Int64}}, translate_in_axis::Int64, Interpolator::Interpolator_enum)::BatchedMedImage
