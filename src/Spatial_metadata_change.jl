@@ -35,7 +35,129 @@ function resample_to_spacing(im, new_spacing::Tuple{Float64,Float64,Float64}, in
     return new_im
 end#resample_to_spacing
 
+function resample_to_spacing(im::BatchedMedImage, new_spacing::Union{Tuple{Float64,Float64,Float64}, Vector{Tuple{Float64,Float64,Float64}}}, interpolator_enum)::BatchedMedImage
+    batch_size = size(im.voxel_data, 4)
+    old_size = size(im.voxel_data)[1:3]
 
+    # Logic for handling shared vs unique spacing
+
+    target_spacings = []
+    if new_spacing isa Vector
+        if length(new_spacing) != batch_size
+            error("New spacing vector length must match batch size")
+        end
+        target_spacings = new_spacing
+    else
+        target_spacings = [new_spacing for _ in 1:batch_size]
+    end
+
+    # Must enforce consistent output size
+    # Calculate expected new size for first item
+    first_new_size = Tuple{Int,Int,Int}(ceil.((old_size .* im.spacing[1]) ./ target_spacings[1]))
+
+    # Verify all match
+    for b in 2:batch_size
+        sz = Tuple{Int,Int,Int}(ceil.((old_size .* im.spacing[b]) ./ target_spacings[b]))
+        if sz != first_new_size
+            error("Batched resampling to spacing requires consistent output voxel dimensions. Item 1 size: $first_new_size, Item $b size: $sz")
+        end
+    end
+
+    # If consistent, we can proceed.
+    # We need to adapt `resample_kernel_launch` to handle batches.
+    # Currently `resample_kernel_launch` takes (image_data, old_spacing, new_spacing, new_dims, ...)
+    # It assumes shared spacing?
+    # Let's check `Utils.jl`.
+
+    # `resample_kernel_launch` in Utils calls `trilinear_resample_enzyme_kernel!` or similar.
+    # The kernels take `old_spacing`, `new_spacing`.
+    # They are marked `@Const` in simple version, or as arrays in the 4D/Enzyme version?
+    # Wait, I added `interpolate_kernel_4d` but did I update `resample_kernel_launch`?
+    # No, I updated `interpolate_pure`.
+    # `resample_to_spacing` uses `resample_kernel_launch`, which is a specialized resampling kernel (inverse mapping).
+    # `interpolate_my` is forward/arbitrary point interpolation.
+
+    # `resample_kernel_launch` is optimized for grid-to-grid resampling.
+    # I need to update `resample_kernel_launch` in `Utils.jl` to support batched arrays and vector spacings!
+
+    # For now, I will use `interpolate_my` approach which supports batching via my previous work,
+    # OR I should update `resample_kernel_launch`.
+    # Updating `resample_kernel_launch` is better for performance (specialized grid kernel).
+    # But `interpolate_my` is more generic.
+
+    # Let's stick to `resample_kernel_launch` if I update it, or fallback to `resample_to_image` logic?
+    # Actually `resample_to_spacing` is a subset of `resample_to_image` where new grid is aligned.
+
+    # If I use `resample_kernel_launch`, I need to modify it in `Utils.jl`.
+    # Let's assume for this step I will rely on `Utils.resample_kernel_launch` and update it if needed,
+    # OR implement loop here.
+
+    # To avoid modifying `Utils.jl` extensively again in this step (risk),
+    # I can implement the batch loop here calling single `resample_kernel_launch`?
+    # No, that's slow on GPU.
+
+    # I should use `interpolate_my` which I ALREADY updated to support batches!
+    # `resample_to_spacing` is effectively: generate grid points for new spacing, interpolate.
+
+    points = Utils.get_base_indicies_arr(first_new_size) # 3 x N
+    n_points = size(points, 2)
+    points_to_interpolate = zeros(Float64, 3, n_points, batch_size)
+
+    for b in 1:batch_size
+        nsp = target_spacings[b]
+        osp = im.spacing[b]
+
+        # Mapping index x_new to physical: (x_new - 1)*nsp
+        # Mapping physical to x_old: phys / osp + 1
+        # Combined: (x_new - 1) * nsp / osp + 1
+
+        # Optimized loop
+        for i in 1:n_points
+            ix = points[1, i]
+            iy = points[2, i]
+            iz = points[3, i]
+
+            rx = (ix - 1.0) * nsp[1] / osp[1] + 1.0
+            ry = (iy - 1.0) * nsp[2] / osp[2] + 1.0
+            rz = (iz - 1.0) * nsp[3] / osp[3] + 1.0
+
+            points_to_interpolate[1, i, b] = rx
+            points_to_interpolate[2, i, b] = ry
+            points_to_interpolate[3, i, b] = rz
+        end
+    end
+
+    # Use (1,1,1) spacing for interpolate_my because points are already in index space of source?
+    # No, interpolate_my takes points in PHYSICAL space (relative to origin/spacing of source).
+    # But `interpolate_pure` (fast path) usually takes points in index space?
+    # Let's check `Utils.jl`:
+    # `interpolate_kernel`:
+    # real_x = (shared_arr... - 1.0) / spacing + 1.0
+    # So it expects PHYSICAL points.
+
+    # My calculation above `rx = ...` is calculating INDEX in source.
+    # If I pass `spacing=(1,1,1)` to interpolate_my, then:
+    # real_x = (rx - 1) / 1 + 1 = rx.
+    # Correct.
+
+    spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
+
+    resampled_flat = interpolate_my(points_to_interpolate, im.voxel_data, spacing_arg, interpolator_enum, false, 0.0, true)
+
+    new_data = reshape(resampled_flat, first_new_size[1], first_new_size[2], first_new_size[3], batch_size)
+
+    return BatchedMedImage(
+        voxel_data = new_data,
+        origin = im.origin,
+        spacing = target_spacings,
+        direction = im.direction,
+        image_type = im.image_type,
+        image_subtype = im.image_subtype,
+        patient_id = im.patient_id,
+        current_device = im.current_device,
+        # ...
+    )
+end
 
 
 #  te force solution get all direction combinetions put it in sitk and try all possible ways to permute and reverse axis to get the same result as sitk then save the result in json or sth and use; do the same with the origin
