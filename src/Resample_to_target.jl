@@ -172,7 +172,17 @@ function resample_to_image(im_fixed::BatchedMedImage, im_moving::BatchedMedImage
         image_subtype = im_moving.image_subtype,
         patient_id = im_moving.patient_id,
         current_device = im_moving.current_device,
-        # ... other fields copied or adapted
+        date_of_saving = im_moving.date_of_saving,
+        acquistion_time = im_moving.acquistion_time,
+        study_uid = im_moving.study_uid,
+        patient_uid = im_moving.patient_uid,
+        series_uid = im_moving.series_uid,
+        study_description = im_moving.study_description,
+        legacy_file_name = im_moving.legacy_file_name,
+        display_data = im_moving.display_data,
+        clinical_data = im_moving.clinical_data,
+        is_contrast_administered = im_moving.is_contrast_administered,
+        metadata = im_moving.metadata
     )
 end
 

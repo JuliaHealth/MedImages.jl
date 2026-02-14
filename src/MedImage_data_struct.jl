@@ -178,8 +178,8 @@ It holds 4D voxel data (x, y, z, batch) and arrays of metadata for each image in
     direction::Vector{NTuple{9,Float64}}
     image_type::Vector{Image_type}
     image_subtype::Vector{Image_subtype}
-    date_of_saving::Vector{DateTime} = [Dates.today()]
-    acquistion_time::Vector{DateTime} = [Dates.now()]
+    date_of_saving::Vector{DateTime}
+    acquistion_time::Vector{DateTime}
     patient_id::Vector{String}
     current_device::current_device_enum = CPU_current_device
     study_uid::Vector{String} = [string(UUIDs.uuid4())]

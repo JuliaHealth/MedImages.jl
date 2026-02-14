@@ -12,7 +12,7 @@ This guide outlines the process for verifying the correctness of batched medical
 The workflow involves:
 1.  **Generating** distinct synthetic images.
 2.  **Batching** them into a single structure.
-3.  **Applying** transformations (Rotate, Scale, Translate, Crop, Pad).
+3.  **Applying** transformations (Rotate, Scale, Translate, Crop, Pad, Affine, Resample).
 4.  **Unbatching** and **Saving** the results.
 5.  **Visually Comparing** the input and output.
 
@@ -26,11 +26,13 @@ julia --project=. test/generate_visual_samples.jl
 
 This script will create a directory `test/visual_output/` containing:
 *   `input_1.nii.gz`, `input_2.nii.gz`: Original synthetic images.
-*   `rotated_1.nii.gz`, `rotated_2.nii.gz`: Images after batched rotation.
-*   `scaled_1.nii.gz`, `scaled_2.nii.gz`: Images after batched scaling.
-*   `translated_1.nii.gz`, `translated_2.nii.gz`: Images after batched translation.
-*   `cropped_1.nii.gz`, `cropped_2.nii.gz`: Images after batched cropping.
-*   `padded_1.nii.gz`, `padded_2.nii.gz`: Images after batched padding.
+*   **Rotated**: `rotated_0deg_1.nii.gz`, `rotated_45deg_2.nii.gz` (Unique rotations).
+*   **Scaled**: `scaled_0.5x_1.nii.gz`, `scaled_0.5x_2.nii.gz` (Shared scaling).
+*   **Translated**: `translated_1.nii.gz`, `translated_2.nii.gz` (Shared translation).
+*   **Cropped/Padded**: `cropped_*.nii.gz`, `padded_*.nii.gz`.
+*   **Affine Shear**: `sheared_id_1.nii.gz` (Identity), `sheared_xy_0.5_2.nii.gz` (Sheared).
+*   **Resample to Spacing**: `resample_spacing_2mm_*.nii.gz`.
+*   **Resample to Image**: `resample_to_img_*.nii.gz`.
 
 ### 2. Visual Inspection Guide
 
@@ -46,8 +48,8 @@ This script will create a directory `test/visual_output/` containing:
 1.  **Open** `input_2.nii.gz` and `scaled_0.5x_2.nii.gz`.
 2.  **Verify**:
     *   The object in `scaled_0.5x_2` should appear spatially consistent but resampled.
-    *   **Spacing check**: If the scaler modifies voxel spacing, verify in the viewer's "Image Information" that the new spacing is double the original (if 0.5x scale means 0.5x resolution/zoom out) or half (if 0.5x means shrinking the image size in mm).
-    *   *Implementation Note*: `scale_mi` in `Basic_transformations.jl` interpolates into a new grid. If you check the physical coordinates of a landmark (e.g., sphere center), it should remain at the same physical location, but the voxel indices will change.
+    *   **Spacing check**: If the scaler modifies voxel spacing, verify in the viewer's "Image Information" that the new spacing is different (typically adapted to maintain FOV or resolution logic).
+    *   *Note*: `scale_mi` resamples the image grid. The object physical size should be consistent if scale implies zooming, or smaller if scale implies shrinking.
 
 #### Translation (e.g., 10 voxels along X)
 
@@ -55,23 +57,34 @@ This script will create a directory `test/visual_output/` containing:
 2.  **Verify**:
     *   The structures should be shifted.
     *   Check `Origin` in image metadata. A translation usually updates the `Origin` coordinate without moving the voxel data array content, or shifts the voxel data.
-    *   *Implementation Note*: `translate_mi` updates the `Origin` metadata. The voxel data array itself usually remains unchanged. In a viewer like ITK-SNAP, if you load both, they might appear aligned if the viewer ignores Origin, or shifted if it respects Origin. Ensure your viewer respects physical coordinates.
 
-#### Cropping (e.g., Center Crop)
+#### Cropping & Padding
 
 1.  **Open** `cropped_1.nii.gz`.
-2.  **Verify**:
-    *   The image dimensions are smaller (e.g., 32x32x32 vs 64x64x64).
-    *   The object should still be centered if the crop was centered.
-    *   Check boundaries for cut-off structures.
+    *   **Verify**: Image dimensions are smaller (32^3 vs 64^3). Object centered.
+2.  **Open** `padded_1.nii.gz`.
+    *   **Verify**: Image dimensions are larger. Original content centered with padding border.
 
-#### Padding (e.g., 5 voxels all sides)
+#### Affine Shearing
 
-1.  **Open** `padded_1.nii.gz`.
+1.  **Open** `sheared_xy_0.5_2.nii.gz` alongside `input_2.nii.gz`.
 2.  **Verify**:
-    *   The image dimensions are larger.
-    *   The original image content is surrounded by the padding value (usually 0).
-    *   The physical alignment (Origin) should be adjusted so the original content stays in the same physical space.
+    *   The object should be skewed. For an XY shear, the X coordinate should shift linearly with Y.
+    *   `sheared_id_1.nii.gz` should be identical to input (Identity transform).
+
+#### Resample to Spacing
+
+1.  **Open** `resample_spacing_2mm_1.nii.gz`.
+2.  **Verify**:
+    *   Voxel dimensions should be half of original (32^3 vs 64^3) assuming spacing doubled (1mm -> 2mm).
+    *   Object should look blockier (downsampled) but occupy the same physical space.
+
+#### Resample to Image
+
+1.  **Open** `resample_to_img_1.nii.gz` and `input_1.nii.gz`.
+2.  **Verify**:
+    *   The output should match the geometry (Origin, Spacing, Size) of the *reference* image used in the script (which had offset origin `(10,10,10)`).
+    *   The content should be the original object resampled into this new frame. If the reference frame is shifted `(10,10,10)`, the object might be shifted within the FOV or cropped if the FOV moved away.
 
 ## Manual Script Example
 
@@ -82,7 +95,6 @@ using MedImages, MedImages.Utils, MedImages.Basic_transformations
 using MedImages.MedImage_data_struct
 
 # 1. Create Data
-# (See generate_visual_samples.jl for create_synthetic_medimage)
 img1 = create_synthetic_medimage((64,64,64), :asym_block)
 img2 = create_synthetic_medimage((64,64,64), :sphere)
 
@@ -90,7 +102,6 @@ img2 = create_synthetic_medimage((64,64,64), :sphere)
 batch = create_batched_medimage([img1, img2])
 
 # 3. Transform (e.g., Rotate Batch with unique angles)
-# Image 1 -> 0 deg, Image 2 -> 90 deg
 angles = [0.0, 90.0]
 batch_rotated = rotate_mi(batch, 3, angles, Linear_en)
 
