@@ -63,7 +63,7 @@ end
         img = MedImage(voxel_data=data, origin=(0.0,0.0,0.0), spacing=(1.0,1.0,1.0), direction=(1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0), image_type=MedImages.MedImage_data_struct.MRI_type, image_subtype=MedImages.MedImage_data_struct.T1_subtype, patient_id="p1")
         batch = create_batched_medimage([img, img])
 
-        # Rotate
+        # Rotate (Unique)
         angles = [0.0, 90.0]
         rot_batch = rotate_mi(batch, 3, angles, Linear_en)
         @test size(rot_batch.voxel_data) == (32, 32, 32, 2)
@@ -72,19 +72,33 @@ end
         # 90 deg should differ
         @test mean(abs.(rot_batch.voxel_data[:,:,:,2] - batch.voxel_data[:,:,:,2])) > 0.01
 
-        # Scale
+        # Scale (Shared)
         scale_batch = scale_mi(batch, (0.5, 0.5, 0.5), Linear_en)
         @test size(scale_batch.voxel_data)[1:3] == (16, 16, 16)
 
-        # Translate
-        trans_batch = translate_mi(batch, 10, 1, Linear_en)
-        @test trans_batch.origin[1][1] == 10.0
+        # Scale (Unique)
+        # Unique scaling must result in same output size.
+        # Scale by 0.5 and 0.5 (redundant check but verifies vector path)
+        scales = [(0.5, 0.5, 0.5), (0.5, 0.5, 0.5)]
+        scale_unique_batch = scale_mi(batch, scales, Linear_en)
+        @test size(scale_unique_batch.voxel_data)[1:3] == (16, 16, 16)
 
-        # Crop
+        # Test error on mismatch
+        scales_bad = [(0.5, 0.5, 0.5), (0.6, 0.6, 0.6)]
+        @test_throws ErrorException scale_mi(batch, scales_bad, Linear_en)
+
+        # Translate (Unique)
+        # Shift 1: 10 units, Shift 2: 20 units
+        shifts = [10, 20]
+        trans_batch = translate_mi(batch, shifts, 1, Linear_en)
+        @test trans_batch.origin[1][1] == 10.0
+        @test trans_batch.origin[2][1] == 20.0
+
+        # Crop (Shared)
         crop_batch = crop_mi(batch, (10,10,10), (10,10,10), Linear_en)
         @test size(crop_batch.voxel_data) == (10, 10, 10, 2)
 
-        # Pad
+        # Pad (Shared)
         pad_batch = pad_mi(batch, (2,2,2), (2,2,2), 0.0, Linear_en)
         @test size(pad_batch.voxel_data) == (36, 36, 36, 2)
     end
@@ -109,59 +123,23 @@ end
         diff = abs.(res_affine.voxel_data - res_std.voxel_data)
         @test mean(diff) < 0.1 # Relaxed tolerance for interpolation edge artifacts
 
-        # Shearing
-        shear_mat = create_affine_matrix(shear=(0.5, 0.0, 0.0))
-        res_shear = affine_transform_mi(batch, shear_mat, Linear_en)
+        # Unique Affine Matrices (Mix Rotate and Shear)
+        mat_rot = create_affine_matrix(rotation=(0.0, 0.0, 90.0))
+        mat_shear = create_affine_matrix(shear=(0.5, 0.0, 0.0))
 
-        # Verify shear effect: x depends on y
-        # Original block x=15..25.
-        # At y=15, x shift = 0.5*15 = 7.5 -> x=22.5..32.5
-        # At y=25, x shift = 0.5*25 = 12.5 -> x=27.5..37.5
+        res_unique = affine_transform_mi(batch, [mat_rot, mat_shear], Linear_en)
 
-        # Check slice at z=20, y=15. X should be around 22.5
-        slice_orig = batch.voxel_data[:,:,20,1]
-        slice_shear = res_shear.voxel_data[:,:,20,1]
+        # Check Image 1 (Rotated)
+        diff_1 = abs.(res_unique.voxel_data[:,:,:,1] - res_std.voxel_data[:,:,:,1]) # Compare to std rotation
+        @test mean(diff_1) < 0.1
 
-        # Center of mass calculation for checking shift?
-        # Or simple check:
-        # Original has mass at x=20. Shear at y=15 adds 7.5 -> x=27.5.
-
-        # In original, x=20, y=15 has value 1.
-        # In shear, x=20, y=15 might be 0 if shifted away.
-        # 20 + 0.5*15 = 27.5.
-        # So at x=27 or 28, y=15 we should see value.
+        # Check Image 2 (Sheared)
+        slice_shear = res_unique.voxel_data[:,:,20,2]
 
         # Relax test or check summation
         @test sum(slice_shear) > 0 # Ensure content is preserved
-        # Check approximate location
-        # If shear worked, center of mass should shift
-        # Original center X ~ 20. New center X ~ 20 + 0.5*20 = 30?
-        # Shear depends on Y relative to origin (center).
-        # Center is at ~16.5.
-        # y_rel = 15 - 16.5 = -1.5.
-        # x_shift = 0.5 * -1.5 = -0.75.
-        # So shift is small near center!
 
-        # Let's check further away. y=5. y_rel = 5 - 16.5 = -11.5.
-        # x_shift = 0.5 * -11.5 = -5.75.
-        # Original block at x=15..25.
-        # New block at x=9.25..19.25.
-
-        # Check x=10, y=5. Original has 0? Block starts at 15.
-        # Shear has mass at 10?
-        # Wait, data is 15:25.
-        # At y=5 (out of block range 15:25), no data.
-
-        # Block y range is 15:25.
-        # At y=15 (edge of block). y_rel = -1.5. Shift -0.75.
-        # At y=25. y_rel = 25 - 16.5 = 8.5. Shift +4.25.
-
-        # Check y=25.
-        # Original x=15..25.
-        # Shifted x = 19.25..29.25.
-
-        # x=28 should have value in shear, but 0 in original.
-        # Check bound
+        # Check approximate location for shear (copied logic)
         if 28 <= 32
              @test slice_shear[28, 25] > 0.1 || slice_shear[27, 25] > 0.1
         end
