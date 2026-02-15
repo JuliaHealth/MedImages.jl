@@ -91,7 +91,7 @@ function Rodrigues_rotation_matrix(image::MedImage, axis::Int, angle::Float64)::
     return Rodrigues_rotation_matrix(image.direction, axis, angle)
 end
 
-ChainRulesCore.@non_differentiable Rodrigues_rotation_matrix(::Any, ::Any, ::Any)
+# ChainRulesCore.@non_differentiable Rodrigues_rotation_matrix(::Any, ::Any, ::Any)
 
 function crop_image_around_center(image::AbstractArray{T,3}, new_dims::Tuple{Int,Int,Int}, center::Tuple{Int,Int,Int}) where {T}
   start_z = max(1, center[1] - new_dims[1] ÷ 2)
