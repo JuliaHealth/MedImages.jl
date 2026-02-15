@@ -72,54 +72,118 @@ function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator
     return new_im
 end
 
+function resample_to_image(im_fixed::BatchedMedImage, im_moving::BatchedMedImage, interpolator_enum::Interpolator_enum, value_to_extrapolate=Nothing)::BatchedMedImage
+    batch_size = size(im_fixed.voxel_data, 4)
+    if size(im_moving.voxel_data, 4) != batch_size
+        error("Batch sizes must match")
+    end
 
-# function load_image(path)
-#   """
-#   load image from path
-#   """
-#   # test_image_equality(p,p)
+    # We must assume fixed images all have same spatial dims (enforced by BatchedMedImage struct logic),
+    # but potentially different origins/spacings.
+    # And we want to resample each moving image [b] to fixed image [b].
 
-#   medimage_instance_array = load_images(path)
-#   medimage_instance = medimage_instance_array[1]
-#   return medimage_instance
-# end#load_image
+    # Strategy:
+    # 1. Generate points_to_interpolate for each batch item.
+    #    Since origins/spacings can differ, points might differ.
+    #    Output grid size is same for all (im_fixed property).
 
+    new_size = size(im_fixed.voxel_data)[1:3]
+    n_points = prod(new_size)
+    points_to_interpolate = zeros(Float64, 3, n_points, batch_size)
 
+    # Base indices are same for all (0-based)
+    base_indices = get_base_indicies_arr(new_size) # 3 x N
 
-# debug_folder="/home/jakubmitura/projects/MedImage.jl/test_data/debug"
-# p="/home/jakubmitura/projects/MedImage.jl/test_data/volume-0.nii.gz"
+    for b in 1:batch_size
+        # For each batch, transform indices to physical space of fixed image
+        # P_fixed = (Idx - 1) * Spacing_fixed + Origin_fixed
 
+        # Then map to "relative" physical space of moving image assuming moving origin is 0?
+        # Original logic:
+        # points = points .- 1
+        # points = points .* new_spacing
+        # points = points .+ 1  (index -> physical offset from origin 0?)
+        # points = points .+ origin_diff
 
+        # Essentially: target_phys = index_to_phys(fixed)
+        # interpolate_my takes physical points relative to moving image origin?
+        # No, interpolate_my:
+        # real_x = (point - 1) / spacing + 1
+        # It assumes point is 1-based physical coordinate relative to origin?
+        # Wait, Utils.jl `interpolate_kernel`:
+        # real_x = (shared_arr[index_local, 1] - 1.0f0) / Float32(spacing[1]) + 1.0f0
+        # This converts "physical-like" coordinate back to index.
+        # If input point is P, index is (P-1)/S + 1.
+        # This implies P = (I-1)*S + 1.
+        # This is 1-based index converted to physical distance if origin was 1?
+        # Or origin 0? If I=1 -> P=1.
 
-# im_fixed=load_image("/home/jakubmitura/projects/MedImage.jl/test_data/pet_data/pat_2_sudy_0_2022-09-16_Standardized_Uptake_Value_body_weight.nii.gz")
-# im_moving=load_image("/home/jakubmitura/projects/MedImage.jl/test_data/pet_data/pat_2_sudy_1_2023-07-12_Standardized_Uptake_Value_body_weight.nii.gz")
-# resample_to_image(im_fixed, im_moving,Linear_en)
+        # Let's trace `resample_to_image` logic:
+        # points = (indices - 1) * new_spacing + 1 + (fixed.origin - moving.origin)
+        # This point P is passed to `interpolate_my`.
+        # Inside `interpolate_my`:
+        # real_x = (P - 1)/old_spacing + 1
 
+        # Let's substitute:
+        # P = (I_fix - 1)*S_fix + 1 + O_fix - O_mov
+        # I_mov = ( (I_fix - 1)*S_fix + 1 + O_fix - O_mov - 1 ) / S_mov + 1
+        #       = ( (I_fix - 1)*S_fix + O_fix - O_mov ) / S_mov + 1
+        # This matches the standard mapping:
+        # P_phys = (I_fix - 1)*S_fix + O_fix
+        # I_mov = (P_phys - O_mov) / S_mov + 1
 
+        # So yes, we need to construct P for each batch b.
 
-# """
-# get 4 dimensional array of cartesian indicies of a 3 dimensional array
-# thats size is passed as an argument dims
-# """
-# function get_base_indicies_arr(dims)
-#     indices = CartesianIndices(dims)
-#     # indices=collect.(Tuple.(collect(indices)))
-#     indices=Tuple.(collect(indices))
-#     indices=collect(Iterators.flatten(indices))
-#     indices=reshape(indices,(3,dims[1]*dims[2]*dims[3]))
-#     indices=permutedims(indices,(1,2))
-#     return indices
-# end#get_base_indicies_arr
+        sp_fixed = im_fixed.spacing[b]
+        origin_diff = im_fixed.origin[b] .- im_moving.origin[b]
 
+        for i in 1:n_points
+            # base_indices is 3xN
+            # 1-based index from base_indices
+            ix = base_indices[1, i]
+            iy = base_indices[2, i]
+            iz = base_indices[3, i]
 
+            # Apply formula: (I-1)*S_new + 1 + diff
+            px = (ix - 1) * sp_fixed[1] + 1 + origin_diff[1]
+            py = (iy - 1) * sp_fixed[2] + 1 + origin_diff[2]
+            pz = (iz - 1) * sp_fixed[3] + 1 + origin_diff[3]
 
-# indices=get_base_indicies_arr((4,4,4))
-# origin=(2.0,2.0,2.0)
-# # fixed_physical = im_fixed.origin .+ ((Tuple.(indices) .- 1).* reshape(collect(im_fixed.spacing), size(Tuple.(indices))))
-# fixed_physical = origin .+ (indices)
+            points_to_interpolate[1, i, b] = px
+            points_to_interpolate[2, i, b] = py
+            points_to_interpolate[3, i, b] = pz
+        end
+    end
 
+    spacing_arg = im_moving.spacing # Vector of tuples
 
+    val_ext = (value_to_extrapolate == Nothing) ? 0.0 : value_to_extrapolate
 
-# vv= zeros(3,3,3)
-# indices = map(el->collect(el) ,collect(CartesianIndices(vv)))
+    resampled_flat = interpolate_my(points_to_interpolate, im_moving.voxel_data, spacing_arg, interpolator_enum, false, Float64(val_ext), true)
+
+    new_data = reshape(resampled_flat, new_size[1], new_size[2], new_size[3], batch_size)
+
+    return BatchedMedImage(
+        voxel_data = new_data,
+        origin = im_fixed.origin,
+        spacing = im_fixed.spacing,
+        direction = im_fixed.direction,
+        image_type = im_moving.image_type,
+        image_subtype = im_moving.image_subtype,
+        patient_id = im_moving.patient_id,
+        current_device = im_moving.current_device,
+        date_of_saving = im_moving.date_of_saving,
+        acquistion_time = im_moving.acquistion_time,
+        study_uid = im_moving.study_uid,
+        patient_uid = im_moving.patient_uid,
+        series_uid = im_moving.series_uid,
+        study_description = im_moving.study_description,
+        legacy_file_name = im_moving.legacy_file_name,
+        display_data = im_moving.display_data,
+        clinical_data = im_moving.clinical_data,
+        is_contrast_administered = im_moving.is_contrast_administered,
+        metadata = im_moving.metadata
+    )
+end
+
 end#Resample_to_target
