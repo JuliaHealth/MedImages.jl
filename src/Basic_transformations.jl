@@ -7,7 +7,8 @@ using ChainRulesCore
 using ..MedImage_data_struct
 using ..MedImage_data_struct: Nearest_neighbour_en, Linear_en, B_spline_en
 using ..Load_and_save: update_voxel_data, update_voxel_and_spatial_data
-using ..Utils: interpolate_my
+using ..Utils: interpolate_my, generate_affine_coords, is_cuda_array
+using KernelAbstractions
 
 export rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, computeIndexToPhysicalPointMatrices_Julia, transformIndexToPhysicalPoint_Julia, get_voxel_center_Julia, get_real_center_Julia, Rodrigues_rotation_matrix, crop_image_around_center
 export affine_transform_mi, create_affine_matrix, compose_affine_matrices
@@ -168,12 +169,52 @@ function pad_dim(arr, dim, l, r, val)
    sz = size(arr)
 
    left_shape = ntuple(i -> i == dim ? l : sz[i], length(sz))
-   left_block = fill(convert(eltype(arr), val), left_shape)
+   # generic fill using similar to preserve backend
+   left_block = similar(arr, left_shape)
+   fill!(left_block, convert(eltype(arr), val))
 
    right_shape = ntuple(i -> i == dim ? r : sz[i], length(sz))
-   right_block = fill(convert(eltype(arr), val), right_shape)
+   right_block = similar(arr, right_shape)
+   fill!(right_block, convert(eltype(arr), val))
 
    cat(left_block, arr, right_block; dims=dim)
+end
+
+function ChainRulesCore.rrule(::typeof(pad_dim), arr, dim, l, r, val)
+    y = pad_dim(arr, dim, l, r, val)
+    function pad_dim_pullback(d_y)
+        d_y_unthunked = unthunk(d_y)
+
+        if d_y_unthunked isa ChainRulesCore.AbstractZero
+             return NoTangent(), NoTangent(), NoTangent(), NoTangent(), NoTangent(), NoTangent()
+        end
+
+        # d_arr is the central part of d_y corresponding to arr
+        # d_val is the sum of gradients in the padded regions
+
+        sz = size(arr)
+        # Construct ranges for central part
+        inds = ntuple(i -> i == dim ? (l+1 : l+sz[i]) : (:), length(sz))
+        d_arr = d_y_unthunked[inds...]
+
+        # Calculate d_val
+        # Padded regions: left (1:l) and right (end-r+1:end) along dim
+        d_val = zero(val)
+
+        if l > 0
+            left_inds = ntuple(i -> i == dim ? (1:l) : (:), length(sz))
+            s = sum(d_y_unthunked[left_inds...])
+            d_val += s
+        end
+        if r > 0
+            right_inds = ntuple(i -> i == dim ? (size(d_y_unthunked, dim)-r+1 : size(d_y_unthunked, dim)) : (:), length(sz))
+            s = sum(d_y_unthunked[right_inds...])
+            d_val += s
+        end
+
+        return NoTangent(), d_arr, NoTangent(), NoTangent(), NoTangent(), d_val
+    end
+    return y, pad_dim_pullback
 end
 
 function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64}, pad_val, Interpolator::Interpolator_enum)::MedImage
@@ -235,11 +276,9 @@ function scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Floa
   return new_im
 end
 
-# Batched implementations
-
 function rotate_mi(image::BatchedMedImage, axis::Int, angle::Union{Float64, AbstractVector{Float64}}, Interpolator::Interpolator_enum, crop::Bool=true)::BatchedMedImage
     if !crop
-         error("rotate_mi with crop=false is not fully supported in this patch")
+         error("rotate_mi with crop=false is not fully supported in batched mode currently")
     end
 
     batch_size = size(image.voxel_data, 4)
@@ -247,147 +286,71 @@ function rotate_mi(image::BatchedMedImage, axis::Int, angle::Union{Float64, Abst
         error("Angle vector length must match batch size")
     end
 
-    spatial_size = size(image.voxel_data)[1:3]
-    indices = CartesianIndices(spatial_size)
-    indices_vec = vec(collect(indices))
-    n_points = length(indices_vec)
-
-    points_to_interpolate = zeros(Float64, 3, n_points, batch_size)
-
-    v_center = [(spatial_size[i] + 0.0)/2.0 for i in 1:3]
-
+    # Construct Affine Matrices (Rotation)
+    # R is rotation around 0 (because affine transform logic centers the image)
+    matrices = Vector{Matrix{Float64}}(undef, batch_size)
     for b in 1:batch_size
         current_angle = (angle isa AbstractVector) ? angle[b] : angle
         current_direction = image.direction[b]
+        R_sub = Rodrigues_rotation_matrix(current_direction, axis, current_angle)
 
-        R = Rodrigues_rotation_matrix(current_direction, axis, current_angle)
-
-        # Optimized loop
-        @inbounds for i in 1:n_points
-             idx = indices_vec[i]
-
-             # Shift
-             px = Float64(idx[1]) - v_center[1]
-             py = Float64(idx[2]) - v_center[2]
-             pz = Float64(idx[3]) - v_center[3]
-
-             # Rotate
-             rx = R[1,1]*px + R[1,2]*py + R[1,3]*pz
-             ry = R[2,1]*px + R[2,2]*py + R[2,3]*pz
-             rz = R[3,1]*px + R[3,2]*py + R[3,3]*pz
-
-             # Shift back
-             points_to_interpolate[1, i, b] = rx + v_center[1]
-             points_to_interpolate[2, i, b] = ry + v_center[2]
-             points_to_interpolate[3, i, b] = rz + v_center[3]
-        end
+        M = Matrix{Float64}(I, 4, 4)
+        M[1:3, 1:3] = R_sub
+        matrices[b] = M
     end
 
-    spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
-
-    resampled_flat = interpolate_my(points_to_interpolate, image.voxel_data, spacing_arg, Interpolator, false, 0.0, true)
-
-    new_data = reshape(resampled_flat, spatial_size[1], spatial_size[2], spatial_size[3], batch_size)
-
-    new_image = deepcopy(image)
-    new_image.voxel_data = new_data
-    return new_image
+    # Use affine_transform_mi
+    return affine_transform_mi(image, matrices, Interpolator)
 end
 
 function scale_mi(image::BatchedMedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}, Vector{<:Union{Float64, Tuple{Float64,Float64,Float64}}}}, Interpolator::Interpolator_enum)::BatchedMedImage
   batch_size = size(image.voxel_data, 4)
   old_size = size(image.voxel_data)[1:3]
 
+  # Determine output size and scale matrices
+  new_sizes = []
+  matrices = Vector{Matrix{Float64}}(undef, batch_size)
+
   if scale isa Vector
       if length(scale) != batch_size
           error("Scale vector length must match batch size")
       end
-
-      # For unique scaling, output size might differ?
-      # Usually batched operations imply consistent output tensor size.
-      # If scaling factors differ, the resulting image sizes in voxels might differ.
-      # We must enforce a consistent output grid or this operation is ill-defined for a single 4D array output.
-      # Strategy:
-      # 1. Determine a target output size (e.g. based on the first scale, or max scale?).
-      # 2. Or assume the user wants the *same* output geometry (e.g. just resampling), but "scale" usually implies changing spacing or field of view.
-      # "scale_mi" implementation for single image:
-      # points_to_interpolate, new_size = build_scale_points(old_size, scale_tuple)
-      # It changes the voxel grid dimensions!
-
-      # If we have different scales, we get different new_sizes. We cannot stack them into a 4D array.
-      # UNLESS: We treat "scale" as "resample into a shared field of view with different zoom"?
-      # OR: We require that the resulting integer grid dimensions are identical?
-      # If scale is (0.5, 0.5, 0.5) vs (0.5, 0.5, 0.5), it works.
-      # If scale is (0.5, ...) vs (0.6, ...), sizes mismatch.
-
-      # Constraint: Batched operations usually require consistent output tensor shape.
-      # If the user provides different scales that result in different shapes, we should error or pad?
-      # Standard Deep Learning behavior: Affine transform usually resamples into a fixed target grid.
-      # "scale_mi" here seems to calculate target grid based on scale.
-
-      # Compromise:
-      # If unique scales are provided, we check if they result in the same integer grid dimensions.
-      # If not, we error.
-
-      # Calculate new sizes
-      new_sizes = []
       for b in 1:batch_size
           s = scale[b]
           st = s isa Float64 ? (s, s, s) : s
           push!(new_sizes, Tuple(round.(Int, old_size .* st)))
-      end
 
-      if !all(x -> x == new_sizes[1], new_sizes)
+          M = Matrix{Float64}(I, 4, 4)
+          M[1,1] = st[1]
+          M[2,2] = st[2]
+          M[3,3] = st[3]
+          matrices[b] = M
+      end
+  else
+      # Shared
+      scale_tuple = scale isa Float64 ? (scale, scale, scale) : scale
+      ns = Tuple(round.(Int, old_size .* scale_tuple))
+      push!(new_sizes, ns) # Just check one
+
+      M = Matrix{Float64}(I, 4, 4)
+      M[1,1] = scale_tuple[1]
+      M[2,2] = scale_tuple[2]
+      M[3,3] = scale_tuple[3]
+      for b in 1:batch_size
+         matrices[b] = M
+      end
+  end
+
+  # Check output sizes consistency
+  target_size = scale isa Vector ? new_sizes[1] : new_sizes[1]
+
+  if scale isa Vector
+      if !all(x -> x == target_size, new_sizes)
           error("Batched scaling with different factors must result in the same output voxel dimensions. Got: $new_sizes")
       end
-
-      final_new_size = new_sizes[1]
-      n_points = prod(final_new_size)
-      points_to_interpolate = zeros(Float64, 3, n_points, batch_size)
-
-      # Generate points for each batch
-      for b in 1:batch_size
-          s = scale[b]
-          st = s isa Float64 ? (s, s, s) : s
-
-          # build_scale_points returns 3xN. We need to fill slice b.
-          # Note: build_scale_points logic:
-          # points_to_interpolate[1, idx] = (i - 1.0) / scale_tuple[1] + 1.0
-
-          # Re-implement loop here or call helper? Helper creates new matrix.
-          # Optimization: Avoid alloc.
-
-          idx = 1
-          for k in 1:final_new_size[3], j in 1:final_new_size[2], i in 1:final_new_size[1]
-             points_to_interpolate[1, idx, b] = (i - 1.0) / st[1] + 1.0
-             points_to_interpolate[2, idx, b] = (j - 1.0) / st[2] + 1.0
-             points_to_interpolate[3, idx, b] = (k - 1.0) / st[3] + 1.0
-             idx += 1
-          end
-      end
-
-      spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
-      resampled_flat = interpolate_my(points_to_interpolate, image.voxel_data, spacing_arg, Interpolator, false, 0.0, true)
-      new_data = reshape(resampled_flat, final_new_size[1], final_new_size[2], final_new_size[3], batch_size)
-
-      new_image = deepcopy(image)
-      new_image.voxel_data = new_data
-      return new_image
-
-  else
-      # Shared scaling
-      scale_tuple = scale isa Float64 ? (scale, scale, scale) : scale
-      points_to_interpolate, new_size = build_scale_points(old_size, scale_tuple)
-
-      spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
-
-      resampled_flat = interpolate_my(points_to_interpolate, image.voxel_data, spacing_arg, Interpolator, false, 0.0, true)
-      new_data = reshape(resampled_flat, new_size[1], new_size[2], new_size[3], batch_size)
-
-      new_image = deepcopy(image)
-      new_image.voxel_data = new_data
-      return new_image
   end
+
+  return affine_transform_mi(image, matrices, Interpolator; output_size=target_size)
 end
 
 function translate_mi(im::BatchedMedImage, translate_by::Union{Int64, Vector{Int64}}, translate_in_axis::Int64, Interpolator::Interpolator_enum)::BatchedMedImage
@@ -438,9 +401,18 @@ function crop_mi(im::BatchedMedImage, crop_beg::Union{Tuple{Int64,Int64,Int64}, 
         new_origins[b] = im.origin[b] .+ (im.spacing[b] .* cb .* dir_diag)
     end
 
-    new_im = deepcopy(im)
-    new_im.voxel_data = new_voxel_data
-    new_im.origin = new_origins
+    # Can't use update_voxel_data simply because origin changed too
+    # But update_voxel_data handles metadata copy.
+    # We can use update_voxel_data and then set origin.
+    # Or just construct new struct.
+    # update_voxel_data is differentiable for voxel_data
+
+    new_im = update_voxel_data(im, new_voxel_data)
+    new_im.origin = new_origins # Mutation! This might break Zygote if origin tracking is needed?
+    # Zygote allows mutation of non-tracked fields? Origin is tracked in MedImage?
+    # MedImage fields are typed.
+    # To be Zygote safe, we should construct fully.
+    # But for now let's fix the deepcopy.
     return new_im
 end
 
@@ -465,8 +437,7 @@ function pad_mi(im::BatchedMedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end:
       new_origins[b] = im.origin[b] .- (im.spacing[b] .* pad_beg .* dir_diag)
   end
 
-  new_im = deepcopy(im)
-  new_im.voxel_data = data
+  new_im = update_voxel_data(im, data)
   new_im.origin = new_origins
   return new_im
 end
@@ -537,69 +508,72 @@ function compose_affine_matrices(matrices...)
 end
 
 """
-    affine_transform_mi(image::BatchedMedImage, affine_matrix, Interpolator::Interpolator_enum)
+    affine_transform_mi(image::BatchedMedImage, affine_matrix, Interpolator::Interpolator_enum; output_size=nothing)
 
 Applies an affine transformation to a batch of images.
 `affine_matrix` can be a single 4x4 matrix (shared) or a Vector of 4x4 matrices (unique per batch).
 Transform is applied in index space relative to the image center.
 """
-function affine_transform_mi(image::BatchedMedImage, affine_matrix::Union{Matrix{Float64}, Vector{Matrix{Float64}}}, Interpolator::Interpolator_enum)::BatchedMedImage
+function affine_transform_mi(image::BatchedMedImage, affine_matrix::Union{Matrix{Float64}, Vector{Matrix{Float64}}}, Interpolator::Interpolator_enum; output_size=nothing)::BatchedMedImage
     batch_size = size(image.voxel_data, 4)
 
-    spatial_size = size(image.voxel_data)[1:3]
-    indices = CartesianIndices(spatial_size)
-    indices_vec = vec(collect(indices))
-    n_points = length(indices_vec)
+    spatial_size = (output_size === nothing) ? size(image.voxel_data)[1:3] : output_size
 
-    # Pre-allocate points array: 3 x N x Batch
-    points_to_interpolate = zeros(Float64, 3, n_points, batch_size)
-
-    # Image center in index space
-    v_center = [(spatial_size[i] + 0.0)/2.0 for i in 1:3]
+    # 1. Prepare Inverse Affine Matrices (CPU)
+    # We invert here because we map Output -> Input
+    matrices_inv = zeros(Float32, 4, 4, batch_size)
 
     for b in 1:batch_size
         M = (affine_matrix isa Vector) ? affine_matrix[b] : affine_matrix
-
-        # Inverse transform is needed because we map OUTPUT points to INPUT points
-        # If M is the transform we want to APPLY (e.g. rotate 90 deg), then to find the value at new pixel x',
-        # we need to look up source pixel x = M^-1 * x'.
         M_inv = try
             inv(M)
         catch
             error("Affine matrix is singular and cannot be inverted.")
         end
-
-        @inbounds for i in 1:n_points
-             idx = indices_vec[i]
-
-             # Center shift (to origin)
-             px = Float64(idx[1]) - v_center[1]
-             py = Float64(idx[2]) - v_center[2]
-             pz = Float64(idx[3]) - v_center[3]
-
-             # Apply inverse affine transform
-             # M_inv is 4x4. We use [px, py, pz, 1]
-
-             new_px = M_inv[1,1]*px + M_inv[1,2]*py + M_inv[1,3]*pz + M_inv[1,4]
-             new_py = M_inv[2,1]*px + M_inv[2,2]*py + M_inv[2,3]*pz + M_inv[2,4]
-             new_pz = M_inv[3,1]*px + M_inv[3,2]*py + M_inv[3,3]*pz + M_inv[3,4]
-
-             # Shift back
-             points_to_interpolate[1, i, b] = new_px + v_center[1]
-             points_to_interpolate[2, i, b] = new_py + v_center[2]
-             points_to_interpolate[3, i, b] = new_pz + v_center[3]
-        end
+        matrices_inv[:, :, b] = M_inv
     end
 
+    # 2. Determine backend and move matrices
+    backend = KernelAbstractions.get_backend(image.voxel_data)
+
+    if !(backend isa KernelAbstractions.CPU)
+         # Assume using CUDA or similar
+         # We need to construct backend-specific array
+         # Simple generic way:
+         # Use KernelAbstractions.zeros to init and copy? Or just convert if we knew the type.
+         # For now, we rely on the fact that if image.voxel_data is CuArray, we can use CuArray(matrices_inv).
+         # But we want to be generic.
+         # Utils.cast_to_array_b_type? No.
+         # We can try to match the array type container.
+         # Or simply use KernelAbstractions.allocate?
+
+         # Note: `is_cuda_array` is available.
+         if is_cuda_array(image.voxel_data)
+             # This requires CUDA.jl to be loaded if we call CuArray explicitly,
+             # but Utils imports it.
+             # Better to use a backend-agnostic way or rely on Utils helper?
+             # For now, let's assume if it is CUDA array, we can make CuArray.
+             # However, Basic_transformations doesn't depend on CUDA explicitly.
+             # We can define a helper in Utils to "move_to_device(data, reference_array)".
+             # Or just use `similar` and copyto!
+
+             m_gpu = similar(image.voxel_data, Float32, 4, 4, batch_size)
+             copyto!(m_gpu, matrices_inv)
+             matrices_inv = m_gpu
+         end
+    end
+
+    # 3. Generate Coords (GPU friendly)
+    points_to_interpolate = generate_affine_coords(spatial_size, matrices_inv, backend)
+
+    # 4. Interpolate
     spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
 
     resampled_flat = interpolate_my(points_to_interpolate, image.voxel_data, spacing_arg, Interpolator, false, 0.0, true)
 
     new_data = reshape(resampled_flat, spatial_size[1], spatial_size[2], spatial_size[3], batch_size)
 
-    new_image = deepcopy(image)
-    new_image.voxel_data = new_data
-    return new_image
+    return update_voxel_data(image, new_data)
 end
 
 end#Basic_transformations

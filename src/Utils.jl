@@ -6,6 +6,7 @@ import KernelAbstractions: synchronize, get_backend
 using Enzyme
 using ChainRulesCore
 import Random
+using LinearAlgebra
 
 export interpolate_point
 export get_base_indicies_arr
@@ -17,6 +18,7 @@ export create_nii_from_medimage
 export resample_kernel_launch
 export is_cuda_array, extract_corners
 export create_batched_medimage, unbatch_medimage
+export generate_affine_coords
 
 import ..MedImage_data_struct: MedImage, BatchedMedImage, Interpolator_enum, Mode_mi, Orientation_code, Nearest_neighbour_en, Linear_en, B_spline_en
 
@@ -476,46 +478,131 @@ function ChainRulesCore.rrule(::typeof(interpolate_pure), points_to_interpolate,
         backend = get_backend(points_to_interpolate)
         source_arr_shape = size(input_array)
 
+        is_batched = ndims(input_array) == 4
+
+        # Prepare 4D helpers if batched
+        points_batch_stride = 0
+        spacing_arg = input_array_spacing
+
+        if is_batched
+            batch_size = size(input_array, 4)
+             if ndims(points_to_interpolate) == 3 && size(points_to_interpolate, 3) == batch_size
+                 points_batch_stride = 1
+            elseif ndims(points_to_interpolate) == 2
+                 points_batch_stride = 0
+            end
+
+            # Prepare spacing matrix
+             if isa(input_array_spacing, Vector)
+                # Convert vector of tuples to matrix for kernel
+                # Assuming input_array_spacing is Vector{Tuple{Float64, Float64, Float64}}
+                # We need Float32 matrix
+                spacing_mat = Matrix{Float32}(undef, 3, batch_size)
+                for b in 1:batch_size
+                    spacing_mat[1, b] = Float32(input_array_spacing[b][1])
+                    spacing_mat[2, b] = Float32(input_array_spacing[b][2])
+                    spacing_mat[3, b] = Float32(input_array_spacing[b][3])
+                end
+                if backend isa KernelAbstractions.GPU
+                     spacing_mat = CuArray(spacing_mat)
+                end
+                spacing_arg = spacing_mat
+            end
+        end
+
         if backend isa KernelAbstractions.CPU
-            # Use pure Julia loop for CPU - Enzyme compatible
             d_output = d_output_raw
-            function cpu_wrapper(out, src, pts, sp, kbs, ev, inn)
-                interpolate_cpu_loop!(out, source_arr_shape, src, pts, sp, kbs, ev, inn)
-                return nothing
-            end
 
-            Enzyme.autodiff(
-                Reverse,
-                cpu_wrapper,
-                Const,
-                Duplicated(output, d_output),
-                Duplicated(input_array, d_input),
-                Duplicated(points_to_interpolate, d_points),
-                Const(input_array_spacing),
-                Const(keep_begining_same),
-                Const(extrapolate_value),
-                Const(is_nearest_neighbour)
-            )
+            if is_batched
+                # CPU 4D
+                 # Handle points reshape for Enzyme if needed
+                 # points_to_interpolate might be 2D but kernel logic handles it via stride.
+                 # However, Enzyme might need exact matching shape if we duplicated it?
+                 # d_points was created as zero(points_to_interpolate), so shapes match.
+
+                function cpu_wrapper_4d(out, src, pts, sp, kbs, ev, inn, str)
+                    interpolate_cpu_loop_4d!(out, source_arr_shape, src, pts, sp, kbs, ev, inn, str)
+                    return nothing
+                end
+
+                Enzyme.autodiff(
+                    Reverse,
+                    cpu_wrapper_4d,
+                    Const,
+                    Duplicated(output, d_output),
+                    Duplicated(input_array, d_input),
+                    Duplicated(points_to_interpolate, d_points),
+                    Const(spacing_arg),
+                    Const(keep_begining_same),
+                    Const(extrapolate_value),
+                    Const(is_nearest_neighbour),
+                    Const(points_batch_stride)
+                )
+            else
+                # CPU 3D
+                function cpu_wrapper(out, src, pts, sp, kbs, ev, inn)
+                    interpolate_cpu_loop!(out, source_arr_shape, src, pts, sp, kbs, ev, inn)
+                    return nothing
+                end
+
+                Enzyme.autodiff(
+                    Reverse,
+                    cpu_wrapper,
+                    Const,
+                    Duplicated(output, d_output),
+                    Duplicated(input_array, d_input),
+                    Duplicated(points_to_interpolate, d_points),
+                    Const(input_array_spacing),
+                    Const(keep_begining_same),
+                    Const(extrapolate_value),
+                    Const(is_nearest_neighbour)
+                )
+            end
         else
-            # Use KA kernel for GPU - ensure gradient arrays are on the same device
+            # GPU
             d_output = is_cuda_array(output) && !is_cuda_array(d_output_raw) ? CuArray(d_output_raw) : d_output_raw
-            function kernel_wrapper(out, src, pts, sp, kbs, ev, inn)
-                 interpolate_kernel(backend, 512)(out, source_arr_shape, src, pts, sp, kbs, ev, inn, ndrange=size(out))
-                 return nothing
-            end
 
-            Enzyme.autodiff(
-                Reverse,
-                kernel_wrapper,
-                Const,
-                Duplicated(output, d_output),
-                Duplicated(input_array, d_input),
-                Duplicated(points_to_interpolate, d_points),
-                Const(input_array_spacing),
-                Const(keep_begining_same),
-                Const(extrapolate_value),
-                Const(is_nearest_neighbour)
-            )
+            if is_batched
+                 # GPU 4D
+                 function kernel_wrapper_4d(out, src, pts, sp, kbs, ev, inn, str)
+                     interpolate_kernel_4d(backend, 512)(out, source_arr_shape, src, pts, sp, kbs, ev, inn, str, ndrange=length(out))
+                     return nothing
+                 end
+
+                 Enzyme.autodiff(
+                    Reverse,
+                    kernel_wrapper_4d,
+                    Const,
+                    Duplicated(output, d_output),
+                    Duplicated(input_array, d_input),
+                    Duplicated(points_to_interpolate, d_points),
+                    Const(spacing_arg),
+                    Const(keep_begining_same),
+                    Const(extrapolate_value),
+                    Const(is_nearest_neighbour),
+                    Const(points_batch_stride)
+                )
+
+            else
+                # GPU 3D
+                function kernel_wrapper(out, src, pts, sp, kbs, ev, inn)
+                     interpolate_kernel(backend, 512)(out, source_arr_shape, src, pts, sp, kbs, ev, inn, ndrange=size(out))
+                     return nothing
+                end
+
+                Enzyme.autodiff(
+                    Reverse,
+                    kernel_wrapper,
+                    Const,
+                    Duplicated(output, d_output),
+                    Duplicated(input_array, d_input),
+                    Duplicated(points_to_interpolate, d_points),
+                    Const(input_array_spacing),
+                    Const(keep_begining_same),
+                    Const(extrapolate_value),
+                    Const(is_nearest_neighbour)
+                )
+            end
         end
         # Convert gradients back to CPU if needed for Zygote
         d_points_out = is_cuda_array(d_points) ? Array(d_points) : d_points
@@ -894,6 +981,118 @@ function resample_kernel_launch(image_data, old_spacing, new_spacing, new_dims, 
     return output
 end
 
+@kernel function affine_coords_kernel(points_out, @Const(affine_matrices), @Const(spatial_size), batch_size, @Const(center_shift))
+    i = @index(Global, Linear)
+
+    # Calculate output index (spatial) and batch index
+    n_spatial = prod(spatial_size)
+
+    # Map linear index to spatial index and batch index
+    # We iterate over (N_points * BatchSize)
+    idx_spatial = (i - 1) % n_spatial + 1
+    idx_batch = (i - 1) ÷ n_spatial + 1
+
+    # Convert spatial index to 3D coords (x,y,z)
+    sx = spatial_size[1]
+    sy = spatial_size[2]
+    # sz = spatial_size[3]
+    stride_z = sx * sy
+
+    iz = (idx_spatial - 1) ÷ stride_z + 1
+    rem_z = (idx_spatial - 1) % stride_z
+    iy = rem_z ÷ sx + 1
+    ix = rem_z % sx + 1
+
+    # Center shift
+    px = Float32(ix) - center_shift[1]
+    py = Float32(iy) - center_shift[2]
+    pz = Float32(iz) - center_shift[3]
+
+    # Get affine matrix for this batch
+    # affine_matrices is (4, 4, Batch) or (4, 4, 1)
+    # If size(affine_matrices, 3) == 1, use 1, else use idx_batch
+    mat_idx = size(affine_matrices, 3) == 1 ? 1 : idx_batch
+
+    # Read matrix (column major)
+    # M_inv is passed directly
+    m11 = affine_matrices[1, 1, mat_idx]
+    m21 = affine_matrices[2, 1, mat_idx]
+    m31 = affine_matrices[3, 1, mat_idx]
+
+    m12 = affine_matrices[1, 2, mat_idx]
+    m22 = affine_matrices[2, 2, mat_idx]
+    m32 = affine_matrices[3, 2, mat_idx]
+
+    m13 = affine_matrices[1, 3, mat_idx]
+    m23 = affine_matrices[2, 3, mat_idx]
+    m33 = affine_matrices[3, 3, mat_idx]
+
+    m14 = affine_matrices[1, 4, mat_idx]
+    m24 = affine_matrices[2, 4, mat_idx]
+    m34 = affine_matrices[3, 4, mat_idx]
+
+    # Apply affine transform: p_new = M * p
+    # p is [px, py, pz, 1]
+
+    new_px = m11*px + m12*py + m13*pz + m14
+    new_py = m21*px + m22*py + m23*pz + m24
+    new_pz = m31*px + m32*py + m33*pz + m34
+
+    # Shift back
+    final_x = new_px + center_shift[1]
+    final_y = new_py + center_shift[2]
+    final_z = new_pz + center_shift[3]
+
+    # Write to output (3, N_spatial, Batch)
+    # Output is linearly indexed as well, or we can use 3D index
+    # points_out is reshaped to (3, N_spatial * Batch) or similar?
+    # Actually, let's treat points_out as linear array of size (3, N_total)
+    # Layout: [x1, y1, z1, x2, y2, z2...]
+    # BUT interpolate_kernel expects (3, N_points) or (3, N_points, Batch)
+    # If 3D array (3, N, B):
+    # points_out[1, idx_spatial, idx_batch] = final_x
+
+    # KA handles multi-dim arrays:
+    points_out[1, idx_spatial, idx_batch] = final_x
+    points_out[2, idx_spatial, idx_batch] = final_y
+    points_out[3, idx_spatial, idx_batch] = final_z
+end
+
+function generate_affine_coords(spatial_size, affine_matrices, backend)
+    # affine_matrices: Array{Float32, 3} of size (4, 4, Batch) or (4, 4, 1)
+    # Returns points_to_interpolate: Array{Float32, 3} of size (3, N_points, Batch)
+
+    batch_size = size(affine_matrices, 3)
+    # If matrices are shared (size 1) but we want to generate points for a batch?
+    # Usually if shared matrix, we can generate points once (3, N, 1).
+    # But interpolate_kernel_4d handles batch stride.
+    # If we want unique output per batch (e.g. if we had unique shift or something), we need (3, N, B).
+    # Here, we assume if affine_matrices has B > 1, output has B.
+    # If affine_matrices has B == 1, output CAN be B=1.
+
+    # BUT wait, the caller might want B outputs even if matrix is shared (e.g. if other params differ).
+    # However, for pure affine transform, if matrix is shared, points are shared.
+
+    out_batch_size = batch_size
+    n_points = prod(spatial_size)
+
+    points_out = KernelAbstractions.zeros(backend, Float32, 3, n_points, out_batch_size)
+
+    center_shift = Float32.([(s + 0.0)/2.0 for s in spatial_size])
+    # Move center_shift to GPU? It's small, can be captured as Const tuple or array?
+    # KA usually handles small arrays in arguments fine, or use Tuple.
+    center_shift_tuple = (center_shift[1], center_shift[2], center_shift[3])
+
+    # Launch kernel
+    # Total threads: n_points * out_batch_size
+    affine_coords_kernel(backend, 256)(points_out, affine_matrices, spatial_size, out_batch_size, center_shift_tuple, ndrange=n_points * out_batch_size)
+    synchronize(backend)
+
+    return points_out
+end
+
+ChainRulesCore.@non_differentiable generate_affine_coords(::Any, ::Any, ::Any)
+
 function create_batched_medimage(med_images::Vector{MedImage})::BatchedMedImage
     if isempty(med_images)
         error("Input vector of MedImages is empty")
@@ -932,6 +1131,32 @@ function create_batched_medimage(med_images::Vector{MedImage})::BatchedMedImage
         is_contrast_administered = [img.is_contrast_administered for img in med_images],
         metadata = [img.metadata for img in med_images]
     )
+end
+
+function ChainRulesCore.rrule(::typeof(create_batched_medimage), med_images::Vector{MedImage})
+    y = create_batched_medimage(med_images)
+    function create_batched_pullback(d_y)
+        d_y_unthunked = unthunk(d_y)
+        # Check if we have gradients for voxel_data
+        # d_y_unthunked should be Tangent{BatchedMedImage}
+        # access .voxel_data
+
+        d_voxels = d_y_unthunked.voxel_data
+
+        if d_voxels isa AbstractArray
+            d_med_images = map(1:length(med_images)) do i
+                # Create a Tangent for MedImage with just voxel_data
+                # We slice the 4th dimension
+                slice = selectdim(d_voxels, 4, i)
+                # Tangent takes kwargs for fields
+                Tangent{MedImage}(; voxel_data=slice)
+            end
+            return NoTangent(), d_med_images
+        else
+             return NoTangent(), NoTangent()
+        end
+    end
+    return y, create_batched_pullback
 end
 
 function unbatch_medimage(batched_image::BatchedMedImage)::Vector{MedImage}

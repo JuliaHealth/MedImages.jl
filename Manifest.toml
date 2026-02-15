@@ -570,7 +570,9 @@ version = "0.4.15"
 
 [[deps.ITKIOWrapper]]
 deps = ["CxxWrap", "ITKIOWrapper_jll"]
-git-tree-sha1 = "cf1e6d9a94da93055d06ea04f572558b80e27675"
+git-tree-sha1 = "ea57dc6d6d9aae8da5f296bb8578d1937f74cea1"
+repo-rev = "main"
+repo-url = "https://github.com/JuliaHealth/ITKIOWrapper.jl.git"
 uuid = "8538b10a-c1b7-4e8d-b607-b3a5053e6a1f"
 version = "4.0.2"
 
