@@ -3,7 +3,7 @@ module Load_and_save
 using Dictionaries, Dates, PyCall
 using Accessors, UUIDs, ITKIOWrapper
 using ..MedImage_data_struct
-using ..MedImage_data_struct: MedImage
+using ..MedImage_data_struct: MedImage, BatchedMedImage
 using ..Brute_force_orientation
 using ..Utils
 export load_image
@@ -88,7 +88,7 @@ function create_nii_from_medimage(med_image::MedImage, file_path::String)
   sitk.WriteImage(image_sitk, file_path * ".nii.gz")
 end
 
-function update_voxel_data(old_image, new_voxel_data::AbstractArray)
+function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
 
   return MedImage(
     new_voxel_data,
@@ -112,6 +112,34 @@ function update_voxel_data(old_image, new_voxel_data::AbstractArray)
     old_image.is_contrast_administered,
     old_image.metadata)
 
+end
+
+function update_voxel_data(old_image::BatchedMedImage, new_voxel_data::AbstractArray)
+  # For BatchedMedImage, we assume new_voxel_data is 4D
+  # We construct a new BatchedMedImage copying metadata
+  # Note: This is constructor based, so it should be differentiable if BatchedMedImage constructor is differentiable (which is struct construction).
+
+  return BatchedMedImage(
+      voxel_data = new_voxel_data,
+      origin = old_image.origin,
+      spacing = old_image.spacing,
+      direction = old_image.direction,
+      image_type = old_image.image_type,
+      image_subtype = old_image.image_subtype,
+      date_of_saving = old_image.date_of_saving,
+      acquistion_time = old_image.acquistion_time,
+      patient_id = old_image.patient_id,
+      current_device = old_image.current_device,
+      study_uid = old_image.study_uid,
+      patient_uid = old_image.patient_uid,
+      series_uid = old_image.series_uid,
+      study_description = old_image.study_description,
+      legacy_file_name = old_image.legacy_file_name,
+      display_data = old_image.display_data,
+      clinical_data = old_image.clinical_data,
+      is_contrast_administered = old_image.is_contrast_administered,
+      metadata = old_image.metadata
+  )
 end
 
 function update_voxel_and_spatial_data(old_image, new_voxel_data::AbstractArray, new_origin, new_spacing, new_direction)
