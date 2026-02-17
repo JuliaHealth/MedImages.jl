@@ -1,0 +1,241 @@
+  Activating project at `~/project_ssd/MedImages.jl/benchmark`
+   Resolving package versions...
+   Installed MarkdownAST ───────── v0.1.3
+   Installed MPItrampoline_jll ─── v5.5.5+0
+   Installed ExpressionExplorer ── v1.1.4
+   Installed ITKIOWrapper ──────── v4.0.2
+   Installed DocumenterVitepress ─ v0.3.1
+    Updating `~/project_ssd/MedImages.jl/benchmark/Project.toml`
+  [fbff095b] + MedImages v2.0.1 `~/project_ssd/MedImages.jl`
+    Updating `~/project_ssd/MedImages.jl/benchmark/Manifest.toml`
+  [47edcb42] + ADTypes v1.21.0
+  [a4c015fc] + ANSIColoredPrinters v0.0.1
+  [1520ce14] + AbstractTrees v0.4.5
+  [7d9f7c33] + Accessors v0.1.43
+  [4fba245c] + ArrayInterface v7.22.0
+  [13072b0f] + AxisAlgorithms v1.1.0
+  [a74b3585] + Blosc v0.7.3
+  [2a0fbf3d] + CPUSummary v0.2.7
+  [082447d4] + ChainRules v1.73.0
+  [d360d2e6] + ChainRulesCore v1.26.0
+⌅ [3da002f7] ↓ ColorTypes v0.12.1 ⇒ v0.11.5
+⌃ [c3611d14] ↓ ColorVectorSpace v0.11.0 ⇒ v0.10.0
+  [861a8166] + Combinatorics v1.1.0
+  [bbf7d656] + CommonSubexpressions v0.3.1
+  [f70d9fcc] + CommonWorldInvalidations v1.0.0
+  [b0b7db55] + ComponentArrays v0.15.32
+  [a33af91c] + CompositionsBase v0.1.2
+  [2569d6c7] + ConcreteStructs v0.2.3
+  [187b0558] + ConstructionBase v1.6.0
+  [150eb455] + CoordinateTransformations v0.6.4
+  [adafc99b] + CpuId v0.3.1
+⌅ [1f15a43c] + CxxWrap v0.16.2
+  [85a47980] + Dictionaries v0.4.6
+  [163ba53b] + DiffResults v1.1.0
+  [b552c78f] + DiffRules v1.15.1
+  [8d63f2c5] + DispatchDoctor v0.4.28
+  [43dc2714] + DocInventories v1.0.0
+  [e30172f5] + Documenter v1.16.1
+  [4710194d] + DocumenterVitepress v0.3.1
+  [7da242da] + Enzyme v0.13.129
+  [f151be2c] + EnzymeCore v0.8.18
+  [21656369] + ExpressionExplorer v1.1.4
+  [9aa1b823] + FastClosures v0.3.2
+  [5789e2e9] + FileIO v1.18.0
+  [1a297f60] + FillArrays v1.16.0
+  [26cc04aa] + FiniteDifferences v0.12.33
+  [f6369f11] + ForwardDiff v1.3.2
+  [d9f16b24] + Functors v0.5.2
+  [d7ba0133] + Git v1.5.0
+  [c8ec2601] + H5Zblosc v0.1.2
+  [f67ccb44] + HDF5 v0.17.2
+  [b5f81e59] + IOCapture v1.0.0
+  [7869d1d1] + IRTools v0.4.15
+  [8538b10a] + ITKIOWrapper v4.0.2
+  [615f187c] + IfElse v0.1.1
+  [c817782e] + ImageBase v0.1.7
+  [a09fc81d] + ImageCore v0.10.5
+  [02fcd773] + ImageTransformations v0.10.2
+  [313cdc1a] + Indexing v1.1.1
+⌃ [a98d9a8b] + Interpolations v0.15.1
+  [3587e190] + InverseFunctions v0.1.17
+  [4138dd39] + JLD v0.13.5
+⌃ [682c06a0] ↓ JSON v1.4.0 ⇒ v0.21.4
+  [0e77f7df] + LazilyInitializedFields v1.3.0
+  [b2108857] + Lux v1.31.3
+  [bb33d45b] + LuxCore v1.5.3
+  [82251201] + LuxLib v1.15.4
+  [7e8f7934] + MLDataDevices v1.17.4
+  [3da0fdf6] + MPIPreferences v0.1.11
+  [dbb5928d] + MappedArrays v0.4.3
+  [d0879d2d] + MarkdownAST v0.1.3
+  [fbff095b] + MedImages v2.0.1 `~/project_ssd/MedImages.jl`
+  [e94cdb99] + MosaicViews v0.3.4
+  [872c559c] + NNlib v0.9.33
+  [d8793406] + ObjectFile v0.5.0
+  [6fe1bfb0] + OffsetArrays v1.17.0
+  [3bd65402] + Optimisers v0.4.7
+  [5432bcbf] + PaddedViews v0.5.12
+  [d96e819e] + Parameters v0.12.3
+  [94ee1d12] + Quaternions v0.7.7
+  [c84ed2f1] + Ratios v0.4.5
+  [a3311ec8] + ReactantCore v0.1.16
+  [c1ae055f] + RealDot v0.1.0
+  [2792f1a3] + RegistryInstances v0.1.0
+  [708f8203] + Richardson v1.4.2
+  [6038ab10] + Rotations v1.7.1
+  [431bcebd] + SciMLPublic v1.0.1
+  [efcf1570] + Setfield v1.1.2
+  [dc90abb0] + SparseInverseSubset v0.1.2
+  [276daf66] + SpecialFunctions v2.7.1
+  [cae243ae] + StackViews v0.1.2
+  [aedffcd0] + Static v1.3.1
+  [0d7ed370] + StaticArrayInterface v1.9.0
+  [09ab397b] + StructArrays v0.7.2
+  [53d494c1] + StructIO v0.3.1
+  [ec057cc2] - StructUtils v2.6.3
+  [3a884ed6] + UnPack v1.0.2
+  [d49dbf32] + WeightInitializers v1.3.1
+  [efce3f68] + WoodburyMatrices v1.1.0
+  [e88e6eb3] + Zygote v0.7.10
+  [700de1a5] + ZygoteRules v0.2.7
+  [0b7ba130] + Blosc_jll v1.21.7+0
+  [7cc45869] + Enzyme_jll v0.0.249+0
+  [2e619515] + Expat_jll v2.7.3+0
+  [f5851436] + FFTW_jll v3.3.11+0
+  [020c3dae] + Git_LFS_jll v3.7.0+0
+  [f8c6e375] + Git_jll v2.53.0+0
+⌅ [0234f1f7] + HDF5_jll v1.14.3+3
+  [e33a78d0] + Hwloc_jll v2.13.0+0
+  [b6265aa4] + ITKIOWrapper_jll v3.0.1+1
+  [3324d3a8] + ITK_jll v5.3.3+0
+  [aacddb02] + JpegTurbo_jll v3.1.4+0
+  [88015f11] + LERC_jll v4.0.1+0
+  [94ce4f54] + Libiconv_jll v1.18.0+0
+  [89763e89] + Libtiff_jll v4.7.2+0
+  [5ced341a] + Lz4_jll v1.10.1+0
+  [7cb0a576] + MPICH_jll v5.0.0+0
+  [f1f71cc9] + MPItrampoline_jll v5.5.5+0
+  [9237b28f] + MicrosoftMPI_jll v10.1.4+3
+  [c7aee132] + NodeJS_20_jll v20.12.2+0
+⌅ [fe0851c0] + OpenMPI_jll v4.1.8+1
+  [9bd350c2] + OpenSSH_jll v10.2.1+0
+  [efe28fd5] + OpenSpecFun_jll v0.5.6+0
+⌅ [02c8fc9c] + XML2_jll v2.13.9+0
+  [ffd25f8a] + XZ_jll v5.8.2+0
+  [a65dc6b1] + Xorg_libpciaccess_jll v0.18.1+0
+  [3161d3a3] + Zstd_jll v1.5.7+1
+  [477f73a3] + libaec_jll v1.1.5+0
+⌅ [3eaa8342] + libcxxwrap_julia_jll v0.13.4+0
+  [b53b4c65] + libpng_jll v1.6.55+0
+  [8ba89e20] + Distributed
+  [1a1011a3] + SharedArrays
+  [4607b0f0] + SuiteSparse
+  [efcefdf7] + PCRE2_jll v10.42.0+1
+        Info Packages marked with ⌃ and ⌅ have new versions available. Those with ⌃ may be upgradable, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`
+Precompiling packages...
+    252.1 ms  ✓ MPItrampoline_jll
+    602.0 ms  ✓ ExpressionExplorer
+    311.6 ms  ✓ MarkdownAST
+    311.6 ms  ✓ MPICH_jll
+    338.9 ms  ✓ FileIO → HTTPExt
+    308.9 ms  ✓ ReactantCore
+    671.0 ms  ✓ BenchmarkTools
+    456.6 ms  ✓ HDF5_jll
+   1802.8 ms  ✓ ColorSchemes
+   2451.4 ms  ✓ HDF5
+    349.6 ms  ✓ H5Zblosc
+    688.7 ms  ✓ JLD
+   3748.6 ms  ✓ ITK_jll
+    309.8 ms  ✓ ITKIOWrapper_jll
+    813.5 ms  ✓ ITKIOWrapper
+   6404.5 ms  ✓ Lux
+    722.2 ms  ✓ Lux → ComponentArraysExt
+    761.3 ms  ✓ Lux → GPUArraysExt
+   1053.1 ms  ✓ Lux → ZygoteExt
+   1056.1 ms  ✓ Lux → EnzymeExt
+   8480.9 ms  ✓ Documenter
+    625.5 ms  ✓ DocumenterVitepress
+  18667.0 ms  ✓ UnicodePlots
+  12965.8 ms  ✓ MedImages
+  24 dependencies successfully precompiled in 23 seconds. 309 already precompiled.
+ERROR: LoadError: UndefVarError: `Rodrigues_rotation_matrix` not defined
+Stacktrace:
+ [1] benchmark_batched_affine(image::MedImage, batch_size::Int64, backend::String, device_id::Int64)
+   @ Main ~/project_ssd/MedImages.jl/benchmark/gpu_benchmarks.jl:117
+ [2] run_all_benchmarks(images::Dict{Symbol, Vector{MedImage}}, operations::Vector{SubString{String}}, backends::Vector{String}, device_id::Int64)
+   @ Main ~/project_ssd/MedImages.jl/benchmark/run_gpu_benchmarks.jl:212
+ [3] main()
+   @ Main ~/project_ssd/MedImages.jl/benchmark/run_gpu_benchmarks.jl:418
+ [4] top-level scope
+   @ ~/project_ssd/MedImages.jl/benchmark/run_gpu_benchmarks.jl:463
+in expression starting at /home/jm/project_ssd/MedImages.jl/benchmark/run_gpu_benchmarks.jl:462
+CUDA available: NVIDIA GeForce RTX 3090
+CUDA memory: 23 GB
+================================================================================
+MedImages.jl GPU Benchmark Suite
+================================================================================
+Start time: 2026-02-17T07:11:13.310
+
+================================================================================
+Benchmark Configuration
+================================================================================
+
+Image Sizes:
+  xlarge: 1024 x 1024 x 512
+  large: 512 x 512 x 256
+  small: 128 x 128 x 64
+  medium: 256 x 256 x 128
+
+Interpolation Methods:
+  - Nearest Neighbor
+  - Linear
+
+Spacing Configurations:
+  anisotropic_ct: 0.7 x 0.7 x 5.0 mm
+  anisotropic_mri: 1.0 x 1.0 x 3.0 mm
+  isotropic: 1.0 x 1.0 x 1.0 mm
+
+Resampling Factors:
+  downsample_2x: 0.5x
+  upsample_1_5x: 1.5x
+  downsample_4x: 0.25x
+
+Point Counts: 100000, 1000000
+
+Backends:
+  - CPU (GPU: false)
+  - CUDA (GPU: true)
+
+Benchmark Settings:
+  Samples: 10
+  Min time: 2.0s
+  Warmup iterations: 3
+
+Output:
+  Results directory: benchmark_results
+  Compare SimpleITK: true
+================================================================================
+Creating synthetic test images...
+  Creating large image: 512x512x256
+  Creating medium image: 256x256x128
+
+================================================================================
+Starting Benchmark Suite
+================================================================================
+Operations: batched_affine, separate_affine, fused_affine
+Backends: cpu, cuda
+Device ID: 1
+================================================================================
+
+================================================================================
+Image Size: large (512x512x256)
+================================================================================
+
+--------------------------------------------------------------------------------
+Backend: CPU
+--------------------------------------------------------------------------------
+
+### Batched Affine Benchmarks ###
+
+Benchmarking batched_affine: CPU backend, batch_size=4

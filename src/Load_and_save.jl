@@ -71,21 +71,24 @@ Determines the study type for an image based on its metadata using SimpleITK
 #   return MedImage_data_struct.CT_type
 # end
 
-function create_nii_from_medimage(med_image::MedImage, file_path::String)
-  # Convert voxel_data to a numpy array (Assuming voxel_data is stored in Julia array format)
-  voxel_data_np = med_image.voxel_data
-  voxel_data_np = permutedims(voxel_data_np, (3, 2, 1))
-  # Create a SimpleITK image from numpy array
-  sitk = pyimport("SimpleITK")
-  image_sitk = sitk.GetImageFromArray(voxel_data_np)
+function create_nii_from_medimage(med_image::MedImage, file_path::String, extension::String=".nii.gz")
+  # Ensure path has extension if not already present
+  full_path = endswith(file_path, extension) ? file_path : file_path * extension
 
-  # Set spatial metadata
-  image_sitk.SetOrigin(med_image.origin)
-  image_sitk.SetSpacing(med_image.spacing)
-  image_sitk.SetDirection(med_image.direction)
+  # Prepare VoxelData (requires Float32 for ITKIOWrapper)
+  voxel_f32 = Array{Float32, 3}(med_image.voxel_data)
+  vd = ITKIOWrapper.DataStructs.VoxelData(voxel_f32)
 
-  # Save the image as .nii.gz
-  sitk.WriteImage(image_sitk, file_path * ".nii.gz")
+  # Prepare SpatialMetaData
+  origin = NTuple{3, Float64}(med_image.origin)
+  spacing = NTuple{3, Float64}(med_image.spacing)
+  sz = NTuple{3, Int64}(size(med_image.voxel_data))
+  direction = NTuple{9, Float64}(med_image.direction)
+  
+  meta = ITKIOWrapper.DataStructs.SpatialMetaData(origin, spacing, sz, direction)
+
+  # Save using native ITK wrapper
+  ITKIOWrapper.save_image(vd, meta, full_path, false)
 end
 
 function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
