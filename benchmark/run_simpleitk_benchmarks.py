@@ -9,6 +9,7 @@ import numpy as np
 import time
 import csv
 import sys
+import os
 from datetime import datetime
 
 def create_synthetic_image(dims, spacing=(1.0, 1.0, 1.0)):
@@ -133,6 +134,214 @@ def benchmark_pad(img, pad_lower, pad_upper, pad_value=0.0, num_runs=10):
 
     return times
 
+def benchmark_separate_affine(img, num_runs=10):
+    """Benchmark separate affine transformations (Translate -> Rotate -> Scale)."""
+    # Parameters matches Julia benchmark
+    translation = (10.0, 10.0, 10.0)
+    rotation_angle = 45.0
+    scale_factor = 1.2
+
+    # Option 1: Chain of ResampleImageFilters (closest to "separate" operations)
+    # But usually we want to benchmark the transform composition + single resample
+    # vs doing 3 resamples.
+    # The Julia benchmark did: translate -> rotate -> scale (3 resampling ops if lazy evaluation isn't used)
+    # MedImages.jl operations are eager by default unless composed.
+    # The "separate_affine" benchmark in Julia was:
+    # img_t = translate_mi(...)
+    # img_r = rotate_mi(img_t, ...)
+    # result = scale_mi(img_r, ...)
+    # So it implies 3 actual resampling steps if they are eager.
+
+    # We will simulate 3 separate resampling steps to match the Julia benchmark logic exactly.
+
+    # 1. Translate
+    trans_transform = sitk.TranslationTransform(3)
+    trans_transform.SetOffset(translation)
+
+    # 2. Rotate
+    # Rotate around Z axis (index 2)
+    center = [c + s*sp/2 for c, s, sp in zip(img.GetOrigin(), img.GetSize(), img.GetSpacing())]
+    rot_transform = sitk.Euler3DTransform()
+    rot_transform.SetCenter(center)
+    rot_transform.SetRotation(0, 0, np.deg2rad(rotation_angle))
+
+    # 3. Scale
+    # SimpleITK ScaleTransform uses inverse scale parameter typically?
+    # No, ScaleTransform SetScale(scales).
+    scale_transform = sitk.ScaleTransform(3)
+    scale_transform.SetCenter(center)
+    scale_transform.SetScale((scale_factor, scale_factor, scale_factor))
+
+    # Setup resampler
+    resampler = sitk.ResampleImageFilter()
+    resampler.SetReferenceImage(img)
+    resampler.SetInterpolator(sitk.sitkLinear)
+    resampler.SetDefaultPixelValue(0.0)
+
+    # Warmup
+    resampler.SetTransform(trans_transform)
+    t_img = resampler.Execute(img)
+    resampler.SetTransform(rot_transform)
+    r_img = resampler.Execute(t_img)
+    resampler.SetTransform(scale_transform)
+    s_img = resampler.Execute(r_img)
+
+    times = []
+    for _ in range(num_runs):
+        start = time.perf_counter()
+        
+        # 1. Translate
+        resampler.SetTransform(trans_transform)
+        t_img = resampler.Execute(img)
+        
+        # 2. Rotate
+        resampler.SetTransform(rot_transform)
+        resampler.SetReferenceImage(t_img) # Update reference to new image grid? 
+        # Actually separate operations usually change grid. 
+        # MedImages.translate_mi changes Origin.
+        # MedImages.rotate_mi changes Direction/Resamples?
+        # For fair comparison, we assume the Julia benchmark does 3 full resamplings.
+        # So we do 3 full resamplings here.
+        r_img = resampler.Execute(t_img)
+        
+        # 3. Scale
+        resampler.SetTransform(scale_transform)
+        resampler.SetReferenceImage(r_img)
+        s_img = resampler.Execute(r_img)
+        
+        elapsed = time.perf_counter() - start
+        times.append(elapsed)
+        
+        # Reset reference for next run
+        resampler.SetReferenceImage(img)
+
+    return times
+
+def benchmark_fused_affine(img, num_runs=10):
+    """Benchmark fused affine transformation (Single Matrix)."""
+    # Parameters matches separate_affine
+    translation = (10.0, 10.0, 10.0)
+    rotation_angle = 45.0
+    scale_factor = 1.2
+    
+    center = [c + s*sp/2 for c, s, sp in zip(img.GetOrigin(), img.GetSize(), img.GetSpacing())]
+
+    # Create composite transform
+    # Order: Scale -> Rotate -> Translate
+    # In SimpleITK composite: T_composite(x) = T_outer(T_inner(x))
+    # We want: Translate(Rotate(Scale(x)))
+    
+    scale = sitk.ScaleTransform(3)
+    scale.SetCenter(center)
+    scale.SetScale((scale_factor, scale_factor, scale_factor))
+    
+    rotate = sitk.Euler3DTransform()
+    rotate.SetCenter(center)
+    rotate.SetRotation(0, 0, np.deg2rad(rotation_angle))
+    
+    translate = sitk.TranslationTransform(3)
+    translate.SetOffset(translation)
+    
+    composite = sitk.CompositeTransform([translate, rotate, scale])
+    
+    # Or just use AffineTransform and set matrix directly if we want to be exact?
+    # But composite is "fused" in execution.
+    # Let's use clean AffineTransform for "single matrix" equivalent
+    # But constructing one from params is mathy. Composite is safer to match logic.
+    # SimpleITK will flatten composite to single transform if possible or efficient? 
+    # Actually explicit AffineTransform is better for "fused".
+    
+    # Let's stick to Composite which represents "one resampling with combined transform".
+    
+    resampler = sitk.ResampleImageFilter()
+    resampler.SetReferenceImage(img)
+    resampler.SetInterpolator(sitk.sitkLinear)
+    resampler.SetDefaultPixelValue(0.0)
+    resampler.SetTransform(composite)
+
+    # Warmup
+    resampler.Execute(img)
+
+    times = []
+    for _ in range(num_runs):
+        start = time.perf_counter()
+        result = resampler.Execute(img)
+        elapsed = time.perf_counter() - start
+        times.append(elapsed)
+
+    return times
+
+def benchmark_orientation(img, target_orientation, num_runs=10):
+    """Benchmark orientation change operation."""
+    # target_orientation is string like 'LAS', 'RAS', etc.
+    # SimpleITK DICOMOrientImageFilter can be used
+    orient_filter = sitk.DICOMOrientImageFilter()
+    orient_filter.SetDesiredCoordinateOrientation(target_orientation)
+    
+    # Warmup
+    orient_filter.Execute(img)
+    
+    times = []
+    for _ in range(num_runs):
+        start = time.perf_counter()
+        result = orient_filter.Execute(img)
+        elapsed = time.perf_counter() - start
+        times.append(elapsed)
+    return times
+
+def benchmark_interpolation(dims, point_count, interpolator, num_runs=10):
+    """Benchmark raw interpolation of N points."""
+    # Create simple volume
+    data = np.random.rand(*dims).astype(np.float32)
+    img = sitk.GetImageFromArray(data)
+    
+    # Random points in physical space
+    # (x, y, z)
+    points = np.random.rand(point_count, 3).astype(np.float64)
+    # Scale to image dims
+    for i in range(3):
+        points[:, i] *= (dims[2-i] - 1) # SimpleITK uses [x,y,z] order for points
+        
+    times = []
+    for _ in range(num_runs):
+        start = time.perf_counter()
+        # In SimpleITK, interpolation of arbitrary points is usually done via EvaluateAtPhysicalPoint
+        # but that would be slow for 1M points in a loop.
+        # Efficient way: Resample with a displacement field or a set of points?
+        # Actually, for 1M points, usually we use sitk.Resample with a specific grid.
+        # But if we want arbitrary points:
+        # We can create a 1x1xN grid and resample onto it.
+        
+        # Create a "point cloud" image
+        # This is a bit complex in SITK.
+        # Alternatively, use Sitk.EvaluateAtPhysicalPoint in a vectorized way if possible?
+        # No, SITK doesn't expose vectorized point evaluation easily in Python.
+        
+        # Let's approximate by resampling onto a 100x100x100 grid if point_count=1M
+        # to match the workload of 1M interpolations.
+        
+        # BUT the table says "Interpolation (1M points)".
+        # Let's just use a grid of size that equals point_count.
+        target_size = [int(point_count**(1/3.0))] * 3
+        if target_size[0]**3 < point_count:
+           target_size[0] += 1 # Ensure at least point_count
+           
+        resampler = sitk.ResampleImageFilter()
+        resampler.SetSize(target_size)
+        resampler.SetOutputSpacing([1.0]*3)
+        resampler.SetOutputOrigin([0.0]*3)
+        resampler.SetOutputDirection([1,0,0, 0,1,0, 0,0,1])
+        if interpolator == "nearest":
+            resampler.SetInterpolator(sitk.sitkNearestNeighbor)
+        else:
+            resampler.SetInterpolator(sitk.sitkLinear)
+            
+        result = resampler.Execute(img)
+        elapsed = time.perf_counter() - start
+        times.append(elapsed)
+        
+    return times
+
 def run_benchmarks(dims, size_name, num_runs=10):
     """Run all benchmarks for a given image size."""
     results = []
@@ -233,8 +442,64 @@ def run_benchmarks(dims, size_name, num_runs=10):
         "time_median_ms": median_ms,
         "time_std_ms": np.std(times) * 1000
     })
+    
+    # 5. Affine Comparison Benchmarks
+    print("\n  Affine Comparison benchmarks:")
+    
+    # Separate
+    times = benchmark_separate_affine(img, num_runs)
+    median_ms = np.median(times) * 1000
+    print(f"    Separate Affine: {median_ms:.3f} ms")
+    results.append({
+        "operation": "separate_affine",
+        "image_size": size_name,
+        "time_mean_ms": np.mean(times) * 1000,
+        "time_median_ms": median_ms,
+        "time_std_ms": np.std(times) * 1000
+    })
+    
+    # Fused
+    times = benchmark_fused_affine(img, num_runs)
+    median_ms = np.median(times) * 1000
+    print(f"    Fused Affine: {median_ms:.3f} ms")
+    results.append({
+        "operation": "fused_affine",
+        "image_size": size_name,
+        "time_mean_ms": np.mean(times) * 1000,
+        "time_median_ms": median_ms,
+        "time_std_ms": np.std(times) * 1000
+    })
+
+    # 6. Orientation benchmarks
+    print("\n  Orientation benchmarks:")
+    for orient in ["LAS", "RAS", "RPI"]:
+        times = benchmark_orientation(img, orient, num_runs)
+        median_ms = np.median(times) * 1000
+        print(f"    Orientation {orient}: {median_ms:.3f} ms")
+        results.append({
+            "operation": f"orientation_{orient}",
+            "image_size": size_name,
+            "time_mean_ms": np.mean(times) * 1000,
+            "time_median_ms": median_ms,
+            "time_std_ms": np.std(times) * 1000
+        })
+
+    # 7. Interpolation benchmarks (1M points)
+    print("\n  Interpolation benchmarks (1M points):")
+    for interp_name, interp_type in [("Nearest", "nearest"), ("Linear", "linear")]:
+        times = benchmark_interpolation(dims, 1000000, interp_type, num_runs)
+        median_ms = np.median(times) * 1000
+        print(f"    Interpolation (1M, {interp_name}): {median_ms:.3f} ms")
+        results.append({
+            "operation": f"interpolate_1M_{interp_type}",
+            "image_size": size_name,
+            "time_mean_ms": np.mean(times) * 1000,
+            "time_median_ms": median_ms,
+            "time_std_ms": np.std(times) * 1000
+        })
 
     return results
+
 
 def main():
     print("="*80)
@@ -258,6 +523,12 @@ def main():
 
     # Save results to CSV
     output_file = "benchmark_results/simpleitk_results.csv"
+    
+    # Create output directory
+    output_dir = os.path.dirname(output_file)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     with open(output_file, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=["operation", "image_size", "time_mean_ms", "time_median_ms", "time_std_ms"])
         writer.writeheader()

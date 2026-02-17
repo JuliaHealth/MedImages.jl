@@ -1,0 +1,42 @@
+Absolute Root Output Dir: /home/jm/project_ssd/MedImages.jl/test/visual_output
+Root Output directory: /home/jm/project_ssd/MedImages.jl/test/visual_output
+Generating synthetic images...
+DEBUG: Saving img1 MedImages batched...
+DEBUG: create_nii_from_medimage_visual writing to: /home/jm/project_ssd/MedImages.jl/test/visual_output/batched/MedImages/input_1.nii.gz
+ERROR: LoadError: PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+RuntimeError('Exception thrown in SimpleITK ImageFileWriter_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageFileWriter.cxx:212:\nsitk::ERROR: Unable to determine ImageIO writer for "/home/jm/project_ssd/MedImages.jl/test/visual_output/batched/MedImages/input_1.nii.gz"')
+  File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 434, in WriteImage
+    return writer.Execute(image)
+           ~~~~~~~~~~~~~~^^^^^^^
+  File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 7939, in Execute
+    return _SimpleITK.ImageFileWriter_Execute(self, *args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+
+Stacktrace:
+  [1] pyerr_check
+    @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:75 [inlined]
+  [2] pyerr_check
+    @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:79 [inlined]
+  [3] _handle_error(msg::String)
+    @ PyCall ~/.julia/packages/PyCall/1gn3u/src/exception.jl:96
+  [4] macro expansion
+    @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:110 [inlined]
+  [5] #107
+    @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 [inlined]
+  [6] disable_sigint
+    @ ./c.jl:473 [inlined]
+  [7] __pycall!
+    @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:42 [inlined]
+  [8] _pycall!(ret::PyObject, o::PyObject, args::Tuple{PyObject, String}, nargs::Int64, kw::Ptr{Nothing})
+    @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:29
+  [9] _pycall!(ret::PyObject, o::PyObject, args::Tuple{PyObject, String}, kwargs::@Kwargs{})
+    @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:11
+ [10] (::PyObject)(::PyObject, ::Vararg{Any}; kwargs::@Kwargs{})
+    @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:86
+ [11] create_nii_from_medimage_visual(med_image::MedImage, file_path::String)
+    @ Main ~/project_ssd/MedImages.jl/test/generate_all_visual_samples.jl:65
+ [12] main()
+    @ Main ~/project_ssd/MedImages.jl/test/generate_all_visual_samples.jl:227
+ [13] top-level scope
+    @ ~/project_ssd/MedImages.jl/test/generate_all_visual_samples.jl:417
+in expression starting at /home/jm/project_ssd/MedImages.jl/test/generate_all_visual_samples.jl:417

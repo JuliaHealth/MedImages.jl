@@ -1,0 +1,84 @@
+  Activating project at `~/project_ssd/MedImages.jl/benchmark`
+   Resolving package versions...
+  No Changes to `~/project_ssd/MedImages.jl/benchmark/Project.toml`
+  No Changes to `~/project_ssd/MedImages.jl/benchmark/Manifest.toml`
+ERROR: LoadError: UndefVarError: `Rodrigues_rotation_matrix` not defined
+Stacktrace:
+ [1] benchmark_batched_affine(image::MedImage, batch_size::Int64, backend::String, device_id::Int64)
+   @ Main ~/project_ssd/MedImages.jl/benchmark/gpu_benchmarks.jl:117
+ [2] run_all_benchmarks(images::Dict{Symbol, Vector{MedImage}}, operations::Vector{SubString{String}}, backends::Vector{SubString{String}}, device_id::Int64)
+   @ Main ~/project_ssd/MedImages.jl/benchmark/run_gpu_benchmarks.jl:212
+ [3] main()
+   @ Main ~/project_ssd/MedImages.jl/benchmark/run_gpu_benchmarks.jl:418
+ [4] top-level scope
+   @ ~/project_ssd/MedImages.jl/benchmark/run_gpu_benchmarks.jl:463
+in expression starting at /home/jm/project_ssd/MedImages.jl/benchmark/run_gpu_benchmarks.jl:462
+CUDA available: NVIDIA GeForce RTX 3090
+CUDA memory: 23 GB
+================================================================================
+MedImages.jl GPU Benchmark Suite
+================================================================================
+Start time: 2026-02-17T07:15:18.175
+
+================================================================================
+Benchmark Configuration
+================================================================================
+
+Image Sizes:
+  xlarge: 1024 x 1024 x 512
+  large: 512 x 512 x 256
+  small: 128 x 128 x 64
+  medium: 256 x 256 x 128
+
+Interpolation Methods:
+  - Nearest Neighbor
+  - Linear
+
+Spacing Configurations:
+  anisotropic_ct: 0.7 x 0.7 x 5.0 mm
+  anisotropic_mri: 1.0 x 1.0 x 3.0 mm
+  isotropic: 1.0 x 1.0 x 1.0 mm
+
+Resampling Factors:
+  downsample_2x: 0.5x
+  upsample_1_5x: 1.5x
+  downsample_4x: 0.25x
+
+Point Counts: 100000, 1000000
+
+Backends:
+  - CPU (GPU: false)
+  - CUDA (GPU: true)
+
+Benchmark Settings:
+  Samples: 10
+  Min time: 2.0s
+  Warmup iterations: 3
+
+Output:
+  Results directory: benchmark_results
+  Compare SimpleITK: true
+================================================================================
+Creating synthetic test images...
+  Creating large image: 512x512x256
+  Creating medium image: 256x256x128
+
+================================================================================
+Starting Benchmark Suite
+================================================================================
+Operations: batched_affine, separate_affine, fused_affine
+Backends: cuda
+Device ID: 1
+================================================================================
+
+================================================================================
+Image Size: large (512x512x256)
+================================================================================
+
+--------------------------------------------------------------------------------
+Backend: CUDA
+--------------------------------------------------------------------------------
+
+### Batched Affine Benchmarks ###
+
+Benchmarking batched_affine: CUDA backend, batch_size=4
