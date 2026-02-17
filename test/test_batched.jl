@@ -79,8 +79,6 @@ end
         @test size(scale_batch.voxel_data)[1:3] == (16, 16, 16)
 
         # Scale (Unique)
-        # Unique scaling must result in same output size.
-        # Scale by 0.5 and 0.5 (redundant check but verifies vector path)
         scales = [(0.5, 0.5, 0.5), (0.5, 0.5, 0.5)]
         scale_unique_batch = scale_mi(batch, scales, Linear_en)
         @test size(scale_unique_batch.voxel_data)[1:3] == (16, 16, 16)
@@ -90,7 +88,6 @@ end
         @test_throws ErrorException scale_mi(batch, scales_bad, Linear_en)
 
         # Translate (Unique)
-        # Shift 1: 10 units, Shift 2: 20 units
         shifts = [10, 20]
         trans_batch = translate_mi(batch, shifts, 1, Linear_en)
         @test trans_batch.origin[1][1] == 10.0

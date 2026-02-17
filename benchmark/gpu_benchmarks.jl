@@ -75,14 +75,17 @@ function warmup_gpu(image::MedImage, iterations::Int=WARMUP_ITERATIONS)
 end
 
 """
-    transfer_to_gpu(image::MedImage) -> MedImage
+    transfer_to_gpu(image::MedImage, device_id::Int=0) -> MedImage
 
-Transfer image data to GPU memory.
+Transfer image data to GPU memory on specified device.
 """
-function transfer_to_gpu(image::MedImage)
+function transfer_to_gpu(image::MedImage, device_id::Int=0)
     if !CUDA_AVAILABLE
         return image
     end
+
+    # Select device
+    CUDA.device!(device_id)
 
     # Create copy with GPU array
     gpu_image = deepcopy(image)
@@ -90,6 +93,293 @@ function transfer_to_gpu(image::MedImage)
     gpu_image.current_device = MedImages.MedImage_data_struct.CUDA_current_device
 
     return gpu_image
+end
+
+"""
+    benchmark_batched_affine(image::MedImage, batch_size::Int, backend::String, device_id::Int=0) -> BenchmarkResult
+
+Benchmark batched affine transformation.
+"""
+function benchmark_batched_affine(image::MedImage, batch_size::Int, backend::String, device_id::Int=0)
+    @printf("\nBenchmarking batched_affine: %s backend, batch_size=%d\n", backend, batch_size)
+
+    dims = size(image.voxel_data)
+    
+    # Create batch of affine matrices (random small perturbations)
+    # Identity + small random noise
+    affine_matrices = Vector{Matrix{Float64}}(undef, batch_size)
+    for i in 1:batch_size
+        # Create a random affine matrix
+        # Translation
+        tr = (randn(), randn(), randn()) .* 5.0
+        # Rotation (small angles)
+        rot_angles = (randn(), randn(), randn()) .* 5.0
+        rot_mat = MedImages.Rodrigues_rotation_matrix(image.direction, 1, rot_angles[1]) *
+                  MedImages.Rodrigues_rotation_matrix(image.direction, 2, rot_angles[2]) *
+                  MedImages.Rodrigues_rotation_matrix(image.direction, 3, rot_angles[3])
+        # Scale
+        sc = (1.0 + randn()*0.1, 1.0 + randn()*0.1, 1.0 + randn()*0.1)
+        
+        # Compose (simplified for benchmark)
+        # We use create_affine_matrix from MedImages
+        affine_matrices[i] = MedImages.create_affine_matrix(
+            translation=tr, 
+            rotation=rot_angles, 
+            scale=sc, 
+            shear=(0.0, 0.0, 0.0)
+        )
+    end
+
+    # Prepare input
+    batch_input = nothing
+    if backend == "CUDA"
+        CUDA.device!(device_id)
+        # For batched, we need a BatchedMedImage
+        # Replicate image batch_size times
+        images_list = [image for _ in 1:batch_size]
+        batch_input = MedImages.create_batched_medimage(images_list)
+        batch_input.voxel_data = CuArray(batch_input.voxel_data)
+        # Warmup
+        MedImages.affine_transform_mi(batch_input, affine_matrices, MedImages.Linear_en)
+        CUDA.@sync nothing
+    else
+        images_list = [image for _ in 1:batch_size]
+        batch_input = MedImages.create_batched_medimage(images_list)
+        # Warmup
+        MedImages.affine_transform_mi(batch_input, affine_matrices, MedImages.Linear_en)
+    end
+
+    # Benchmark
+    println("  Running benchmark...")
+    b = @benchmark begin
+        result = MedImages.affine_transform_mi($batch_input, $affine_matrices, MedImages.Linear_en)
+        if $backend == "CUDA"
+            CUDA.@sync nothing
+        end
+    end samples=BENCHMARK_SAMPLES seconds=BENCHMARK_SECONDS
+
+    # Calculate throughput
+    voxel_count = prod(dims) * batch_size
+    throughput = voxel_count / (median(b).time * 1e-9)
+
+    @printf("  Time: %.3f ms (median), %.3f ms (mean), %.3f ms (std)\n",
+            median(b).time * 1e-6, mean(b).time * 1e-6, std(b).time * 1e-6)
+    @printf("  Throughput: %.2e voxels/sec\n", throughput)
+    @printf("  Memory: %.1f MB\n", b.memory / 1024^2)
+
+    return BenchmarkResult(
+        "batched_affine",
+        "affine",
+        backend,
+        "$(dims[1])x$(dims[2])x$(dims[3])",
+        Dict("batch_size" => batch_size),
+        mean(b).time * 1e-9,
+        median(b).time * 1e-9,
+        std(b).time * 1e-9,
+        b.memory,
+        throughput,
+        now()
+    )
+end
+
+"""
+    benchmark_separate_affine(image::MedImage, backend::String, device_id::Int=0) -> BenchmarkResult
+
+Benchmark separate affine transformations (Translate -> Rotate -> Scale).
+"""
+function benchmark_separate_affine(image::MedImage, backend::String, device_id::Int=0)
+    @printf("\nBenchmarking separate_affine: %s backend\n", backend)
+
+    dims = size(image.voxel_data)
+    
+    # Parameters
+    translation = (10.0, 10.0, 10.0)
+    rotation_angle = 45.0
+    scale_factor = (1.2, 1.2, 1.2)
+    
+    # Transfer to GPU if needed
+    test_image = if backend == "CUDA" 
+        CUDA.device!(device_id)
+        transfer_to_gpu(image, device_id)
+    else 
+        image
+    end
+
+    # Warmup
+    if backend == "CUDA"
+        warmup_gpu(test_image)
+    end
+
+    # Benchmark
+    println("  Running benchmark...")
+    b = @benchmark begin
+        # Chain operations: Translate -> Rotate -> Scale
+        # translate_mi only supports integer voxel shift per axis (metadata update)
+        img_t1 = MedImages.translate_mi($test_image, 10, 1, MedImages.Linear_en)
+        img_t2 = MedImages.translate_mi(img_t1, 10, 2, MedImages.Linear_en)
+        img_t3 = MedImages.translate_mi(img_t2, 10, 3, MedImages.Linear_en)
+        
+        img_r = MedImages.rotate_mi(img_t3, 3, $rotation_angle, MedImages.Linear_en)
+        result = MedImages.scale_mi(img_r, $scale_factor, MedImages.Linear_en)
+        
+        if $backend == "CUDA"
+            CUDA.@sync nothing
+        end
+    end samples=BENCHMARK_SAMPLES seconds=BENCHMARK_SECONDS
+
+    # Calculate throughput
+    voxel_count = prod(dims)
+    throughput = voxel_count / (median(b).time * 1e-9)
+
+    @printf("  Time: %.3f ms (median), %.3f ms (mean), %.3f ms (std)\n",
+            median(b).time * 1e-6, mean(b).time * 1e-6, std(b).time * 1e-6)
+    @printf("  Throughput: %.2e voxels/sec\n", throughput)
+    @printf("  Memory: %.1f MB\n", b.memory / 1024^2)
+
+    return BenchmarkResult(
+        "separate_affine",
+        "affine_comparison",
+        backend,
+        "$(dims[1])x$(dims[2])x$(dims[3])",
+        Dict("type" => "separate"),
+        mean(b).time * 1e-9,
+        median(b).time * 1e-9,
+        std(b).time * 1e-9,
+        b.memory,
+        throughput,
+        now()
+    )
+end
+
+"""
+    benchmark_fused_affine(image::MedImage, backend::String, device_id::Int=0) -> BenchmarkResult
+
+Benchmark fused affine transformation (Single Matrix).
+"""
+function benchmark_fused_affine(image::MedImage, backend::String, device_id::Int=0)
+    @printf("\nBenchmarking fused_affine: %s backend\n", backend)
+
+    dims = size(image.voxel_data)
+    
+    # Parameters matches separate_affine
+    translation = (10.0, 10.0, 10.0)
+    rotation_angle = 45.0 # deg around Z (axis 3)
+    scale = (1.2, 1.2, 1.2)
+    rotation = (0.0, 0.0, rotation_angle) 
+    
+    # Create single affine matrix
+    affine_matrix = MedImages.create_affine_matrix(
+        translation=translation,
+        rotation=rotation,
+        scale=scale,
+        shear=(0.0, 0.0, 0.0)
+    )
+    
+    # Prepare batch input of size 1 for affine_transform_mi
+    # (assuming affine_transform_mi works on BatchedMedImage)
+    
+    images_list = [image]
+    batch_input = MedImages.create_batched_medimage(images_list)
+    
+    if backend == "CUDA"
+        CUDA.device!(device_id)
+        batch_input.voxel_data = CuArray(batch_input.voxel_data)
+    end
+
+    # Wrap matrix in vector for batch of 1
+    affine_matrices = [affine_matrix]
+
+    # Warmup
+    MedImages.affine_transform_mi(batch_input, affine_matrices, MedImages.Linear_en)
+    if backend == "CUDA"
+        CUDA.@sync nothing
+    end
+
+    # Benchmark
+    println("  Running benchmark...")
+    b = @benchmark begin
+        result = MedImages.affine_transform_mi($batch_input, $affine_matrices, MedImages.Linear_en)
+        if $backend == "CUDA"
+            CUDA.@sync nothing
+        end
+    end samples=BENCHMARK_SAMPLES seconds=BENCHMARK_SECONDS
+
+    # Calculate throughput
+    voxel_count = prod(dims)
+    throughput = voxel_count / (median(b).time * 1e-9)
+
+    @printf("  Time: %.3f ms (median), %.3f ms (mean), %.3f ms (std)\n",
+            median(b).time * 1e-6, mean(b).time * 1e-6, std(b).time * 1e-6)
+    @printf("  Throughput: %.2e voxels/sec\n", throughput)
+    @printf("  Memory: %.1f MB\n", b.memory / 1024^2)
+
+    return BenchmarkResult(
+        "fused_affine",
+        "affine_comparison",
+        backend,
+        "$(dims[1])x$(dims[2])x$(dims[3])",
+        Dict("type" => "fused"),
+        mean(b).time * 1e-9,
+        median(b).time * 1e-9,
+        std(b).time * 1e-9,
+        b.memory,
+        throughput,
+        now()
+    )
+end
+
+"""
+    benchmark_memory_transfer(image::MedImage) -> Dict
+
+Benchmark CPU <-> GPU memory transfer performance.
+"""
+function benchmark_memory_transfer(image::MedImage)
+    if !CUDA_AVAILABLE
+        @warn "CUDA not available, skipping memory transfer benchmark"
+        return Dict()
+    end
+
+    @printf("\nBenchmarking memory transfer: %s\n", size(image.voxel_data))
+
+    dims = size(image.voxel_data)
+    data_size = prod(dims) * sizeof(eltype(image.voxel_data)) / 1024^2
+
+    results = Dict()
+
+    # CPU -> GPU
+    println("  CPU -> GPU transfer...")
+    cpu_data = image.voxel_data
+    b_to_gpu = @benchmark begin
+        gpu_data = CuArray($cpu_data)
+        CUDA.@sync nothing
+    end samples=BENCHMARK_SAMPLES
+
+    transfer_rate_to_gpu = data_size / (median(b_to_gpu).time * 1e-9)
+    @printf("    Time: %.3f ms (median)\n", median(b_to_gpu).time * 1e-6)
+    @printf("    Transfer rate: %.2f MB/s\n", transfer_rate_to_gpu)
+
+    results["cpu_to_gpu_time"] = median(b_to_gpu).time * 1e-9
+    results["cpu_to_gpu_rate_mbs"] = transfer_rate_to_gpu
+
+    # GPU -> CPU
+    println("  GPU -> CPU transfer...")
+    gpu_data = CuArray(cpu_data)
+    CUDA.@sync nothing
+
+    b_to_cpu = @benchmark begin
+        cpu_result = Array($gpu_data)
+        CUDA.@sync nothing
+    end samples=BENCHMARK_SAMPLES
+
+    transfer_rate_to_cpu = data_size / (median(b_to_cpu).time * 1e-9)
+    @printf("    Time: %.3f ms (median)\n", median(b_to_cpu).time * 1e-6)
+    @printf("    Transfer rate: %.2f MB/s\n", transfer_rate_to_cpu)
+
+    results["gpu_to_cpu_time"] = median(b_to_cpu).time * 1e-9
+    results["gpu_to_cpu_rate_mbs"] = transfer_rate_to_cpu
+    results["data_size_mb"] = data_size
+
+    return results
 end
 
 """

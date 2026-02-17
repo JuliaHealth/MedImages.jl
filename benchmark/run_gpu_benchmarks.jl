@@ -17,18 +17,18 @@ Options:
     --help              Show this help message
 """
 
-# First load packages from benchmark project
+using Pkg
+
+# Activate benchmark project
+Pkg.activate(@__DIR__)
+# Ensure MedImages is available in this environment
+Pkg.develop(path=joinpath(@__DIR__, ".."))
+Pkg.instantiate() 
+
 using Printf
 using Dates
 using ArgParse
-
-# Now activate parent MedImages.jl project to access MedImages
-using Pkg
-Pkg.activate(joinpath(@__DIR__, ".."))
 using MedImages
-
-# Switch back to benchmark project for other dependencies
-Pkg.activate(@__DIR__)
 
 # Include benchmark modules
 include("benchmark_config.jl")
@@ -82,6 +82,11 @@ function parse_commandline()
             help = "Output directory"
             arg_type = String
             default = "benchmark_results"
+
+        "--device"
+            help = "GPU Device ID (default: 0)"
+            arg_type = Int
+            default = 0
     end
 
     return parse_args(s)
@@ -101,7 +106,9 @@ function load_or_create_test_images(catalog_file::String, use_synthetic::Bool)
         # Create images - use medium and large to avoid OOM with upsampling
         # xlarge (1024x1024x512) * 4x upsample would require ~4TB RAM
         for (size_name, dims) in IMAGE_SIZES
-            if size_name in [:medium, :large, :xlarge]  # Include xlarge for comprehensive benchmarks
+            # Modified to include all sizes for complete comprehensive benchmarking if needed
+            # But sticking to large/xlarge priority
+            if size_name in [:medium] 
                 println("  Creating $size_name image: $(dims[1])x$(dims[2])x$(dims[3])")
                 img = create_synthetic_test_image(dims)
                 images[size_name] = [img]
@@ -153,11 +160,11 @@ function load_or_create_test_images(catalog_file::String, use_synthetic::Bool)
 end
 
 """
-    run_all_benchmarks(images::Dict, operations::Vector{String}, backends::Vector{String}) -> Vector{BenchmarkResult}
+    run_all_benchmarks(images::Dict, operations::Vector{String}, backends::Vector{String}, device_id::Int) -> Vector{BenchmarkResult}
 
 Run all selected benchmarks on provided images.
 """
-function run_all_benchmarks(images::Dict, operations::Vector{<:AbstractString}, backends::Vector{<:AbstractString})
+function run_all_benchmarks(images::Dict, operations::Vector{<:AbstractString}, backends::Vector{<:AbstractString}, device_id::Int)
     all_results = []
 
     println("\n" * "="^80)
@@ -165,6 +172,7 @@ function run_all_benchmarks(images::Dict, operations::Vector{<:AbstractString}, 
     println("="^80)
     println("Operations: $(join(operations, ", "))")
     println("Backends: $(join(backends, ", "))")
+    println("Device ID: $device_id")
     println("="^80)
 
     # Iterate through each size category
@@ -195,7 +203,37 @@ function run_all_benchmarks(images::Dict, operations::Vector{<:AbstractString}, 
             println("Backend: $backend_name_upper")
             println("-"^80)
 
-            # 1. Interpolation kernel benchmarks
+            # 1. Batched Affine Benchmarks
+            if "batched_affine" in operations || "all" in operations
+                println("\n### Batched Affine Benchmarks ###")
+                # Benchmarking with different batch sizes
+                # Only run on GPU essentially relies on batched speedup, but we test CPU too
+                # Small batch
+                result = benchmark_batched_affine(img, 4, backend_name_upper, device_id)
+                push!(all_results, result)
+                
+                # Large batch (careful with memory)
+                if size_cat != :xlarge
+                     result = benchmark_batched_affine(img, 16, backend_name_upper, device_id)
+                     push!(all_results, result)
+                end
+            end
+            
+            # 2. Separate Affine Benchmarks
+            if "separate_affine" in operations || "all" in operations
+                println("\n### Separate Affine Benchmarks ###")
+                result = benchmark_separate_affine(img, backend_name_upper, device_id)
+                push!(all_results, result)
+            end
+
+            # 3. Fused Affine Benchmarks
+            if "fused_affine" in operations || "all" in operations
+                println("\n### Fused Affine Benchmarks ###")
+                result = benchmark_fused_affine(img, backend_name_upper, device_id)
+                push!(all_results, result)
+            end
+
+            # 4. Interpolation kernel benchmarks
             if "interpolate" in operations || "all" in operations
                 println("\n### Interpolation Kernel Benchmarks ###")
 
@@ -209,7 +247,7 @@ function run_all_benchmarks(images::Dict, operations::Vector{<:AbstractString}, 
                 end
             end
 
-            # 2. Resampling benchmarks
+            # 5. Resampling benchmarks
             if "resample" in operations || "all" in operations
                 println("\n### Resampling Benchmarks ###")
 
@@ -237,7 +275,7 @@ function run_all_benchmarks(images::Dict, operations::Vector{<:AbstractString}, 
                 end
             end
 
-            # 3. Cross-image resampling (only if we have multiple images)
+            # 6. Cross-image resampling (only if we have multiple images)
             if ("cross_resample" in operations || "all" in operations) && length(img_list) >= 2
                 println("\n### Cross-Image Resampling Benchmarks ###")
 
@@ -253,7 +291,7 @@ function run_all_benchmarks(images::Dict, operations::Vector{<:AbstractString}, 
                 end
             end
 
-            # 4. Rotation benchmarks
+            # 7. Rotation benchmarks
             if "rotate" in operations || "all" in operations
                 println("\n### Rotation Benchmarks ###")
 
@@ -271,7 +309,7 @@ function run_all_benchmarks(images::Dict, operations::Vector{<:AbstractString}, 
                 end
             end
 
-            # 5. Crop benchmarks
+            # 8. Crop benchmarks
             if "crop" in operations || "all" in operations
                 println("\n### Crop Benchmarks ###")
 
@@ -281,7 +319,7 @@ function run_all_benchmarks(images::Dict, operations::Vector{<:AbstractString}, 
                 end
             end
 
-            # 6. Pad benchmarks (CPU only - CUDA has scalar indexing issues in MedImages.jl)
+            # 9. Pad benchmarks (CPU only - CUDA has scalar indexing issues in MedImages.jl)
             if ("pad" in operations || "all" in operations) && backend_name != "cuda"
                 println("\n### Pad Benchmarks ###")
 
@@ -293,7 +331,7 @@ function run_all_benchmarks(images::Dict, operations::Vector{<:AbstractString}, 
                 println("\n### Pad Benchmarks (skipped - CUDA scalar indexing not supported) ###")
             end
 
-            # 7. Orientation change benchmarks
+            # 10. Orientation change benchmarks
             if "orientation" in operations || "all" in operations
                 println("\n### Orientation Change Benchmarks ###")
 
@@ -365,6 +403,8 @@ function main()
     if "all" in backends
         backends = ["cpu", "cuda"]
     end
+    
+    device_id = args["device"]
 
     # Load or create images
     images = load_or_create_test_images(args["catalog"], args["synthetic"])
@@ -375,7 +415,7 @@ function main()
     end
 
     # Run benchmarks
-    all_results, memory_stats = run_all_benchmarks(images, operations, backends)
+    all_results, memory_stats = run_all_benchmarks(images, operations, backends, device_id)
 
     # Save and report results
     output_dir = args["output"]

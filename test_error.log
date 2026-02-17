@@ -1,0 +1,31 @@
+Script starting: Loading MedImages...
+MedImages loaded. Loading other dependencies...
+Generating target images (8x8x8)...
+Starting image reconstruction training (8x8x8)...
+Iter 1 starting...
+  Forward pass...
+  Loss: 117.38213
+  Backward pass...
+ERROR: LoadError: MethodError: no method matching zero(::Nothing)
+
+Closest candidates are:
+  zero(!Matched::Type{Union{}}, Any...)
+   @ Base number.jl:310
+  zero(!Matched::Type{BFloat16s.BFloat16})
+   @ BFloat16s ~/.julia/packages/BFloat16s/lYUbX/src/bfloat16.jl:254
+  zero(!Matched::Type{Pkg.Resolve.FieldValue})
+   @ Pkg ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Pkg/src/Resolve/fieldvalues.jl:38
+  ...
+
+Stacktrace:
+ [1] iszero(x::Nothing)
+   @ Base ./number.jl:42
+ [2] _all(f::typeof(iszero), itr::@NamedTuple{layer_1::Nothing, layer_2::@NamedTuple{weight::Matrix{Float32}, bias::Vector{Float32}}, layer_3::@NamedTuple{weight::Matrix{Float32}, bias::Vector{Float32}}}, ::Colon)
+   @ Base ./reduce.jl:1288
+ [3] all(f::Function, itr::@NamedTuple{layer_1::Nothing, layer_2::@NamedTuple{weight::Matrix{Float32}, bias::Vector{Float32}}, layer_3::@NamedTuple{weight::Matrix{Float32}, bias::Vector{Float32}}})
+   @ Base ./reduce.jl:1283
+ [4] train()
+   @ Main ~/project_ssd/MedImages.jl/test/differentiability_tests/test_model_cube.jl:101
+ [5] top-level scope
+   @ ~/project_ssd/MedImages.jl/test/differentiability_tests/test_model_cube.jl:112
+in expression starting at /home/jm/project_ssd/MedImages.jl/test/differentiability_tests/test_model_cube.jl:111

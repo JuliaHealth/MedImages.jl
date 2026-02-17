@@ -14,6 +14,7 @@ export load_image, update_voxel_data, update_voxel_and_spatial_data, create_nii_
 export save_med_image, load_med_image
 export resample_to_spacing, change_orientation
 export resample_to_image, rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi
+export Rodrigues_rotation_matrix, create_affine_matrix, compose_affine_matrices, affine_transform_mi
 export string_to_orientation_enum, orientation_enum_to_string
 export create_batched_medimage, unbatch_medimage
 
@@ -47,6 +48,7 @@ using .Orientation_dicts: string_to_orientation_enum, orientation_enum_to_string
 using .Spatial_metadata_change: resample_to_spacing, change_orientation
 using .Resample_to_target: resample_to_image
 using .Basic_transformations: rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi
+using .Basic_transformations: Rodrigues_rotation_matrix, create_affine_matrix, compose_affine_matrices, affine_transform_mi
 
 # Make HDF5 functions available (they're not in a module)
 export save_med_image, load_med_image

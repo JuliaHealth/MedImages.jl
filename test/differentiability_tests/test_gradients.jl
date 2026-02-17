@@ -162,36 +162,36 @@ end
     # Disabled due to Zygote issues with complex mutable struct pullback (Jnew error).
     # Forward pass and single-image differentiability are verified.
     # GPU compatibility for batched ops is implemented via KernelAbstractions.
-    # @testset "Batched Differentiability" begin
-    #     # Test differentiability of batched rotate
-    #     data = rand(Float32, 10, 10, 10)
-    #     data_batch = cat(data, data, dims=4) # 2 in batch
+    @testset "Batched Differentiability" begin
+        # Test differentiability of batched rotate
+        data = rand(Float32, 10, 10, 10)
+        data_batch = cat(data, data, dims=4) # 2 in batch
 
-    #     function loss_batch(x)
-    #         # Create batched image structure (mocked)
-    #         # x is 4D array
-    #         img1 = create_mock_medimage(x[:,:,:,1])
-    #         img2 = create_mock_medimage(x[:,:,:,2])
-    #         batch = create_batched_medimage([img1, img2])
+        function loss_batch(x)
+            # Create batched image structure (mocked)
+            # x is 4D array
+            img1 = create_mock_medimage(x[:,:,:,1])
+            img2 = create_mock_medimage(x[:,:,:,2])
+            batch = create_batched_medimage([img1, img2])
 
-    #         # Rotate batch
-    #         # We want to differentiate w.r.t input data x
-    #         # Note: create_batched_medimage might not be Zygote-friendly if it uses array mutation?
-    #         # It uses `cat`.
-    #         # But `img1.voxel_data` is `x[:,:,:,1]` (view/getindex).
+            # Rotate batch
+            # We want to differentiate w.r.t input data x
+            # Note: create_batched_medimage might not be Zygote-friendly if it uses array mutation?
+            # It uses `cat`.
+            # But `img1.voxel_data` is `x[:,:,:,1]` (view/getindex).
 
-    #         # Rotate
-    #         rotated_batch = MedImages.rotate_mi(batch, 1, 45.0, TEST_LINEAR)
-    #         return sum(rotated_batch.voxel_data)
-    #     end
+            # Rotate
+            rotated_batch = MedImages.rotate_mi(batch, 1, 45.0, TEST_LINEAR)
+            return sum(rotated_batch.voxel_data)
+        end
 
-    #     # We need to ensure `create_batched_medimage` is differentiable or manually construct struct
-    #     # `create_batched_medimage` does `cat([img.voxel_data]...)`.
-    #     # Zygote supports cat.
+        # We need to ensure `create_batched_medimage` is differentiable or manually construct struct
+        # `create_batched_medimage` does `cat([img.voxel_data]...)`.
+        # Zygote supports cat.
 
-    #     grads = Zygote.gradient(loss_batch, data_batch)
-    #     @test grads[1] !== nothing
-    #     @test !all(iszero, grads[1])
-    # end
+        grads = Zygote.gradient(loss_batch, data_batch)
+        @test grads[1] !== nothing
+        @test !all(iszero, grads[1])
+    end
 
 end

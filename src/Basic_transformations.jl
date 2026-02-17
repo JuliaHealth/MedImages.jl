@@ -7,8 +7,9 @@ using ChainRulesCore
 using ..MedImage_data_struct
 using ..MedImage_data_struct: Nearest_neighbour_en, Linear_en, B_spline_en
 using ..Load_and_save: update_voxel_data, update_voxel_and_spatial_data
-using ..Utils: interpolate_my, generate_affine_coords, is_cuda_array
+using ..Utils: interpolate_my, generate_affine_coords, is_cuda_array, interpolate_fused_affine
 using KernelAbstractions
+using CUDA
 
 export rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, computeIndexToPhysicalPointMatrices_Julia, transformIndexToPhysicalPoint_Julia, get_voxel_center_Julia, get_real_center_Julia, Rodrigues_rotation_matrix, crop_image_around_center
 export affine_transform_mi, create_affine_matrix, compose_affine_matrices
@@ -91,7 +92,7 @@ function Rodrigues_rotation_matrix(image::MedImage, axis::Int, angle::Float64)::
     return Rodrigues_rotation_matrix(image.direction, axis, angle)
 end
 
-# ChainRulesCore.@non_differentiable Rodrigues_rotation_matrix(::Any, ::Any, ::Any)
+ChainRulesCore.@non_differentiable Rodrigues_rotation_matrix(::Any, ::Any, ::Any)
 
 function crop_image_around_center(image::AbstractArray{T,3}, new_dims::Tuple{Int,Int,Int}, center::Tuple{Int,Int,Int}) where {T}
   start_z = max(1, center[1] - new_dims[1] ÷ 2)
@@ -287,16 +288,15 @@ function rotate_mi(image::BatchedMedImage, axis::Int, angle::Union{Float64, Abst
     end
 
     # Construct Affine Matrices (Rotation)
-    # R is rotation around 0 (because affine transform logic centers the image)
-    matrices = Vector{Matrix{Float64}}(undef, batch_size)
-    for b in 1:batch_size
+    matrices = map(1:batch_size) do b
         current_angle = (angle isa AbstractVector) ? angle[b] : angle
         current_direction = image.direction[b]
         R_sub = Rodrigues_rotation_matrix(current_direction, axis, current_angle)
 
-        M = Matrix{Float64}(I, 4, 4)
-        M[1:3, 1:3] = R_sub
-        matrices[b] = M
+        return [R_sub[1,1] R_sub[1,2] R_sub[1,3] 0.0;
+                R_sub[2,1] R_sub[2,2] R_sub[2,3] 0.0;
+                R_sub[3,1] R_sub[3,2] R_sub[3,3] 0.0;
+                0.0        0.0        0.0        1.0]
     end
 
     # Use affine_transform_mi
@@ -307,46 +307,27 @@ function scale_mi(image::BatchedMedImage, scale::Union{Float64, Tuple{Float64,Fl
   batch_size = size(image.voxel_data, 4)
   old_size = size(image.voxel_data)[1:3]
 
-  # Determine output size and scale matrices
-  new_sizes = []
-  matrices = Vector{Matrix{Float64}}(undef, batch_size)
-
-  if scale isa Vector
-      if length(scale) != batch_size
-          error("Scale vector length must match batch size")
-      end
-      for b in 1:batch_size
-          s = scale[b]
-          st = s isa Float64 ? (s, s, s) : s
-          push!(new_sizes, Tuple(round.(Int, old_size .* st)))
-
-          M = Matrix{Float64}(I, 4, 4)
-          M[1,1] = st[1]
-          M[2,2] = st[2]
-          M[3,3] = st[3]
-          matrices[b] = M
-      end
-  else
-      # Shared
-      scale_tuple = scale isa Float64 ? (scale, scale, scale) : scale
-      ns = Tuple(round.(Int, old_size .* scale_tuple))
-      push!(new_sizes, ns) # Just check one
-
-      M = Matrix{Float64}(I, 4, 4)
-      M[1,1] = scale_tuple[1]
-      M[2,2] = scale_tuple[2]
-      M[3,3] = scale_tuple[3]
-      for b in 1:batch_size
-         matrices[b] = M
-      end
+  matrices = map(1:batch_size) do b
+      s = (scale isa Vector) ? scale[b] : scale
+      st = s isa Float64 ? (s, s, s) : s
+      return [st[1] 0.0   0.0   0.0;
+              0.0   st[2] 0.0   0.0;
+              0.0   0.0   st[3] 0.0;
+              0.0   0.0   0.0   1.0]
   end
 
-  # Check output sizes consistency
-  target_size = scale isa Vector ? new_sizes[1] : new_sizes[1]
+  # Logic for output size
+  s_first = (scale isa Vector) ? scale[1] : scale
+  s_first_tuple = s_first isa Float64 ? (s_first, s_first, s_first) : s_first
+  target_size = Tuple(round.(Int, old_size .* s_first_tuple))
 
+  # Check output sizes consistency
   if scale isa Vector
-      if !all(x -> x == target_size, new_sizes)
-          error("Batched scaling with different factors must result in the same output voxel dimensions. Got: $new_sizes")
+      for b in 2:batch_size
+          sz = Tuple(round.(Int, old_size .* (scale[b] isa Float64 ? (scale[b], scale[b], scale[b]) : scale[b])))
+          if sz != target_size
+              error("Batched scaling requires consistent output voxel dimensions. Item 1 size: $target_size, Item $b size: $sz")
+          end
       end
   end
 
@@ -360,86 +341,98 @@ function translate_mi(im::BatchedMedImage, translate_by::Union{Int64, Vector{Int
   # It updates spatial metadata only.
 
   batch_size = size(im.voxel_data, 4)
-  new_im = deepcopy(im)
-
-  for b in 1:batch_size
+  new_origins = map(1:batch_size) do b
       t_by = (translate_by isa Vector) ? translate_by[b] : translate_by
-
-      origin_val = new_im.origin[b][translate_in_axis] + t_by * new_im.spacing[b][translate_in_axis]
-      translated_origin = ntuple(i -> i == translate_in_axis ? origin_val : new_im.origin[b][i], 3)
-      new_im.origin[b] = translated_origin
+      origin_val = im.origin[b][translate_in_axis] + t_by * im.spacing[b][translate_in_axis]
+      return ntuple(i -> i == translate_in_axis ? origin_val : im.origin[b][i], 3)
   end
-  return new_im
+
+  return BatchedMedImage(
+      voxel_data = im.voxel_data,
+      origin = new_origins,
+      spacing = im.spacing,
+      direction = im.direction,
+      image_type = im.image_type,
+      image_subtype = im.image_subtype,
+      date_of_saving = im.date_of_saving,
+      acquistion_time = im.acquistion_time,
+      patient_id = im.patient_id,
+      current_device = im.current_device,
+      study_uid = im.study_uid,
+      patient_uid = im.patient_uid,
+      series_uid = im.series_uid,
+      study_description = im.study_description,
+      legacy_file_name = im.legacy_file_name,
+      display_data = im.display_data,
+      clinical_data = im.clinical_data,
+      is_contrast_administered = im.is_contrast_administered,
+      metadata = im.metadata
+  )
 end
 
 function crop_mi(im::BatchedMedImage, crop_beg::Union{Tuple{Int64,Int64,Int64}, Vector{Tuple{Int64,Int64,Int64}}}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::BatchedMedImage
-    # Output size is fixed by crop_size
     batch_size = size(im.voxel_data, 4)
 
-    # Check if we can use a view or need to copy. Since offsets might vary, we can't create a simple 4D view if offsets vary.
-    # We must construct a new array.
-
-    new_voxel_data = similar(im.voxel_data, crop_size[1], crop_size[2], crop_size[3], batch_size)
-    new_origins = deepcopy(im.origin)
-
-    for b in 1:batch_size
+    slices = map(1:batch_size) do b
         cb = (crop_beg isa Vector) ? crop_beg[b] : crop_beg
-
         julia_beg = cb .+ 1
-        # Extract slice
-        # Verify bounds?
-        # Assuming valid
-        slice = view(im.voxel_data,
+        slice = im.voxel_data[
             julia_beg[1]:(julia_beg[1]+crop_size[1]-1),
             julia_beg[2]:(julia_beg[2]+crop_size[2]-1),
             julia_beg[3]:(julia_beg[3]+crop_size[3]-1),
-            b)
+            b]
+        return reshape(slice, crop_size[1], crop_size[2], crop_size[3], 1)
+    end
+    new_voxel_data = cat(slices..., dims=4)
 
-        new_voxel_data[:, :, :, b] .= slice
-
+    new_origins = map(1:batch_size) do b
+        cb = (crop_beg isa Vector) ? crop_beg[b] : crop_beg
         dir_diag = (im.direction[b][1], im.direction[b][5], im.direction[b][9])
-        new_origins[b] = im.origin[b] .+ (im.spacing[b] .* cb .* dir_diag)
+        return im.origin[b] .+ (im.spacing[b] .* cb .* dir_diag)
     end
 
-    # Can't use update_voxel_data simply because origin changed too
-    # But update_voxel_data handles metadata copy.
-    # We can use update_voxel_data and then set origin.
-    # Or just construct new struct.
-    # update_voxel_data is differentiable for voxel_data
-
-    new_im = update_voxel_data(im, new_voxel_data)
-    new_im.origin = new_origins # Mutation! This might break Zygote if origin tracking is needed?
-    # Zygote allows mutation of non-tracked fields? Origin is tracked in MedImage?
-    # MedImage fields are typed.
-    # To be Zygote safe, we should construct fully.
-    # But for now let's fix the deepcopy.
-    return new_im
+    return BatchedMedImage(
+        voxel_data = new_voxel_data,
+        origin = new_origins,
+        spacing = im.spacing,
+        direction = im.direction,
+        image_type = im.image_type,
+        image_subtype = im.image_subtype,
+        date_of_saving = im.date_of_saving,
+        acquistion_time = im.acquistion_time,
+        patient_id = im.patient_id,
+        current_device = im.current_device,
+        study_uid = im.study_uid,
+        patient_uid = im.patient_uid, series_uid = im.series_uid, study_description = im.study_description, legacy_file_name = im.legacy_file_name, display_data = im.display_data, clinical_data = im.clinical_data, is_contrast_administered = im.is_contrast_administered, metadata = im.metadata )
 end
 
 function pad_mi(im::BatchedMedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64}, pad_val, Interpolator::Interpolator_enum)::BatchedMedImage
-  # Pad params shared
   batch_size = size(im.voxel_data, 4)
-
-  # Process each channel? Or treat batch dim as channel?
-  # pad_dim only handles 3D array?
-  # function pad_dim(arr, dim, l, r, val)
-  # It takes arr.
-  # We can pad 4D array in dims 1, 2, 3.
 
   data = im.voxel_data
   data = pad_dim(data, 1, pad_beg[1], pad_end[1], pad_val)
   data = pad_dim(data, 2, pad_beg[2], pad_end[2], pad_val)
   data = pad_dim(data, 3, pad_beg[3], pad_end[3], pad_val)
 
-  new_origins = deepcopy(im.origin)
-  for b in 1:batch_size
+  new_origins = map(1:batch_size) do b
       dir_diag = (im.direction[b][1], im.direction[b][5], im.direction[b][9])
-      new_origins[b] = im.origin[b] .- (im.spacing[b] .* pad_beg .* dir_diag)
+      return im.origin[b] .- (im.spacing[b] .* pad_beg .* dir_diag)
   end
 
-  new_im = update_voxel_data(im, data)
-  new_im.origin = new_origins
-  return new_im
+  return BatchedMedImage(
+      voxel_data = data,
+      origin = new_origins,
+      spacing = im.spacing,
+      direction = im.direction,
+      image_type = im.image_type,
+      image_subtype = im.image_subtype,
+      date_of_saving = im.date_of_saving,
+      acquistion_time = im.acquistion_time,
+      patient_id = im.patient_id,
+      current_device = im.current_device,
+      study_uid = im.study_uid,
+      patient_uid = im.patient_uid, series_uid = im.series_uid, study_description = im.study_description, legacy_file_name = im.legacy_file_name, display_data = im.display_data, clinical_data = im.clinical_data, is_contrast_administered = im.is_contrast_administered, metadata = im.metadata
+  )
 end
 
 # --- Affine Transformation ---
@@ -454,40 +447,39 @@ Rotation angles are in degrees.
 """
 function create_affine_matrix(; translation=(0.0,0.0,0.0), rotation=(0.0,0.0,0.0), scale=(1.0,1.0,1.0), shear=(0.0,0.0,0.0))
     # Translation Matrix
-    T = Matrix{Float64}(I, 4, 4)
-    T[1:3, 4] .= translation
+    tx, ty, tz = translation
+    T = [1.0 0.0 0.0 tx;
+         0.0 1.0 0.0 ty;
+         0.0 0.0 1.0 tz;
+         0.0 0.0 0.0 1.0]
 
     # Rotation Matrix (Z * Y * X)
-    rx, ry, rz = deg2rad.(rotation)
-    Rx = [1 0 0; 0 cos(rx) -sin(rx); 0 sin(rx) cos(rx)]
-    Ry = [cos(ry) 0 sin(ry); 0 1 0; -sin(ry) 0 cos(ry)]
-    Rz = [cos(rz) -sin(rz) 0; sin(rz) cos(rz) 0; 0 0 1]
+    rx, ry, rz = Base.Broadcast.broadcasted(deg2rad, rotation)
+    Rx = [1.0 0.0 0.0; 0.0 cos(rx) -sin(rx); 0.0 sin(rx) cos(rx)]
+    Ry = [cos(ry) 0.0 sin(ry); 0.0 1.0 0.0; -sin(ry) 0.0 cos(ry)]
+    Rz = [cos(rz) -sin(rz) 0.0; sin(rz) cos(rz) 0.0; 0.0 0.0 1.0]
     R_mat = Rz * Ry * Rx
-
-    R = Matrix{Float64}(I, 4, 4)
-    R[1:3, 1:3] = R_mat
+    
+    R = [R_mat[1,1] R_mat[1,2] R_mat[1,3] 0.0;
+         R_mat[2,1] R_mat[2,2] R_mat[2,3] 0.0;
+         R_mat[3,1] R_mat[3,2] R_mat[3,3] 0.0;
+         0.0        0.0        0.0        1.0]
 
     # Scale Matrix
-    S = Matrix{Float64}(I, 4, 4)
-    S[1,1] = scale[1]
-    S[2,2] = scale[2]
-    S[3,3] = scale[3]
+    sx, sy, sz = scale
+    S = [sx  0.0 0.0 0.0;
+         0.0 sy  0.0 0.0;
+         0.0 0.0 sz  0.0;
+         0.0 0.0 0.0 1.0]
 
-    # Shear Matrix (simplified for now, xy, xz, yz, etc.)
-    # Shear can be complex. Typically:
-    # [1 xy xz 0]
-    # [yx 1 yz 0]
-    # [zx zy 1 0]
-    # [0 0 0 1]
-    # Here we assume shear=(xy, xz, yz) for upper triangular part, or symmetric?
-    # Let's support 3 shear components: xy (shear x w.r.t y), xz, yz
-    Sh = Matrix{Float64}(I, 4, 4)
-    Sh[1,2] = shear[1]
-    Sh[1,3] = shear[2]
-    Sh[2,3] = shear[3]
+    # Shear Matrix (simplified: xy, xz, yz)
+    s_xy, s_xz, s_yz = shear
+    Sh = [1.0  s_xy s_xz 0.0;
+          0.0  1.0  s_yz 0.0;
+          0.0  0.0  1.0  0.0;
+          0.0  0.0  0.0  1.0]
 
     # Combine: Translation * Rotation * Shear * Scale
-    # Applied right to left on point column vector: p' = T * R * Sh * S * p
     return T * R * Sh * S
 end
 
@@ -521,17 +513,17 @@ function affine_transform_mi(image::BatchedMedImage, affine_matrix::Union{Matrix
 
     # 1. Prepare Inverse Affine Matrices (CPU)
     # We invert here because we map Output -> Input
-    matrices_inv = zeros(Float32, 4, 4, batch_size)
-
-    for b in 1:batch_size
+    matrices_inv_list = map(1:batch_size) do b
         M = (affine_matrix isa Vector) ? affine_matrix[b] : affine_matrix
+        # inv is differentiable in Zygote for Matrix
         M_inv = try
             inv(M)
         catch
             error("Affine matrix is singular and cannot be inverted.")
         end
-        matrices_inv[:, :, b] = M_inv
+        return Float32.(M_inv)
     end
+    matrices_inv = cat([reshape(m, 4, 4, 1) for m in matrices_inv_list]...; dims=3)
 
     # 2. Determine backend and move matrices
     backend = KernelAbstractions.get_backend(image.voxel_data)
@@ -557,19 +549,12 @@ function affine_transform_mi(image::BatchedMedImage, affine_matrix::Union{Matrix
              # We can define a helper in Utils to "move_to_device(data, reference_array)".
              # Or just use `similar` and copyto!
 
-             m_gpu = similar(image.voxel_data, Float32, 4, 4, batch_size)
-             copyto!(m_gpu, matrices_inv)
-             matrices_inv = m_gpu
+             matrices_inv = CuArray(matrices_inv)
          end
     end
 
-    # 3. Generate Coords (GPU friendly)
-    points_to_interpolate = generate_affine_coords(spatial_size, matrices_inv, backend)
-
-    # 4. Interpolate
-    spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
-
-    resampled_flat = interpolate_my(points_to_interpolate, image.voxel_data, spacing_arg, Interpolator, false, 0.0, true)
+    # 3. Perform Fused Affine Interpolation
+    resampled_flat = interpolate_fused_affine(image.voxel_data, matrices_inv, spatial_size, Interpolator, false)
 
     new_data = reshape(resampled_flat, spatial_size[1], spatial_size[2], spatial_size[3], batch_size)
 

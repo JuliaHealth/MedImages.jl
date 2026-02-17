@@ -11,7 +11,7 @@ using LinearAlgebra
 export interpolate_point
 export get_base_indicies_arr
 export cast_to_array_b_type
-export interpolate_my
+export interpolate_my, interpolate_fused_affine
 export TransformIndexToPhysicalPoint_julia
 export ensure_tuple
 export create_nii_from_medimage
@@ -331,6 +331,84 @@ function interpolate_cpu_loop!(out_res, source_arr_shape, source_arr, points_to_
     return nothing
 end
 
+@kernel function fused_affine_interpolate_kernel(out_res, @Const(source_arr_shape), @Const(source_arr), @Const(affine_matrices), @Const(output_size), @Const(center_shift), keep_begining_same, extrapolate_value, is_nearest_neighbour)
+    # Map index to output voxel and batch
+    # ndrange is (prod(output_size) * BatchSize)
+    I = @index(Global)
+    
+    n_spatial = output_size[1] * output_size[2] * output_size[3]
+    idx_spatial = (I - 1) % n_spatial + 1
+    idx_batch = (I - 1) ÷ n_spatial + 1
+    
+    # Map spatial index to (ix, iy, iz) 1-based
+    stride_z = output_size[1] * output_size[2]
+    iz = (idx_spatial - 1) ÷ stride_z + 1
+    rem_z = (idx_spatial - 1) % stride_z
+    iy = rem_z ÷ output_size[1] + 1
+    ix = rem_z % output_size[1] + 1
+    
+    # Shift to center
+    px = Float32(ix) - center_shift[1]
+    py = Float32(iy) - center_shift[2]
+    pz = Float32(iz) - center_shift[3]
+    
+    # Which matrix to use?
+    mat_idx = size(affine_matrices, 3) == 1 ? 1 : idx_batch
+    
+    # Apply inverse affine matrix: p_source = M_inv * p_output
+    # Matrix is 4x4
+    new_px = affine_matrices[1,1,mat_idx]*px + affine_matrices[1,2,mat_idx]*py + affine_matrices[1,3,mat_idx]*pz + affine_matrices[1,4,mat_idx]
+    new_py = affine_matrices[2,1,mat_idx]*px + affine_matrices[2,2,mat_idx]*py + affine_matrices[2,3,mat_idx]*pz + affine_matrices[2,4,mat_idx]
+    new_pz = affine_matrices[3,1,mat_idx]*px + affine_matrices[3,2,mat_idx]*py + affine_matrices[3,3,mat_idx]*pz + affine_matrices[3,4,mat_idx]
+    
+    # Shift back to find real index in source
+    real_x = new_px + center_shift[1]
+    real_y = new_py + center_shift[2]
+    real_z = new_pz + center_shift[3]
+    
+    # Bounds check
+    if real_x < 1.0f0 || real_y < 1.0f0 || real_z < 1.0f0 || real_x > Float32(source_arr_shape[1]) || real_y > Float32(source_arr_shape[2]) || real_z > Float32(source_arr_shape[3])
+        out_res[I] = extrapolate_value
+    else
+        # Handle keep_beginning_same logic
+        if keep_begining_same
+            real_x = max(real_x, 1.0f0)
+            real_y = max(real_y, 1.0f0)
+            real_z = max(real_z, 1.0f0)
+        end
+
+        if is_nearest_neighbour
+            # Nearest Neighbor
+            out_res[I] = source_arr[Int(round(real_x)), Int(round(real_y)), Int(round(real_z)), idx_batch]
+        else
+            # Trilinear Interpolation
+            x0 = floor(Int, real_x)
+            y0 = floor(Int, real_y)
+            z0 = floor(Int, real_z)
+
+            x1 = min(x0 + 1, source_arr_shape[1])
+            y1 = min(y0 + 1, source_arr_shape[2])
+            z1 = min(z0 + 1, source_arr_shape[3])
+
+            xd = real_x - x0
+            yd = real_y - y0
+            zd = real_z - z0
+
+            @inbounds begin
+                c00 = Float32(source_arr[x0, y0, z0, idx_batch]) * (1.0f0 - xd) + Float32(source_arr[x1, y0, z0, idx_batch]) * xd
+                c10 = Float32(source_arr[x0, y1, z0, idx_batch]) * (1.0f0 - xd) + Float32(source_arr[x1, y1, z0, idx_batch]) * xd
+                c01 = Float32(source_arr[x0, y0, z1, idx_batch]) * (1.0f0 - xd) + Float32(source_arr[x1, y0, z1, idx_batch]) * xd
+                c11 = Float32(source_arr[x0, y1, z1, idx_batch]) * (1.0f0 - xd) + Float32(source_arr[x1, y1, z1, idx_batch]) * xd
+
+                c0 = c00 * (1.0f0 - yd) + c10 * yd
+                c1 = c01 * (1.0f0 - yd) + c11 * yd
+
+                out_res[I] = c0 * (1.0f0 - zd) + c1 * zd
+            end
+        end
+    end
+end
+
 function interpolate_cpu_loop_4d!(out_res, source_arr_shape, source_arr, points_to_interpolate, spacing_arr, keep_begining_same, extrapolate_value, is_nearest_neighbour, points_batch_stride)
     n_points = size(out_res, 1)
     batch_size = size(out_res, 2)
@@ -511,15 +589,12 @@ function ChainRulesCore.rrule(::typeof(interpolate_pure), points_to_interpolate,
         end
 
         if backend isa KernelAbstractions.CPU
+            d_points = zero(points_to_interpolate)
+            d_input = zero(input_array)
             d_output = d_output_raw
 
             if is_batched
                 # CPU 4D
-                 # Handle points reshape for Enzyme if needed
-                 # points_to_interpolate might be 2D but kernel logic handles it via stride.
-                 # However, Enzyme might need exact matching shape if we duplicated it?
-                 # d_points was created as zero(points_to_interpolate), so shapes match.
-
                 function cpu_wrapper_4d(out, src, pts, sp, kbs, ev, inn, str)
                     interpolate_cpu_loop_4d!(out, source_arr_shape, src, pts, sp, kbs, ev, inn, str)
                     return nothing
@@ -540,14 +615,14 @@ function ChainRulesCore.rrule(::typeof(interpolate_pure), points_to_interpolate,
                 )
             else
                 # CPU 3D
-                function cpu_wrapper(out, src, pts, sp, kbs, ev, inn)
-                    interpolate_cpu_loop!(out, source_arr_shape, src, pts, sp, kbs, ev, inn)
-                    return nothing
+                function cpu_wrapper_3d(out, src, pts, sp, kbs, ev, inn)
+                     interpolate_cpu_loop!(out, source_arr_shape, src, pts, sp, kbs, ev, inn)
+                     return nothing
                 end
 
                 Enzyme.autodiff(
                     Reverse,
-                    cpu_wrapper,
+                    cpu_wrapper_3d,
                     Const,
                     Duplicated(output, d_output),
                     Duplicated(input_array, d_input),
@@ -558,56 +633,61 @@ function ChainRulesCore.rrule(::typeof(interpolate_pure), points_to_interpolate,
                     Const(is_nearest_neighbour)
                 )
             end
+            return NoTangent(), d_points, d_input, NoTangent(), NoTangent(), NoTangent(), NoTangent()
         else
-            # GPU
-            d_output = is_cuda_array(output) && !is_cuda_array(d_output_raw) ? CuArray(d_output_raw) : d_output_raw
+            # GPU path - Use CPU fallback for gradient stability to ensure loss drop
+            out_cpu = Array(output)
+            d_out_cpu = Array(d_output_raw)
+            src_cpu = Array(input_array)
+            pts_cpu = Array(points_to_interpolate)
+            
+            d_pts_cpu = zero(pts_cpu)
+            d_src_cpu = zero(src_cpu)
+            
+            # Ensure spacing is on CPU for fallback
+            spacing_cpu = is_cuda_array(spacing_arg) ? Array(spacing_arg) : spacing_arg
+            sp_arg_3d_cpu = is_cuda_array(input_array_spacing) ? Array(input_array_spacing) : input_array_spacing
 
             if is_batched
-                 # GPU 4D
-                 function kernel_wrapper_4d(out, src, pts, sp, kbs, ev, inn, str)
-                     interpolate_kernel_4d(backend, 512)(out, source_arr_shape, src, pts, sp, kbs, ev, inn, str, ndrange=length(out))
-                     return nothing
-                 end
-
-                 Enzyme.autodiff(
+                function fallback_4d(out, src, pts, sp, kbs, ev, inn, str)
+                    interpolate_cpu_loop_4d!(out, source_arr_shape, src, pts, sp, kbs, ev, inn, str)
+                    return nothing
+                end
+                Enzyme.autodiff(
                     Reverse,
-                    kernel_wrapper_4d,
+                    fallback_4d,
                     Const,
-                    Duplicated(output, d_output),
-                    Duplicated(input_array, d_input),
-                    Duplicated(points_to_interpolate, d_points),
-                    Const(spacing_arg),
+                    Duplicated(out_cpu, d_out_cpu),
+                    Duplicated(src_cpu, d_src_cpu),
+                    Duplicated(pts_cpu, d_pts_cpu),
+                    Const(spacing_cpu),
                     Const(keep_begining_same),
                     Const(extrapolate_value),
                     Const(is_nearest_neighbour),
                     Const(points_batch_stride)
                 )
-
             else
-                # GPU 3D
-                function kernel_wrapper(out, src, pts, sp, kbs, ev, inn)
-                     interpolate_kernel(backend, 512)(out, source_arr_shape, src, pts, sp, kbs, ev, inn, ndrange=size(out))
-                     return nothing
+                # 3D
+                function fallback_3d(out, src, pts, sp, kbs, ev, inn)
+                    interpolate_cpu_loop!(out, source_arr_shape, src, pts, sp, kbs, ev, inn)
+                    return nothing
                 end
-
                 Enzyme.autodiff(
                     Reverse,
-                    kernel_wrapper,
+                    fallback_3d,
                     Const,
-                    Duplicated(output, d_output),
-                    Duplicated(input_array, d_input),
-                    Duplicated(points_to_interpolate, d_points),
-                    Const(input_array_spacing),
+                    Duplicated(out_cpu, d_out_cpu),
+                    Duplicated(src_cpu, d_src_cpu),
+                    Duplicated(pts_cpu, d_pts_cpu),
+                    Const(sp_arg_3d_cpu),
                     Const(keep_begining_same),
                     Const(extrapolate_value),
                     Const(is_nearest_neighbour)
                 )
             end
+            
+            return NoTangent(), CuArray(d_pts_cpu), CuArray(d_src_cpu), NoTangent(), NoTangent(), NoTangent(), NoTangent()
         end
-        # Convert gradients back to CPU if needed for Zygote
-        d_points_out = is_cuda_array(d_points) ? Array(d_points) : d_points
-        d_input_out = is_cuda_array(d_input) ? Array(d_input) : d_input
-        return NoTangent(), d_points_out, d_input_out, NoTangent(), NoTangent(), NoTangent(), NoTangent()
     end
     return output, interpolate_pullback
 end
@@ -615,6 +695,33 @@ end
 
 """
 perform the interpolation of the set of points in a given space
+"""
+function interpolate_fused_affine(input_array, affine_matrices, output_size, interpolator_enum, keep_begining_same, extrapolate_value=0)
+    backend = KernelAbstractions.get_backend(input_array)
+    batch_size = size(input_array, 4)
+    mat_batch_size = size(affine_matrices, 3)
+    
+    n_spatial = prod(output_size)
+    total_threads = n_spatial * batch_size
+    
+    out_res = KernelAbstractions.zeros(backend, eltype(input_array), total_threads)
+    
+    source_shape = (Int32(size(input_array, 1)), Int32(size(input_array, 2)), Int32(size(input_array, 3)))
+    out_size_ka = (Int32(output_size[1]), Int32(output_size[2]), Int32(output_size[3]))
+    
+    center_shift = Float32.([(s + 0.0)/2.0 for s in output_size])
+    center_shift_tuple = (center_shift[1], center_shift[2], center_shift[3])
+    
+    is_nearest = (interpolator_enum == Nearest_neighbour_en)
+    
+    kernel = fused_affine_interpolate_kernel(backend)
+    kernel(out_res, source_shape, input_array, affine_matrices, out_size_ka, center_shift_tuple, keep_begining_same, Float32(extrapolate_value), is_nearest, ndrange=total_threads)
+    KernelAbstractions.synchronize(backend)
+    
+    return out_res
+end
+
+"""
 input_array - array we will use to find interpolated val
 input_array_spacing - spacing associated with array from which we will perform interpolation
 Interpolator_enum - enum value defining the type of interpolation
@@ -1058,6 +1165,37 @@ end
     points_out[3, idx_spatial, idx_batch] = final_z
 end
 
+function generate_affine_coords_cpu_loop!(points_out, affine_matrices, spatial_size, batch_size, center_shift)
+    n_spatial = prod(spatial_size)
+    sx = spatial_size[1]
+    sy = spatial_size[2]
+    stride_z = sx * sy
+
+    for i in 1:(n_spatial * batch_size)
+        idx_spatial = (i - 1) % n_spatial + 1
+        idx_batch = (i - 1) ÷ n_spatial + 1
+
+        iz = (idx_spatial - 1) ÷ stride_z + 1
+        rem_z = (idx_spatial - 1) % stride_z
+        iy = rem_z ÷ sx + 1
+        ix = rem_z % sx + 1
+
+        px = Float32(ix) - center_shift[1]
+        py = Float32(iy) - center_shift[2]
+        pz = Float32(iz) - center_shift[3]
+
+        mat_idx = size(affine_matrices, 3) == 1 ? 1 : idx_batch
+
+        new_px = affine_matrices[1, 1, mat_idx]*px + affine_matrices[1, 2, mat_idx]*py + affine_matrices[1, 3, mat_idx]*pz + affine_matrices[1, 4, mat_idx]
+        new_py = affine_matrices[2, 1, mat_idx]*px + affine_matrices[2, 2, mat_idx]*py + affine_matrices[2, 3, mat_idx]*pz + affine_matrices[2, 4, mat_idx]
+        new_pz = affine_matrices[3, 1, mat_idx]*px + affine_matrices[3, 2, mat_idx]*py + affine_matrices[3, 3, mat_idx]*pz + affine_matrices[3, 4, mat_idx]
+
+        points_out[1, idx_spatial, idx_batch] = new_px + center_shift[1]
+        points_out[2, idx_spatial, idx_batch] = new_py + center_shift[2]
+        points_out[3, idx_spatial, idx_batch] = new_pz + center_shift[3]
+    end
+end
+
 function generate_affine_coords(spatial_size, affine_matrices, backend)
     # affine_matrices: Array{Float32, 3} of size (4, 4, Batch) or (4, 4, 1)
     # Returns points_to_interpolate: Array{Float32, 3} of size (3, N_points, Batch)
@@ -1091,7 +1229,64 @@ function generate_affine_coords(spatial_size, affine_matrices, backend)
     return points_out
 end
 
-ChainRulesCore.@non_differentiable generate_affine_coords(::Any, ::Any, ::Any)
+function ChainRulesCore.rrule(::typeof(generate_affine_coords), spatial_size, affine_matrices, backend)
+    output = generate_affine_coords(spatial_size, affine_matrices, backend)
+
+    function generate_affine_coords_pullback(d_output_unthunked)
+        d_output = unthunk(d_output_unthunked)
+        d_affine_matrices = zero(affine_matrices)
+
+        center_shift = Float32.([(s + 0.0)/2.0 for s in spatial_size])
+        center_shift_tuple = (center_shift[1], center_shift[2], center_shift[3])
+        batch_size = size(affine_matrices, 3)
+
+        if backend isa KernelAbstractions.CPU
+            function cpu_wrapper(out, mats, sz, bs, cs)
+                generate_affine_coords_cpu_loop!(out, mats, sz, bs, cs)
+                return nothing
+            end
+
+            Enzyme.autodiff(
+                Reverse,
+                cpu_wrapper,
+                Const,
+                Duplicated(output, d_output),
+                Duplicated(affine_matrices, d_affine_matrices),
+                Const(spatial_size),
+                Const(batch_size),
+                Const(center_shift_tuple)
+            )
+            return NoTangent(), NoTangent(), d_affine_matrices, NoTangent()
+        else
+            # GPU path - Use CPU fallback for stability
+            out_cpu = Array(output)
+            d_out_cpu = Array(unthunk(d_output_unthunked))
+            mats_cpu = Array(affine_matrices)
+            
+            d_mats_cpu = zero(mats_cpu)
+            
+            function fallback_gpu(out, mats, sz, bs, cs)
+                generate_affine_coords_cpu_loop!(out, mats, sz, bs, cs)
+                return nothing
+            end
+
+            Enzyme.autodiff(
+                Reverse,
+                fallback_gpu,
+                Const,
+                Duplicated(out_cpu, d_out_cpu),
+                Duplicated(mats_cpu, d_mats_cpu),
+                Const(spatial_size),
+                Const(batch_size),
+                Const(center_shift_tuple)
+            )
+            
+            return NoTangent(), NoTangent(), CuArray(d_mats_cpu), NoTangent()
+        end
+    end
+
+    return output, generate_affine_coords_pullback
+end
 
 function create_batched_medimage(med_images::Vector{MedImage})::BatchedMedImage
     if isempty(med_images)

@@ -1,0 +1,105 @@
+ERROR: LoadError: Some tests did not pass: 15 passed, 0 failed, 1 errored, 0 broken.
+in expression starting at /home/jm/project_ssd/MedImages.jl/test/differentiability_tests/test_gradients.jl:33
+Batched Differentiability: Error During Test at /home/jm/project_ssd/MedImages.jl/test/differentiability_tests/test_gradients.jl:165
+  Got exception outside of a @test
+  MethodError: no method matching +(::Tuple{Float64, Nothing, Nothing, Float64, Nothing, Nothing, Float64, Nothing, Nothing}, ::ChainRulesCore.Tangent{NTuple{9, Float64}, Tuple{Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent, Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent, Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent}})
+  
+  Closest candidates are:
+    +(::Any, ::Any, !Matched::Any, !Matched::Any...)
+     @ Base operators.jl:587
+    +(!Matched::ChainRulesCore.NoTangent, ::ChainRulesCore.StructuralTangent)
+     @ ChainRulesCore ~/.julia/packages/ChainRulesCore/Vsbj9/src/tangent_arithmetic.jl:59
+    +(!Matched::ChainRulesCore.NotImplemented, ::ChainRulesCore.StructuralTangent)
+     @ ChainRulesCore ~/.julia/packages/ChainRulesCore/Vsbj9/src/tangent_arithmetic.jl:24
+    ...
+  
+  Stacktrace:
+    [1] accum(x::Tuple{Float64, Nothing, Nothing, Float64, Nothing, Nothing, Float64, Nothing, Nothing}, y::ChainRulesCore.Tangent{NTuple{9, Float64}, Tuple{Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent, Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent, Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent}})
+      @ Zygote ~/.julia/packages/Zygote/55SqB/src/lib/lib.jl:9
+    [2] _broadcast_getindex_evalf
+      @ ./broadcast.jl:709 [inlined]
+    [3] _broadcast_getindex
+      @ ./broadcast.jl:682 [inlined]
+    [4] getindex
+      @ ./broadcast.jl:636 [inlined]
+    [5] copyto_nonleaf!(dest::Vector{Tuple{Float64, Nothing, Nothing, Float64, Nothing, Nothing, Float64, Nothing, Nothing}}, bc::Base.Broadcast.Broadcasted{Base.Broadcast.DefaultArrayStyle{1}, Tuple{Base.OneTo{Int64}}, typeof(Zygote.accum), Tuple{Base.Broadcast.Extruded{Vector{Tuple{Float64, Nothing, Nothing, Float64, Nothing, Nothing, Float64, Nothing, Nothing}}, Tuple{Bool}, Tuple{Int64}}, Base.Broadcast.Extruded{Vector{ChainRulesCore.AbstractTangent}, Tuple{Bool}, Tuple{Int64}}}}, iter::Base.OneTo{Int64}, state::Int64, count::Int64)
+      @ Base.Broadcast ./broadcast.jl:1098
+    [6] copy
+      @ ./broadcast.jl:950 [inlined]
+    [7] materialize(bc::Base.Broadcast.Broadcasted{Base.Broadcast.DefaultArrayStyle{1}, Nothing, typeof(Zygote.accum), Tuple{Vector{Tuple{Float64, Nothing, Nothing, Float64, Nothing, Nothing, Float64, Nothing, Nothing}}, Vector{ChainRulesCore.AbstractTangent}}})
+      @ Base.Broadcast ./broadcast.jl:903
+    [8] broadcast_preserving_zero_d(::Function, ::Vector{Tuple{Float64, Nothing, Nothing, Float64, Nothing, Nothing, Float64, Nothing, Nothing}}, ::Vararg{Any})
+      @ Base.Broadcast ./broadcast.jl:892
+    [9] accum
+      @ ~/.julia/packages/Zygote/55SqB/src/lib/lib.jl:17 [inlined]
+   [10] accum(x::Vector{Tuple{Float64, Nothing, Nothing, Float64, Nothing, Nothing, Float64, Nothing, Nothing}}, y::ChainRulesCore.InplaceableThunk{ChainRulesCore.Thunk{ChainRules.var"#675#677"{Vector{NTuple{9, Float64}}, ChainRulesCore.Tangent{Any, Tuple{Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent, Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent, Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent}}, Tuple{Int64}}}, ChainRules.var"#674#676"{Vector{NTuple{9, Float64}}, ChainRulesCore.Tangent{Any, Tuple{Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent, Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent, Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent}}, Tuple{Int64}}})
+      @ Zygote ~/.julia/packages/Zygote/55SqB/src/lib/lib.jl:50
+   [11] macro expansion
+      @ ~/.julia/packages/Zygote/55SqB/src/lib/lib.jl:21 [inlined]
+   [12] accum
+      @ ~/.julia/packages/Zygote/55SqB/src/lib/lib.jl:21 [inlined]
+   [13] macro expansion
+      @ ~/.julia/packages/Zygote/55SqB/src/lib/lib.jl:21 [inlined]
+   [14] accum(x::@NamedTuple{image::@NamedTuple{voxel_data::Array{Float32, 4}, origin::Nothing, spacing::Nothing, direction::Vector{Tuple{Float64, Nothing, Nothing, Float64, Nothing, Nothing, Float64, Nothing, Nothing}}, image_type::Nothing, image_subtype::Nothing, date_of_saving::Nothing, acquistion_time::Nothing, patient_id::Nothing, current_device::Nothing, study_uid::Nothing, patient_uid::Nothing, series_uid::Nothing, study_description::Nothing, legacy_file_name::Nothing, display_data::Nothing, clinical_data::Nothing, is_contrast_administered::Nothing, metadata::Nothing}, axis::Nothing, angle::Float64}, y::@NamedTuple{image::@NamedTuple{voxel_data::Array{Float32, 4}, origin::Nothing, spacing::Nothing, direction::ChainRulesCore.InplaceableThunk{ChainRulesCore.Thunk{ChainRules.var"#675#677"{Vector{NTuple{9, Float64}}, ChainRulesCore.Tangent{Any, Tuple{Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent, Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent, Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent}}, Tuple{Int64}}}, ChainRules.var"#674#676"{Vector{NTuple{9, Float64}}, ChainRulesCore.Tangent{Any, Tuple{Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent, Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent, Float64, ChainRulesCore.ZeroTangent, ChainRulesCore.ZeroTangent}}, Tuple{Int64}}}, image_type::Nothing, image_subtype::Nothing, date_of_saving::Nothing, acquistion_time::Nothing, patient_id::Nothing, current_device::Nothing, study_uid::Nothing, patient_uid::Nothing, series_uid::Nothing, study_description::Nothing, legacy_file_name::Nothing, display_data::Nothing, clinical_data::Nothing, is_contrast_administered::Nothing, metadata::Nothing}, axis::Nothing, angle::Float64})
+      @ Zygote ~/.julia/packages/Zygote/55SqB/src/lib/lib.jl:21
+   [15] BottomRF
+      @ ./reduce.jl:86 [inlined]
+   [16] _foldl_impl(op::Base.BottomRF{typeof(Zygote.accum)}, init::Nothing, itr::Vector{NamedTuple{(:image, :axis, :angle)}})
+      @ Base ./reduce.jl:62
+   [17] foldl_impl
+      @ ./reduce.jl:48 [inlined]
+   [18] mapfoldl_impl(f::typeof(identity), op::typeof(Zygote.accum), nt::Nothing, itr::Vector{NamedTuple{(:image, :axis, :angle)}})
+      @ Base ./reduce.jl:44
+   [19] _mapreduce_dim(f::Function, op::Function, nt::Nothing, A::Vector{NamedTuple{(:image, :axis, :angle)}}, ::Colon)
+      @ Base ./reducedim.jl:364
+   [20] mapreduce
+      @ ./reducedim.jl:359 [inlined]
+   [21] #reduce#825
+      @ ./reducedim.jl:408 [inlined]
+   [22] (::Zygote.var"#map_back#681"{MedImages.Basic_transformations.var"#18#19"{BatchedMedImage, Int64, Float64}, 1, Tuple{UnitRange{Int64}}, Tuple{Tuple{Base.OneTo{Int64}}}, Vector{Tuple{Matrix{Float64}, Zygote.Pullback{Tuple{MedImages.Basic_transformations.var"#18#19"{BatchedMedImage, Int64, Float64}, Int64}, Any}}}})(Δ::Vector{Matrix{Float64}})
+      @ Zygote ~/.julia/packages/Zygote/55SqB/src/lib/array.jl:204
+   [23] (::Zygote.var"#2865#back#687"{Zygote.var"#map_back#681"{MedImages.Basic_transformations.var"#18#19"{BatchedMedImage, Int64, Float64}, 1, Tuple{UnitRange{Int64}}, Tuple{Tuple{Base.OneTo{Int64}}}, Vector{Tuple{Matrix{Float64}, Zygote.Pullback{Tuple{MedImages.Basic_transformations.var"#18#19"{BatchedMedImage, Int64, Float64}, Int64}, Any}}}}})(Δ::Vector{Matrix{Float64}})
+      @ Zygote ~/.julia/packages/ZygoteRules/CkVIK/src/adjoint.jl:72
+   [24] rotate_mi
+      @ ~/project_ssd/MedImages.jl/src/Basic_transformations.jl:290 [inlined]
+   [25] (::Zygote.Pullback{Tuple{typeof(rotate_mi), BatchedMedImage, Int64, Float64, Interpolator_enum, Bool}, Any})(Δ::Base.RefValue{Any})
+      @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+   [26] rotate_mi
+      @ ~/project_ssd/MedImages.jl/src/Basic_transformations.jl:280 [inlined]
+   [27] (::Zygote.Pullback{Tuple{typeof(rotate_mi), BatchedMedImage, Int64, Float64, Interpolator_enum}, Tuple{Zygote.Pullback{Tuple{typeof(rotate_mi), BatchedMedImage, Int64, Float64, Interpolator_enum, Bool}, Any}}})(Δ::Base.RefValue{Any})
+      @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+   [28] loss_batch
+      @ ~/project_ssd/MedImages.jl/test/differentiability_tests/test_gradients.jl:184 [inlined]
+   [29] (::Zygote.Pullback{Tuple{var"#loss_batch#9", Array{Float32, 4}}, Tuple{Zygote.Pullback{Tuple{typeof(create_mock_medimage), Array{Float32, 3}}, Tuple{Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, DateTime}}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, Image_subtype}}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, Image_type}}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Core.kwcall), @NamedTuple{voxel_data::Array{Float32, 3}, origin::Tuple{Float64, Float64, Float64}, spacing::Tuple{Float64, Float64, Float64}, direction::NTuple{9, Float64}, image_type::Image_type, image_subtype::Image_subtype, patient_id::String, date_of_saving::DateTime, acquistion_time::DateTime}, Type{MedImage}}, Any}, Zygote.Pullback{Tuple{Type{NamedTuple{(:voxel_data, :origin, :spacing, :direction, :image_type, :image_subtype, :patient_id, :date_of_saving, :acquistion_time)}}, Tuple{Array{Float32, 3}, Tuple{Float64, Float64, Float64}, Tuple{Float64, Float64, Float64}, NTuple{9, Float64}, Image_type, Image_subtype, String, DateTime, DateTime}}, Tuple{Zygote.var"#2240#back#329"{Zygote.Jnew{@NamedTuple{voxel_data::Array{Float32, 3}, origin::Tuple{Float64, Float64, Float64}, spacing::Tuple{Float64, Float64, Float64}, direction::NTuple{9, Float64}, image_type::Image_type, image_subtype::Image_subtype, patient_id::String, date_of_saving::DateTime, acquistion_time::DateTime}, Nothing, true}}}}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, DateTime}}}}, Zygote.var"#2200#back#317"{Zygote.var"#back#316"{:voxel_data, Zygote.Context{false}, BatchedMedImage, Array{Float32, 4}}}, Zygote.Pullback{Tuple{typeof(rotate_mi), BatchedMedImage, Int64, Float64, Interpolator_enum}, Tuple{Zygote.Pullback{Tuple{typeof(rotate_mi), BatchedMedImage, Int64, Float64, Interpolator_enum, Bool}, Any}}}, Zygote.ZBack{ChainRules.var"#getindex_pullback#673"{Array{Float32, 4}, Tuple{Colon, Colon, Colon, Int64}, NTuple{4, ChainRulesCore.NoTangent}}}, Zygote.ZBack{ChainRules.var"#sum_pullback#723"{Colon, Array{Float32, 4}, ChainRulesCore.ProjectTo{AbstractArray, @NamedTuple{element::ChainRulesCore.ProjectTo{Float32, @NamedTuple{}}, axes::NTuple{4, Base.OneTo{Int64}}}}}}, Zygote.ZBack{MedImages.Utils.var"#create_batched_pullback#52"{Vector{MedImage}}}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, Interpolator_enum}}, Zygote.ZBack{ChainRules.var"#vect_pullback#443"{2}}, Zygote.ZBack{ChainRules.var"#getindex_pullback#673"{Array{Float32, 4}, Tuple{Colon, Colon, Colon, Int64}, NTuple{4, ChainRulesCore.NoTangent}}}, Zygote.Pullback{Tuple{typeof(create_mock_medimage), Array{Float32, 3}}, Tuple{Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, DateTime}}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, Image_subtype}}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, Image_type}}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Core.kwcall), @NamedTuple{voxel_data::Array{Float32, 3}, origin::Tuple{Float64, Float64, Float64}, spacing::Tuple{Float64, Float64, Float64}, direction::NTuple{9, Float64}, image_type::Image_type, image_subtype::Image_subtype, patient_id::String, date_of_saving::DateTime, acquistion_time::DateTime}, Type{MedImage}}, Any}, Zygote.Pullback{Tuple{Type{NamedTuple{(:voxel_data, :origin, :spacing, :direction, :image_type, :image_subtype, :patient_id, :date_of_saving, :acquistion_time)}}, Tuple{Array{Float32, 3}, Tuple{Float64, Float64, Float64}, Tuple{Float64, Float64, Float64}, NTuple{9, Float64}, Image_type, Image_subtype, String, DateTime, DateTime}}, Tuple{Zygote.var"#2240#back#329"{Zygote.Jnew{@NamedTuple{voxel_data::Array{Float32, 3}, origin::Tuple{Float64, Float64, Float64}, spacing::Tuple{Float64, Float64, Float64}, direction::NTuple{9, Float64}, image_type::Image_type, image_subtype::Image_subtype, patient_id::String, date_of_saving::DateTime, acquistion_time::DateTime}, Nothing, true}}}}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, DateTime}}}}}})(Δ::Float32)
+      @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+   [30] (::Zygote.var"#88#89"{Zygote.Pullback{Tuple{var"#loss_batch#9", Array{Float32, 4}}, Tuple{Zygote.Pullback{Tuple{typeof(create_mock_medimage), Array{Float32, 3}}, Tuple{Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, DateTime}}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, Image_subtype}}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, Image_type}}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Core.kwcall), @NamedTuple{voxel_data::Array{Float32, 3}, origin::Tuple{Float64, Float64, Float64}, spacing::Tuple{Float64, Float64, Float64}, direction::NTuple{9, Float64}, image_type::Image_type, image_subtype::Image_subtype, patient_id::String, date_of_saving::DateTime, acquistion_time::DateTime}, Type{MedImage}}, Any}, Zygote.Pullback{Tuple{Type{NamedTuple{(:voxel_data, :origin, :spacing, :direction, :image_type, :image_subtype, :patient_id, :date_of_saving, :acquistion_time)}}, Tuple{Array{Float32, 3}, Tuple{Float64, Float64, Float64}, Tuple{Float64, Float64, Float64}, NTuple{9, Float64}, Image_type, Image_subtype, String, DateTime, DateTime}}, Tuple{Zygote.var"#2240#back#329"{Zygote.Jnew{@NamedTuple{voxel_data::Array{Float32, 3}, origin::Tuple{Float64, Float64, Float64}, spacing::Tuple{Float64, Float64, Float64}, direction::NTuple{9, Float64}, image_type::Image_type, image_subtype::Image_subtype, patient_id::String, date_of_saving::DateTime, acquistion_time::DateTime}, Nothing, true}}}}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, DateTime}}}}, Zygote.var"#2200#back#317"{Zygote.var"#back#316"{:voxel_data, Zygote.Context{false}, BatchedMedImage, Array{Float32, 4}}}, Zygote.Pullback{Tuple{typeof(rotate_mi), BatchedMedImage, Int64, Float64, Interpolator_enum}, Tuple{Zygote.Pullback{Tuple{typeof(rotate_mi), BatchedMedImage, Int64, Float64, Interpolator_enum, Bool}, Any}}}, Zygote.ZBack{ChainRules.var"#getindex_pullback#673"{Array{Float32, 4}, Tuple{Colon, Colon, Colon, Int64}, NTuple{4, ChainRulesCore.NoTangent}}}, Zygote.ZBack{ChainRules.var"#sum_pullback#723"{Colon, Array{Float32, 4}, ChainRulesCore.ProjectTo{AbstractArray, @NamedTuple{element::ChainRulesCore.ProjectTo{Float32, @NamedTuple{}}, axes::NTuple{4, Base.OneTo{Int64}}}}}}, Zygote.ZBack{MedImages.Utils.var"#create_batched_pullback#52"{Vector{MedImage}}}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, Interpolator_enum}}, Zygote.ZBack{ChainRules.var"#vect_pullback#443"{2}}, Zygote.ZBack{ChainRules.var"#getindex_pullback#673"{Array{Float32, 4}, Tuple{Colon, Colon, Colon, Int64}, NTuple{4, ChainRulesCore.NoTangent}}}, Zygote.Pullback{Tuple{typeof(create_mock_medimage), Array{Float32, 3}}, Tuple{Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, DateTime}}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, Image_subtype}}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, Image_type}}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.var"#2033#back#218"{typeof(identity)}, Zygote.Pullback{Tuple{typeof(Core.kwcall), @NamedTuple{voxel_data::Array{Float32, 3}, origin::Tuple{Float64, Float64, Float64}, spacing::Tuple{Float64, Float64, Float64}, direction::NTuple{9, Float64}, image_type::Image_type, image_subtype::Image_subtype, patient_id::String, date_of_saving::DateTime, acquistion_time::DateTime}, Type{MedImage}}, Any}, Zygote.Pullback{Tuple{Type{NamedTuple{(:voxel_data, :origin, :spacing, :direction, :image_type, :image_subtype, :patient_id, :date_of_saving, :acquistion_time)}}, Tuple{Array{Float32, 3}, Tuple{Float64, Float64, Float64}, Tuple{Float64, Float64, Float64}, NTuple{9, Float64}, Image_type, Image_subtype, String, DateTime, DateTime}}, Tuple{Zygote.var"#2240#back#329"{Zygote.Jnew{@NamedTuple{voxel_data::Array{Float32, 3}, origin::Tuple{Float64, Float64, Float64}, spacing::Tuple{Float64, Float64, Float64}, direction::NTuple{9, Float64}, image_type::Image_type, image_subtype::Image_subtype, patient_id::String, date_of_saving::DateTime, acquistion_time::DateTime}, Nothing, true}}}}, Zygote.var"#2006#back#208"{Zygote.var"#204#207"{Zygote.Context{false}, GlobalRef, DateTime}}}}}}})(Δ::Float32)
+      @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:97
+   [31] gradient(f::Function, args::Array{Float32, 4})
+      @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:154
+   [32] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/differentiability_tests/test_gradients.jl:192 [inlined]
+   [33] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [34] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/differentiability_tests/test_gradients.jl:167 [inlined]
+   [35] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [36] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/differentiability_tests/test_gradients.jl:35
+   [37] include(mod::Module, _path::String)
+      @ Base ./Base.jl:495
+   [38] exec_options(opts::Base.JLOptions)
+      @ Base ./client.jl:323
+   [39] _start()
+      @ Base ./client.jl:557
+Test Summary:               | Pass  Error  Total   Time
+Differentiability Tests     |   15      1     16  42.4s
+  resample_to_image         |    2             2  23.7s
+  rotate_mi                 |    1             1   2.5s
+  scale_mi                  |    1             1   0.2s
+  translate_mi              |    2             2   1.6s
+  crop_mi                   |    3             3   1.4s
+  pad_mi                    |    2             2   0.6s
+  resample_to_spacing       |    2             2   0.7s
+  change_orientation        |    2             2   0.1s
+  Batched Differentiability |           1      1  11.6s
