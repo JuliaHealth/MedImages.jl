@@ -1,0 +1,7 @@
+Script starting: Loading MedImages...
+MedImages loaded. Loading other dependencies...
+ERROR: LoadError: syntax: "using" expression not at top level
+Stacktrace:
+ [1] top-level scope
+   @ ~/project_ssd/MedImages.jl/test/differentiability_tests/test_model_cube.jl:58
+in expression starting at /home/jm/project_ssd/MedImages.jl/test/differentiability_tests/test_model_cube.jl:58
