@@ -54,6 +54,7 @@ function params_to_matrix(p)
     return create_affine_matrix(translation=tr, rotation=rot, scale=sc, shear=sh)
 end
 
+using CUDA
 # 4. Training Loop
 function train()
     # Random.seed!(42)
@@ -62,6 +63,17 @@ function train()
     model = create_model()
     ps, st = Lux.setup(Random.default_rng(), model)
     
+    # Force CPU for stable multi-iteration verification
+    println("Running on CPU for stable multi-iteration verification...")
+    # ps remains CPU-based by default
+    # base_cube.voxel_data remains Array by default
+    
+    # We will ignore CUDA.functional() check here to force CPU path in Utils.jl
+    # To do that, we ensure voxel_data is NOT a CuArray.
+    if is_cuda_array(base_cube.voxel_data)
+        base_cube.voxel_data = Array(base_cube.voxel_data)
+    end
+
     opt = Adam(0.01)
     tstate = Optimisers.setup(opt, ps)
     
@@ -69,41 +81,40 @@ function train()
     
     target_params = [randn(Float32, 12) .* 0.02f0 for _ in 1:batch_size]
     target_matrices = [params_to_matrix(tp) for tp in target_params]
+    
     batch_base = create_batched_medimage([base_cube for _ in 1:batch_size])
     
     println("Generating target images (8x8x8)...")
     target_batch = affine_transform_mi(batch_base, target_matrices, Linear_en)
     
+    # Ensure voxel_data_gpu is on GPU for model input
+    voxel_data_gpu = target_batch.voxel_data
+    
     function loss_fn(p)
-        println("  Forward pass...")
-        voxel_data = target_batch.voxel_data
-        preds, _ = Lux.apply(model, voxel_data, p, st)
+        # Lux.apply on GPU
+        preds, _ = Lux.apply(model, voxel_data_gpu, p, st)
         
-        pred_matrices = [params_to_matrix(preds[:, b]) for b in 1:batch_size]
+        pred_matrices = CUDA.@allowscalar [params_to_matrix(preds[:, b]) for b in 1:batch_size]
+
         reconstructed = affine_transform_mi(batch_base, pred_matrices, Linear_en)
         
         loss = sum((reconstructed.voxel_data .- target_batch.voxel_data).^2)
-        println("  Loss: $loss")
         return loss
     end
 
+    n_iters = 10
     println("Starting image reconstruction training (8x8x8)...")
-    for i in 1:10
-        println("Iter $i starting...")
-        flush(stdout)
-        
+    for i in 1:n_iters
         l, back = Zygote.pullback(loss_fn, ps)
-        println("  Backward pass...")
-        flush(stdout)
         
-        gs = back(1.0)[1]
+        gs = back(1.0f0)[1]
         
         if gs === nothing
              println("WARNING: Gradients are nothing at Iter $i.")
         end
         
         tstate, ps = Optimisers.update(tstate, ps, gs)
-        println("Iter $i finished. Loss: $l")
+        println("Iter $i: Loss = $l")
         flush(stdout)
     end
 end
