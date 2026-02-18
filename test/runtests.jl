@@ -214,6 +214,11 @@ mkpath(DEBUG_DIR)
         include("test_batched.jl")
     end
 
+    # SUV Calculation Tests
+    @testset "SUV Calculation Tests" begin
+        include("test_suv.jl")
+    end
+
 end # main testset
 
 # Summary output
