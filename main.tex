@@ -90,7 +90,7 @@
   \section{Motivation and Significance}
 
   Medical imaging suffers from the two-language problem: researchers prototype in Python but rely on opaque C++ kernels (SimpleITK \cite{LowekampChen2013, YanivLowekamp2017}, ITK) for performance. This creates three critical limitations: (1) \textbf{Metadata Loss}—converting
-  SimpleITK images to NumPy arrays discards spatial metadata (origin, spacing, direction), requiring manual tracking; (2) \textbf{Non-Differentiability}—C++ functions are black boxes to PyTorch's \cite{Chaubal_2026} autograd, preventing end-to-end
+  SimpleITK images to NumPy arrays discards spatial metadata (origin, spacing, direction), requiring manual tracking; (2) \textbf{Non-Differentiability}—C++ functions are black boxes to PyTorch's \cite{Paszke_2019} autograd, preventing end-to-end
   optimization of registration or reconstruction parameters; (3) \textbf{Performance Ceiling}—custom operations require C++/CUDA compilation, creating high-friction development cycles.
 
   MedImages.jl solves these through Julia's \cite{BezansonChen2018} unique capabilities. Native Julia code compiles to LLVM machine code, achieving C++ performance without the two-language barrier. The package implements a BIDS (Brain Imaging Data Structure)
