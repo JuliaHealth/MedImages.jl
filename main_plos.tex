@@ -47,6 +47,32 @@ Medical imaging suffers from the "two-language problem": researchers prototype i
 
 MedImages.jl solves these through Julia's unique capabilities. Native Julia code compiles to LLVM machine code, achieving C++ performance without the two-language barrier. The package implements a BIDS-inspired metadata paradigm where spatial context is intrinsic to the data structure via zero-cost type abstractions—metadata travels with pixel data without performance penalty. Critically, all operations are differentiable via Zygote.jl/Enzyme.jl, enabling physics-informed deep learning where MRI reconstruction physics or registration parameters can be optimized jointly with neural networks. GPU acceleration (60--180$\times$ speedups) is transparent, requiring no code changes.
 
+\subsection*{Importance of Nuclear Medicine}
+Nuclear medicine represents a paradigm shift from purely anatomical imaging to molecular and functional characterization of disease processes. Its importance lies in the ability to visualize biological processes at the cellular and molecular levels, often detecting disease manifestations before they result in anatomical changes visible on conventional Computed Tomography (CT) or Magnetic Resonance Imaging (MRI).
+
+Conventional imaging modalities primarily rely on morphological information—changes in size, shape, and tissue density \cite{GammelSolari2024, FrumerMilk2020}. While MRI offers superior soft-tissue contrast \cite{GammelSolari2024}, these methods often struggle to identify small-volume disease or differentiate between benign and malignant tissue changes \cite{CaraccioloCastello2022, SoeterikWever2022}. Nuclear medicine fills this gap by using radiotracers that target specific biological pathways, allowing for higher sensitivity and precision medicine (theranostics) \cite{MoreiraMussi2022, GammelSolari2024}.
+
+The field encompasses diverse imaging types involved in many diseases:
+\begin{itemize}
+    \item \textbf{Positron Emission Tomography (PET):} The cornerstone of modern nuclear medicine, often combined with CT or MRI. Different tracers interrogate different processes, such as glucose metabolism (18F-FDG) \cite{MurthySonni2021, LiZelchan2022}, cell membrane synthesis (Choline) \cite{MarkoGould2016, LiZelchan2022}, and antigen-specific targeting (PSMA) which has revolutionized prostate cancer management \cite{MurthySonni2021, AmalachandranSivathapandi2024}.
+    \item \textbf{Single Photon Emission Computed Tomography (SPECT):} A vital workhorse due to widespread availability. Applications range from bone scintigraphy for screening metastases \cite{MarkoGould2016, SoeterikWever2022} to emerging targeted SPECT (e.g., 99mTc-PSMA) as a cost-effective alternative to PET \cite{WangKetteler2024, DuncanIngold2023}.
+    \item \textbf{Hybrid Imaging (PET/MRI):} Combines molecular sensitivity with superior soft-tissue contrast, reducing radiation exposure and potentially improving local staging \cite{LiuSheng2021, WooGhafoor2020}.
+    \item \textbf{Theranostics:} Integrates diagnosis and therapy by pairing diagnostic and therapeutic radiotracers targeting the same receptor, enabling highly targeted treatment \cite{KoehlerBerliner2023, BarakatYacoub2020}.
+\end{itemize}
+
+\subsection*{Importance of SUV Calculations}
+The Standardized Uptake Value (SUV) serves as a critical semi-quantitative metric in nuclear medicine, particularly for PET/CT. SUV calculations are important for transforming subjective visual assessments into objective data that drive diagnosis, risk stratification, staging, and therapeutic monitoring.
+
+Key clinical domains where SUV calculations are essential include:
+\begin{itemize}
+    \item \textbf{Discrimination of Clinically Significant Disease:} Quantitative SUV thresholds help distinguish malignant lesions from benign uptake and establish cut-off values for clinically significant cancer \cite{CaraccioloCastello2024, PEPEPEPE2023}. High SUV values can potentially serve as "virtual biopsies" for high-risk lesions \cite{HeetmanWever2022}.
+    \item \textbf{Prediction of Tumor Aggressiveness:} There is a positive correlation between SUV metrics and histopathological aggressiveness (e.g., Gleason Score in prostate cancer) \cite{ZhangLi2020, SharmaKumar2023}.
+    \item \textbf{Preoperative Staging:} High SUV in the primary tumor can predict metastatic risk and local invasion \cite{KlingenbergJochumsen2020, elenGltekin2020}.
+    \item \textbf{Therapeutic Selection (Theranostics):} SUV calculations are mandatory for selecting patients for radioligand therapy (e.g., Lutetium-177) to ensure sufficient target expression \cite{AmalachandranSivathapandi2024}.
+    \item \textbf{Treatment Response Monitoring:} Changes in SUV provide an objective method to assess response to systemic therapies, often preceding structural changes \cite{UdovicichJia2025, EsenSeymen2023}.
+    \item \textbf{Standardization:} Calculating SUV allows for standardization across institutions, which is vital for multicenter trials and reproducibility \cite{GengZhang2024}.
+\end{itemize}
+
 \subsection*{Relevance to Nuclear Medicine}
 This library is particularly well-suited for Nuclear Medicine (NM), a field that uses radiotracers to visualize physiological functions. Unlike anatomical imaging (CT, MRI), NM scans (such as PET and SPECT) frequently cover a wide physical range—often from mid-thigh to head for whole-body oncology surveys. This results in large volumetric datasets that require significant computational resources for reconstruction, processing, and analysis.
 
