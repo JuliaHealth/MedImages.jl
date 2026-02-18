@@ -1,2 +1,0 @@
-# This file is intentionally minimal to allow CI to regenerate it.
-# The CI environment will perform a full Pkg.instantiate() and resolve dependencies.
