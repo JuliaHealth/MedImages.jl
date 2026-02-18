@@ -1,0 +1,1 @@
+bash: /root/.julia/juliaup/julia-1.10.4+0.x64.linux.gnu/bin/julia: Permission denied
