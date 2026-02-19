@@ -105,7 +105,7 @@
   context, MedImages.jl uses zero-cost abstractions—metadata (origin, spacing, direction, patient ID, acquisition timestamp) is intrinsic to the structure without runtime overhead.
 
   A critical design decision: ITK (C++) is used \textit{only} for I/O robustness (NIfTI, DICOM parsing), while \textit{all} transformations are native Julia. This ensures: (1) \textbf{Differentiability}—operations integrate with
-  Zygote.jl/Enzyme.jl for automatic differentiation; (2) \textbf{Composability}—seamless integration with Flux.jl, DifferentialEquations.jl without language barriers; (3) \textbf{Transparency}—users can inspect and extend algorithms
+  Zygote.jl/Enzyme.jl for automatic differentiation; (2) \textbf{Composability}—seamless integration with Lux.jl, DifferentialEquations.jl without language barriers; (3) \textbf{Transparency}—users can inspect and extend algorithms
   without C++ recompilation. The framework handles Julia's column-major (Fortran-style) vs ITK's row-major (C-style) memory layout automatically, abstracting these complexities. SimpleITK \cite{LowekampChen2013} validates correctness in tests but is never a
   runtime dependency.
 
@@ -249,7 +249,7 @@
   \begin{itemize}
       \item \textbf{Differentiable Image Registration:} Computing gradients through spatial transformations allows optimization-based image registration without manual Jacobian computation.
 
-      \item \textbf{Neural Network Integration:} Medical image transformations can be composed seamlessly with deep learning frameworks (Flux.jl) for end-to-end training of spatial transformer networks.
+      \item \textbf{Neural Network Integration:} Medical image transformations can be composed seamlessly with deep learning frameworks (Lux.jl) for end-to-end training of spatial transformer networks.
 
       \item \textbf{Scientific Machine Learning:} Physics-informed neural networks and inverse problems require gradients through imaging operations.
 
