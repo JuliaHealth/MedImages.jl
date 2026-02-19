@@ -1,0 +1,25 @@
+┌ Warning: pydicom.dcmread failed for /home/jm/project_ssd/MedImages.jl/test/visual_output/local/dicoms/5-PET_WB_120min_Uncorrected/resources/DICOM/files/I0000854: PyError (PyImport_ImportModule
+│ 
+│ The Python package pydicom.multival.MultiValue could not be imported by pyimport. Usually this means
+│ that you did not install pydicom.multival.MultiValue in the Python version being used by PyCall.
+│ 
+│ PyCall is currently configured to use the Julia-specific Python distribution
+│ installed by the Conda.jl package.  To install the pydicom.multival.MultiValue module, you can
+│ use `pyimport_conda("pydicom.multival.MultiValue", PKG)`, where PKG is the Anaconda
+│ package that contains the module pydicom.multival.MultiValue, or alternatively you can use the
+│ Conda package directly (via `using Conda` followed by `Conda.add` etcetera).
+│ 
+│ Alternatively, if you want to use a different Python distribution on your
+│ system, such as a system-wide Python (as opposed to the Julia-specific Python),
+│ you can re-configure PyCall with that Python.   As explained in the PyCall
+│ documentation, set ENV["PYTHON"] to the path/name of the python executable
+│ you want to use, run Pkg.build("PyCall"), and re-launch Julia.
+│ 
+│ ) <class 'ModuleNotFoundError'>
+│ ModuleNotFoundError("No module named 'pydicom.multival.MultiValue'; 'pydicom.multival' is not a package")
+└ @ MedImages.Load_and_save ~/project_ssd/MedImages.jl/src/Load_and_save.jl:246
+Loading PET image from: /home/jm/project_ssd/MedImages.jl/test/visual_output/local/dicoms/5-PET_WB_120min_Uncorrected/resources/DICOM/files
+Metadata keys: Any[]
+Radio seq MISSING from mi.metadata
+Calculating SUV factor...
+Error: Could not calculate SUV factor. Check metadata.
