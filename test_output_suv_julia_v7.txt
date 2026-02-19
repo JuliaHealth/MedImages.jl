@@ -1,0 +1,18 @@
+/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/pydicom/valuerep.py:443: UserWarning: Invalid value for VR UI: '1.3.12.2.1107.5.1.4.11024.'. Please see <https://dicom.nema.org/medical/dicom/current/output/html/part05.html#table_6.2-1> for allowed values for each VR.
+  warnings.warn(msg)
+Creating image with direct utility function...
+Data size: 11360000
+Dimensions: 200x200x284
+Image created and saved successfully
+Loading PET image from: /home/jm/project_ssd/MedImages.jl/test/visual_output/local/dicoms/5-PET_WB_120min_Uncorrected/resources/DICOM/files
+Metadata keys: Any["RequestedProcedureDescription", "CorrectedImage", "AcquisitionDate", "ContentTime", "PhysiciansOfRecord", "StudyDate", "Columns", "PatientName", "ImageIndex", "RescaleSlope", "SmallestImagePixelValue", "ImagePositionPatient", "RequestingPhysician", "ActualFrameDuration", "Modality", "WindowCenter", "StudyInstanceUID", "EnergyWindowRangeSequence", "PatientOrientationCodeSequence", "DoseCalibrationFactor", "ScatterFractionFactor", "CountsSource", "SeriesDescription", "AxialAcceptance", "7409698", "StudyDescription", "Units", "RequestedProcedureCodeSequence", "Manufacturer", "SoftwareVersions", "TimeOfLastCalibration", "ProcedureCodeSequence", "AcquisitionNumber", "NumberOfFrames", "FrameReferenceTime", "SOPClassUID", "WindowWidth", "SOPInstanceUID", "PregnancyStatus", "RadiopharmaceuticalInformationSequence", "7409700", "RelatedSeriesSequence", "InstanceNumber", "StationName", "ManufacturerModelName", "PhotometricInterpretation", "ProtocolName", "2691104", "BitsStored", "SliceThickness", "DeviceSerialNumber", "PatientWeight", "DateOfLastCalibration", "7405584", "PixelSpacing", "ReferencedPatientSequence", "ImageOrientationPatient", "RequestingService", "MedicalRecordLocator", "CollimatorType", "AcquisitionTime", "OperatorsName", "SliceLocation", "FrameOfReferenceUID", "2686992", "PatientPosition", "PatientTelephoneNumbers", "InstitutionName", "ContentDate", "SeriesNumber", "PatientSize", "WindowCenterWidthExplanation", "RandomsCorrectionMethod", "Rows", "RescaleType", "PerformingPhysicianName", "SeriesTime", "BitsAllocated", "DecayCorrection", "RescaleIntercept", "SeriesDate", "ImageType", "SeriesType", "StudyID", "InstitutionAddress", "2691096", "InstitutionalDepartmentName", "SeriesInstanceUID", "PatientBirthDate", "ReferencedStudySequence", "LargestImagePixelValue", "NumberOfSlices", "StudyTime", "PixelRepresentation", "PositionReferenceIndicator", "SamplesPerPixel", "AccessionNumber", "PatientID", "ImageComments", "PatientComments", "DecayFactor", "IssuerOfPatientID", "ReconstructionMethod", "PatientAge", "ConvolutionKernel", "2691097", "PatientGantryRelationshipCodeSequence", "PatientSex", "PatientAddress", "ReferringPhysicianName", "HighBit", "LossyImageCompression", "AxialMash", "SpecificCharacterSet"]
+Radio seq found. length: 1
+First item keys: Any["RadiopharmaceuticalVolume", "RadiopharmaceuticalStartTime", "RadiopharmaceuticalAdministrationEventUID", "RadiopharmaceuticalStopDateTime", "Radiopharmaceutical", "RadionuclideTotalDose", "RadionuclidePositronFraction", "RadiopharmaceuticalStartDateTime", "RadionuclideHalfLife", "RadionuclideCodeSequence"]
+Calculating SUV factor...
+Julia SUV Factor: 0.002382710717104043
+Saving Julia SUV image to: juliasuv.nii.gz
+Saving image from voxel data and metadata
+Data shape: (200, 200, 284)
+Metadata size: (200, 200, 284)
+Data length: 11360000
+Expected size: 11360000
