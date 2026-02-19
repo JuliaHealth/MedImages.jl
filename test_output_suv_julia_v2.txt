@@ -1,0 +1,5 @@
+WARNING: Method definition calculate_suv_factor(MedImages.MedImage_data_struct.MedImage) in module SUV_calc at /home/jm/project_ssd/MedImages.jl/src/SUV.jl:14 overwritten at /home/jm/project_ssd/MedImages.jl/src/SUV.jl:174.
+ERROR: Method overwriting is not permitted during Module precompilation. Use `__precompile__(false)` to opt-out of precompilation.
+Loading PET image from: /home/jm/project_ssd/MedImages.jl/test/visual_output/local/dicoms/5-PET_WB_120min_Uncorrected/resources/DICOM/files
+Calculating SUV factor...
+Error: Could not calculate SUV factor. Check metadata.

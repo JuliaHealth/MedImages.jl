@@ -12,7 +12,7 @@ export SUV_calc
 
 # Export key functions that tests need
 export load_image, update_voxel_data, update_voxel_and_spatial_data, create_nii_from_medimage
-export calculate_suv_factor
+export calculate_suv_factor, apply_suv, apply_suv!
 export save_med_image, load_med_image
 export resample_to_spacing, change_orientation
 export resample_to_image, rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi
@@ -24,6 +24,8 @@ export create_batched_medimage, unbatch_medimage
 export MedImage, BatchedMedImage, Image_type, Image_subtype, current_device_enum
 export Interpolator_enum, Mode_mi, Orientation_code
 export Nearest_neighbour_en, Linear_en, B_spline_en
+export MRI_type, PET_type, CT_type
+export CT_subtype, ADC_subtype, DWI_subtype, T1_subtype, T2_subtype, FLAIR_subtype, FDG_subtype, PSMA_subtype
 # Export orientation enum values
 export ORIENTATION_RPI, ORIENTATION_LPI, ORIENTATION_RAI, ORIENTATION_LAI
 export ORIENTATION_RPS, ORIENTATION_LPS, ORIENTATION_RAS, ORIENTATION_LAS
@@ -41,11 +43,13 @@ include("SUV.jl")
 
 # Re-export functions from submodules
 using .Utils
-using .SUV_calc: calculate_suv_factor
+using .SUV_calc: calculate_suv_factor, apply_suv, apply_suv!
 using .Load_and_save: load_image, update_voxel_data, update_voxel_and_spatial_data, create_nii_from_medimage
 using .MedImage_data_struct: MedImage, BatchedMedImage, Image_type, Image_subtype, current_device_enum
 using .MedImage_data_struct: Interpolator_enum, Mode_mi, Orientation_code
 using .MedImage_data_struct: Nearest_neighbour_en, Linear_en, B_spline_en
+using .MedImage_data_struct: MRI_type, PET_type, CT_type
+using .MedImage_data_struct: CT_subtype, ADC_subtype, DWI_subtype, T1_subtype, T2_subtype, FLAIR_subtype, FDG_subtype, PSMA_subtype
 using .MedImage_data_struct: ORIENTATION_RPI, ORIENTATION_LPI, ORIENTATION_RAI, ORIENTATION_LAI
 using .MedImage_data_struct: ORIENTATION_RPS, ORIENTATION_LPS, ORIENTATION_RAS, ORIENTATION_LAS
 using .Orientation_dicts: string_to_orientation_enum, orientation_enum_to_string
