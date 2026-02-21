@@ -1,0 +1,10 @@
+Script starting: Loading dependencies...
+CUDA functional: true
+Using GPU device: CuDevice(0)
+Generating target images on GPU: true
+Starting training for 50 iterations...
+Iter 1: Loss = 0.0
+
+[1149279] signal (11.1): Segmentation fault
+in expression starting at /home/jm/project_ssd/MedImages.jl/test/differentiability_tests/test_model_gpu.jl:154
+Allocations: 233110400 (Pool: 232732244; Big: 378156); GC: 146
