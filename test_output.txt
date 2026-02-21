@@ -1,0 +1,78 @@
+Script starting: Loading dependencies...
+ERROR: LoadError: `llvmcall` must be compiled to be called
+Stacktrace:
+  [1] macro expansion
+    @ ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0 [inlined]
+  [2] _pullback(::Zygote.Context{false}, ::Core.IntrinsicFunction, ::Tuple{String, String}, ::Type{Nothing}, ::Type{Tuple{Bool}}, ::Bool)
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:81
+  [3] assume
+    @ ~/.julia/packages/LLVM/fEIbx/src/interop/intrinsics.jl:16 [inlined]
+  [4] driver_version
+    @ ~/.julia/packages/CUDA/FJf6p/lib/cudadrv/version.jl:20 [inlined]
+  [5] isvalid
+    @ ~/.julia/packages/CUDA/FJf6p/lib/cudadrv/context.jl:71 [inlined]
+  [6] _pullback(ctx::Zygote.Context{false}, f::typeof(CUDA.isvalid), args::CuContext)
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+  [7] validate_task_local_state
+    @ ~/.julia/packages/CUDA/FJf6p/lib/cudadrv/state.jl:61 [inlined]
+  [8] _pullback(ctx::Zygote.Context{false}, f::typeof(CUDA.validate_task_local_state), args::CUDA.TaskLocalState)
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+  [9] task_local_state!
+    @ ~/.julia/packages/CUDA/FJf6p/lib/cudadrv/state.jl:72 [inlined]
+ [10] _pullback(::Zygote.Context{false}, ::typeof(CUDA.task_local_state!))
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [11] device
+    @ ~/.julia/packages/CUDA/FJf6p/lib/cudadrv/state.jl:189 [inlined]
+ [12] CuArray
+    @ ~/.julia/packages/CUDA/FJf6p/src/array.jl:91 [inlined]
+ [13] _pullback(::Zygote.Context{false}, ::Type{CuArray{Float32, 1, CUDA.DeviceMemory}}, ::UndefInitializer, ::Tuple{Int64})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [14] zeros
+    @ ~/.julia/packages/CUDA/FJf6p/src/CUDAKernels.jl:25 [inlined]
+ [15] #zeros#5
+    @ ~/.julia/packages/KernelAbstractions/aLmvZ/src/KernelAbstractions.jl:564 [inlined]
+ [16] _pullback(::Zygote.Context{false}, ::KernelAbstractions.var"##zeros#5", ::@Kwargs{}, ::typeof(KernelAbstractions.zeros), ::CUDABackend, ::Type{Float32}, ::Int64)
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [17] _apply(::Function, ::Vararg{Any})
+    @ Core ./boot.jl:838
+ [18] adjoint
+    @ ~/.julia/packages/Zygote/55SqB/src/lib/lib.jl:211 [inlined]
+ [19] _pullback
+    @ ~/.julia/packages/ZygoteRules/CkVIK/src/adjoint.jl:67 [inlined]
+ [20] zeros
+    @ ~/.julia/packages/KernelAbstractions/aLmvZ/src/KernelAbstractions.jl:564 [inlined]
+ [21] _pullback(::Zygote.Context{false}, ::typeof(KernelAbstractions.zeros), ::CUDABackend, ::Type{Float32}, ::Int64)
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [22] interpolate_fused_affine
+    @ ~/project_ssd/MedImages.jl/src/Utils.jl:723 [inlined]
+ [23] _pullback(::Zygote.Context{false}, ::typeof(interpolate_fused_affine), ::CuArray{Float32, 4, CUDA.DeviceMemory}, ::CuArray{Float32, 3, CUDA.DeviceMemory}, ::Tuple{Int64, Int64, Int64}, ::Interpolator_enum, ::Bool, ::Int64)
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [24] interpolate_fused_affine
+    @ ~/project_ssd/MedImages.jl/src/Utils.jl:716 [inlined]
+ [25] _pullback(::Zygote.Context{false}, ::typeof(interpolate_fused_affine), ::CuArray{Float32, 4, CUDA.DeviceMemory}, ::CuArray{Float32, 3, CUDA.DeviceMemory}, ::Tuple{Int64, Int64, Int64}, ::Interpolator_enum, ::Bool)
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [26] #affine_transform_mi#33
+    @ ~/project_ssd/MedImages.jl/src/Basic_transformations.jl:557 [inlined]
+ [27] _pullback(::Zygote.Context{false}, ::MedImages.Basic_transformations.var"##affine_transform_mi#33", ::Nothing, ::typeof(affine_transform_mi), ::BatchedMedImage, ::Vector{Matrix{Float64}}, ::Interpolator_enum)
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [28] affine_transform_mi
+    @ ~/project_ssd/MedImages.jl/src/Basic_transformations.jl:509 [inlined]
+ [29] _pullback(::Zygote.Context{false}, ::typeof(affine_transform_mi), ::BatchedMedImage, ::Vector{Matrix{Float64}}, ::Interpolator_enum)
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [30] loss_fn
+    @ ~/project_ssd/MedImages.jl/test/differentiability_tests/test_model_gpu.jl:116 [inlined]
+ [31] _pullback(ctx::Zygote.Context{false}, f::var"#loss_fn#8"{Array{Float32, 4}, BatchedMedImage, BatchedMedImage, Int64, @NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{}, layer_3::@NamedTuple{}}, Chain{@NamedTuple{layer_1::FlattenLayer{Nothing}, layer_2::Dense{typeof(relu), Int64, Int64, Nothing, Nothing, Static.True}, layer_3::Dense{typeof(identity), Int64, Int64, Nothing, Nothing, Static.True}}, Nothing}}, args::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{weight::Matrix{Float32}, bias::Vector{Float32}}, layer_3::@NamedTuple{weight::Matrix{Float32}, bias::Vector{Float32}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [32] pullback(f::Function, cx::Zygote.Context{false}, args::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{weight::Matrix{Float32}, bias::Vector{Float32}}, layer_3::@NamedTuple{weight::Matrix{Float32}, bias::Vector{Float32}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:96
+ [33] pullback(f::Function, args::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{weight::Matrix{Float32}, bias::Vector{Float32}}, layer_3::@NamedTuple{weight::Matrix{Float32}, bias::Vector{Float32}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:94
+ [34] train()
+    @ Main ~/project_ssd/MedImages.jl/test/differentiability_tests/test_model_gpu.jl:126
+ [35] top-level scope
+    @ ~/project_ssd/MedImages.jl/test/differentiability_tests/test_model_gpu.jl:155
+in expression starting at /home/jm/project_ssd/MedImages.jl/test/differentiability_tests/test_model_gpu.jl:154
+CUDA functional: true
+Using GPU device: CuDevice(0)
+Generating target images on GPU: true
+Starting training for 50 iterations...
