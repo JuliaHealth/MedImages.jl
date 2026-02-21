@@ -235,7 +235,6 @@ function _get_metadata(path::String)
     end
 
     if !isfile(target_path)
-        @warn "Metadata extraction failed: Target path is not a file: $target_path"
         return Dict{Any, Any}()
     end
 
@@ -243,7 +242,7 @@ function _get_metadata(path::String)
         ds = pydicom.dcmread(target_path, stop_before_pixels=true)
         return _pydicom_ds_to_dict(ds)
     catch e
-        @warn "pydicom.dcmread failed for $target_path: $e"
+        # If not a DICOM file or other error
         return Dict{Any, Any}()
     end
 end
@@ -267,7 +266,7 @@ function _pydicom_ds_to_dict(ds)
             end
             d[key] = seq_list
         # Handle MultiValue
-        elseif typeof(val) <: PyObject && pybuiltin("isinstance")(val, pyimport("pydicom.multival").MultiValue)
+        elseif typeof(val) <: PyObject && pybuiltin("isinstance")(val, pyimport("pydicom.multival.MultiValue"))
              d[key] = collect(val)
         else
              d[key] = val
