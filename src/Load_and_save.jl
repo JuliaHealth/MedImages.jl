@@ -3,7 +3,7 @@ module Load_and_save
 using Dictionaries, Dates, PyCall
 using Accessors, UUIDs, ITKIOWrapper
 using ..MedImage_data_struct
-using ..MedImage_data_struct: MedImage
+using ..MedImage_data_struct: MedImage, BatchedMedImage
 using ..Brute_force_orientation
 using ..Utils
 export load_image
@@ -71,24 +71,27 @@ Determines the study type for an image based on its metadata using SimpleITK
 #   return MedImage_data_struct.CT_type
 # end
 
-function create_nii_from_medimage(med_image::MedImage, file_path::String)
-  # Convert voxel_data to a numpy array (Assuming voxel_data is stored in Julia array format)
-  voxel_data_np = med_image.voxel_data
-  voxel_data_np = permutedims(voxel_data_np, (3, 2, 1))
-  # Create a SimpleITK image from numpy array
-  sitk = pyimport("SimpleITK")
-  image_sitk = sitk.GetImageFromArray(voxel_data_np)
+function create_nii_from_medimage(med_image::MedImage, file_path::String, extension::String=".nii.gz")
+  # Ensure path has extension if not already present
+  full_path = endswith(file_path, extension) ? file_path : file_path * extension
 
-  # Set spatial metadata
-  image_sitk.SetOrigin(med_image.origin)
-  image_sitk.SetSpacing(med_image.spacing)
-  image_sitk.SetDirection(med_image.direction)
+  # Prepare VoxelData (requires Float32 for ITKIOWrapper)
+  voxel_f32 = Array{Float32, 3}(med_image.voxel_data)
+  vd = ITKIOWrapper.DataStructs.VoxelData(voxel_f32)
 
-  # Save the image as .nii.gz
-  sitk.WriteImage(image_sitk, file_path * ".nii.gz")
+  # Prepare SpatialMetaData
+  origin = NTuple{3, Float64}(med_image.origin)
+  spacing = NTuple{3, Float64}(med_image.spacing)
+  sz = NTuple{3, Int64}(size(med_image.voxel_data))
+  direction = NTuple{9, Float64}(med_image.direction)
+  
+  meta = ITKIOWrapper.DataStructs.SpatialMetaData(origin, spacing, sz, direction)
+
+  # Save using native ITK wrapper
+  ITKIOWrapper.save_image(vd, meta, full_path, false)
 end
 
-function update_voxel_data(old_image, new_voxel_data::AbstractArray)
+function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
 
   return MedImage(
     new_voxel_data,
@@ -112,6 +115,34 @@ function update_voxel_data(old_image, new_voxel_data::AbstractArray)
     old_image.is_contrast_administered,
     old_image.metadata)
 
+end
+
+function update_voxel_data(old_image::BatchedMedImage, new_voxel_data::AbstractArray)
+  # For BatchedMedImage, we assume new_voxel_data is 4D
+  # We construct a new BatchedMedImage copying metadata
+  # Note: This is constructor based, so it should be differentiable if BatchedMedImage constructor is differentiable (which is struct construction).
+
+  return BatchedMedImage(
+      voxel_data = new_voxel_data,
+      origin = old_image.origin,
+      spacing = old_image.spacing,
+      direction = old_image.direction,
+      image_type = old_image.image_type,
+      image_subtype = old_image.image_subtype,
+      date_of_saving = old_image.date_of_saving,
+      acquistion_time = old_image.acquistion_time,
+      patient_id = old_image.patient_id,
+      current_device = old_image.current_device,
+      study_uid = old_image.study_uid,
+      patient_uid = old_image.patient_uid,
+      series_uid = old_image.series_uid,
+      study_description = old_image.study_description,
+      legacy_file_name = old_image.legacy_file_name,
+      display_data = old_image.display_data,
+      clinical_data = old_image.clinical_data,
+      is_contrast_administered = old_image.is_contrast_administered,
+      metadata = old_image.metadata
+  )
 end
 
 function update_voxel_and_spatial_data(old_image, new_voxel_data::AbstractArray, new_origin, new_spacing, new_direction)

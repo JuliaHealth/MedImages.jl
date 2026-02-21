@@ -1,0 +1,69 @@
+Script starting: Loading MedImages...
+MedImages loaded. Loading other dependencies...
+ERROR: LoadError: Scalar indexing is disallowed.
+Invocation of getindex resulted in scalar indexing of a GPU array.
+This is typically caused by calling an iterating implementation of a method.
+Such implementations *do not* execute on the GPU, but very slowly on the CPU,
+and therefore should be avoided.
+
+If you want to allow scalar iteration, use `allowscalar` or `@allowscalar`
+to enable scalar iteration globally or for the operations in question.
+Stacktrace:
+  [1] error(s::String)
+    @ Base ./error.jl:35
+  [2] errorscalar(op::String)
+    @ GPUArraysCore ~/.julia/packages/GPUArraysCore/aNaXo/src/GPUArraysCore.jl:151
+  [3] _assertscalar(op::String, behavior::GPUArraysCore.ScalarIndexing)
+    @ GPUArraysCore ~/.julia/packages/GPUArraysCore/aNaXo/src/GPUArraysCore.jl:124
+  [4] assertscalar(op::String)
+    @ GPUArraysCore ~/.julia/packages/GPUArraysCore/aNaXo/src/GPUArraysCore.jl:112
+  [5] getindex
+    @ ~/.julia/packages/GPUArrays/3a5jB/src/host/indexing.jl:50 [inlined]
+  [6] rrule
+    @ ~/.julia/packages/ChainRules/3Zo8T/src/rulesets/Base/indexing.jl:63 [inlined]
+  [7] rrule
+    @ ~/.julia/packages/ChainRulesCore/Vsbj9/src/rules.jl:138 [inlined]
+  [8] chain_rrule
+    @ ~/.julia/packages/Zygote/55SqB/src/compiler/chainrules.jl:234 [inlined]
+  [9] macro expansion
+    @ ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0 [inlined]
+ [10] _pullback
+    @ ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:81 [inlined]
+ [11] literal_getindex
+    @ ~/.julia/packages/Zygote/55SqB/src/tools/builtins.jl:12 [inlined]
+ [12] params_to_matrix
+    @ ~/project_ssd/MedImages.jl/test/differentiability_tests/test_model_cube.jl:49 [inlined]
+ [13] _pullback(ctx::Zygote.Context{false}, f::typeof(params_to_matrix), args::CuArray{Float32, 1, CUDA.DeviceMemory})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [14] #4
+    @ ~/.julia/packages/CUDA/FJf6p/src/CUDAKernels.jl:0 [inlined]
+ [15] #676
+    @ ~/.julia/packages/Zygote/55SqB/src/lib/array.jl:188 [inlined]
+ [16] iterate
+    @ ./generator.jl:47 [inlined]
+ [17] _collect(c::UnitRange{Int64}, itr::Base.Generator{UnitRange{Int64}, Zygote.var"#676#680"{Zygote.Context{false}, var"#4#9"{CuArray{Float32, 2, CUDA.DeviceMemory}}}}, ::Base.EltypeUnknown, isz::Base.HasShape{1})
+    @ Base ./array.jl:854
+ [18] collect_similar
+    @ ./array.jl:763 [inlined]
+ [19] map
+    @ ./abstractarray.jl:3286 [inlined]
+ [20] ∇map(cx::Zygote.Context{false}, f::var"#4#9"{CuArray{Float32, 2, CUDA.DeviceMemory}}, args::UnitRange{Int64})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/lib/array.jl:188
+ [21] _pullback
+    @ ~/.julia/packages/Zygote/55SqB/src/lib/array.jl:231 [inlined]
+ [22] loss_fn
+    @ ~/project_ssd/MedImages.jl/test/differentiability_tests/test_model_cube.jl:95 [inlined]
+ [23] _pullback(ctx::Zygote.Context{false}, f::var"#loss_fn#8"{CuArray{Float32, 4, CUDA.DeviceMemory}, BatchedMedImage, BatchedMedImage, Int64, @NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{}, layer_3::@NamedTuple{}}, Chain{@NamedTuple{layer_1::FlattenLayer{Nothing}, layer_2::Dense{typeof(relu), Int64, Int64, Nothing, Nothing, Static.True}, layer_3::Dense{typeof(identity), Int64, Int64, Nothing, Nothing, Static.True}}, Nothing}}, args::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{weight::CuArray{Float32, 2, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_3::@NamedTuple{weight::CuArray{Float32, 2, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [24] pullback(f::Function, cx::Zygote.Context{false}, args::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{weight::CuArray{Float32, 2, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_3::@NamedTuple{weight::CuArray{Float32, 2, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:96
+ [25] pullback(f::Function, args::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{weight::CuArray{Float32, 2, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_3::@NamedTuple{weight::CuArray{Float32, 2, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:94
+ [26] train()
+    @ Main ~/project_ssd/MedImages.jl/test/differentiability_tests/test_model_cube.jl:106
+ [27] top-level scope
+    @ ~/project_ssd/MedImages.jl/test/differentiability_tests/test_model_cube.jl:121
+in expression starting at /home/jm/project_ssd/MedImages.jl/test/differentiability_tests/test_model_cube.jl:120
+Moving to GPU...
+Generating target images (8x8x8)...
+Starting image reconstruction training (8x8x8)...

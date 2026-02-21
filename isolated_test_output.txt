@@ -1,0 +1,24 @@
+ERROR: LoadError: Some tests did not pass: 21 passed, 1 failed, 0 errored, 0 broken.
+in expression starting at /home/jm/project_ssd/MedImages.jl/test/test_batched.jl:36
+DEBUG: 0 deg rotation mean diff = 0.0, max diff = 0.0
+Batched Basic Transformations: Test Failed at /home/jm/project_ssd/MedImages.jl/test/test_batched.jl:76
+  Expression: scale_mi(batch, scales_bad, Linear_en)
+    Expected: ErrorException
+  No exception thrown
+
+Stacktrace:
+ [1] macro expansion
+   @ ~/project_ssd/MedImages.jl/test/test_batched.jl:76 [inlined]
+ [2] macro expansion
+   @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+ [3] macro expansion
+   @ ~/project_ssd/MedImages.jl/test/test_batched.jl:46 [inlined]
+ [4] macro expansion
+   @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+ [5] top-level scope
+   @ ~/project_ssd/MedImages.jl/test/test_batched.jl:44
+Test Summary:                       | Pass  Fail  Total  Time
+BatchedMedImage Comprehensive Tests |   21     1     22  6.6s
+  Batched Basic Transformations     |    9     1     10  3.3s
+  Batched Resample                  |    4            4  2.1s
+  SimpleITK Verification            |    8            8  0.9s
