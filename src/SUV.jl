@@ -1,8 +1,8 @@
 module SUV_calc
-using Dates, ChainRulesCore
+using Dates
 using ..MedImage_data_struct: MedImage, BatchedMedImage
 
-export calculate_suv_factor, apply_suv, apply_suv!
+export calculate_suv_factor
 
 """
     calculate_suv_factor(med_image::MedImage)
@@ -11,8 +11,82 @@ Calculates the Standardized Uptake Value (SUV) conversion factor for a given Med
 Returns the factor (Float64) that should be multiplied with pixel values to get SUVbw.
 Returns `nothing` if required metadata is missing or invalid.
 """
-calculate_suv_factor(med_image::MedImage) = _calculate_suv_from_metadata(med_image.metadata)
+function calculate_suv_factor(med_image::MedImage)::Union{Float64, Nothing}
+    meta = med_image.metadata
 
+    # 1. Retrieve Patient Weight
+    if !haskey(meta, "PatientWeight") || meta["PatientWeight"] === nothing
+        @warn "SUV calculation failed: Missing PatientWeight"
+        return nothing
+    end
+    # PatientWeight is in kg, convert to g
+    weight_g = Float64(meta["PatientWeight"]) * 1000.0
+
+    # 2. Retrieve Radiopharmaceutical Information
+    if !haskey(meta, "RadiopharmaceuticalInformationSequence") || isempty(meta["RadiopharmaceuticalInformationSequence"])
+        @warn "SUV calculation failed: Missing RadiopharmaceuticalInformationSequence"
+        return nothing
+    end
+
+    # We assume the first sequence item contains the relevant info
+    radio_seq = meta["RadiopharmaceuticalInformationSequence"][1]
+
+    if !haskey(radio_seq, "RadionuclideTotalDose") || !haskey(radio_seq, "RadionuclideHalfLife") || !haskey(radio_seq, "RadiopharmaceuticalStartTime")
+        @warn "SUV calculation failed: Missing required fields in RadiopharmaceuticalInformationSequence"
+        return nothing
+    end
+
+    inj_dose_bq = Float64(radio_seq["RadionuclideTotalDose"])
+    half_life_s = Float64(radio_seq["RadionuclideHalfLife"])
+    inj_time_str = string(radio_seq["RadiopharmaceuticalStartTime"]) # Ensure it's string
+
+    # 3. Determine Scan (Acquisition) Time
+    scan_time_str = get(meta, "AcquisitionTime", get(meta, "SeriesTime", nothing))
+    if scan_time_str === nothing
+        @warn "SUV calculation failed: Missing AcquisitionTime and SeriesTime"
+        return nothing
+    end
+    scan_time_str = string(scan_time_str)
+
+    # 4. Parse Times and Calculate Decay
+    try
+        t_inj = parse_dicom_time(inj_time_str)
+        t_scan = parse_dicom_time(scan_time_str)
+
+        # Calculate delta in seconds
+        # Dates.value(t) returns nanoseconds since midnight
+        s_inj = Dates.value(t_inj) / 1.0e9
+        s_scan = Dates.value(t_scan) / 1.0e9
+
+        delta_s = s_scan - s_inj
+
+        # Correction for midnight crossover (if scan was the day after injection, or injection late previous day)
+        # DICOM time doesn't have date, so we assume if scan is "earlier" than injection, it crossed midnight once.
+        # However, standard practice often ignores date if not present, but crossover is common in PET.
+        if delta_s < 0
+            delta_s += 24 * 3600
+        end
+
+        # 5. Radioactive Decay Correction
+        # A(t) = A0 * 2^(-t/T_half)
+        decay_factor = 2.0^(-delta_s / half_life_s)
+        actual_dose = inj_dose_bq * decay_factor
+
+        if actual_dose == 0
+            @warn "SUV calculation failed: Calculated actual dose is 0"
+            return nothing
+        end
+
+        # 6. Calculate Final SUV Factor
+        # SUVbw = (PixelValue * Weight[g]) / Dose[Bq]
+        # We return Weight/Dose
+        return weight_g / actual_dose
+
+    catch e
+        @warn "SUV calculation failed during time parsing or calculation: $e"
+        return nothing
+    end
+end
 
 """
     calculate_suv_factor(batched_image::BatchedMedImage)
@@ -36,104 +110,6 @@ function calculate_suv_factor(batched_image::BatchedMedImage)::Vector{Union{Floa
         res[i] = _calculate_suv_from_metadata(batched_image.metadata[i])
     end
     return res
-end
-
-"""
-    apply_suv(med_image::MedImage)
-
-Calculates the SUV factor and applies it to the voxel data, returning a new MedImage.
-The resulting voxel data will typically be Float32.
-"""
-function apply_suv(med_image::MedImage)
-    factor = calculate_suv_factor(med_image)
-    if factor === nothing
-        @warn "SUV application failed: factor is nothing. Returning original image."
-        return med_image
-    end
-    
-    # Broadcast multiplication is differentiable and GPU-friendly
-    new_voxel = med_image.voxel_data .* Float32(factor)
-    
-    # Create new MedImage using all fields from original
-    return MedImage(
-        voxel_data = new_voxel,
-        origin = med_image.origin,
-        spacing = med_image.spacing,
-        direction = med_image.direction,
-        image_type = med_image.image_type,
-        image_subtype = med_image.image_subtype,
-        date_of_saving = med_image.date_of_saving,
-        acquistion_time = med_image.acquistion_time,
-        patient_id = med_image.patient_id,
-        current_device = med_image.current_device,
-        study_uid = med_image.study_uid,
-        patient_uid = med_image.patient_uid,
-        series_uid = med_image.series_uid,
-        study_description = med_image.study_description,
-        legacy_file_name = med_image.legacy_file_name,
-        display_data = med_image.display_data,
-        clinical_data = med_image.clinical_data,
-        is_contrast_administered = med_image.is_contrast_administered,
-        metadata = med_image.metadata
-    )
-end
-
-"""
-    apply_suv(batched_image::BatchedMedImage)
-
-Applies SUV factors to a batch of images.
-"""
-function apply_suv(batched_image::BatchedMedImage)
-    factors = calculate_suv_factor(batched_image)
-    
-    # voxel_data is (H, W, D, B)
-    # factors is Vector{Union{Float64, Nothing}} of length B
-    
-    # Handle potentially missing factors (fill with 1.0 or warn?)
-    # For differentiability, we want a clean array.
-    # Let's use 1.0 for missing and warn.
-    clean_factors = map(f -> f === nothing ? 1.0f0 : Float32(f), factors)
-    
-    # Reshape factors for broadcasting: (1, 1, 1, B)
-    f_reshaped = reshape(clean_factors, 1, 1, 1, :)
-    
-    new_voxel = batched_image.voxel_data .* f_reshaped
-    
-    return BatchedMedImage(
-        voxel_data = new_voxel,
-        origin = batched_image.origin,
-        spacing = batched_image.spacing,
-        direction = batched_image.direction,
-        image_type = batched_image.image_type,
-        image_subtype = batched_image.image_subtype,
-        date_of_saving = batched_image.date_of_saving,
-        acquistion_time = batched_image.acquistion_time,
-        patient_id = batched_image.patient_id,
-        current_device = batched_image.current_device,
-        study_uid = batched_image.study_uid,
-        patient_uid = batched_image.patient_uid,
-        series_uid = batched_image.series_uid,
-        study_description = batched_image.study_description,
-        legacy_file_name = batched_image.legacy_file_name,
-        display_data = batched_image.display_data,
-        clinical_data = batched_image.clinical_data,
-        is_contrast_administered = batched_image.is_contrast_administered,
-        metadata = batched_image.metadata
-    )
-end
-
-"""
-    apply_suv!(med_image::MedImage)
-
-In-place version of apply_suv. Mutates med_image.voxel_data.
-Note: Only works if voxel_data type is compatible (e.g. Float32).
-"""
-function apply_suv!(med_image::MedImage)
-    factor = calculate_suv_factor(med_image)
-    if factor !== nothing
-        med_image.voxel_data .*= Float32(factor)
-    end
-    return med_image
 end
 
 # Internal helper to share logic
@@ -194,6 +170,9 @@ function _calculate_suv_from_metadata(meta::Dict{Any, Any})::Union{Float64, Noth
     end
 end
 
+# Redirect MedImage call to helper to keep DRY
+calculate_suv_factor(med_image::MedImage) = _calculate_suv_from_metadata(med_image.metadata)
+
 
 function parse_dicom_time(t_str::AbstractString)
     # DICOM TM format: HHMMSS.ffffff (variable precision) or HHMMSS
@@ -242,10 +221,5 @@ function parse_dicom_time(t_str::AbstractString)
         return Time(t_str, dateformat"HHMMSS")
     end
 end
-
-# Mark factor calculations as non-differentiable for AD engines like Zygote
-@non_differentiable calculate_suv_factor(::Any)
-@non_differentiable _calculate_suv_from_metadata(::Any)
-@non_differentiable parse_dicom_time(::Any)
 
 end
