@@ -164,6 +164,41 @@ MedImages.jl supports automatic differentiation (AD) via Zygote.jl and Enzyme.jl
 
 \textbf{Proof-of-Concept: Learned Inverse Rotation.} A notable experiment conducted using MedImages.jl involved a neural network learning to optimize the parameters of a rotation operation. By making the \texttt{rotate\_mi} function differentiable, the network could propagate gradients through the rotation kernel to optimize its internal weights. This approach reduced reconstruction error by 68.7\%, illustrating the potential for "learned" preprocessing and registration steps that go beyond traditional hand-tuned filters.
 
+\subsection*{Illustrative Example: Multi-Modal Batched Processing in Theranostics}
+To demonstrate the capability of \texttt{BatchedMedImage} in handling complex, multi-modal datasets typical of theranostics, we processed a dataset containing four distinct imaging modalities:
+\begin{enumerate}
+    \item $[^{177}\text{Lu}]\text{Lu-PSMA}$ SPECT with attenuation correction (AC)
+    \item $[^{177}\text{Lu}]\text{Lu-PSMA}$ SPECT without attenuation correction (NAC)
+    \item $[^{177}\text{Lu}]\text{Lu-PSMA}$ Dosemap (voxel-wise absorbed dose)
+    \item Computed Tomography (CT) for anatomical reference
+\end{enumerate}
+
+These images were loaded into a single \texttt{BatchedMedImage} object, preserving their individual spatial metadata and voxel types. A batched rotation transformation was then applied simultaneously to all four modalities. Figure \ref{fig:batched_rotation} illustrates the results, showcasing the original axial slices (left) and the rotated output (right). The ability to apply identical geometric transformations across functional (SPECT, Dosemap) and anatomical (CT) data in a single operation ensures perfect spatial alignment is maintained during augmentation or registration tasks, which is critical for accurate dosimetry and treatment planning.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/orig.png}
+        \caption*{A: Original}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/rot.png}
+        \caption*{B: Rotated}
+    \end{minipage}
+    \caption{\textbf{Simultaneous Batched Rotation of Multi-Modal Theranostic Data.}
+    Panel A displays the original axial slices of four distinct modalities stored within a single \texttt{BatchedMedImage} structure: (Top-Left) $[^{177}\text{Lu}]\text{Lu-PSMA}$ SPECT AC, (Top-Right) $[^{177}\text{Lu}]\text{Lu-PSMA}$ SPECT NAC, (Bottom-Left) $[^{177}\text{Lu}]\text{Lu-PSMA}$ Dosemap, and (Bottom-Right) CT.
+    Panel B shows the result after applying a single \texttt{rotate\_mi} operation to the batch. The spatial integrity and alignment between the functional distribution (SPECT/Dose) and anatomical structure (CT) are preserved during the transformation.}
+    \label{fig:batched_rotation}
+\end{figure}
+
+\section*{Conclusions}
+The development of MedImages.jl represents a fundamental shift in how we approach medical image analysis. By overcoming the "two-language problem" through Julia's unique capabilities, the library provides a unified framework where physical accuracy and computational performance are no longer at odds. The ability to perform differentiable spatial transformations while maintaining absolute metadata integrity is not just a technical achievement; it is a clinical necessity for the era of molecular imaging and quantitative theranostics.
+
+As the field of nuclear medicine moves toward more complex 4D dynamic studies and scientific machine learning, the architectural limitations of traditional Python/C++ frameworks will become increasingly apparent. MedImages.jl offers a path forward—a future where imaging physics is integrated directly into the deep learning pipeline, where hardware acceleration is transparent and ubiquitous, and where the metadata that defines our physical world is preserved with the same rigor as the pixel values themselves. By bridging the divide between the physics of acquisition and the logic of inference, MedImages.jl empowers researchers and clinicians to unlock the full potential of medical imaging as a precise, quantitative science.
+
 \section*{Availability and Future Directions}
 MedImages.jl is open-source and available at \url{https://github.com/JuliaHealth/MedImages.jl}. It is licensed under the Apache License 2.0.
 
