@@ -8,9 +8,11 @@ export Basic_transformations
 export Resample_to_target
 export Spatial_metadata_change
 export Utils
+export SUV_calc
 
 # Export key functions that tests need
 export load_image, update_voxel_data, update_voxel_and_spatial_data, create_nii_from_medimage
+export calculate_suv_factor
 export save_med_image, load_med_image
 export resample_to_spacing, change_orientation
 export resample_to_image, rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi
@@ -35,9 +37,11 @@ include("Basic_transformations.jl")
 include("Spatial_metadata_change.jl")
 include("Resample_to_target.jl")
 include("HDF5_manag.jl")
+include("SUV.jl")
 
 # Re-export functions from submodules
 using .Utils
+using .SUV_calc: calculate_suv_factor
 using .Load_and_save: load_image, update_voxel_data, update_voxel_and_spatial_data, create_nii_from_medimage
 using .MedImage_data_struct: MedImage, BatchedMedImage, Image_type, Image_subtype, current_device_enum
 using .MedImage_data_struct: Interpolator_enum, Mode_mi, Orientation_code
