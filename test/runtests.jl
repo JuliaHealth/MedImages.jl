@@ -217,6 +217,7 @@ mkpath(DEBUG_DIR)
     # SUV Calculation Tests
     @testset "SUV Calculation Tests" begin
         include("test_suv.jl")
+        include("test_suv_stats.jl")
     end
 
 end # main testset
