@@ -200,8 +200,81 @@ function load_image(path::String, type::String)::MedImage
   subtype = type == "CT" ? MedImage_data_struct.CT_subtype : MedImage_data_struct.FDG_subtype
   legacy_file_name_field = string(split(path, "/")[length(split(path, "/"))])
 
-  return MedImage(voxel_data=voxel_arr, origin=spatial_meta.origin, spacing=spatial_meta.spacing, direction=spatial_meta.direction, patient_id="test_id", image_type=study_type, image_subtype=subtype, legacy_file_name=legacy_file_name_field)
+  metadata_dict = Dict{Any, Any}()
+  try
+      metadata_dict = _get_metadata(path)
+  catch e
+      @warn "Could not extract DICOM metadata using pydicom: $e"
+  end
+
+  return MedImage(voxel_data=voxel_arr, origin=spatial_meta.origin, spacing=spatial_meta.spacing, direction=spatial_meta.direction, patient_id="test_id", image_type=study_type, image_subtype=subtype, legacy_file_name=legacy_file_name_field, metadata=metadata_dict)
 end
+
+function _get_metadata(path::String)
+    pydicom = pyimport("pydicom")
+    os = pyimport("os")
+
+    target_path = path
+    if isdir(path)
+        # Find first DICOM file in directory
+        files = readdir(path)
+        # Try to find .dcm extension
+        dcm_files = filter(f -> endswith(lowercase(f), ".dcm"), files)
+        if !isempty(dcm_files)
+            target_path = joinpath(path, dcm_files[1])
+        else
+            # If no .dcm, try first file that is not a directory
+            for f in files
+                full_p = joinpath(path, f)
+                if isfile(full_p)
+                    target_path = full_p
+                    break
+                end
+            end
+        end
+    end
+
+    if !isfile(target_path)
+        return Dict{Any, Any}()
+    end
+
+    try
+        ds = pydicom.dcmread(target_path, stop_before_pixels=true)
+        return _pydicom_ds_to_dict(ds)
+    catch e
+        # If not a DICOM file or other error
+        return Dict{Any, Any}()
+    end
+end
+
+function _pydicom_ds_to_dict(ds)
+    d = Dict{Any, Any}()
+    for elem in ds
+        key = elem.keyword
+        if isempty(key)
+            # Use tag if keyword is empty (e.g. private tags)
+            key = string(elem.tag)
+        end
+
+        val = elem.value
+
+        # Handle Sequences
+        if elem.VR == "SQ"
+            seq_list = []
+            for item in val
+                push!(seq_list, _pydicom_ds_to_dict(item))
+            end
+            d[key] = seq_list
+        # Handle MultiValue
+        elseif typeof(val) <: PyObject && pybuiltin("isinstance")(val, pyimport("pydicom.multival.MultiValue"))
+             d[key] = collect(val)
+        else
+             d[key] = val
+        end
+    end
+    return d
+end
+
 end
 
 
