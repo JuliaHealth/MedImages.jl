@@ -1,0 +1,1725 @@
+Precompiling packages...
+    454.7 ms  ✓ ConcreteStructs
+    572.6 ms  ✓ IOCapture
+    426.7 ms  ✓ UnPack
+    424.9 ms  ✓ Richardson
+    455.2 ms  ✓ StatsAPI
+    456.0 ms  ✓ TensorCore
+    433.1 ms  ✓ PrettyPrint
+    434.0 ms  ✓ ArgCheck
+    445.3 ms  ✓ ANSIColoredPrinters
+    468.7 ms  ✓ InverseFunctions
+    522.3 ms  ✓ VersionParsing
+    559.5 ms  ✓ ADTypes
+    601.7 ms  ✓ ExpressionExplorer
+    663.5 ms  ✓ Combinatorics
+    656.5 ms  ✓ InitialValues
+    242.2 ms  ✓ SafeTestsets
+    235.7 ms  ✓ PtrArrays
+    244.3 ms  ✓ CompositionsBase
+    233.3 ms  ✓ DefineSingletons
+    284.3 ms  ✓ Parameters
+    721.0 ms  ✓ OffsetArrays
+    294.2 ms  ✓ ShowCases
+    293.9 ms  ✓ Requires
+    346.2 ms  ✓ AbstractTrees
+    263.8 ms  ✓ ContextVariablesX
+    377.0 ms  ✓ TranscodingStreams
+    300.5 ms  ✓ DelimitedFiles
+    393.3 ms  ✓ CpuId
+    248.5 ms  ✓ IfElse
+    275.1 ms  ✓ LazilyInitializedFields
+    283.3 ms  ✓ CommonWorldInvalidations
+    270.7 ms  ✓ FastClosures
+    284.6 ms  ✓ SciMLPublic
+    287.9 ms  ✓ Indexing
+    322.2 ms  ✓ MappedArrays
+    368.2 ms  ✓ ProgressLogging
+    673.1 ms  ✓ CUDA_Runtime_Discovery
+    325.5 ms  ✓ Quaternions
+    359.2 ms  ✓ WoodburyMatrices
+    486.4 ms  ✓ SimpleTraits
+    324.6 ms  ✓ NodeJS_20_jll
+    356.7 ms  ✓ OpenSSL_jll
+    333.8 ms  ✓ Xorg_libpciaccess_jll
+    371.0 ms  ✓ Lz4_jll
+    304.4 ms  ✓ LibTracyClient_jll
+    349.9 ms  ✓ libaec_jll
+    297.7 ms  ✓ libpng_jll
+    604.8 ms  ✓ Baselet
+    380.3 ms  ✓ libcxxwrap_julia_jll
+    298.1 ms  ✓ LERC_jll
+    954.7 ms  ✓ DispatchDoctor
+    332.8 ms  ✓ JpegTurbo_jll
+    688.6 ms  ✓ Setfield
+    320.6 ms  ✓ XZ_jll
+    340.7 ms  ✓ Zstd_jll
+    283.5 ms  ✓ MicrosoftMPI_jll
+    325.6 ms  ✓ Expat_jll
+    293.4 ms  ✓ Git_LFS_jll
+    288.0 ms  ✓ FFTW_jll
+    319.7 ms  ✓ Libiconv_jll
+    236.1 ms  ✓ InverseFunctions → InverseFunctionsDatesExt
+    254.7 ms  ✓ NameResolution
+    231.8 ms  ✓ ADTypes → ADTypesEnzymeCoreExt
+    266.5 ms  ✓ ADTypes → ADTypesChainRulesCoreExt
+    362.5 ms  ✓ Functors
+    258.3 ms  ✓ ADTypes → ADTypesConstructionBaseExt
+    241.8 ms  ✓ Ratios
+    276.2 ms  ✓ AliasTables
+    260.6 ms  ✓ StackViews
+    275.4 ms  ✓ PaddedViews
+    382.4 ms  ✓ ReactantCore
+    241.0 ms  ✓ OffsetArrays → OffsetArraysAdaptExt
+    302.6 ms  ✓ ArrayInterface
+    246.4 ms  ✓ FLoopsBase
+    276.1 ms  ✓ CodecZlib
+    399.8 ms  ✓ MarkdownAST
+    356.2 ms  ✓ RegistryInstances
+    309.9 ms  ✓ AxisAlgorithms
+    413.2 ms  ✓ Static
+    326.5 ms  ✓ OpenSSH_jll
+    312.4 ms  ✓ MPIPreferences
+    253.6 ms  ✓ DispatchDoctor → DispatchDoctorEnzymeCoreExt
+    584.3 ms  ✓ Dictionaries
+    463.8 ms  ✓ MLCore
+   1165.7 ms  ✓ FixedPointNumbers
+    320.9 ms  ✓ DispatchDoctor → DispatchDoctorChainRulesCoreExt
+    587.7 ms  ✓ Tracy
+    367.3 ms  ✓ Blosc_jll
+    259.5 ms  ✓ LogExpFunctions → LogExpFunctionsInverseFunctionsExt
+    484.8 ms  ✓ SplittablesBase
+    324.3 ms  ✓ Libtiff_jll
+    311.6 ms  ✓ InverseFunctions → InverseFunctionsTestExt
+    325.5 ms  ✓ Git_jll
+    337.7 ms  ✓ XML2_jll
+    233.3 ms  ✓ CompositionsBase → CompositionsBaseInverseFunctionsExt
+    625.4 ms  ✓ LuxCore
+   1246.5 ms  ✓ WeightInitializers
+    292.6 ms  ✓ MosaicViews
+    271.0 ms  ✓ ArrayInterface → ArrayInterfaceStaticArraysCoreExt
+    295.8 ms  ✓ ArrayInterface → ArrayInterfaceGPUArraysCoreExt
+    309.5 ms  ✓ ArrayInterface → ArrayInterfaceChainRulesCoreExt
+    340.5 ms  ✓ ArrayInterface → ArrayInterfaceSparseArraysExt
+    474.8 ms  ✓ MLDataDevices
+   1498.3 ms  ✓ FileIO
+    520.4 ms  ✓ CPUSummary
+    296.6 ms  ✓ MPItrampoline_jll
+    569.0 ms  ✓ DocInventories
+    328.7 ms  ✓ OpenMPI_jll
+    306.5 ms  ✓ Blosc
+    767.4 ms  ✓ Optimisers
+    338.5 ms  ✓ Ratios → RatiosFixedPointNumbersExt
+    265.8 ms  ✓ Git
+    318.8 ms  ✓ Hwloc_jll
+    271.3 ms  ✓ LuxCore → FunctorsExt
+    278.4 ms  ✓ LuxCore → EnzymeCoreExt
+    277.9 ms  ✓ LuxCore → SetfieldExt
+    679.5 ms  ✓ StaticArrayInterface
+    328.9 ms  ✓ LuxCore → ChainRulesCoreExt
+    340.8 ms  ✓ MLDataDevices → ChainRulesCoreExt
+    278.3 ms  ✓ MLDataDevices → FillArraysExt
+    404.6 ms  ✓ ArrayInterface → ArrayInterfaceChainRulesExt
+   1109.7 ms  ✓ StatsBase
+    501.9 ms  ✓ WeightInitializers → ChainRulesCoreExt
+    289.7 ms  ✓ Optimisers → OptimisersEnzymeCoreExt
+    290.6 ms  ✓ Optimisers → OptimisersAdaptExt
+    351.3 ms  ✓ MLDataDevices → SparseArraysExt
+    266.2 ms  ✓ LuxCore → MLDataDevicesExt
+    351.7 ms  ✓ MPICH_jll
+    273.2 ms  ✓ StaticArrayInterface → StaticArrayInterfaceOffsetArraysExt
+   3362.5 ms  ✓ StaticArrays
+   1229.1 ms  ✓ ColorTypes
+    403.9 ms  ✓ MLDataDevices → ChainRulesExt
+    544.4 ms  ✓ ComponentArrays
+   1072.6 ms  ✓ Accessors
+    344.6 ms  ✓ FillArrays → FillArraysStaticArraysExt
+    348.1 ms  ✓ StaticArrays → StaticArraysChainRulesCoreExt
+    360.4 ms  ✓ Adapt → AdaptStaticArraysExt
+    369.8 ms  ✓ ConstructionBase → ConstructionBaseStaticArraysExt
+    391.0 ms  ✓ ForwardDiff → ForwardDiffStaticArraysExt
+    534.4 ms  ✓ HDF5_jll
+    473.7 ms  ✓ StaticArrays → StaticArraysStatisticsExt
+    495.4 ms  ✓ CoordinateTransformations
+    289.2 ms  ✓ Accessors → LinearAlgebraExt
+    315.2 ms  ✓ ComponentArrays → ComponentArraysOptimisersExt
+    301.3 ms  ✓ MLDataDevices → ComponentArraysExt
+    609.2 ms  ✓ MLDataDevices → ZygoteExt
+    421.5 ms  ✓ StaticArrayInterface → StaticArrayInterfaceStaticArraysExt
+    638.5 ms  ✓ FiniteDifferences
+   1091.6 ms  ✓ Rotations
+    453.9 ms  ✓ StructArrays → StructArraysStaticArraysExt
+    856.4 ms  ✓ ComponentArrays → ComponentArraysZygoteExt
+    388.3 ms  ✓ Accessors → TestExt
+    626.8 ms  ✓ Accessors → StructArraysExt
+    555.8 ms  ✓ Accessors → StaticArraysExt
+    482.9 ms  ✓ BangBang
+   1030.9 ms  ✓ Interpolations
+   1365.0 ms  ✓ ColorVectorSpace
+   4928.7 ms  ✓ Parsers
+    317.7 ms  ✓ BangBang → BangBangTablesExt
+    321.1 ms  ✓ BangBang → BangBangChainRulesCoreExt
+    267.5 ms  ✓ InlineStrings → ParsersExt
+    415.2 ms  ✓ MicroCollections
+    463.8 ms  ✓ BangBang → BangBangStaticArraysExt
+    429.6 ms  ✓ ColorVectorSpace → SpecialFunctionsExt
+   1665.9 ms  ✓ KernelAbstractions
+    300.2 ms  ✓ BangBang → BangBangStructArraysExt
+   1962.7 ms  ✓ Colors
+    721.2 ms  ✓ JSON
+    356.1 ms  ✓ KernelAbstractions → LinearAlgebraExt
+    427.7 ms  ✓ NVTX → NVTXColorsExt
+    458.0 ms  ✓ Conda
+   1025.7 ms  ✓ BangBang → BangBangDataFramesExt
+    721.7 ms  ✓ Zygote → ZygoteColorsExt
+    439.4 ms  ✓ KernelAbstractions → EnzymeExt
+    514.4 ms  ✓ KernelAbstractions → SparseArraysExt
+    714.0 ms  ✓ StructArrays → StructArraysGPUArraysCoreExt
+   1254.7 ms  ✓ Transducers
+    811.9 ms  ✓ ComponentArrays → ComponentArraysKernelAbstractionsExt
+    419.3 ms  ✓ Transducers → TransducersAdaptExt
+   7290.3 ms  ✓ MLStyle
+   2764.5 ms  ✓ HDF5
+    877.6 ms  ✓ Transducers → TransducersDataFramesExt
+    352.9 ms  ✓ H5Zblosc
+   1610.0 ms  ✓ GPUArrays
+   1127.0 ms  ✓ JuliaVariables
+    787.2 ms  ✓ JLD
+   4461.8 ms  ✓ ITK_jll
+    606.4 ms  ✓ MLDataDevices → GPUArraysSparseArraysExt
+    648.8 ms  ✓ WeightInitializers → GPUArraysExt
+   2354.5 ms  ✓ NNlib
+    755.0 ms  ✓ ComponentArrays → ComponentArraysGPUArraysExt
+    404.2 ms  ✓ ITKIOWrapper_jll
+    532.8 ms  ✓ OneHotArrays
+    536.3 ms  ✓ NNlib → NNlibSpecialFunctionsExt
+    584.9 ms  ✓ NNlib → NNlibEnzymeCoreExt
+    533.5 ms  ✓ MLDataDevices → OneHotArraysExt
+    532.4 ms  ✓ NNlib → NNlibForwardDiffExt
+   1585.9 ms  ✓ FLoops
+   4302.3 ms  ✓ PyCall
+   7219.0 ms  ✓ Enzyme → EnzymeStaticArraysExt
+   1852.2 ms  ✓ LuxLib
+    537.4 ms  ✓ LuxLib → EnzymeExt
+    547.9 ms  ✓ LuxLib → OneHotArraysExt
+    635.8 ms  ✓ LuxLib → ForwardDiffExt
+   2491.1 ms  ✓ MLUtils
+   7475.7 ms  ✓ ImageCore
+    810.0 ms  ✓ MLDataDevices → MLUtilsExt
+  12704.9 ms  ✓ CxxWrap
+   1082.6 ms  ✓ ImageBase
+    823.0 ms  ✓ ITKIOWrapper
+   1028.1 ms  ✓ ImageTransformations
+   9556.6 ms  ✓ Documenter
+    650.2 ms  ✓ DocumenterVitepress
+   2911.9 ms  ✓ Flux
+   1053.2 ms  ✓ Flux → FluxFiniteDifferencesExt
+   1096.1 ms  ✓ LuxCore → FluxExt
+   7527.5 ms  ✓ Lux
+    712.2 ms  ✓ Lux → ComponentArraysExt
+    737.5 ms  ✓ Lux → GPUArraysExt
+    821.0 ms  ✓ Lux → MLUtilsExt
+   1020.9 ms  ✓ Lux → EnzymeExt
+   1089.7 ms  ✓ Lux → ZygoteExt
+   1167.3 ms  ✓ Lux → FluxExt
+   7344.4 ms  ✓ Flux → FluxEnzymeExt
+  20479.3 ms  ✓ CUDA
+   2410.6 ms  ✓ Atomix → AtomixCUDAExt
+   2984.1 ms  ✓ CUDA → ChainRulesCoreExt
+   2996.9 ms  ✓ ArrayInterface → ArrayInterfaceCUDAExt
+   3018.2 ms  ✓ CUDA → EnzymeCoreExt
+   3022.6 ms  ✓ MLDataDevices → CUDAExt
+   3107.2 ms  ✓ CUDA → SpecialFunctionsExt
+   2373.6 ms  ✓ WeightInitializers → CUDAExt
+   2629.4 ms  ✓ NNlib → NNlibCUDAExt
+    317.3 ms  ✓ Flux → FluxCUDAExt
+   2584.8 ms  ✓ LuxLib → CUDAExt
+   2592.4 ms  ✓ LuxLib → CUDAForwardDiffExt
+  12483.5 ms  ✓ MedImages
+  237 dependencies successfully precompiled in 56 seconds. 109 already precompiled.
+  1 dependency had output during precompilation:
+┌ Flux → FluxCUDAExt
+│  ┌ Warning: Package cuDNN not found in current path.
+│  │ - Run `import Pkg; Pkg.add("cuDNN")` to install the cuDNN package, then restart julia.
+│  │ - If cuDNN is not installed, some Flux functionalities will not be available when running on the GPU.
+│  └ @ FluxCUDAExt ~/.julia/packages/Flux/DZYiO/ext/FluxCUDAExt.jl:8
+└  
+    Updating registry at `~/.julia/registries/General.toml`
+   Installed PtrArrays ─────────── v1.4.0
+   Installed StaticArrays ──────── v1.9.17
+   Installed DocumenterVitepress ─ v0.3.2
+   Installed Documenter ────────── v1.17.0
+    Updating `~/project_ssd/MedImages.jl/Project.toml`
+  [7d9f7c33] + Accessors v0.1.43
+  [a9b6321e] + Atomix v1.1.2
+  [052768ef] + CUDA v5.9.6
+  [d360d2e6] + ChainRulesCore v1.26.0
+⌅ [3da002f7] + ColorTypes v0.11.5
+  [861a8166] + Combinatorics v1.1.0
+  [b0b7db55] + ComponentArrays v0.15.32
+  [150eb455] + CoordinateTransformations v0.6.4
+  [85a47980] + Dictionaries v0.4.6
+  [e30172f5] + Documenter v1.17.0
+  [4710194d] + DocumenterVitepress v0.3.2
+  [7da242da] + Enzyme v0.13.129
+  [26cc04aa] + FiniteDifferences v0.12.33
+  [587475ba] + Flux v0.16.9
+  [f6369f11] + ForwardDiff v1.3.2
+  [f67ccb44] + HDF5 v0.17.2
+  [8538b10a] + ITKIOWrapper v4.0.2
+  [02fcd773] + ImageTransformations v0.10.2
+⌅ [a98d9a8b] + Interpolations v0.15.1
+  [4138dd39] + JLD v0.13.5
+⌅ [682c06a0] + JSON v0.21.4
+  [63c18a36] + KernelAbstractions v0.9.40
+  [b2108857] + Lux v1.31.3
+  [3bd65402] + Optimisers v0.4.7
+  [d96e819e] + Parameters v0.12.3
+  [438e738f] + PyCall v1.96.4
+  [6038ab10] + Rotations v1.7.1
+  [efcf1570] + Setfield v1.1.2
+  [90137ffa] + StaticArrays v1.9.17
+  [e88e6eb3] + Zygote v0.7.10
+  [10745b16] ~ Statistics ⇒ v1.10.0
+    Updating `~/project_ssd/MedImages.jl/Manifest.toml`
+  [47edcb42] + ADTypes v1.21.0
+  [a4c015fc] + ANSIColoredPrinters v0.0.1
+  [621f4979] + AbstractFFTs v1.5.0
+  [1520ce14] + AbstractTrees v0.4.5
+  [7d9f7c33] + Accessors v0.1.43
+  [79e6a3ab] + Adapt v4.4.0
+  [66dad0bd] + AliasTables v1.1.3
+  [dce04be8] + ArgCheck v2.5.0
+  [4fba245c] + ArrayInterface v7.22.0
+  [a9b6321e] + Atomix v1.1.2
+  [13072b0f] + AxisAlgorithms v1.1.0
+  [ab4f0b2a] + BFloat16s v0.6.1
+  [198e06fe] + BangBang v0.4.8
+  [9718e550] + Baselet v0.1.1
+  [a74b3585] + Blosc v0.7.3
+  [fa961155] + CEnum v0.5.0
+  [2a0fbf3d] + CPUSummary v0.2.7
+  [052768ef] + CUDA v5.9.6
+  [1af6417a] + CUDA_Runtime_Discovery v1.0.0
+  [082447d4] + ChainRules v1.73.0
+  [d360d2e6] + ChainRulesCore v1.26.0
+  [944b1d66] + CodecZlib v0.7.8
+⌅ [3da002f7] + ColorTypes v0.11.5
+⌃ [c3611d14] + ColorVectorSpace v0.10.0
+  [5ae59095] + Colors v0.13.1
+  [861a8166] + Combinatorics v1.1.0
+  [bbf7d656] + CommonSubexpressions v0.3.1
+  [f70d9fcc] + CommonWorldInvalidations v1.0.0
+  [34da2185] + Compat v4.18.1
+  [b0b7db55] + ComponentArrays v0.15.32
+  [a33af91c] + CompositionsBase v0.1.2
+  [2569d6c7] + ConcreteStructs v0.2.3
+  [8f4d0f93] + Conda v1.10.3
+  [187b0558] + ConstructionBase v1.6.0
+  [6add18c4] + ContextVariablesX v0.1.3
+  [150eb455] + CoordinateTransformations v0.6.4
+  [adafc99b] + CpuId v0.3.1
+  [a8cc5b0e] + Crayons v4.1.1
+⌅ [1f15a43c] + CxxWrap v0.16.2
+  [9a962f9c] + DataAPI v1.16.0
+  [a93c6f00] + DataFrames v1.8.1
+  [864edb3b] + DataStructures v0.19.3
+  [e2d170a0] + DataValueInterfaces v1.0.0
+  [244e2a9f] + DefineSingletons v0.1.2
+  [8bb1440f] + DelimitedFiles v1.9.1
+  [85a47980] + Dictionaries v0.4.6
+  [163ba53b] + DiffResults v1.1.0
+  [b552c78f] + DiffRules v1.15.1
+  [8d63f2c5] + DispatchDoctor v0.4.28
+  [43dc2714] + DocInventories v1.0.0
+  [ffbed154] + DocStringExtensions v0.9.5
+  [e30172f5] + Documenter v1.17.0
+  [4710194d] + DocumenterVitepress v0.3.2
+  [7da242da] + Enzyme v0.13.129
+  [f151be2c] + EnzymeCore v0.8.18
+  [e2ba6199] + ExprTools v0.1.10
+  [21656369] + ExpressionExplorer v1.1.4
+  [cc61a311] + FLoops v0.2.2
+  [b9860ae5] + FLoopsBase v0.1.1
+  [9aa1b823] + FastClosures v0.3.2
+  [5789e2e9] + FileIO v1.18.0
+  [1a297f60] + FillArrays v1.16.0
+  [26cc04aa] + FiniteDifferences v0.12.33
+  [53c48c17] + FixedPointNumbers v0.8.5
+  [587475ba] + Flux v0.16.9
+  [f6369f11] + ForwardDiff v1.3.2
+  [d9f16b24] + Functors v0.5.2
+  [0c68f7d7] + GPUArrays v11.4.1
+  [46192b85] + GPUArraysCore v0.2.0
+  [61eb1bfa] + GPUCompiler v1.8.2
+  [096a3bc2] + GPUToolbox v1.0.0
+  [d7ba0133] + Git v1.5.0
+  [c8ec2601] + H5Zblosc v0.1.2
+  [f67ccb44] + HDF5 v0.17.2
+  [076d061b] + HashArrayMappedTries v0.2.0
+  [b5f81e59] + IOCapture v1.0.0
+  [7869d1d1] + IRTools v0.4.15
+  [8538b10a] + ITKIOWrapper v4.0.2
+  [615f187c] + IfElse v0.1.1
+  [c817782e] + ImageBase v0.1.7
+  [a09fc81d] + ImageCore v0.10.5
+  [02fcd773] + ImageTransformations v0.10.2
+  [313cdc1a] + Indexing v1.1.1
+  [22cec73e] + InitialValues v0.3.1
+  [842dd82b] + InlineStrings v1.4.5
+⌅ [a98d9a8b] + Interpolations v0.15.1
+  [3587e190] + InverseFunctions v0.1.17
+  [41ab1584] + InvertedIndices v1.3.1
+  [92d709cd] + IrrationalConstants v0.2.6
+  [82899510] + IteratorInterfaceExtensions v1.0.0
+  [4138dd39] + JLD v0.13.5
+  [692b3bcd] + JLLWrappers v1.7.1
+⌅ [682c06a0] + JSON v0.21.4
+  [b14d175d] + JuliaVariables v0.2.4
+  [63c18a36] + KernelAbstractions v0.9.40
+  [929cbde3] + LLVM v9.4.6
+  [8b046642] + LLVMLoopInfo v1.0.0
+  [b964fa9f] + LaTeXStrings v1.4.0
+  [0e77f7df] + LazilyInitializedFields v1.3.0
+  [2ab3a3ac] + LogExpFunctions v0.3.29
+  [b2108857] + Lux v1.31.3
+  [bb33d45b] + LuxCore v1.5.3
+  [82251201] + LuxLib v1.15.4
+  [c2834f40] + MLCore v1.0.0
+  [7e8f7934] + MLDataDevices v1.17.4
+  [d8e11817] + MLStyle v0.4.17
+  [f1d291b0] + MLUtils v0.4.8
+  [3da0fdf6] + MPIPreferences v0.1.11
+  [1914dd2f] + MacroTools v0.5.16
+  [dbb5928d] + MappedArrays v0.4.3
+  [d0879d2d] + MarkdownAST v0.1.3
+  [128add7d] + MicroCollections v0.2.0
+  [e1d29d7a] + Missings v1.2.0
+  [e94cdb99] + MosaicViews v0.3.4
+  [872c559c] + NNlib v0.9.33
+  [5da4648a] + NVTX v1.0.3
+  [77ba4419] + NaNMath v1.1.3
+  [71a1bf82] + NameResolution v0.1.5
+  [d8793406] + ObjectFile v0.5.0
+  [6fe1bfb0] + OffsetArrays v1.17.0
+  [0b1bfda6] + OneHotArrays v0.2.10
+  [3bd65402] + Optimisers v0.4.7
+  [bac558e1] + OrderedCollections v1.8.1
+  [5432bcbf] + PaddedViews v0.5.12
+  [d96e819e] + Parameters v0.12.3
+  [69de0a69] + Parsers v2.8.3
+  [2dfb63ee] + PooledArrays v1.4.3
+⌅ [aea7be01] + PrecompileTools v1.2.1
+  [21216c6a] + Preferences v1.5.1
+  [8162dcfd] + PrettyPrint v0.2.0
+  [08abe8d2] + PrettyTables v3.2.3
+  [33c8b6b6] + ProgressLogging v0.1.6
+  [43287f4e] + PtrArrays v1.4.0
+  [438e738f] + PyCall v1.96.4
+  [94ee1d12] + Quaternions v0.7.7
+  [74087812] + Random123 v1.7.1
+  [e6cf234a] + RandomNumbers v1.6.0
+  [c84ed2f1] + Ratios v0.4.5
+  [a3311ec8] + ReactantCore v0.1.16
+  [c1ae055f] + RealDot v0.1.0
+  [189a3867] + Reexport v1.2.2
+  [2792f1a3] + RegistryInstances v0.1.0
+  [ae029012] + Requires v1.3.1
+  [708f8203] + Richardson v1.4.2
+  [6038ab10] + Rotations v1.7.1
+  [431bcebd] + SciMLPublic v1.0.1
+  [7e506255] + ScopedValues v1.5.0
+  [6c6a2e73] + Scratch v1.3.0
+  [91c51154] + SentinelArrays v1.4.9
+  [efcf1570] + Setfield v1.1.2
+  [605ecd9f] + ShowCases v0.1.0
+  [699a6c99] + SimpleTraits v0.9.5
+  [a2af1166] + SortingAlgorithms v1.2.2
+  [dc90abb0] + SparseInverseSubset v0.1.2
+  [276daf66] + SpecialFunctions v2.7.1
+  [171d559e] + SplittablesBase v0.1.15
+  [cae243ae] + StackViews v0.1.2
+  [aedffcd0] + Static v1.3.1
+  [0d7ed370] + StaticArrayInterface v1.9.0
+  [90137ffa] + StaticArrays v1.9.17
+  [1e83bf80] + StaticArraysCore v1.4.4
+  [82ae8749] + StatsAPI v1.8.0
+  [2913bbd2] + StatsBase v0.34.10
+  [892a3eda] + StringManipulation v0.4.2
+  [09ab397b] + StructArrays v0.7.2
+  [53d494c1] + StructIO v0.3.1
+  [3783bdb8] + TableTraits v1.0.1
+  [bd369af6] + Tables v1.12.1
+  [62fd8b95] + TensorCore v0.1.1
+  [e689c965] + Tracy v0.1.6
+  [3bb67fe8] + TranscodingStreams v0.11.3
+  [28d57a85] + Transducers v0.4.85
+  [3a884ed6] + UnPack v1.0.2
+  [013be700] + UnsafeAtomics v0.3.0
+  [81def892] + VersionParsing v1.3.0
+  [d49dbf32] + WeightInitializers v1.3.1
+  [efce3f68] + WoodburyMatrices v1.1.0
+  [e88e6eb3] + Zygote v0.7.10
+  [700de1a5] + ZygoteRules v0.2.7
+  [0b7ba130] + Blosc_jll v1.21.7+0
+  [d1e2174e] + CUDA_Compiler_jll v0.4.1+1
+  [4ee394cb] + CUDA_Driver_jll v13.1.0+2
+⌅ [76a88914] + CUDA_Runtime_jll v0.19.2+0
+  [7cc45869] + Enzyme_jll v0.0.249+0
+  [2e619515] + Expat_jll v2.7.3+0
+  [f5851436] + FFTW_jll v3.3.11+0
+  [020c3dae] + Git_LFS_jll v3.7.0+0
+  [f8c6e375] + Git_jll v2.53.0+0
+⌅ [0234f1f7] + HDF5_jll v1.14.3+3
+  [e33a78d0] + Hwloc_jll v2.13.0+0
+  [b6265aa4] + ITKIOWrapper_jll v3.0.1+1
+  [3324d3a8] + ITK_jll v5.3.3+0
+  [aacddb02] + JpegTurbo_jll v3.1.4+0
+  [9c1d0b0a] + JuliaNVTXCallbacks_jll v0.2.1+0
+  [88015f11] + LERC_jll v4.0.1+0
+  [dad2f222] + LLVMExtra_jll v0.0.38+0
+  [ad6e5548] + LibTracyClient_jll v0.13.1+0
+  [94ce4f54] + Libiconv_jll v1.18.0+0
+  [89763e89] + Libtiff_jll v4.7.2+0
+  [5ced341a] + Lz4_jll v1.10.1+0
+  [7cb0a576] + MPICH_jll v5.0.0+0
+  [f1f71cc9] + MPItrampoline_jll v5.5.5+0
+  [9237b28f] + MicrosoftMPI_jll v10.1.4+3
+  [e98f9f5b] + NVTX_jll v3.2.2+0
+  [c7aee132] + NodeJS_20_jll v20.12.2+0
+⌅ [fe0851c0] + OpenMPI_jll v4.1.8+1
+  [9bd350c2] + OpenSSH_jll v10.2.1+0
+  [458c3c95] + OpenSSL_jll v3.5.5+0
+  [efe28fd5] + OpenSpecFun_jll v0.5.6+0
+⌅ [02c8fc9c] + XML2_jll v2.13.9+0
+  [ffd25f8a] + XZ_jll v5.8.2+0
+  [a65dc6b1] + Xorg_libpciaccess_jll v0.18.1+0
+  [3161d3a3] + Zstd_jll v1.5.7+1
+  [1e29f10c] + demumble_jll v1.3.0+0
+  [477f73a3] + libaec_jll v1.1.5+0
+⌅ [3eaa8342] + libcxxwrap_julia_jll v0.13.4+0
+  [b53b4c65] + libpng_jll v1.6.55+0
+  [0dad84c5] + ArgTools v1.1.1
+  [56f22d72] + Artifacts
+  [2a0f44e3] + Base64
+  [ade2ca70] + Dates
+  [8ba89e20] + Distributed
+  [f43a241f] + Downloads v1.6.0
+  [7b1f6079] + FileWatching
+  [9fa8497b] + Future
+  [b77e0a4c] + InteractiveUtils
+  [4af54fe1] + LazyArtifacts
+  [b27032c2] + LibCURL v0.6.4
+  [76f85450] + LibGit2
+  [8f399da3] + Libdl
+  [37e2e46d] + LinearAlgebra
+  [56ddb016] + Logging
+  [d6f4376e] + Markdown
+  [a63ad114] + Mmap
+  [ca575930] + NetworkOptions v1.2.0
+  [44cfe95a] + Pkg v1.10.0
+  [de0858da] + Printf
+  [3fa0cd96] + REPL
+  [9a3f8284] + Random
+  [ea8e919c] + SHA v0.7.0
+  [9e88b42a] + Serialization
+  [1a1011a3] + SharedArrays
+  [6462fe0b] + Sockets
+  [2f01184e] + SparseArrays v1.10.0
+  [10745b16] + Statistics v1.10.0
+  [4607b0f0] + SuiteSparse
+  [fa267f1f] + TOML v1.0.3
+  [a4e569a6] + Tar v1.10.0
+  [8dfed614] + Test
+  [cf7118a7] + UUIDs
+  [4ec0a83e] + Unicode
+  [e66e0078] + CompilerSupportLibraries_jll v1.1.1+0
+  [deac9b47] + LibCURL_jll v8.4.0+0
+  [e37daf67] + LibGit2_jll v1.6.4+0
+  [29816b5a] + LibSSH2_jll v1.11.0+1
+  [c8ffd9c3] + MbedTLS_jll v2.28.2+1
+  [14a3606d] + MozillaCACerts_jll v2023.1.10
+  [4536629a] + OpenBLAS_jll v0.3.23+4
+  [05823500] + OpenLibm_jll v0.8.5+0
+  [efcefdf7] + PCRE2_jll v10.42.0+1
+  [bea87d4a] + SuiteSparse_jll v7.2.1+1
+  [83775a58] + Zlib_jll v1.2.13+1
+  [8e850b90] + libblastrampoline_jll v5.11.0+0
+  [8e850ede] + nghttp2_jll v1.52.0+1
+  [3f19e933] + p7zip_jll v17.4.0+2
+        Info Packages marked with ⌃ and ⌅ have new versions available. Those with ⌃ may be upgradable, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`
+     Testing MedImages
+      Status `/tmp/jl_wYSYuM/Project.toml`
+  [7d9f7c33] Accessors v0.1.43
+  [d360d2e6] ChainRulesCore v1.26.0
+⌅ [3da002f7] ColorTypes v0.11.5
+  [861a8166] Combinatorics v1.1.0
+  [150eb455] CoordinateTransformations v0.6.4
+  [85a47980] Dictionaries v0.4.6
+  [e30172f5] Documenter v1.17.0
+  [4710194d] DocumenterVitepress v0.3.2
+  [f67ccb44] HDF5 v0.17.2
+  [8538b10a] ITKIOWrapper v4.0.2
+⌃ [a98d9a8b] Interpolations v0.15.1
+  [4138dd39] JLD v0.13.5
+⌃ [682c06a0] JSON v0.21.4
+  [63c18a36] KernelAbstractions v0.9.40
+  [fbff095b] MedImages v2.0.1 `~/project_ssd/MedImages.jl`
+  [d96e819e] Parameters v0.12.3
+  [438e738f] PyCall v1.96.4
+  [6038ab10] Rotations v1.7.1
+  [1bc83da4] SafeTestsets v0.1.0
+  [efcf1570] Setfield v1.1.2
+  [90137ffa] StaticArrays v1.9.17
+  [ade2ca70] Dates
+  [37e2e46d] LinearAlgebra
+  [44cfe95a] Pkg v1.10.0
+  [9a3f8284] Random
+  [10745b16] Statistics v1.10.0
+  [8dfed614] Test
+  [cf7118a7] UUIDs
+      Status `/tmp/jl_wYSYuM/Manifest.toml`
+  [47edcb42] ADTypes v1.21.0
+  [a4c015fc] ANSIColoredPrinters v0.0.1
+  [621f4979] AbstractFFTs v1.5.0
+  [1520ce14] AbstractTrees v0.4.5
+  [7d9f7c33] Accessors v0.1.43
+  [79e6a3ab] Adapt v4.4.0
+  [66dad0bd] AliasTables v1.1.3
+  [dce04be8] ArgCheck v2.5.0
+  [4fba245c] ArrayInterface v7.22.0
+  [a9b6321e] Atomix v1.1.2
+  [13072b0f] AxisAlgorithms v1.1.0
+  [ab4f0b2a] BFloat16s v0.6.1
+  [198e06fe] BangBang v0.4.8
+  [9718e550] Baselet v0.1.1
+  [a74b3585] Blosc v0.7.3
+  [fa961155] CEnum v0.5.0
+  [2a0fbf3d] CPUSummary v0.2.7
+  [052768ef] CUDA v5.9.6
+  [1af6417a] CUDA_Runtime_Discovery v1.0.0
+  [082447d4] ChainRules v1.73.0
+  [d360d2e6] ChainRulesCore v1.26.0
+  [944b1d66] CodecZlib v0.7.8
+⌅ [3da002f7] ColorTypes v0.11.5
+⌃ [c3611d14] ColorVectorSpace v0.10.0
+  [5ae59095] Colors v0.13.1
+  [861a8166] Combinatorics v1.1.0
+  [bbf7d656] CommonSubexpressions v0.3.1
+  [f70d9fcc] CommonWorldInvalidations v1.0.0
+  [34da2185] Compat v4.18.1
+  [b0b7db55] ComponentArrays v0.15.32
+  [a33af91c] CompositionsBase v0.1.2
+  [2569d6c7] ConcreteStructs v0.2.3
+  [8f4d0f93] Conda v1.10.3
+  [187b0558] ConstructionBase v1.6.0
+  [6add18c4] ContextVariablesX v0.1.3
+  [150eb455] CoordinateTransformations v0.6.4
+  [adafc99b] CpuId v0.3.1
+  [a8cc5b0e] Crayons v4.1.1
+⌅ [1f15a43c] CxxWrap v0.16.2
+  [9a962f9c] DataAPI v1.16.0
+  [a93c6f00] DataFrames v1.8.1
+  [864edb3b] DataStructures v0.19.3
+  [e2d170a0] DataValueInterfaces v1.0.0
+  [244e2a9f] DefineSingletons v0.1.2
+  [8bb1440f] DelimitedFiles v1.9.1
+  [85a47980] Dictionaries v0.4.6
+  [163ba53b] DiffResults v1.1.0
+  [b552c78f] DiffRules v1.15.1
+  [8d63f2c5] DispatchDoctor v0.4.28
+  [43dc2714] DocInventories v1.0.0
+  [ffbed154] DocStringExtensions v0.9.5
+  [e30172f5] Documenter v1.17.0
+  [4710194d] DocumenterVitepress v0.3.2
+  [7da242da] Enzyme v0.13.129
+  [f151be2c] EnzymeCore v0.8.18
+  [e2ba6199] ExprTools v0.1.10
+  [21656369] ExpressionExplorer v1.1.4
+  [cc61a311] FLoops v0.2.2
+  [b9860ae5] FLoopsBase v0.1.1
+  [9aa1b823] FastClosures v0.3.2
+  [5789e2e9] FileIO v1.18.0
+  [1a297f60] FillArrays v1.16.0
+  [26cc04aa] FiniteDifferences v0.12.33
+  [53c48c17] FixedPointNumbers v0.8.5
+  [587475ba] Flux v0.16.9
+  [f6369f11] ForwardDiff v1.3.2
+  [d9f16b24] Functors v0.5.2
+  [0c68f7d7] GPUArrays v11.4.1
+  [46192b85] GPUArraysCore v0.2.0
+  [61eb1bfa] GPUCompiler v1.8.2
+  [096a3bc2] GPUToolbox v1.0.0
+  [d7ba0133] Git v1.5.0
+  [c8ec2601] H5Zblosc v0.1.2
+  [f67ccb44] HDF5 v0.17.2
+  [076d061b] HashArrayMappedTries v0.2.0
+  [b5f81e59] IOCapture v1.0.0
+  [7869d1d1] IRTools v0.4.15
+  [8538b10a] ITKIOWrapper v4.0.2
+  [615f187c] IfElse v0.1.1
+  [c817782e] ImageBase v0.1.7
+  [a09fc81d] ImageCore v0.10.5
+  [02fcd773] ImageTransformations v0.10.2
+  [313cdc1a] Indexing v1.1.1
+  [22cec73e] InitialValues v0.3.1
+  [842dd82b] InlineStrings v1.4.5
+⌃ [a98d9a8b] Interpolations v0.15.1
+  [3587e190] InverseFunctions v0.1.17
+  [41ab1584] InvertedIndices v1.3.1
+  [92d709cd] IrrationalConstants v0.2.6
+  [82899510] IteratorInterfaceExtensions v1.0.0
+  [4138dd39] JLD v0.13.5
+  [692b3bcd] JLLWrappers v1.7.1
+⌃ [682c06a0] JSON v0.21.4
+  [b14d175d] JuliaVariables v0.2.4
+  [63c18a36] KernelAbstractions v0.9.40
+  [929cbde3] LLVM v9.4.6
+  [8b046642] LLVMLoopInfo v1.0.0
+  [b964fa9f] LaTeXStrings v1.4.0
+  [0e77f7df] LazilyInitializedFields v1.3.0
+  [2ab3a3ac] LogExpFunctions v0.3.29
+  [b2108857] Lux v1.31.3
+  [bb33d45b] LuxCore v1.5.3
+  [82251201] LuxLib v1.15.4
+  [c2834f40] MLCore v1.0.0
+  [7e8f7934] MLDataDevices v1.17.4
+  [d8e11817] MLStyle v0.4.17
+  [f1d291b0] MLUtils v0.4.8
+  [3da0fdf6] MPIPreferences v0.1.11
+  [1914dd2f] MacroTools v0.5.16
+  [dbb5928d] MappedArrays v0.4.3
+  [d0879d2d] MarkdownAST v0.1.3
+  [fbff095b] MedImages v2.0.1 `~/project_ssd/MedImages.jl`
+  [128add7d] MicroCollections v0.2.0
+  [e1d29d7a] Missings v1.2.0
+  [e94cdb99] MosaicViews v0.3.4
+  [872c559c] NNlib v0.9.33
+  [5da4648a] NVTX v1.0.3
+  [77ba4419] NaNMath v1.1.3
+  [71a1bf82] NameResolution v0.1.5
+  [d8793406] ObjectFile v0.5.0
+  [6fe1bfb0] OffsetArrays v1.17.0
+  [0b1bfda6] OneHotArrays v0.2.10
+  [3bd65402] Optimisers v0.4.7
+  [bac558e1] OrderedCollections v1.8.1
+  [5432bcbf] PaddedViews v0.5.12
+  [d96e819e] Parameters v0.12.3
+  [69de0a69] Parsers v2.8.3
+  [2dfb63ee] PooledArrays v1.4.3
+⌅ [aea7be01] PrecompileTools v1.2.1
+  [21216c6a] Preferences v1.5.1
+  [8162dcfd] PrettyPrint v0.2.0
+  [08abe8d2] PrettyTables v3.2.3
+  [33c8b6b6] ProgressLogging v0.1.6
+  [43287f4e] PtrArrays v1.4.0
+  [438e738f] PyCall v1.96.4
+  [94ee1d12] Quaternions v0.7.7
+  [74087812] Random123 v1.7.1
+  [e6cf234a] RandomNumbers v1.6.0
+  [c84ed2f1] Ratios v0.4.5
+  [a3311ec8] ReactantCore v0.1.16
+  [c1ae055f] RealDot v0.1.0
+  [189a3867] Reexport v1.2.2
+  [2792f1a3] RegistryInstances v0.1.0
+  [ae029012] Requires v1.3.1
+  [708f8203] Richardson v1.4.2
+  [6038ab10] Rotations v1.7.1
+  [1bc83da4] SafeTestsets v0.1.0
+  [431bcebd] SciMLPublic v1.0.1
+  [7e506255] ScopedValues v1.5.0
+  [6c6a2e73] Scratch v1.3.0
+  [91c51154] SentinelArrays v1.4.9
+  [efcf1570] Setfield v1.1.2
+  [605ecd9f] ShowCases v0.1.0
+  [699a6c99] SimpleTraits v0.9.5
+  [a2af1166] SortingAlgorithms v1.2.2
+  [dc90abb0] SparseInverseSubset v0.1.2
+  [276daf66] SpecialFunctions v2.7.1
+  [171d559e] SplittablesBase v0.1.15
+  [cae243ae] StackViews v0.1.2
+  [aedffcd0] Static v1.3.1
+  [0d7ed370] StaticArrayInterface v1.9.0
+  [90137ffa] StaticArrays v1.9.17
+  [1e83bf80] StaticArraysCore v1.4.4
+  [82ae8749] StatsAPI v1.8.0
+  [2913bbd2] StatsBase v0.34.10
+  [892a3eda] StringManipulation v0.4.2
+  [09ab397b] StructArrays v0.7.2
+  [53d494c1] StructIO v0.3.1
+  [3783bdb8] TableTraits v1.0.1
+  [bd369af6] Tables v1.12.1
+  [62fd8b95] TensorCore v0.1.1
+  [e689c965] Tracy v0.1.6
+  [3bb67fe8] TranscodingStreams v0.11.3
+  [28d57a85] Transducers v0.4.85
+  [3a884ed6] UnPack v1.0.2
+  [013be700] UnsafeAtomics v0.3.0
+  [81def892] VersionParsing v1.3.0
+  [d49dbf32] WeightInitializers v1.3.1
+  [efce3f68] WoodburyMatrices v1.1.0
+  [e88e6eb3] Zygote v0.7.10
+  [700de1a5] ZygoteRules v0.2.7
+  [0b7ba130] Blosc_jll v1.21.7+0
+  [d1e2174e] CUDA_Compiler_jll v0.4.1+1
+  [4ee394cb] CUDA_Driver_jll v13.1.0+2
+⌅ [76a88914] CUDA_Runtime_jll v0.19.2+0
+  [7cc45869] Enzyme_jll v0.0.249+0
+  [2e619515] Expat_jll v2.7.3+0
+  [f5851436] FFTW_jll v3.3.11+0
+  [020c3dae] Git_LFS_jll v3.7.0+0
+  [f8c6e375] Git_jll v2.53.0+0
+⌅ [0234f1f7] HDF5_jll v1.14.3+3
+  [e33a78d0] Hwloc_jll v2.13.0+0
+  [b6265aa4] ITKIOWrapper_jll v3.0.1+1
+  [3324d3a8] ITK_jll v5.3.3+0
+  [aacddb02] JpegTurbo_jll v3.1.4+0
+  [9c1d0b0a] JuliaNVTXCallbacks_jll v0.2.1+0
+  [88015f11] LERC_jll v4.0.1+0
+  [dad2f222] LLVMExtra_jll v0.0.38+0
+  [ad6e5548] LibTracyClient_jll v0.13.1+0
+  [94ce4f54] Libiconv_jll v1.18.0+0
+  [89763e89] Libtiff_jll v4.7.2+0
+  [5ced341a] Lz4_jll v1.10.1+0
+  [7cb0a576] MPICH_jll v5.0.0+0
+  [f1f71cc9] MPItrampoline_jll v5.5.5+0
+  [9237b28f] MicrosoftMPI_jll v10.1.4+3
+  [e98f9f5b] NVTX_jll v3.2.2+0
+  [c7aee132] NodeJS_20_jll v20.12.2+0
+⌅ [fe0851c0] OpenMPI_jll v4.1.8+1
+  [9bd350c2] OpenSSH_jll v10.2.1+0
+  [458c3c95] OpenSSL_jll v3.5.5+0
+  [efe28fd5] OpenSpecFun_jll v0.5.6+0
+⌅ [02c8fc9c] XML2_jll v2.13.9+0
+  [ffd25f8a] XZ_jll v5.8.2+0
+  [a65dc6b1] Xorg_libpciaccess_jll v0.18.1+0
+  [3161d3a3] Zstd_jll v1.5.7+1
+  [1e29f10c] demumble_jll v1.3.0+0
+  [477f73a3] libaec_jll v1.1.5+0
+⌅ [3eaa8342] libcxxwrap_julia_jll v0.13.4+0
+  [b53b4c65] libpng_jll v1.6.55+0
+  [0dad84c5] ArgTools v1.1.1
+  [56f22d72] Artifacts
+  [2a0f44e3] Base64
+  [ade2ca70] Dates
+  [8ba89e20] Distributed
+  [f43a241f] Downloads v1.6.0
+  [7b1f6079] FileWatching
+  [9fa8497b] Future
+  [b77e0a4c] InteractiveUtils
+  [4af54fe1] LazyArtifacts
+  [b27032c2] LibCURL v0.6.4
+  [76f85450] LibGit2
+  [8f399da3] Libdl
+  [37e2e46d] LinearAlgebra
+  [56ddb016] Logging
+  [d6f4376e] Markdown
+  [a63ad114] Mmap
+  [ca575930] NetworkOptions v1.2.0
+  [44cfe95a] Pkg v1.10.0
+  [de0858da] Printf
+  [3fa0cd96] REPL
+  [9a3f8284] Random
+  [ea8e919c] SHA v0.7.0
+  [9e88b42a] Serialization
+  [1a1011a3] SharedArrays
+  [6462fe0b] Sockets
+  [2f01184e] SparseArrays v1.10.0
+  [10745b16] Statistics v1.10.0
+  [4607b0f0] SuiteSparse
+  [fa267f1f] TOML v1.0.3
+  [a4e569a6] Tar v1.10.0
+  [8dfed614] Test
+  [cf7118a7] UUIDs
+  [4ec0a83e] Unicode
+  [e66e0078] CompilerSupportLibraries_jll v1.1.1+0
+  [deac9b47] LibCURL_jll v8.4.0+0
+  [e37daf67] LibGit2_jll v1.6.4+0
+  [29816b5a] LibSSH2_jll v1.11.0+1
+  [c8ffd9c3] MbedTLS_jll v2.28.2+1
+  [14a3606d] MozillaCACerts_jll v2023.1.10
+  [4536629a] OpenBLAS_jll v0.3.23+4
+  [05823500] OpenLibm_jll v0.8.5+0
+  [efcefdf7] PCRE2_jll v10.42.0+1
+  [bea87d4a] SuiteSparse_jll v7.2.1+1
+  [83775a58] Zlib_jll v1.2.13+1
+  [8e850b90] libblastrampoline_jll v5.11.0+0
+  [8e850ede] nghttp2_jll v1.52.0+1
+  [3f19e933] p7zip_jll v17.4.0+2
+        Info Packages marked with ⌃ and ⌅ have new versions available. Those with ⌃ may be upgradable, but those with ⌅ are restricted by compatibility constraints from upgrading.
+     Testing Running tests...
+Creating image with direct utility function...
+Data size: 19660800
+Dimensions: 512x512x75
+Image created and saved successfully
+Creating image with direct utility function...
+Data size: 19660800
+Dimensions: 512x512x75
+Image created and saved successfully
+Creating image with direct utility function...
+Data size: 19660800
+Dimensions: 512x512x75
+Image created and saved successfully
+Creating image with direct utility function...
+Data size: 19660800
+Dimensions: 512x512x75
+Image created and saved successfully
+WARNING: Method definition get_sitk_interpolator(Any) in module Main at /home/jm/project_ssd/MedImages.jl/test/basic_transformations_tests/test_rotate_mi.jl:70 overwritten at /home/jm/project_ssd/MedImages.jl/test/basic_transformations_tests/test_scale_mi.jl:25.
+WARNING: Method definition get_sitk_interpolator(Any) in module Main at /home/jm/project_ssd/MedImages.jl/test/basic_transformations_tests/test_scale_mi.jl:25 overwritten at /home/jm/project_ssd/MedImages.jl/test/spatial_metadata_change_tests/test_resample_to_spacing.jl:18.
+WARNING: Method definition get_sitk_interpolator(Any) in module Main at /home/jm/project_ssd/MedImages.jl/test/spatial_metadata_change_tests/test_resample_to_spacing.jl:18 overwritten at /home/jm/project_ssd/MedImages.jl/test/resample_to_target_tests/test_resample_to_image.jl:18.
+Saving image from voxel data and metadata
+Data shape: (512, 512, 75)
+Metadata size: (512, 512, 75)
+Data length: 19660800
+Expected size: 19660800
+Saving image from voxel data and metadata
+Data shape: (512, 512, 75)
+Metadata size: (512, 512, 75)
+Data length: 19660800
+Expected size: 19660800
+Created file can be read by SimpleITK: Error During Test at /home/jm/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:35
+  Got exception outside of a @test
+  PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+  RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/load_and_save_tests/outputs/create_nii/20260224_083450_6332/readable.nii.gz"')
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+      return reader.Execute()
+             ~~~~~~~~~~~~~~^^
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+      return _SimpleITK.ImageFileReader_Execute(self)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  
+  Stacktrace:
+    [1] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:75 [inlined]
+    [2] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:79 [inlined]
+    [3] _handle_error(msg::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/exception.jl:96
+    [4] macro expansion
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:110 [inlined]
+    [5] #107
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 [inlined]
+    [6] disable_sigint
+      @ ./c.jl:473 [inlined]
+    [7] __pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:42 [inlined]
+    [8] _pycall!(ret::PyObject, o::PyObject, args::Tuple{String}, nargs::Int64, kw::Ptr{Nothing})
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:29
+    [9] _pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:11 [inlined]
+   [10] (::PyObject)(args::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:86
+   [11] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:47 [inlined]
+   [12] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [13] (::var"#51#52"{PyObject})(output_dir::String)
+      @ Main ~/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:36
+   [14] with_temp_output_dir(f::var"#51#52"{PyObject}, module_name::String, function_name::String)
+      @ Main.TestHelpers ~/project_ssd/MedImages.jl/test/test_helpers.jl:63
+   [15] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:19 [inlined]
+   [16] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [17] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:17
+   [18] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [19] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:129 [inlined]
+   [20] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [21] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:124 [inlined]
+   [22] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [23] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:41
+   [24] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [25] top-level scope
+      @ none:6
+   [26] eval
+      @ ./boot.jl:385 [inlined]
+   [27] exec_options(opts::Base.JLOptions)
+      @ Base ./client.jl:296
+   [28] _start()
+      @ Base ./client.jl:557
+Saving image from voxel data and metadata
+Data shape: (512, 512, 75)
+Metadata size: (512, 512, 75)
+Data length: 19660800
+Expected size: 19660800
+Metadata preserved in output: Error During Test at /home/jm/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:53
+  Got exception outside of a @test
+  PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+  RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/load_and_save_tests/outputs/create_nii/20260224_083450_6332/metadata.nii.gz"')
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+      return reader.Execute()
+             ~~~~~~~~~~~~~~^^
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+      return _SimpleITK.ImageFileReader_Execute(self)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  
+  Stacktrace:
+    [1] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:75 [inlined]
+    [2] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:79 [inlined]
+    [3] _handle_error(msg::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/exception.jl:96
+    [4] macro expansion
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:110 [inlined]
+    [5] #107
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 [inlined]
+    [6] disable_sigint
+      @ ./c.jl:473 [inlined]
+    [7] __pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:42 [inlined]
+    [8] _pycall!(ret::PyObject, o::PyObject, args::Tuple{String}, nargs::Int64, kw::Ptr{Nothing})
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:29
+    [9] _pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:11 [inlined]
+   [10] (::PyObject)(args::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:86
+   [11] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:64 [inlined]
+   [12] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [13] (::var"#51#52"{PyObject})(output_dir::String)
+      @ Main ~/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:54
+   [14] with_temp_output_dir(f::var"#51#52"{PyObject}, module_name::String, function_name::String)
+      @ Main.TestHelpers ~/project_ssd/MedImages.jl/test/test_helpers.jl:63
+   [15] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:19 [inlined]
+   [16] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [17] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:17
+   [18] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [19] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:129 [inlined]
+   [20] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [21] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:124 [inlined]
+   [22] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [23] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:41
+   [24] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [25] top-level scope
+      @ none:6
+   [26] eval
+      @ ./boot.jl:385 [inlined]
+   [27] exec_options(opts::Base.JLOptions)
+      @ Base ./client.jl:296
+   [28] _start()
+      @ Base ./client.jl:557
+Saving image from voxel data and metadata
+Data shape: (512, 512, 75)
+Metadata size: (512, 512, 75)
+Data length: 19660800
+Expected size: 19660800
+Output matches original dimensions: Error During Test at /home/jm/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:70
+  Got exception outside of a @test
+  PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+  RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/load_and_save_tests/outputs/create_nii/20260224_083450_6332/dimensions.nii.gz"')
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+      return reader.Execute()
+             ~~~~~~~~~~~~~~^^
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+      return _SimpleITK.ImageFileReader_Execute(self)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  
+  Stacktrace:
+    [1] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:75 [inlined]
+    [2] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:79 [inlined]
+    [3] _handle_error(msg::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/exception.jl:96
+    [4] macro expansion
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:110 [inlined]
+    [5] #107
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 [inlined]
+    [6] disable_sigint
+      @ ./c.jl:473 [inlined]
+    [7] __pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:42 [inlined]
+    [8] _pycall!(ret::PyObject, o::PyObject, args::Tuple{String}, nargs::Int64, kw::Ptr{Nothing})
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:29
+    [9] _pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:11 [inlined]
+   [10] (::PyObject)(args::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:86
+   [11] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:81 [inlined]
+   [12] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [13] (::var"#51#52"{PyObject})(output_dir::String)
+      @ Main ~/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:71
+   [14] with_temp_output_dir(f::var"#51#52"{PyObject}, module_name::String, function_name::String)
+      @ Main.TestHelpers ~/project_ssd/MedImages.jl/test/test_helpers.jl:63
+   [15] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:19 [inlined]
+   [16] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [17] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/load_and_save_tests/test_create_nii_from_medimage.jl:17
+   [18] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [19] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:129 [inlined]
+   [20] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [21] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:124 [inlined]
+   [22] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [23] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:41
+   [24] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [25] top-level scope
+      @ none:6
+   [26] eval
+      @ ./boot.jl:385 [inlined]
+   [27] exec_options(opts::Base.JLOptions)
+      @ Base ./client.jl:296
+   [28] _start()
+      @ Base ./client.jl:557
+rotate_mi Tests: Error During Test at /home/jm/project_ssd/MedImages.jl/test/basic_transformations_tests/test_rotate_mi.jl:81
+  Got exception outside of a @test
+  PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+  RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+      return reader.Execute()
+             ~~~~~~~~~~~~~~^^
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+      return _SimpleITK.ImageFileReader_Execute(self)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  
+  Stacktrace:
+    [1] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:75 [inlined]
+    [2] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:79 [inlined]
+    [3] _handle_error(msg::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/exception.jl:96
+    [4] macro expansion
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:110 [inlined]
+    [5] #107
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 [inlined]
+    [6] disable_sigint
+      @ ./c.jl:473 [inlined]
+    [7] __pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:42 [inlined]
+    [8] _pycall!(ret::PyObject, o::PyObject, args::Tuple{String}, nargs::Int64, kw::Ptr{Nothing})
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:29
+    [9] _pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:11 [inlined]
+   [10] (::PyObject)(args::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:86
+   [11] (::var"#53#54"{PyObject})(output_dir::String)
+      @ Main ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_rotate_mi.jl:91
+   [12] with_temp_output_dir(f::var"#53#54"{PyObject}, module_name::String, function_name::String)
+      @ Main.TestHelpers ~/project_ssd/MedImages.jl/test/test_helpers.jl:63
+   [13] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_rotate_mi.jl:89 [inlined]
+   [14] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [15] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_rotate_mi.jl:82
+   [16] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [17] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:141 [inlined]
+   [18] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [19] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:141 [inlined]
+   [20] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [21] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:41
+   [22] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [23] top-level scope
+      @ none:6
+   [24] eval
+      @ ./boot.jl:385 [inlined]
+   [25] exec_options(opts::Base.JLOptions)
+      @ Base ./client.jl:296
+   [26] _start()
+      @ Base ./client.jl:557
+crop_mi Tests: Error During Test at /home/jm/project_ssd/MedImages.jl/test/basic_transformations_tests/test_crop_mi.jl:27
+  Got exception outside of a @test
+  PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+  RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+      return reader.Execute()
+             ~~~~~~~~~~~~~~^^
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+      return _SimpleITK.ImageFileReader_Execute(self)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  
+  Stacktrace:
+    [1] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:75 [inlined]
+    [2] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:79 [inlined]
+    [3] _handle_error(msg::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/exception.jl:96
+    [4] macro expansion
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:110 [inlined]
+    [5] #107
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 [inlined]
+    [6] disable_sigint
+      @ ./c.jl:473 [inlined]
+    [7] __pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:42 [inlined]
+    [8] _pycall!(ret::PyObject, o::PyObject, args::Tuple{String}, nargs::Int64, kw::Ptr{Nothing})
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:29
+    [9] _pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:11 [inlined]
+   [10] (::PyObject)(args::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:86
+   [11] (::var"#55#56"{PyObject})(output_dir::String)
+      @ Main ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_crop_mi.jl:37
+   [12] with_temp_output_dir(f::var"#55#56"{PyObject}, module_name::String, function_name::String)
+      @ Main.TestHelpers ~/project_ssd/MedImages.jl/test/test_helpers.jl:63
+   [13] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_crop_mi.jl:35 [inlined]
+   [14] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [15] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_crop_mi.jl:28
+   [16] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [17] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:142 [inlined]
+   [18] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [19] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:141 [inlined]
+   [20] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [21] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:41
+   [22] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [23] top-level scope
+      @ none:6
+   [24] eval
+      @ ./boot.jl:385 [inlined]
+   [25] exec_options(opts::Base.JLOptions)
+      @ Base ./client.jl:296
+   [26] _start()
+      @ Base ./client.jl:557
+pad_mi Tests: Error During Test at /home/jm/project_ssd/MedImages.jl/test/basic_transformations_tests/test_pad_mi.jl:31
+  Got exception outside of a @test
+  PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+  RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+      return reader.Execute()
+             ~~~~~~~~~~~~~~^^
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+      return _SimpleITK.ImageFileReader_Execute(self)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  
+  Stacktrace:
+    [1] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:75 [inlined]
+    [2] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:79 [inlined]
+    [3] _handle_error(msg::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/exception.jl:96
+    [4] macro expansion
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:110 [inlined]
+    [5] #107
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 [inlined]
+    [6] disable_sigint
+      @ ./c.jl:473 [inlined]
+    [7] __pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:42 [inlined]
+    [8] _pycall!(ret::PyObject, o::PyObject, args::Tuple{String}, nargs::Int64, kw::Ptr{Nothing})
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:29
+    [9] _pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:11 [inlined]
+   [10] (::PyObject)(args::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:86
+   [11] (::var"#59#60"{PyObject})(output_dir::String)
+      @ Main ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_pad_mi.jl:41
+   [12] with_temp_output_dir(f::var"#59#60"{PyObject}, module_name::String, function_name::String)
+      @ Main.TestHelpers ~/project_ssd/MedImages.jl/test/test_helpers.jl:63
+   [13] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_pad_mi.jl:39 [inlined]
+   [14] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [15] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_pad_mi.jl:32
+   [16] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [17] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:143 [inlined]
+   [18] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [19] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:141 [inlined]
+   [20] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [21] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:41
+   [22] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [23] top-level scope
+      @ none:6
+   [24] eval
+      @ ./boot.jl:385 [inlined]
+   [25] exec_options(opts::Base.JLOptions)
+      @ Base ./client.jl:296
+   [26] _start()
+      @ Base ./client.jl:557
+translate_mi Tests: Error During Test at /home/jm/project_ssd/MedImages.jl/test/basic_transformations_tests/test_translate_mi.jl:26
+  Got exception outside of a @test
+  PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+  RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+      return reader.Execute()
+             ~~~~~~~~~~~~~~^^
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+      return _SimpleITK.ImageFileReader_Execute(self)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  
+  Stacktrace:
+    [1] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:75 [inlined]
+    [2] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:79 [inlined]
+    [3] _handle_error(msg::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/exception.jl:96
+    [4] macro expansion
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:110 [inlined]
+    [5] #107
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 [inlined]
+    [6] disable_sigint
+      @ ./c.jl:473 [inlined]
+    [7] __pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:42 [inlined]
+    [8] _pycall!(ret::PyObject, o::PyObject, args::Tuple{String}, nargs::Int64, kw::Ptr{Nothing})
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:29
+    [9] _pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:11 [inlined]
+   [10] (::PyObject)(args::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:86
+   [11] (::var"#63#64"{PyObject})(output_dir::String)
+      @ Main ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_translate_mi.jl:36
+   [12] with_temp_output_dir(f::var"#63#64"{PyObject}, module_name::String, function_name::String)
+      @ Main.TestHelpers ~/project_ssd/MedImages.jl/test/test_helpers.jl:63
+   [13] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_translate_mi.jl:34 [inlined]
+   [14] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [15] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_translate_mi.jl:27
+   [16] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [17] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:144 [inlined]
+   [18] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [19] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:141 [inlined]
+   [20] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [21] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:41
+   [22] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [23] top-level scope
+      @ none:6
+   [24] eval
+      @ ./boot.jl:385 [inlined]
+   [25] exec_options(opts::Base.JLOptions)
+      @ Base ./client.jl:296
+   [26] _start()
+      @ Base ./client.jl:557
+scale_mi Tests: Error During Test at /home/jm/project_ssd/MedImages.jl/test/basic_transformations_tests/test_scale_mi.jl:36
+  Got exception outside of a @test
+  PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+  RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+      return reader.Execute()
+             ~~~~~~~~~~~~~~^^
+    File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+      return _SimpleITK.ImageFileReader_Execute(self)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  
+  Stacktrace:
+    [1] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:75 [inlined]
+    [2] pyerr_check
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:79 [inlined]
+    [3] _handle_error(msg::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/exception.jl:96
+    [4] macro expansion
+      @ ~/.julia/packages/PyCall/1gn3u/src/exception.jl:110 [inlined]
+    [5] #107
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 [inlined]
+    [6] disable_sigint
+      @ ./c.jl:473 [inlined]
+    [7] __pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:42 [inlined]
+    [8] _pycall!(ret::PyObject, o::PyObject, args::Tuple{String}, nargs::Int64, kw::Ptr{Nothing})
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:29
+    [9] _pycall!
+      @ ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:11 [inlined]
+   [10] (::PyObject)(args::String)
+      @ PyCall ~/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:86
+   [11] (::var"#67#68"{PyObject})(output_dir::String)
+      @ Main ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_scale_mi.jl:46
+   [12] with_temp_output_dir(f::var"#67#68"{PyObject}, module_name::String, function_name::String)
+      @ Main.TestHelpers ~/project_ssd/MedImages.jl/test/test_helpers.jl:63
+   [13] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_scale_mi.jl:44 [inlined]
+   [14] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [15] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/basic_transformations_tests/test_scale_mi.jl:37
+   [16] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [17] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:145 [inlined]
+   [18] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [19] macro expansion
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:141 [inlined]
+   [20] macro expansion
+      @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [21] top-level scope
+      @ ~/project_ssd/MedImages.jl/test/runtests.jl:41
+   [22] include(fname::String)
+      @ Base.MainInclude ./client.jl:494
+   [23] top-level scope
+      @ none:6
+   [24] eval
+      @ ./boot.jl:385 [inlined]
+   [25] exec_options(opts::Base.JLOptions)
+      @ Base ./client.jl:296
+   [26] _start()
+      @ Base ./client.jl:557
+Test Summary:                               | Pass  Error  Broken  Total     Time
+MedImages.jl Complete Test Suite            |  652      8      30    690  1m20.9s
+  Module Structure Tests                    |    7                     7     0.3s
+  Test Data Availability                    |    4                     4     0.0s
+  Python Dependencies                       |    2                     2     0.0s
+  MedImage Data Struct Tests                |   61                    61     2.8s
+  Orientation Dicts Tests                   |   92                    92     0.2s
+  Utils Tests                               |  257                   257     5.2s
+  Kernel Validity Tests                     |   23                    23     0.9s
+  Load and Save Tests                       |   35      3             38    21.4s
+    load_image Tests                        |   19                    19     1.3s
+    load_image Error Handling               |    1                     1     0.1s
+    update_voxel_and_spatial_data Tests     |    7                     7     0.9s
+    update_voxel_data Tests                 |    7                     7     1.2s
+    create_nii_from_medimage Tests          |    1      3              4    17.9s
+      Create NIfTI from loaded image        |    1                     1     4.4s
+      Created file can be read by SimpleITK |           1              1     4.6s
+      Metadata preserved in output          |           1              1     4.4s
+      Output matches original dimensions    |           1              1     4.3s
+  Basic Transformations Tests               |   12      5             17    15.4s
+    rotate_mi Tests                         |           1              1     0.9s
+    crop_mi Tests                           |           1              1     0.4s
+    crop_mi Edge Cases                      |    2                     2     0.3s
+    pad_mi Tests                            |           1              1     0.5s
+    pad_mi Dimension Tests                  |    3                     3     1.3s
+    translate_mi Tests                      |           1              1     0.4s
+    translate_mi Origin Tests               |    3                     3     0.3s
+    scale_mi Tests                          |           1              1     0.4s
+    scale_mi Dimension Tests                |    3  [ Info: Module structure verified
+[ Info: Found primary test NIfTI file: /home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz
+[ Info: Found synthetic test file: /home/jm/project_ssd/MedImages.jl/test/../test_data/synthethic_small.nii.gz
+[ Info: Found DICOM test directory: /home/jm/project_ssd/MedImages.jl/test/../test_data/ScalarVolume_0
+[ Info: Python dependencies verified
+[ Info: Upsample: Mean Diff = 3.4820573e-9, Max Diff = 5.9604645e-8
+[ Info: Downsample: Mean Diff = 0.0, Max Diff = 0.0
+[ Info: Mixed: Mean Diff = 1.6823044e-7, Max Diff = 2.026558e-6
+[ Info: Generic Kernel Upsample: Mean Diff = 0.0, Max Diff = 0.0
+[ Info: Generic Kernel Downsample: Mean Diff = 0.0, Max Diff = 0.0
+[ Info: Generic Kernel Mixed: Mean Diff = 2.2577516e-11, Max Diff = 5.9604645e-8
+┌ Info: Error in resample test (interp=Nearest, spacing=(5.0, 0.9, 0.7)): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample test (interp=Nearest, spacing=(1.0, 2.0, 1.1)): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample test (interp=Nearest, spacing=(0.5, 0.5, 0.5)): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample test (interp=Nearest, spacing=(2.0, 2.0, 2.0)): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample test (interp=Linear, spacing=(5.0, 0.9, 0.7)): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample test (interp=Linear, spacing=(1.0, 2.0, 1.1)): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample test (interp=Linear, spacing=(0.5, 0.5, 0.5)): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample test (interp=Linear, spacing=(2.0, 2.0, 2.0)): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample test (interp=BSpline, spacing=(5.0, 0.9, 0.7)): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample test (interp=BSpline, spacing=(1.0, 2.0, 1.1)): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample test (interp=BSpline, spacing=(0.5, 0.5, 0.5)): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample test (interp=BSpline, spacing=(2.0, 2.0, 2.0)): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in orientation test (RAS): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in orientation test (LAS): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in orientation test (RPI): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in orientation test (LPI): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in orientation test (RAI): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in orientation test (LAI): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in orientation test (RPS): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in orientation test (LPS): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample_to_image test (interp=Nearest): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample_to_image test (interp=Linear): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in resample_to_image test (interp=BSpline): PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error changing orientation to RAS: PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error changing orientation to LAS: PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error changing orientation to RPI: PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error changing orientation to LPI: PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error getting orientation vectors: PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Info: Error in brute_force_find_from_sitk: PyError ($(Expr(:escape, :(ccall(#= /home/jm/.julia/packages/PyCall/1gn3u/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RuntimeError'>
+│ RuntimeError('Exception thrown in SimpleITK ImageFileReader_Execute: /home/conda/feedstock_root/build_artifacts/libsimpleitk_1764037160497/work/Code/IO/src/sitkImageReaderBase.cxx:99:\nsitk::ERROR: Unable to determine ImageIO reader for "/home/jm/project_ssd/MedImages.jl/test/../test_data/volume-0.nii.gz"')
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/extra.py", line 384, in ReadImage
+│     return reader.Execute()
+│            ~~~~~~~~~~~~~~^^
+│   File "/home/jm/.julia/conda/3/x86_64/lib/python3.13/site-packages/SimpleITK/SimpleITK.py", line 8534, in Execute
+│     return _SimpleITK.ImageFileReader_Execute(self)
+└            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+┌ Warning: Zygote not available or failed to load: ArgumentError("Package Zygote not found in current path.\n- Run `import Pkg; Pkg.add(\"Zygote\")` to install the Zygote package.")
+└ @ Main ~/project_ssd/MedImages.jl/test/runtests.jl:207
+┌ Warning: SUV calculation failed: Missing or invalid metadata in MedImage
+└ @ MedImages.SUV_calc ~/project_ssd/MedImages.jl/src/SUV.jl:76
+┌ Warning: SUV calculation failed: Missing or invalid metadata in MedImage
+└ @ MedImages.SUV_calc ~/project_ssd/MedImages.jl/src/SUV.jl:76
+┌ Warning: SUV calculation failed: Missing or invalid metadata in MedImage
+└ @ MedImages.SUV_calc ~/project_ssd/MedImages.jl/src/SUV.jl:76
+┌ Warning: SUV calculation failed: Missing or invalid metadata in MedImage
+└ @ MedImages.SUV_calc ~/project_ssd/MedImages.jl/src/SUV.jl:76
+ERROR: LoadError: Some tests did not pass: 652 passed, 0 failed, 8 errored, 30 broken.
+in expression starting at /home/jm/project_ssd/MedImages.jl/test/runtests.jl:38
+                   3     4.2s
+    scale_mi Spacing Tests                  |    1                     1     6.5s
+  Spatial Metadata Change Tests             |   55             20     75    13.9s
+  Resample to Target Tests                  |    7              3     10     7.5s
+  HDF5 Management Tests                     |   27                    27     7.2s
+  Brute Force Orientation Tests             |    5              6     11     0.7s
+  Differentiability Tests                   |                   1      1     0.0s
+  Batched Processing Tests                  |   31                    31     4.0s
+  SUV Calculation Tests                     |   34                    34     1.5s
+ERROR: Package MedImages errored during testing
+Stacktrace:
+ [1] pkgerror(msg::String)
+   @ Pkg.Types ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Pkg/src/Types.jl:70
+ [2] test(ctx::Pkg.Types.Context, pkgs::Vector{Pkg.Types.PackageSpec}; coverage::Bool, julia_args::Cmd, test_args::Cmd, test_fn::Nothing, force_latest_compatible_version::Bool, allow_earlier_backwards_compatible_versions::Bool, allow_reresolve::Bool)
+   @ Pkg.Operations ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Pkg/src/Operations.jl:2034
+ [3] test
+   @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Pkg/src/Operations.jl:1915 [inlined]
+ [4] test(ctx::Pkg.Types.Context, pkgs::Vector{Pkg.Types.PackageSpec}; coverage::Bool, test_fn::Nothing, julia_args::Cmd, test_args::Cmd, force_latest_compatible_version::Bool, allow_earlier_backwards_compatible_versions::Bool, allow_reresolve::Bool, kwargs::@Kwargs{io::IOStream})
+   @ Pkg.API ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Pkg/src/API.jl:444
+ [5] test(pkgs::Vector{Pkg.Types.PackageSpec}; io::IOStream, kwargs::@Kwargs{})
+   @ Pkg.API ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Pkg/src/API.jl:159
+ [6] test(pkgs::Vector{Pkg.Types.PackageSpec})
+   @ Pkg.API ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Pkg/src/API.jl:148
+ [7] test(; name::Nothing, uuid::Nothing, version::Nothing, url::Nothing, rev::Nothing, path::Nothing, mode::Pkg.Types.PackageMode, subdir::Nothing, kwargs::@Kwargs{})
+   @ Pkg.API ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Pkg/src/API.jl:174
+ [8] test()
+   @ Pkg.API ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Pkg/src/API.jl:165
+ [9] top-level scope
+   @ none:1
