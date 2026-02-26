@@ -7,7 +7,6 @@ using MedImages.Basic_transformations
 using Lux
 using Zygote
 using Optimisers
-using Functors
 using Random
 using LinearAlgebra
 using Test
