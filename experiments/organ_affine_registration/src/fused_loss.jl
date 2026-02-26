@@ -60,6 +60,21 @@ end
 
 # --- Kernel Definition with Tree Reduction ---
 
+"""
+    organ_loss_kernel_optimized!(loss_out, points_tensor, affine_params, gold_vol, ...)
+
+Optimized KernelAbstractions kernel for computing organ registration loss.
+
+# Features
+- **Fused Operation**: Applies affine transform, computes distance penalty, and samples interpolation in one pass.
+- **Tree Reduction**: Uses shared memory (`@localmem`) and binary tree reduction for efficient summation within a workgroup (512 threads), avoiding atomic operations.
+- **Scalar Optimization**: All helper functions are inlined.
+
+# Inputs
+- `points_tensor`: (3, 512, Num_Organs) - Reference points from Atlas.
+- `affine_params`: (15, Num_Organs, Batch) - Predicted transform parameters.
+- `gold_vol`: (X, Y, Z, Num_Organs) - One-hot encoded Gold Standard volume.
+"""
 @kernel function organ_loss_kernel_optimized!(loss_out, @Const(points_tensor), @Const(affine_params), @Const(gold_vol), @Const(barycenters), @Const(radii), batch_size, num_organs, vol_sx, vol_sy, vol_sz)
     # Workgroup size must be power of 2 for tree reduction (e.g., 512)
     # One Workgroup per (Organ * Batch)
@@ -244,6 +259,24 @@ end
 
 # --- Differentiable Launcher ---
 
+"""
+    compute_organ_loss(points_tensor, affine_params, gold_vol, organ_meta_list)
+
+High-level, differentiable wrapper for the fused registration loss.
+
+# Mechanics
+- Launches `organ_loss_kernel_optimized!` on the appropriate backend (CPU/GPU).
+- Defines a custom `ChainRulesCore.rrule` using `Enzyme.autodiff` to propagate gradients through the kernel back to `affine_params`.
+
+# Arguments
+- `points_tensor`: Preprocessed Atlas points.
+- `affine_params`: Predicted parameters from the model.
+- `gold_vol`: Target Gold Standard volume.
+- `organ_meta_list`: List of `OrganMetadata` (barycenters, radii).
+
+# Returns
+Scalar mean loss across all organs and batch items.
+"""
 function compute_organ_loss(points_tensor, affine_params, gold_vol, organ_meta_list)
     batch_size = size(affine_params, 3)
     num_organs = size(points_tensor, 3)

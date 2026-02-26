@@ -16,12 +16,21 @@ end
 """
     preprocess_organ_data(atlas_mask::MedImage, gold_standard_mask::MedImage; max_points=512)
 
-Preprocesses atlas and gold standard masks for the registration task.
+Prepares Atlas and Gold Standard segmentation data for the affine registration network.
 
-Returns:
-- `points_tensor`: Array{Float32, 3} of shape (3, max_points, num_organs)
-- `organ_metadata`: Vector{OrganMetadata}
-- `gold_standard_onehot`: Array{Float32, 4} (X, Y, Z, num_organs)
+# Steps
+1.  **Organ Identification**: Finds all unique organ IDs in the Atlas mask.
+2.  **Point Extraction**: For each organ in the Atlas, extracts voxel coordinates.
+3.  **Deterministic Downsampling**:
+    -   If points > `max_points`, selects a subset using a fixed stride to ensure deterministic behavior.
+    -   If points < `max_points`, pads the tensor with `(-1, -1, -1)`.
+4.  **Metadata Computation**: Calculates the Barycenter and Maximum Radius for each organ in the Gold Standard mask.
+5.  **One-Hot Encoding**: Converts the Gold Standard mask into a multi-channel probability volume for differentiable interpolation.
+
+# Returns
+- `points_tensor`: `Array{Float32, 3}` of shape `(3, max_points, num_organs)`.
+- `organ_metadata`: `Vector{OrganMetadata}` containing ID, Barycenter, and Radius.
+- `gold_standard_onehot`: `Array{Float32, 4}` of shape `(X, Y, Z, num_organs)`.
 """
 function preprocess_organ_data(atlas_mask::MedImage, gold_standard_mask::MedImage; max_points=512)
     # 1. Identify unique organs (integers > 0)
