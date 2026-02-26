@@ -48,8 +48,8 @@ using Dates
             origin = (0.0, 0.0, 0.0),
             spacing = (1.0, 1.0, 1.0),
             direction = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),
-            image_type = MedImages.PET_type,
-            image_subtype = MedImages.FDG_subtype,
+            image_type = MedImages.MedImage_data_struct.PET_type,
+            image_subtype = MedImages.MedImage_data_struct.FDG_subtype,
             patient_id = "test_pat",
             metadata = valid_meta
         )
@@ -74,8 +74,8 @@ using Dates
             origin = [(0.0, 0.0, 0.0), (0.0, 0.0, 0.0)],
             spacing = [(1.0, 1.0, 1.0), (1.0, 1.0, 1.0)],
             direction = [(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0), (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)],
-            image_type = [MedImages.PET_type, MedImages.PET_type],
-            image_subtype = [MedImages.FDG_subtype, MedImages.FDG_subtype],
+            image_type = [MedImages.MedImage_data_struct.PET_type, MedImages.MedImage_data_struct.PET_type],
+            image_subtype = [MedImages.MedImage_data_struct.FDG_subtype, MedImages.MedImage_data_struct.FDG_subtype],
             date_of_saving = [Dates.now(), Dates.now()],
             acquistion_time = [Dates.now(), Dates.now()],
             patient_id = ["p1", "p2"],
@@ -96,8 +96,8 @@ using Dates
             origin = (0.0,0.0,0.0),
             spacing = (1.0,1.0,1.0),
             direction = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),
-            image_type = MedImages.PET_type,
-            image_subtype = MedImages.FDG_subtype,
+            image_type = MedImages.MedImage_data_struct.PET_type,
+            image_subtype = MedImages.MedImage_data_struct.FDG_subtype,
             patient_id = "test",
             metadata = Dict{Any, Any}()
         )
@@ -136,8 +136,8 @@ using Dates
             origin = (0.0,0.0,0.0),
             spacing = (1.0,1.0,1.0),
             direction = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),
-            image_type = MedImages.PET_type,
-            image_subtype = MedImages.FDG_subtype,
+            image_type = MedImages.MedImage_data_struct.PET_type,
+            image_subtype = MedImages.MedImage_data_struct.FDG_subtype,
             patient_id = "test",
             metadata = meta_cross
         )
