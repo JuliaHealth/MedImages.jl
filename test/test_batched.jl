@@ -287,4 +287,21 @@ end
     catch e
         @info "Skipping SimpleITK verification: $e"
     end
+
+    # --- 6. Custom Center of Rotation ---
+    @testset "Batched Rotation Custom Center" begin
+        dims = (21, 21, 21)
+        data = zeros(Float32, dims)
+        data[16, 11, 11] = 1.0 # Point at (16, 11, 11).
+
+        img = MedImage(voxel_data=data, origin=(0.0,0.0,0.0), spacing=(1.0,1.0,1.0), direction=(1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0), image_type=MedImages.MedImage_data_struct.MRI_type, image_subtype=MedImages.MedImage_data_struct.T1_subtype, patient_id="p1")
+        batch = create_batched_medimage([img])
+
+        # Rotate around (16, 11, 11) - should stay in place
+        center = (16.0, 11.0, 11.0)
+        rot_custom = rotate_mi(batch, 3, 90.0, Nearest_neighbour_en; center_of_rotation=center)
+
+        val_custom = rot_custom.voxel_data[16, 11, 11, 1]
+        @test val_custom == 1.0
+    end
 end
