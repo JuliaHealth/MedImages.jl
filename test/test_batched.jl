@@ -304,4 +304,59 @@ end
         val_custom = rot_custom.voxel_data[16, 11, 11, 1]
         @test val_custom == 1.0
     end
+
+    # --- 7. Extended Affine Tests with Custom Center ---
+    @testset "Extended Affine Custom Center" begin
+        # Test 1: Scaling around a corner (1, 1, 1)
+        # Point at (2, 2, 2). Scale by 2.0.
+        # If scale around (1, 1, 1):
+        # Dist = (1, 1, 1). New Dist = (2, 2, 2). New Pos = (1+2, 1+2, 1+2) = (3, 3, 3).
+        # If scale around default center (e.g. 5, 5, 5 for 10x10x10):
+        # Dist = (2-5, ...) = (-3). New Dist = (-6). New Pos = 5-6 = -1 (out of bounds).
+
+        dims = (20, 20, 20)
+        data = zeros(Float32, dims)
+        data[2, 2, 2] = 1.0
+
+        img = MedImage(voxel_data=data, origin=(0.0,0.0,0.0), spacing=(1.0,1.0,1.0), direction=(1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0), image_type=MedImages.MedImage_data_struct.MRI_type, image_subtype=MedImages.MedImage_data_struct.T1_subtype, patient_id="p1")
+        batch = create_batched_medimage([img])
+
+        scale_val = (2.0, 2.0, 2.0)
+        center_corner = (1.0, 1.0, 1.0)
+
+        # We need to construct affine matrix for scaling manually to pass to affine_transform_mi
+        # scale_mi currently doesn't support center_of_rotation kwarg in its dispatch (it calls affine_transform_mi internally but doesn't expose the arg).
+        # So we call affine_transform_mi directly.
+        mat_scale = create_affine_matrix(scale=scale_val)
+
+        res_scale = affine_transform_mi(batch, mat_scale, Nearest_neighbour_en; center_of_rotation=center_corner)
+
+        # Check if point moved to (3, 3, 3)
+        @test res_scale.voxel_data[3, 3, 3, 1] == 1.0
+
+        # Verify that with default center it would be gone (or elsewhere)
+        res_default = affine_transform_mi(batch, mat_scale, Nearest_neighbour_en)
+        @test res_default.voxel_data[3, 3, 3, 1] == 0.0
+
+        # Test 2: Rotate around a point that is NOT the object
+        # Point at (10, 10, 10). Center at (10, 2, 10) (Shifted in Y).
+        # Rotate 90 deg around X axis (1).
+        # Relative vector: (0, 8, 0).
+        # Rotate 90 deg X: (x, y, z) -> (x, -z, y)? Or (x, z, -y)?
+        # Rodrigues (1, 0, 0) 90 deg:
+        # [1 0 0; 0 0 -1; 0 1 0] (y->-z, z->y)
+        # Vector (0, 8, 0) -> (0, 0, 8).
+        # New Position = Center + New Vector = (10, 2, 10) + (0, 0, 8) = (10, 2, 18).
+
+        data2 = zeros(Float32, dims)
+        data2[10, 10, 10] = 1.0
+        batch2 = create_batched_medimage([MedImage(voxel_data=data2, origin=(0.0,0.0,0.0), spacing=(1.0,1.0,1.0), direction=(1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0), image_type=MedImages.MedImage_data_struct.MRI_type, image_subtype=MedImages.MedImage_data_struct.T1_subtype, patient_id="p2")])
+
+        center_y_shift = (10.0, 2.0, 10.0)
+        # Rotate 90 deg around axis 3 (X) to match direction vector expectation
+        res_rot_off = rotate_mi(batch2, 3, 90.0, Nearest_neighbour_en; center_of_rotation=center_y_shift)
+
+        # Check expected location (10, 2, 18)
+        @test res_rot_off.voxel_data[10, 2, 18, 1] == 1.0
+    end
 end
