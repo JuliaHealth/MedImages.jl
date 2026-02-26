@@ -283,9 +283,72 @@ end
             expected_origin2[1] += 20.0 * spacing2[1]
             @test isapprox(collect(unbatched_trans[2].origin), expected_origin2; atol=1e-3)
 
+            # --- Unique Rotation Around Custom Center Verification ---
+            # Image 1: Rotate 90 deg around Z (axis 3) around a custom point
+            # SITK Center logic:
+            center_pt = (5.0, 5.0, 5.0) # Physical point
+
+            # Function helper
+            function get_sitk_rotated_custom_center(image, center, angle_deg, axis)
+                 radians = angle_deg * π / 180.0
+                 transform = sitk.Euler3DTransform()
+                 transform.SetCenter(center)
+                 if axis == 1
+                     transform.SetRotation(radians, 0.0, 0.0)
+                 elseif axis == 2
+                     transform.SetRotation(0.0, radians, 0.0)
+                 elseif axis == 3
+                     transform.SetRotation(0.0, 0.0, radians)
+                 end
+
+                 resampler = sitk.ResampleImageFilter()
+                 resampler.SetReferenceImage(image)
+                 resampler.SetTransform(transform)
+                 resampler.SetInterpolator(sitk.sitkLinear)
+                 resampler.SetDefaultPixelValue(0.0)
+                 return resampler.Execute(image)
+            end
+
+            # Using sitk_img1 (uniform spacing 1.0, origin 0.0)
+            # Physical center (5.0, 5.0, 5.0) corresponds to index (6, 6, 6) approx?
+            # Index = (Physical - Origin)/Spacing + 1? No 0-based in SITK?
+            # SITK uses physical coordinates for SetCenter.
+            # MedImages `center_of_rotation` is in **Index Space** (1-based or 0-based? Wait).
+            # Let's check Utils.jl logic.
+            # `generate_affine_coords`: `px = Float32(ix) - center_shift[1]`. ix is 1-based.
+            # So `center_shift` is in 1-based index coordinates.
+            # SITK `SetCenter` is in Physical Coordinates.
+
+            # Mapping:
+            # Physical (5.0, 5.0, 5.0)
+            # Origin (0,0,0), Spacing (1,1,1) -> Index 0-based: (5,5,5). 1-based: (6,6,6).
+
+            # SITK rotation
+            sitk_rot_custom = get_sitk_rotated_custom_center(sitk_img1, center_pt, 90.0, 3)
+
+            # MedImages rotation
+            # Center in index space (1-based)
+            # (5.0 - 0.0)/1.0 + 1.0 = 6.0
+            med_center = (6.0, 6.0, 6.0)
+
+            # Create a single batch for this test
+            batch_single = create_batched_medimage([img1])
+            res_med_custom = rotate_mi(batch_single, 3, 90.0, Linear_en; center_of_rotation=med_center)
+
+            res_arr_custom = permutedims(res_med_custom.voxel_data[:,:,:,1], (3, 2, 1))
+            ref_arr_custom = sitk.GetArrayFromImage(sitk_rot_custom)
+
+            # Compare
+            @test size(res_arr_custom) == size(ref_arr_custom)
+            # Center slice comparison
+            center_slice_res = res_arr_custom[16, :, :]
+            center_slice_ref = ref_arr_custom[16, :, :]
+            @test mean(abs.(center_slice_res - center_slice_ref)) < 0.2
+
         end
     catch e
         @info "Skipping SimpleITK verification: $e"
+        rethrow(e)
     end
 
     # --- 6. Custom Center of Rotation ---
