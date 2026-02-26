@@ -1,0 +1,16 @@
+┌ Info: CUDA functional - running GPU autodiff tests
+└   device = CuDevice(0): NVIDIA GeForce RTX 3090
+[ Info: resample_to_spacing GPU forward pass works
+[ Info: rotate_mi GPU forward pass works
+[ Info: scale_mi GPU forward pass works
+[ Info: translate_mi GPU forward pass works
+[ Info: translate_mi GPU gradient computed successfully
+┌ Info: translate_mi: GPU and CPU gradients match
+└   max_diff = 0.0f0
+[ Info: GPU kernel autodiff limitation documented: Enzyme cannot differentiate through KernelAbstractions kernels
+Test Summary:          | Pass  Total  Time
+GPU Forward Pass Tests |    8      8  9.6s
+Test Summary:                           | Pass  Total   Time
+GPU Autodiff - Metadata-Only Operations |    3      3  13.0s
+Test Summary:                    | Pass  Total  Time
+GPU Autodiff - Known Limitations |    2      2  0.0s
