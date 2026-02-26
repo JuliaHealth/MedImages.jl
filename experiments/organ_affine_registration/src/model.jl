@@ -6,6 +6,27 @@ using NNlib
 
 export MultiScaleCNN
 
+"""
+    MultiScaleCNN(in_channels::Int, num_organs::Int)
+
+A 3D CNN architecture for predicting organ-specific affine transformation parameters.
+
+# Architecture
+- **Multi-Scale Convolutions**: Parallel branches with kernel sizes (3,3,3), (5,5,5), and (7,7,7) to capture features at different spatial resolutions.
+- **Global Pooling**: Reduces spatial dimensions after feature extraction.
+- **MLP Head**: Projects features to `num_organs * 15` parameters.
+
+# Output Parameters (per organ)
+1.  **Rotation (3)**: Tanh activation scaled by π (radians).
+2.  **Translation (3)**: Linear output.
+3.  **Scale (3)**: Exponential activation (positive).
+4.  **Shear (3)**: Tanh activation.
+5.  **Center (3)**: Linear output.
+
+# Arguments
+- `in_channels`: Number of input channels (e.g., 2 for CT + Atlas).
+- `num_organs`: Number of organs to predict parameters for.
+"""
 struct MultiScaleCNN{C, D} <: Lux.AbstractLuxLayer
     conv_branches::C
     dense_layers::D
