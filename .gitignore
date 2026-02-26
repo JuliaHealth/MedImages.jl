@@ -12,3 +12,4 @@ test/new/
 # Test outputs
 test/*/outputs/
 test/visual_output/
+test_data/dataset_Lu/
