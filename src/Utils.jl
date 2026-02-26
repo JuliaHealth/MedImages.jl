@@ -564,7 +564,7 @@ end
 """
 perform the interpolation of the set of points in a given space
 """
-function interpolate_fused_affine(input_array, affine_matrices, output_size, interpolator_enum, keep_begining_same, extrapolate_value=0)
+function interpolate_fused_affine(input_array, affine_matrices, output_size, interpolator_enum, keep_begining_same, extrapolate_value=0, center_of_rotation=nothing)
     backend = KernelAbstractions.get_backend(input_array)
     batch_size = size(input_array, 4)
     mat_batch_size = size(affine_matrices, 3)
@@ -577,7 +577,12 @@ function interpolate_fused_affine(input_array, affine_matrices, output_size, int
     source_shape = (Int32(size(input_array, 1)), Int32(size(input_array, 2)), Int32(size(input_array, 3)))
     out_size_ka = (Int32(output_size[1]), Int32(output_size[2]), Int32(output_size[3]))
     
-    center_shift = Float32.([(s + 0.0)/2.0 for s in output_size])
+    if center_of_rotation === nothing
+        center_shift = Float32.([(s + 0.0)/2.0 for s in output_size])
+    else
+        center_shift = Float32.(center_of_rotation)
+    end
+
     center_shift_tuple = (center_shift[1], center_shift[2], center_shift[3])
     
     is_nearest = (interpolator_enum == Nearest_neighbour_en)
