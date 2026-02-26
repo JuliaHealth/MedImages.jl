@@ -115,7 +115,13 @@ function preprocess_organ_data(atlas_mask::MedImage, gold_standard_mask::MedImag
 
         # Compute Barycenter
         coords = [Float32.((idx[1], idx[2], idx[3])) for idx in indices]
-        center = mean(coords)
+        # Tuple mean is not standard in Statistics for simple divide
+        # Calculate manually
+        sum_x = sum(c[1] for c in coords)
+        sum_y = sum(c[2] for c in coords)
+        sum_z = sum(c[3] for c in coords)
+        n = length(coords)
+        center = (sum_x/n, sum_y/n, sum_z/n)
 
         # Compute Max Radius
         # Max distance from center to any voxel in the organ
