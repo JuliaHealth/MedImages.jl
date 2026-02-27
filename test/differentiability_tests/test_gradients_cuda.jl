@@ -139,39 +139,36 @@ end
     end
 end
 
-# Note: GPU autodiff for kernel-based operations (resample, rotate, scale) is not yet supported
-# due to Enzyme's inability to differentiate through KernelAbstractions GPU kernels.
-# See: https://enzyme.mit.edu/index.fcgi/julia/stable/faq/#Activity-of-temporary-storage
-#
-# Tested Julia versions:
-# - Julia 1.10.8: EnzymeMutabilityException (same error)
-# - Julia 1.11.6: EnzymeMutabilityException
-# The issue is fundamental to how Enzyme handles KernelAbstractions GPU kernels,
-# not specific to a Julia version.
-#
-# Current status:
-# - CPU autodiff: Fully working (uses pure Julia loops with Enzyme)
-# - GPU autodiff: Limited to metadata-only operations (translate_mi)
-#
-# To enable GPU autodiff for kernel-based operations would require:
-# - Implementing pure CUDA.jl loops instead of KernelAbstractions kernels
-# - Or using a different AD framework compatible with KA (e.g., direct Zygote rules without Enzyme)
+@testset "GPU Autodiff - Kernel Operations (Direct GPU AD)" begin
+    @testset "rotate_mi GPU gradient" begin
+        data = rand(Float32, 8, 8, 8)
+        
+        function rotate_loss(x)
+            im = create_gpu_medimage(x)
+            rotated = MedImages.rotate_mi(im, 1, 10.0, TEST_LINEAR)
+            return sum(Array(rotated.voxel_data))
+        end
+        
+        println("Computing rotate_mi GPU gradient...")
+        grads = Zygote.gradient(rotate_loss, data)
+        @test grads[1] !== nothing
+        @test !all(isapprox.(grads[1], 0.0, atol=1e-5))
+        @info "rotate_mi GPU gradient computed successfully"
+    end
 
-@testset "GPU Autodiff - Known Limitations" begin
-    @testset "KernelAbstractions kernels - documented limitation" begin
-        # This test documents that GPU kernel-based autodiff is a known limitation
-        # The forward pass works, but backward pass through Enzyme fails
-
-        data = rand(Float32, 4, 4, 4)
-
-        # Forward pass works
-        im = create_gpu_medimage(data)
-        resampled = MedImages.resample_to_spacing(im, (2.0, 2.0, 2.0), TEST_LINEAR)
-        @test is_cuda_array(resampled.voxel_data)
-
-        # Document that gradient through KA kernels is not supported
-        # (Enzyme throws EnzymeMutabilityException)
-        @info "GPU kernel autodiff limitation documented: Enzyme cannot differentiate through KernelAbstractions kernels"
-        @test true  # Documenting the known limitation
+    @testset "resample_to_spacing GPU gradient" begin
+        data = rand(Float32, 8, 8, 8)
+        
+        function resample_loss(x)
+            im = create_gpu_medimage(x)
+            resampled = MedImages.resample_to_spacing(im, (2.0, 2.0, 2.0), TEST_LINEAR)
+            return sum(Array(resampled.voxel_data))
+        end
+        
+        println("Computing resample_to_spacing GPU gradient...")
+        grads = Zygote.gradient(resample_loss, data)
+        @test grads[1] !== nothing
+        @test !all(isapprox.(grads[1], 0.0, atol=1e-5))
+        @info "resample_to_spacing GPU gradient computed successfully"
     end
 end
