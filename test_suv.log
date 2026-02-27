@@ -1,0 +1,8 @@
+┌ Warning: SUV calculation failed: Missing or invalid metadata in MedImage
+└ @ MedImages.SUV_calc ~/project_ssd/MedImages.jl/src/SUV.jl:76
+┌ Warning: SUV calculation failed: Missing or invalid metadata in MedImage
+└ @ MedImages.SUV_calc ~/project_ssd/MedImages.jl/src/SUV.jl:76
+┌ Warning: SUV calculation failed: Missing or invalid metadata in MedImage
+└ @ MedImages.SUV_calc ~/project_ssd/MedImages.jl/src/SUV.jl:76
+Test Summary:         | Pass  Total  Time
+SUV Calculation Tests |   11     11  1.1s

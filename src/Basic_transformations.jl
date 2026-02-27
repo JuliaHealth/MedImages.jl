@@ -277,7 +277,7 @@ function scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Floa
   return new_im
 end
 
-function rotate_mi(image::BatchedMedImage, axis::Int, angle::Union{Float64, AbstractVector{Float64}}, Interpolator::Interpolator_enum, crop::Bool=true)::BatchedMedImage
+function rotate_mi(image::BatchedMedImage, axis::Int, angle::Union{Float64, AbstractVector{Float64}}, Interpolator::Interpolator_enum, crop::Bool=true; center_of_rotation=nothing)::BatchedMedImage
     if !crop
          error("rotate_mi with crop=false is not fully supported in batched mode currently")
     end
@@ -300,7 +300,7 @@ function rotate_mi(image::BatchedMedImage, axis::Int, angle::Union{Float64, Abst
     end
 
     # Use affine_transform_mi
-    return affine_transform_mi(image, matrices, Interpolator)
+    return affine_transform_mi(image, matrices, Interpolator; center_of_rotation=center_of_rotation)
 end
 
 function scale_mi(image::BatchedMedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}, Vector{<:Union{Float64, Tuple{Float64,Float64,Float64}}}}, Interpolator::Interpolator_enum)::BatchedMedImage
@@ -516,9 +516,9 @@ end
 
 Applies an affine transformation to a batch of images.
 `affine_matrix` can be a single 4x4 matrix (shared) or a Vector of 4x4 matrices (unique per batch).
-Transform is applied in index space relative to the image center.
+Transform is applied in index space relative to the image center (default) or `center_of_rotation` if supplied.
 """
-function affine_transform_mi(image::BatchedMedImage, affine_matrix::Union{Matrix{Float64}, Vector{Matrix{Float64}}}, Interpolator::Interpolator_enum; output_size=nothing)::BatchedMedImage
+function affine_transform_mi(image::BatchedMedImage, affine_matrix::Union{Matrix{Float64}, Vector{Matrix{Float64}}}, Interpolator::Interpolator_enum; output_size=nothing, center_of_rotation=nothing)::BatchedMedImage
     batch_size = size(image.voxel_data, 4)
 
     spatial_size = (output_size === nothing) ? size(image.voxel_data)[1:3] : output_size
@@ -566,7 +566,7 @@ function affine_transform_mi(image::BatchedMedImage, affine_matrix::Union{Matrix
     end
 
     # 3. Perform Fused Affine Interpolation
-    resampled_flat = interpolate_fused_affine(image.voxel_data, matrices_inv, spatial_size, Interpolator, false)
+    resampled_flat = interpolate_fused_affine(image.voxel_data, matrices_inv, spatial_size, Interpolator, false, 0, center_of_rotation)
 
     new_data = reshape(resampled_flat, spatial_size[1], spatial_size[2], spatial_size[3], batch_size)
 
