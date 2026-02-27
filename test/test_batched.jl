@@ -283,8 +283,143 @@ end
             expected_origin2[1] += 20.0 * spacing2[1]
             @test isapprox(collect(unbatched_trans[2].origin), expected_origin2; atol=1e-3)
 
+            # --- Unique Rotation Around Custom Center Verification ---
+            # Image 1: Rotate 90 deg around Z (axis 3) around a custom point
+            # SITK Center logic:
+            center_pt = (5.0, 5.0, 5.0) # Physical point
+
+            # Function helper
+            function get_sitk_rotated_custom_center(image, center, angle_deg, axis)
+                 radians = angle_deg * π / 180.0
+                 transform = sitk.Euler3DTransform()
+                 transform.SetCenter(center)
+                 if axis == 1
+                     transform.SetRotation(radians, 0.0, 0.0)
+                 elseif axis == 2
+                     transform.SetRotation(0.0, radians, 0.0)
+                 elseif axis == 3
+                     transform.SetRotation(0.0, 0.0, radians)
+                 end
+
+                 resampler = sitk.ResampleImageFilter()
+                 resampler.SetReferenceImage(image)
+                 resampler.SetTransform(transform)
+                 resampler.SetInterpolator(sitk.sitkLinear)
+                 resampler.SetDefaultPixelValue(0.0)
+                 return resampler.Execute(image)
+            end
+
+            # Using sitk_img1 (uniform spacing 1.0, origin 0.0)
+            # Physical center (5.0, 5.0, 5.0) corresponds to index (6, 6, 6) approx?
+            # Index = (Physical - Origin)/Spacing + 1? No 0-based in SITK?
+            # SITK uses physical coordinates for SetCenter.
+            # MedImages `center_of_rotation` is in **Index Space** (1-based or 0-based? Wait).
+            # Let's check Utils.jl logic.
+            # `generate_affine_coords`: `px = Float32(ix) - center_shift[1]`. ix is 1-based.
+            # So `center_shift` is in 1-based index coordinates.
+            # SITK `SetCenter` is in Physical Coordinates.
+
+            # Mapping:
+            # Physical (5.0, 5.0, 5.0)
+            # Origin (0,0,0), Spacing (1,1,1) -> Index 0-based: (5,5,5). 1-based: (6,6,6).
+
+            # SITK rotation
+            sitk_rot_custom = get_sitk_rotated_custom_center(sitk_img1, center_pt, 90.0, 3)
+
+            # MedImages rotation
+            # Center in index space (1-based)
+            # (5.0 - 0.0)/1.0 + 1.0 = 6.0
+            med_center = (6.0, 6.0, 6.0)
+
+            # Create a single batch for this test
+            batch_single = create_batched_medimage([img1])
+            res_med_custom = rotate_mi(batch_single, 3, 90.0, Linear_en; center_of_rotation=med_center)
+
+            res_arr_custom = permutedims(res_med_custom.voxel_data[:,:,:,1], (3, 2, 1))
+            ref_arr_custom = sitk.GetArrayFromImage(sitk_rot_custom)
+
+            # Compare
+            @test size(res_arr_custom) == size(ref_arr_custom)
+            # Center slice comparison
+            center_slice_res = res_arr_custom[16, :, :]
+            center_slice_ref = ref_arr_custom[16, :, :]
+            @test mean(abs.(center_slice_res - center_slice_ref)) < 0.2
+
         end
     catch e
         @info "Skipping SimpleITK verification: $e"
+        rethrow(e)
+    end
+
+    # --- 6. Custom Center of Rotation ---
+    @testset "Batched Rotation Custom Center" begin
+        dims = (21, 21, 21)
+        data = zeros(Float32, dims)
+        data[16, 11, 11] = 1.0 # Point at (16, 11, 11).
+
+        img = MedImage(voxel_data=data, origin=(0.0,0.0,0.0), spacing=(1.0,1.0,1.0), direction=(1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0), image_type=MedImages.MedImage_data_struct.MRI_type, image_subtype=MedImages.MedImage_data_struct.T1_subtype, patient_id="p1")
+        batch = create_batched_medimage([img])
+
+        # Rotate around (16, 11, 11) - should stay in place
+        center = (16.0, 11.0, 11.0)
+        rot_custom = rotate_mi(batch, 3, 90.0, Nearest_neighbour_en; center_of_rotation=center)
+
+        val_custom = rot_custom.voxel_data[16, 11, 11, 1]
+        @test val_custom == 1.0
+    end
+
+    # --- 7. Extended Affine Tests with Custom Center ---
+    @testset "Extended Affine Custom Center" begin
+        # Test 1: Scaling around a corner (1, 1, 1)
+        # Point at (2, 2, 2). Scale by 2.0.
+        # If scale around (1, 1, 1):
+        # Dist = (1, 1, 1). New Dist = (2, 2, 2). New Pos = (1+2, 1+2, 1+2) = (3, 3, 3).
+        # If scale around default center (e.g. 5, 5, 5 for 10x10x10):
+        # Dist = (2-5, ...) = (-3). New Dist = (-6). New Pos = 5-6 = -1 (out of bounds).
+
+        dims = (20, 20, 20)
+        data = zeros(Float32, dims)
+        data[2, 2, 2] = 1.0
+
+        img = MedImage(voxel_data=data, origin=(0.0,0.0,0.0), spacing=(1.0,1.0,1.0), direction=(1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0), image_type=MedImages.MedImage_data_struct.MRI_type, image_subtype=MedImages.MedImage_data_struct.T1_subtype, patient_id="p1")
+        batch = create_batched_medimage([img])
+
+        scale_val = (2.0, 2.0, 2.0)
+        center_corner = (1.0, 1.0, 1.0)
+
+        # We need to construct affine matrix for scaling manually to pass to affine_transform_mi
+        # scale_mi currently doesn't support center_of_rotation kwarg in its dispatch (it calls affine_transform_mi internally but doesn't expose the arg).
+        # So we call affine_transform_mi directly.
+        mat_scale = create_affine_matrix(scale=scale_val)
+
+        res_scale = affine_transform_mi(batch, mat_scale, Nearest_neighbour_en; center_of_rotation=center_corner)
+
+        # Check if point moved to (3, 3, 3)
+        @test res_scale.voxel_data[3, 3, 3, 1] == 1.0
+
+        # Verify that with default center it would be gone (or elsewhere)
+        res_default = affine_transform_mi(batch, mat_scale, Nearest_neighbour_en)
+        @test res_default.voxel_data[3, 3, 3, 1] == 0.0
+
+        # Test 2: Rotate around a point that is NOT the object
+        # Point at (10, 10, 10). Center at (10, 2, 10) (Shifted in Y).
+        # Rotate 90 deg around X axis (1).
+        # Relative vector: (0, 8, 0).
+        # Rotate 90 deg X: (x, y, z) -> (x, -z, y)? Or (x, z, -y)?
+        # Rodrigues (1, 0, 0) 90 deg:
+        # [1 0 0; 0 0 -1; 0 1 0] (y->-z, z->y)
+        # Vector (0, 8, 0) -> (0, 0, 8).
+        # New Position = Center + New Vector = (10, 2, 10) + (0, 0, 8) = (10, 2, 18).
+
+        data2 = zeros(Float32, dims)
+        data2[10, 10, 10] = 1.0
+        batch2 = create_batched_medimage([MedImage(voxel_data=data2, origin=(0.0,0.0,0.0), spacing=(1.0,1.0,1.0), direction=(1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0), image_type=MedImages.MedImage_data_struct.MRI_type, image_subtype=MedImages.MedImage_data_struct.T1_subtype, patient_id="p2")])
+
+        center_y_shift = (10.0, 2.0, 10.0)
+        # Rotate 90 deg around axis 3 (X) to match direction vector expectation
+        res_rot_off = rotate_mi(batch2, 3, 90.0, Nearest_neighbour_en; center_of_rotation=center_y_shift)
+
+        # Check expected location (10, 2, 18)
+        @test res_rot_off.voxel_data[10, 2, 18, 1] == 1.0
     end
 end
