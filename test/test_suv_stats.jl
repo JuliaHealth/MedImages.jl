@@ -2,6 +2,8 @@ using Test
 using MedImages
 using MedImages.MedImage_data_struct
 using Dates
+using Accessors
+
 
 @testset "SUV Statistics Tests" begin
 
@@ -120,7 +122,7 @@ using Dates
         stats_batch = calculate_suv_statistics(batched_img, mask)
 
         factor1 = calculate_suv_factor(img)
-        img2_mock = deepcopy(img); img2_mock.metadata = meta2;
+        img2_mock = @set img.metadata = meta2;
         factor2 = calculate_suv_factor(img2_mock)
 
         @test length(stats_batch) == 2
@@ -184,7 +186,7 @@ using Dates
         stats_batch_mask = calculate_suv_statistics(batched_img, batched_mask)
 
         factor1 = calculate_suv_factor(img)
-        img2_mock = deepcopy(img); img2_mock.metadata = meta2;
+        img2_mock = @set img.metadata = meta2;
         factor2 = calculate_suv_factor(img2_mock)
 
         @test length(stats_batch_mask) == 2
@@ -193,8 +195,7 @@ using Dates
 
         # Test Dimension Mismatch
         mask_wrong_data = zeros(10, 10, 10, 3) # 3 batches
-        batched_mask_wrong = deepcopy(batched_mask)
-        batched_mask_wrong.voxel_data = mask_wrong_data
+        batched_mask_wrong = @set batched_mask.voxel_data = mask_wrong_data
 
         @test_throws DimensionMismatch calculate_suv_statistics(batched_img, batched_mask_wrong)
     end
