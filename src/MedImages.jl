@@ -15,7 +15,8 @@ export load_image, update_voxel_data, update_voxel_and_spatial_data, create_nii_
 export calculate_suv_factor, calculate_suv_statistics
 export save_med_image, load_med_image
 export resample_to_spacing, change_orientation
-export resample_to_image, rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi
+export resample_to_image, rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, pad_or_crop_mi
+export one_hot_encode, calculate_barycenter, calculate_max_radius, extract_points_from_mask
 export Rodrigues_rotation_matrix, create_affine_matrix, compose_affine_matrices, affine_transform_mi
 export string_to_orientation_enum, orientation_enum_to_string
 export create_batched_medimage, unbatch_medimage
@@ -49,9 +50,9 @@ using .MedImage_data_struct: Nearest_neighbour_en, Linear_en, B_spline_en
 using .MedImage_data_struct: ORIENTATION_RPI, ORIENTATION_LPI, ORIENTATION_RAI, ORIENTATION_LAI
 using .MedImage_data_struct: ORIENTATION_RPS, ORIENTATION_LPS, ORIENTATION_RAS, ORIENTATION_LAS
 using .Orientation_dicts: string_to_orientation_enum, orientation_enum_to_string
-using .Spatial_metadata_change: resample_to_spacing, change_orientation
-using .Resample_to_target: resample_to_image
-using .Basic_transformations: rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi
+using .Spatial_metadata_change: change_orientation
+using .Resample_to_target: resample_to_image, resample_to_spacing
+using .Basic_transformations: rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, pad_or_crop_mi
 using .Basic_transformations: Rodrigues_rotation_matrix, create_affine_matrix, compose_affine_matrices, affine_transform_mi
 
 # Make HDF5 functions available (they're not in a module)

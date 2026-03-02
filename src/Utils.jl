@@ -19,6 +19,7 @@ export resample_kernel_launch
 export is_cuda_array, extract_corners
 export create_batched_medimage, unbatch_medimage
 export generate_affine_coords
+export one_hot_encode, calculate_barycenter, calculate_max_radius, extract_points_from_mask
 
 import ..MedImage_data_struct: MedImage, BatchedMedImage, Interpolator_enum, Mode_mi, Orientation_code, Nearest_neighbour_en, Linear_en, B_spline_en
 
@@ -1429,6 +1430,161 @@ function ChainRulesCore.rrule(::typeof(resample_kernel_launch), image_data, old_
         return NoTangent(), d_image_out, NoTangent(), NoTangent(), NoTangent(), NoTangent()
     end
     return output, resample_pullback
+end
+
+
+
+"""
+    one_hot_encode(arr::AbstractArray{T, N}, num_classes::Int) where {T, N}
+
+Converts an integer-labeled array into a one-hot encoded Float32 array.
+The new dimension is added at N+1.
+"""
+function one_hot_encode(arr::AbstractArray{T, N}, num_classes::Int) where {T, N}
+    backend = get_backend(arr)
+    out_dims = (size(arr)..., num_classes)
+    out = KernelAbstractions.zeros(backend, Float32, out_dims...)
+    
+    for c in 1:num_classes
+        # Select the c-th channel in the last dimension
+        out_channel = selectdim(out, N + 1, c)
+        out_channel .= Float32.(arr .== T(c))
+    end
+    return out
+end
+
+"""
+    calculate_barycenter(mask::AbstractArray{T, N}) where {T, N}
+
+Calculates the barycenter (centroid) of non-zero voxels in a mask.
+If N=4, it calculates a barycenter for each channel/batch in the 4th dimension.
+Returns a Tuple or Vector of Tuples.
+"""
+function calculate_barycenter(mask::AbstractArray{T, N}) where {T, N}
+    backend = get_backend(mask)
+    dims = size(mask)
+    
+    if N == 3
+        # Ensure we work on GPU if possible
+        mask_f32 = Float32.(mask)
+        n = sum(mask_f32)
+        if n == 0
+            return (0.0f0, 0.0f0, 0.0f0)
+        end
+        
+        # Optimized GPU path using grids
+        x_grid = KernelAbstractions.allocate(backend, Float32, dims[1])
+        y_grid = KernelAbstractions.allocate(backend, Float32, dims[2])
+        z_grid = KernelAbstractions.allocate(backend, Float32, dims[3])
+        
+        # Fill grids
+        x_arr = Float32.(collect(1:dims[1]))
+        y_arr = Float32.(collect(1:dims[2]))
+        z_arr = Float32.(collect(1:dims[3]))
+        
+        if backend isa KernelAbstractions.GPU
+            copyto!(x_grid, x_arr)
+            copyto!(y_grid, y_arr)
+            copyto!(z_grid, z_arr)
+        else
+            x_grid .= x_arr
+            y_grid .= y_arr
+            z_grid .= z_arr
+        end
+        
+        sum_x = sum(mask_f32 .* reshape(x_grid, :, 1, 1))
+        sum_y = sum(mask_f32 .* reshape(y_grid, 1, :, 1))
+        sum_z = sum(mask_f32 .* reshape(z_grid, 1, 1, :))
+        
+        return (Float32(sum_x/n), Float32(sum_y/n), Float32(sum_z/n))
+        
+    elseif N == 4
+        # Multichannel support
+        num_channels = dims[4]
+        barycenters = Vector{Tuple{Float32, Float32, Float32}}(undef, num_channels)
+        for c in 1:num_channels
+            barycenters[c] = calculate_barycenter(selectdim(mask, 4, c))
+        end
+        return barycenters
+    else
+        error("calculate_barycenter only supports 3D or 4D arrays")
+    end
+end
+
+"""
+    calculate_max_radius(mask::AbstractArray{T, 3}, barycenter::Tuple{Float32, Float32, Float32})
+
+Calculates the maximum distance from the barycenter to any non-zero voxel in the mask.
+"""
+function calculate_max_radius(mask::AbstractArray{T, 3}, barycenter::Tuple{Float32, Float32, Float32}) where {T}
+    backend = get_backend(mask)
+    dims = size(mask)
+    
+    x_grid = KernelAbstractions.allocate(backend, Float32, dims[1])
+    y_grid = KernelAbstractions.allocate(backend, Float32, dims[2])
+    z_grid = KernelAbstractions.allocate(backend, Float32, dims[3])
+    
+    x_arr = Float32.(collect(1:dims[1]))
+    y_arr = Float32.(collect(1:dims[2]))
+    z_arr = Float32.(collect(1:dims[3]))
+    
+    if backend isa KernelAbstractions.GPU
+        copyto!(x_grid, x_arr)
+        copyto!(y_grid, y_arr)
+        copyto!(z_grid, z_arr)
+    else
+        x_grid .= x_arr
+        y_grid .= y_arr
+        z_grid .= z_arr
+    end
+    
+    # Square distance volume: filter by mask
+    mask_bool = (mask .> 0)
+    dist_sq_vol = (((reshape(x_grid, :, 1, 1) .- barycenter[1]).^2) .+ 
+                   ((reshape(y_grid, 1, :, 1) .- barycenter[2]).^2) .+ 
+                   ((reshape(z_grid, 1, 1, :) .- barycenter[3]).^2)) .* Float32.(mask_bool)
+    
+    return sqrt(maximum(dist_sq_vol))
+end
+
+"""
+    extract_points_from_mask(mask::AbstractArray{T, 3}, max_points::Int)
+
+Extracts a deterministic subset of coordinates for non-zero voxels in a mask.
+Pads with (-1.0, -1.0, -1.0) if fewer than max_points are found.
+"""
+function extract_points_from_mask(mask::AbstractArray{T, 3}, max_points::Int) where {T}
+    # findall always returns indices on CPU for CuArrays (scalar indexing warning)
+    # but for small masks it's okay. For large ones we should use GPU kernels
+    # to find non-zero indices.
+    indices = findall(mask .> 0)
+    n_points = length(indices)
+    
+    points_tensor = fill(-1.0f0, (3, max_points))
+    
+    if n_points == 0
+        return points_tensor
+    end
+    
+    # Deterministic sampling using fixed stride
+    if n_points > max_points
+        if max_points == 1
+            subset = [indices[1]]
+        else
+            sel_indices = round.(Int, range(1, stop=n_points, length=max_points))
+            subset = indices[sel_indices]
+        end
+    else
+        subset = indices
+    end
+    
+    for (p_idx, idx) in enumerate(subset)
+        points_tensor[1, p_idx] = Float32(idx[1])
+        points_tensor[2, p_idx] = Float32(idx[2])
+        points_tensor[3, p_idx] = Float32(idx[3])
+    end
+    
+    return points_tensor
 end
 
 end#Utils
