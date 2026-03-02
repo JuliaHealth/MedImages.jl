@@ -5,6 +5,16 @@ using ..MedImage_data_struct: MedImage, BatchedMedImage
 export calculate_suv_factor
 
 """
+    calculate_suv_factor(mi::MedImage)
+
+Calculates the SUV factor for a single MedImage.
+Returns Float64 or Nothing if calculation fails.
+"""
+function calculate_suv_factor(mi::MedImage)::Union{Float64, Nothing}
+    return _calculate_suv_from_metadata(mi.metadata)
+end
+
+"""
     calculate_suv_factor(batched_image::BatchedMedImage)
 
 Calculates SUV factors for a batch of images.
@@ -16,6 +26,66 @@ function calculate_suv_factor(batched_image::BatchedMedImage)::Vector{Union{Floa
         res[i] = _calculate_suv_from_metadata(batched_image.metadata[i])
     end
     return res
+end
+
+function _calculate_suv_from_metadata(metadata::Dict)::Union{Float64, Nothing}
+    try
+        # 1. Get Patient Weight in grams
+        weight_kg = get(metadata, "PatientWeight", nothing)
+        if weight_kg === nothing
+            return nothing
+        end
+        weight_g = Float64(weight_kg) * 1000.0
+
+        # 2. Get Radionuclide Information
+        radio_seq = get(metadata, "RadiopharmaceuticalInformationSequence", nothing)
+        if radio_seq === nothing || isempty(radio_seq)
+            return nothing
+        end
+        
+        info = radio_seq[1]
+        total_dose = get(info, "RadionuclideTotalDose", nothing)
+        half_life = get(info, "RadionuclideHalfLife", nothing)
+        inj_time_str = get(info, "RadiopharmaceuticalStartTime", nothing)
+        
+        if total_dose === nothing || half_life === nothing || inj_time_str === nothing
+            return nothing
+        end
+
+        # 3. Get Scan/Acquisition Time
+        # Prefer AcquisitionTime, fallback to SeriesTime
+        scan_time_str = get(metadata, "AcquisitionTime", nothing)
+        if scan_time_str === nothing
+            scan_time_str = get(metadata, "SeriesTime", nothing)
+        end
+        
+        if scan_time_str === nothing
+            return nothing
+        end
+
+        # 4. Parse Times and calculate Delta t
+        inj_time = parse_dicom_time(string(inj_time_str))
+        scan_time = parse_dicom_time(string(scan_time_str))
+        
+        # Handle midnight crossover: if scan_time < inj_time, assume it's next day
+        # Time difference in nanoseconds, convert to seconds
+        delta_t = Float64((scan_time - inj_time).value) / 1e9
+        if delta_t < 0
+            delta_t += 86400.0 # Add 24 hours
+        end
+
+        # 5. Calculate Decay and SUV Factor
+        decay = 2.0^(-delta_t / Float64(half_life))
+        actual_dose = Float64(total_dose) * decay
+        
+        if actual_dose == 0
+            return nothing
+        end
+        
+        return weight_g / actual_dose
+    catch
+        return nothing
+    end
 end
 
 function parse_dicom_time(t_str::AbstractString)

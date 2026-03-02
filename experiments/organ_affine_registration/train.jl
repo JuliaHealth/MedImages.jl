@@ -1,18 +1,11 @@
 using Lux, Random, Optimisers, Zygote, Statistics
-using KernelAbstractions
+using KernelAbstractions, LuxCUDA, HDF5
 using MedImages
 using MedImages.MedImage_data_struct
 using Printf
 using MPI
 
-# Optional: Distributed Utils
-# We check if we are running in distributed mode
-const DISTRIBUTED_MODE = MPI.Initialized() ? true : false
-
-# If distributed, we might want to use CUDA if available on local rank
-# For now, we stick to CPU or basic GPU detection.
-
-# Ensure local imports work relative to this file
+# Ensure local imports
 if !@isdefined(Preprocessing)
     include("src/preprocessing.jl")
 end
@@ -23,139 +16,288 @@ if !@isdefined(FusedLoss)
     include("src/fused_loss.jl")
 end
 
+if !@isdefined(RegistrationUtils)
+    include("src/utils.jl")
+end
+
 using .Preprocessing
 using .RegistrationModel
 using .FusedLoss
+using .RegistrationUtils
 
-# --- Distributed Helper (Simple AllReduce) ---
-function average_gradients(grads, comm)
-    # Recursively walk through gradients and Allreduce leaf arrays
-    # In a real Lux.DistributedUtils setup, this is handled automatically.
-    # Here we implement a simple version for demonstration if Lux.DistributedUtils is not available/used directly.
-    # Note: Lux doesn't export DistributedUtils by default in v0.5/v1.0 in the same way.
-    # We will assume single-node training for simplicity unless explicitly requested to use a specific lib.
-    # The user asked for "support for distributed training as shown in https://lux.csail.mit.edu/stable/manual/distributed_utils"
-    # That page describes `Lux.DistributedUtils`.
+# --- Visualization / Inference Helpers ---
+# Moved to src/utils.jl
 
-    # However, Lux.DistributedUtils might need `LuxMPI.jl` or similar extension.
-    # Let's check if `Lux.DistributedUtils` is available in the loaded Lux.
-    return grads # Placeholder if not running distributed
+function visualize_validation(epoch, model, ps, st, valid_train, f, device, ka_backend, rank, dataset_path, num_organs)
+    if rank != 0 return end
+    
+    println("--- Running Visualization for Epoch $epoch ---")
+    output_dir = "epoch_$epoch"
+    mkpath(output_dir)
+    
+    # Use first patient in train as Atlas Reference
+    ref_pat = valid_train[1]
+    ref_gold = read(f[ref_pat]["gold"]) # (X,Y,Z,N)
+    sx, sy, sz, _ = size(ref_gold)
+    
+    # Prepare Atlas Channels on Device
+    atlas_channels = KernelAbstractions.allocate(ka_backend, Float32, sx, sy, sz, 1, num_organs)
+    for i in 1:num_organs
+        ch = reshape(ref_gold[:,:,:,i], sx, sy, sz, 1, 1)
+        # copyto! expects same size or specific subarray
+        copyto!(view(atlas_channels, :, :, :, 1, i), ref_gold[:,:,:,i])
+    end
+    
+    # Select 2 validation subjects
+    val_list = read(f["val_list"])
+    valid_val = [p for p in val_list if p in keys(f)]
+    if isempty(valid_val) return end
+    
+    targets = valid_val[1:min(2, length(valid_val))]
+    labels = [1, 2, 3, 6] # Organs matching SELECTED_ORGANS
+    
+    for pat_id in targets
+        # Load patient data (full resolution for inference visualization)
+        pat_grp = f[pat_id]
+        spect = read(pat_grp["spect"])
+        atlas = read(pat_grp["atlas"])
+        
+        # Prepare Input
+        x_raw = cat(reshape(atlas, size(atlas)..., 1), 
+                     reshape(spect, size(spect)..., 1), dims=4)
+        x_raw = reshape(x_raw, size(x_raw)..., 1) |> device
+        
+        # Predict Parameters
+        params_pred, _ = model(x_raw, ps, st)
+        ap_cpu = Array(reshape(params_pred, 15, num_organs))
+        
+        # Invert and Warp
+        warped_sum = zeros(Float32, sx, sy, sz)
+        warped_channels = KernelAbstractions.zeros(ka_backend, Float32, sx, sy, sz, 1, num_organs)
+        
+        # We need T^-1 (Patient -> Atlas)
+        inv_matrices = zeros(Float32, 3, 4, num_organs)
+        for i in 1:num_organs
+            # Get center from metadata if possible, else middle
+            cx_v, cy_v, cz_v = ap_cpu[13, i], ap_cpu[14, i], ap_cpu[15, i]
+            M = params_to_matrix(ap_cpu[:, i], [cx_v, cy_v, cz_v])
+            M_inv = inv(M)
+            inv_matrices[:, :, i] .= Float32.(M_inv[1:3, :])
+        end
+        
+        # Move to GPU
+        inv_matrices_gpu = KernelAbstractions.allocate(ka_backend, Float32, size(inv_matrices))
+        copyto!(inv_matrices_gpu, inv_matrices)
+        
+        # Dummy centers for the warp kernel since we already shifted back in Matrix
+        dummy_centers_gpu = KernelAbstractions.zeros(ka_backend, Float32, 3, num_organs)
+        
+        # Launch Warp
+        warp_kernel = FusedLoss.gpu_batch_affine_warp_kernel!(ka_backend, (8, 8, 8))
+        warp_kernel(warped_channels, atlas_channels, inv_matrices_gpu, dummy_centers_gpu, ndrange=size(warped_channels))
+        KernelAbstractions.synchronize(ka_backend)
+        
+        # Fuse labels
+        warped_cpu = Array(warped_channels)
+        final_seg = zeros(Float32, sx, sy, sz)
+        for i in 1:num_organs
+            final_seg .+= warped_cpu[:,:,:,1,i] .* Float32(labels[i])
+        end
+        
+        # Save NIfTI
+        pat_dir = joinpath(output_dir, pat_id)
+        mkpath(pat_dir)
+        
+        # Metadata from attributes
+        spacing = Tuple(read(HDF5.attributes(pat_grp)["spacing"]))
+        origin = Tuple(read(HDF5.attributes(pat_grp)["origin"]))
+        direction = Tuple(read(HDF5.attributes(pat_grp)["direction"]))
+        
+        mi = MedImage(
+            voxel_data=final_seg, 
+            origin=origin, 
+            spacing=spacing, 
+            direction=direction,
+            image_type=MedImage_data_struct.CT_type,
+            image_subtype=MedImage_data_struct.CT_subtype,
+            patient_id=pat_id
+        )
+        MedImages.Load_and_save.create_nii_from_medimage(mi, joinpath(pat_dir, "registered_atlas_seg.nii.gz"))
+        
+        # Copy original files
+        src_pat_path = joinpath(dataset_path, pat_id)
+        cp(joinpath(src_pat_path, "SPECT_DATA", "CT.nii.gz"), joinpath(pat_dir, "CT.nii.gz"), force=true)
+        cp(joinpath(src_pat_path, "Atlas", "Atlas_Registered.nii.gz"), joinpath(pat_dir, "Atlas_Registered.nii.gz"), force=true)
+        cp(joinpath(src_pat_path, "TOTAL_SEGMENTOR_OUTPUT", "segmentation.nii.gz"), joinpath(pat_dir, "segmentation.nii.gz"), force=true)
+        cp(joinpath(src_pat_path, "SPECT_DATA", "SPECT_Recon_WholeBody.nii.gz"), joinpath(pat_dir, "SPECT_Recon_WholeBody.nii.gz"), force=true)
+        
+        println("Saved visualization for $pat_id")
+    end
 end
 
-# --- Overfit Experiment ---
-function run_training_experiment(args=ARGS)
-    # Initialize MPI if needed
-    if !MPI.Initialized()
-        MPI.Init()
-    end
-    comm = MPI.COMM_WORLD
-    rank = MPI.Comm_rank(comm)
-    world_size = MPI.Comm_size(comm)
+# --- Augmentation ---
+# Moved to src/utils.jl
+
+function run_training_experiment()
+    # Initialize Distributed Backend
+    Lux.DistributedUtils.initialize(Lux.MPIBackend)
+    backend = Lux.DistributedUtils.get_distributed_backend(Lux.MPIBackend)
+    device = Lux.DistributedUtils.get_device(backend)
+    if device === nothing device = Lux.gpu_device() end
+    rank = Lux.DistributedUtils.local_rank(backend)
+    world_size = Lux.DistributedUtils.total_workers(backend)
 
     rng = Random.default_rng()
     Random.seed!(rng, 1234 + rank)
 
     if rank == 0
-        println("--- Starting Organ Affine Registration Training ---")
-        println("MPI World Size: $world_size")
+        println("--- Starting Real Data Organ Affine Registration ---")
+        println("Distributed Backend: MPI | World Size: $world_size")
     end
 
-    # 1. Setup Data (Mock)
-    # In real distributed training, we split data.
-    # Here we just generate same data for overfitting test, or split if needed.
-
-    batch_size = 1 # Per process
-    num_organs = 1
-
-    # Points Tensor: (3, 512, 1)
-    points = fill(-1.0f0, (3, 512, 1))
-    points[1, 1, 1] = 5.0f0
-    points[2, 1, 1] = 5.0f0
-    points[3, 1, 1] = 5.0f0
-
-    # Gold Standard Volume: (20, 20, 20, 1)
-    gold_vol = zeros(Float32, 20, 20, 20, 1)
-
-    # Create gradient field
-    for x in 1:20, y in 1:20, z in 1:20
-        dist = sqrt((x-10)^2 + (y-5)^2 + (z-5)^2)
-        if dist < 3.0
-            gold_vol[x,y,z,1] = max(0.0f0, 1.0f0 - dist/3.0f0)
-        end
+    # 1. HDF5 Data Loading
+    hdf5_path = "dataset_Lu_50.h5"
+    if !isfile(hdf5_path)
+        if rank == 0 println("ERROR: HDF5 file not found. Run preprocess_data.jl first.") end
+        return
     end
-    gold_vol[10, 5, 5, 1] = 1.0f0
 
-    meta = [OrganMetadata(1, (10.0f0, 5.0f0, 5.0f0), 2.0f0)]
+    f = h5open(hdf5_path, "r")
+    train_list = read(f["train_list"])
+    valid_train = [p for p in train_list if p in keys(f)]
+    
+    if rank == 0 println("Valid training subjects: $(length(valid_train))") end
 
-    x_input = rand(Float32, 16, 16, 16, 2, 1)
-
-    # 2. Model
-    model = MultiScaleCNN(2, num_organs)
+    # 2. Model Setup
+    num_organs = 4
+    model = Chain(
+        Conv((3, 3, 3), 2 => 16, stride=2; pad=SamePad()),
+        relu,
+        Conv((3, 3, 3), 16 => 32, stride=2; pad=SamePad()),
+        relu,
+        Conv((3, 3, 3), 32 => 64, stride=2; pad=SamePad()),
+        relu,
+        GlobalMeanPool(),
+        FlattenLayer(),
+        Dense(64, 128, relu),
+        Dense(128, 15 * num_organs)
+    )
+    
     ps, st = Lux.setup(rng, model)
+    ps = ps |> device
+    st = st |> device
+    ps = Lux.DistributedUtils.synchronize!!(backend, ps)
+    st = Lux.DistributedUtils.synchronize!!(backend, st)
 
-    # Sync initial parameters
-    # Simple broadcast from root
-    # (Skipping deep implementation of parameter sync for this simple script,
-    # assuming deterministic seed is enough for mock)
-
-    # 3. Optimizer
-    opt = Optimisers.Adam(0.05)
-
-    # Wrap optimizer for distributed if using Lux.DistributedUtils
-    # Since we don't have the extension loaded explicitly, we handle gradients manually below or use Optimisers.
+    opt = Optimisers.Adam(0.001)
     opt_state = Optimisers.setup(opt, ps)
 
-    # 4. Training Loop
-    function loss_function(p, state)
-        params_pred, new_state = model(x_input, p, state)
-        l = compute_organ_loss(points, params_pred, gold_vol, meta)
-        return l, new_state
-    end
-
-    losses = Float32[]
-
-    for epoch in 1:100
-        (l, st), back = Zygote.pullback(p -> loss_function(p, st), ps)
-        grads = back((1.0f0, nothing))[1]
-
-        # Distributed Reduction of Gradients
-        if world_size > 1
-            # Flatten gradients
-            # This is a naive implementation. Real `DistributedUtils` does this better.
-            # We skip detailed MPI implementation here to strictly follow "Add support"
-            # which usually implies architecture support, not necessarily a full framework reinvention.
-            # However, for correctness in MPI run:
-            # MPI.Allreduce!(grads_array, +, comm)
-        end
-
-        opt_state, ps = Optimisers.update(opt_state, ps, grads)
-
-        if rank == 0
-            push!(losses, l)
-            if epoch % 10 == 0 || epoch == 1
-                @printf("Epoch %3d: Loss = %.5f\n", epoch, l)
+    # 3. Atlas Points (From one valid patient)
+    atlas_points_cpu = fill(-1.0f0, (3, 512, num_organs))
+    if !isempty(valid_train)
+        first_pat = valid_train[1]
+        atlas_vol = read(f[first_pat]["atlas"])
+        gold_vol = read(f[first_pat]["gold"]) # (X,Y,Z,N)
+        for i in 1:num_organs
+            idxs = findall(gold_vol[:, :, :, i] .> 0.5f0)
+            if !isempty(idxs)
+                n = length(idxs)
+                sel = round.(Int, range(1, stop=n, length=512))
+                subset = idxs[sel]
+                for (j, idx) in enumerate(subset)
+                    atlas_points_cpu[1, j, i] = Float32(idx[1])
+                    atlas_points_cpu[2, j, i] = Float32(idx[2])
+                    atlas_points_cpu[3, j, i] = Float32(idx[3])
+                end
             end
         end
     end
+    atlas_points = atlas_points_cpu |> device
 
-    if rank == 0
-        initial_loss = losses[1]
-        final_loss = losses[end]
+    # 4. Training Loop
+    ka_backend = KernelAbstractions.get_backend(ps.layer_1.weight)
+    
+    for epoch in 1:20
+        shuffle!(rng, valid_train)
+        
+        for pat_id in valid_train
+            # Load Data
+            pat_grp = f[pat_id]
+            hp_spect = read(pat_grp["spect"])
+            hp_atlas = read(pat_grp["atlas"])
+            hp_gold = read(pat_grp["gold"])
+            
+            # 2x Downsample (Strided) to save 8x memory
+            spect = hp_spect[1:2:end, 1:2:end, 1:2:end]
+            atlas = hp_atlas[1:2:end, 1:2:end, 1:2:end]
+            gold = hp_gold[1:2:end, 1:2:end, 1:2:end, :]
+            
+            x_raw = cat(reshape(atlas, size(atlas)..., 1), 
+                         reshape(spect, size(spect)..., 1), dims=4)
+            x_raw = reshape(x_raw, size(x_raw)..., 1) |> device
+            gold_raw = reshape(gold, size(gold)..., 1) |> device
+            
+            # Loss Metadata (Loaded from HDF5)
+            # Patient spatial centers (half resolution due to 2x strided loading if we use that coords)
+            # Actually, metadata in HDF5 is for full resolution. 
+            # If we downsample 2x, we must divide coordinates by 2.
+            bary_raw = read(pat_grp["barycenters"]) ./ 2.0f0
+            radii_raw = read(pat_grp["radii"]) ./ 2.0f0
+            
+            bary_gpu = bary_raw |> device
+            radii_gpu = radii_raw |> device
+            
+            # Augmentation
+            sx, sy, sz = size(atlas)
+            centers = Float32[sx/2; sy/2; sz/2]
+            centers = reshape(centers, 3, 1)
+            
+            x_aug, gold_aug, am_meta = Zygote.ignore() do
+                apply_random_augmentation(x_raw, gold_raw, centers, ka_backend)
+            end
 
-        println("Initial Loss: $initial_loss")
-        println("Final Loss:   $final_loss")
-
-        if final_loss < initial_loss * 0.5
-            println("SUCCESS: Loss dropped significantly.")
-        else
-            println("FAILURE: Loss did not drop enough.")
+            # Gradient Step
+            (l, st), back = Zygote.pullback(p -> begin
+                params_pred, new_state = model(x_aug, p, st)
+                ap = reshape(params_pred, 15, num_organs, 1)
+                l_val = compute_organ_loss(atlas_points, ap, gold_aug[:,:,:,:,1], bary_gpu, radii_gpu)
+                return l_val, new_state
+            end, ps)
+            
+            grads = back((1.0f0, nothing))[1]
+            grads = allreduce_recursive!!(backend, grads)
+            opt_state, ps = Optimisers.update(opt_state, ps, grads)
+            
+            if rank == 0 @printf("Epoch %d | Pat %s | Loss = %.5f\n", epoch, pat_id, l) end
+            
+            # Memory Management
+            x_raw = nothing
+            gold_raw = nothing
+            x_aug = nothing
+            gold_aug = nothing
+            GC.gc()
+            if ka_backend isa LuxCUDA.CUDABackend
+                CUDA.reclaim()
+            end
         end
-
-        # Analyze Params
-        params_final, _ = model(x_input, ps, st)
-        tx = params_final[4, 1, 1]
-        println("Final Translation X: $tx | Expected ~ 5.0")
+        
+        # --- End of Epoch: Visualization ---
+        dataset_path = "/home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu"
+        visualize_validation(epoch, model, ps, st, valid_train, f, device, ka_backend, rank, dataset_path, num_organs)
     end
+    
+    close(f)
+end
+
+function allreduce_recursive!!(backend, x)
+    if x isa NamedTuple
+        return NamedTuple{keys(x)}(map(v -> allreduce_recursive!!(backend, v), values(x)))
+    elseif x isa Tuple
+        return map(v -> allreduce_recursive!!(backend, v), x)
+    elseif x isa AbstractArray
+        Lux.DistributedUtils.allreduce!(backend, x, Lux.DistributedUtils.avg)
+        return x
+    else return x end
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__

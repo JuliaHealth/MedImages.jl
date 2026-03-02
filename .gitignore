@@ -13,3 +13,9 @@ test/new/
 test/*/outputs/
 test/visual_output/
 test_data/dataset_Lu/
+experiments/organ_affine_registration/
+test_data/dataset_PET/
+test_data/dataset_uncorrected/
+test_data/combined.nii.gz
+dataset_unified.h5
+checkpoint_best.jld

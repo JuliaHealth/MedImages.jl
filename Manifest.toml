@@ -2,7 +2,7 @@
 
 julia_version = "1.10.10"
 manifest_format = "2.0"
-project_hash = "9e1399cf629ba510c3cc5b6765e03190cc04db56"
+project_hash = "9901101252f76e7c349aee318b210c8bc7d8eb20"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "f7304359109c768cf32dc5fa2d371565bb63b68a"
@@ -247,6 +247,12 @@ deps = ["Artifacts", "CUDA_Driver_jll", "JLLWrappers", "LazyArtifacts", "Libdl",
 git-tree-sha1 = "92cd84e2b760e471d647153ea5efc5789fc5e8b2"
 uuid = "76a88914-d11a-5bdc-97e0-2f5a05c973a2"
 version = "0.19.2+0"
+
+[[deps.CUDNN_jll]]
+deps = ["Artifacts", "CUDA_Runtime_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "TOML"]
+git-tree-sha1 = "dff9a69017686c95f1fd601c63c088244b3db75b"
+uuid = "62b44479-cb7b-5706-934f-f13b2eb2e645"
+version = "9.17.1+0"
 
 [[deps.ChainRules]]
 deps = ["Adapt", "ChainRulesCore", "Compat", "Distributed", "GPUArraysCore", "IrrationalConstants", "LinearAlgebra", "Random", "RealDot", "SparseArrays", "SparseInverseSubset", "Statistics", "StructArrays", "SuiteSparse"]
@@ -739,12 +745,10 @@ deps = ["Compat", "HDF5_jll", "Libdl", "MPIPreferences", "Mmap", "Preferences", 
 git-tree-sha1 = "e856eef26cf5bf2b0f95f8f4fc37553c72c8641c"
 uuid = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 version = "0.17.2"
+weakdeps = ["MPI"]
 
     [deps.HDF5.extensions]
     MPIExt = "MPI"
-
-    [deps.HDF5.weakdeps]
-    MPI = "da04e1cc-30fd-572f-bb4f-1f8673147195"
 
 [[deps.HDF5_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "LazyArtifacts", "LibCURL_jll", "Libdl", "MPICH_jll", "MPIPreferences", "MPItrampoline_jll", "MicrosoftMPI_jll", "OpenMPI_jll", "OpenSSL_jll", "TOML", "Zlib_jll", "libaec_jll"]
@@ -1077,6 +1081,12 @@ version = "1.31.3"
     Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
     Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
+[[deps.LuxCUDA]]
+deps = ["CUDA", "Reexport", "cuDNN"]
+git-tree-sha1 = "6c6c2a14b1456add3fb304e5572a9d23f7715f0d"
+uuid = "d0bbae9a-e099-4d5b-a835-1c6931763bda"
+version = "0.3.4"
+
 [[deps.LuxCore]]
 deps = ["DispatchDoctor", "Random", "SciMLPublic"]
 git-tree-sha1 = "9455b1e829d8dacad236143869be70b7fdb826b8"
@@ -1221,11 +1231,25 @@ git-tree-sha1 = "a772d8d1987433538a5c226f79393324b55f7846"
 uuid = "f1d291b0-491e-4a28-83b9-f70985020b54"
 version = "0.4.8"
 
+[[deps.MPI]]
+deps = ["Distributed", "DocStringExtensions", "Libdl", "MPICH_jll", "MPIPreferences", "MPItrampoline_jll", "MicrosoftMPI_jll", "OpenMPI_jll", "PkgVersion", "PrecompileTools", "Requires", "Serialization", "Sockets"]
+git-tree-sha1 = "a61ecf714d71064b766d481ef43c094d4c6e3c52"
+uuid = "da04e1cc-30fd-572f-bb4f-1f8673147195"
+version = "0.20.23"
+
+    [deps.MPI.extensions]
+    AMDGPUExt = "AMDGPU"
+    CUDAExt = "CUDA"
+
+    [deps.MPI.weakdeps]
+    AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
+    CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+
 [[deps.MPICH_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "Hwloc_jll", "JLLWrappers", "Libdl", "MPIPreferences", "TOML"]
-git-tree-sha1 = "fec645c5b0306bc15ed1b02bd24255ef16a1c1dd"
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "Hwloc_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "MPIPreferences", "TOML"]
+git-tree-sha1 = "9341048b9f723f2ae2a72a5269ac2f15f80534dc"
 uuid = "7cb0a576-ebde-5e09-9194-50597f1243b4"
-version = "5.0.0+0"
+version = "4.3.2+0"
 
 [[deps.MPIPreferences]]
 deps = ["Libdl", "Preferences"]
@@ -1463,6 +1487,12 @@ deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 version = "1.10.0"
 
+[[deps.PkgVersion]]
+deps = ["Pkg"]
+git-tree-sha1 = "f9501cc0430a26bc3d156ae1b5b0c1b47af4d6da"
+uuid = "eebad327-c553-4316-9ea0-9fa01ccd7688"
+version = "0.3.3"
+
 [[deps.PooledArrays]]
 deps = ["DataAPI", "Future"]
 git-tree-sha1 = "36d8b4b899628fb92c2749eb488d884a926614d3"
@@ -1477,9 +1507,9 @@ version = "1.2.1"
 
 [[deps.Preferences]]
 deps = ["TOML"]
-git-tree-sha1 = "522f093a29b31a93e34eaea17ba055d850edea28"
+git-tree-sha1 = "8b770b60760d4451834fe79dd483e318eee709c4"
 uuid = "21216c6a-2e73-6563-6e65-726566657250"
-version = "1.5.1"
+version = "1.5.2"
 
 [[deps.PrettyPrint]]
 git-tree-sha1 = "632eb4abab3449ab30c5e1afaa874f0b98b586e4"
@@ -1507,6 +1537,12 @@ deps = ["Logging", "SHA", "UUIDs"]
 git-tree-sha1 = "f0803bc1171e455a04124affa9c21bba5ac4db32"
 uuid = "33c8b6b6-d38a-422a-b730-caa89a2f386c"
 version = "0.1.6"
+
+[[deps.ProgressMeter]]
+deps = ["Distributed", "Printf"]
+git-tree-sha1 = "fbb92c6c56b34e1a2c4c36058f68f332bec840e7"
+uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
+version = "1.11.0"
 
 [[deps.PtrArrays]]
 git-tree-sha1 = "4fbbafbc6251b883f4d2705356f3641f3652a7fe"
@@ -1747,9 +1783,9 @@ version = "0.34.10"
 
 [[deps.StringManipulation]]
 deps = ["PrecompileTools"]
-git-tree-sha1 = "a3c1536470bf8c5e02096ad4853606d7c8f62721"
+git-tree-sha1 = "d05693d339e37d6ab134c5ab53c29fce5ee5d7d5"
 uuid = "892a3eda-7b42-436c-8928-eab12a02cf0e"
-version = "0.4.2"
+version = "0.4.4"
 
 [[deps.StructArrays]]
 deps = ["ConstructionBase", "DataAPI", "Tables"]
@@ -1954,6 +1990,12 @@ deps = ["ChainRulesCore", "MacroTools"]
 git-tree-sha1 = "434b3de333c75fc446aa0d19fc394edafd07ab08"
 uuid = "700de1a5-db45-46bc-99cf-38207098b444"
 version = "0.2.7"
+
+[[deps.cuDNN]]
+deps = ["CEnum", "CUDA", "CUDA_Runtime_Discovery", "CUDNN_jll"]
+git-tree-sha1 = "c1e756c5b075d06f19595ac0bc6388ab2973237a"
+uuid = "02a925ec-e4fe-4b08-9a7e-0d78e3d38ccd"
+version = "1.4.6"
 
 [[deps.demumble_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]

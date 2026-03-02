@@ -2,10 +2,11 @@ module Resample_to_target
 using Interpolations
 using Statistics
 using CUDA
+using KernelAbstractions
 using ChainRulesCore
 
 using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Spatial_metadata_change, ..Load_and_save
-export resample_to_image, scale
+export resample_to_image, scale, resample_to_spacing
 
 # Helper function to compute extrapolation value - not differentiable
 function compute_extrapolate_value(voxel_data)
@@ -46,21 +47,25 @@ function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator
     old_spacing = im_moving.spacing
     new_spacing = im_fixed.spacing
     new_size = size(im_fixed.voxel_data)
+    
+    # Check current device
+    backend = try KernelAbstractions.get_backend(im_fixed.voxel_data) catch; KernelAbstractions.CPU() end
+    
     points_to_interpolate = get_base_indicies_arr(new_size)
+    points_to_interpolate = Float32.(points_to_interpolate) .- 1.0f0
+    points_to_interpolate = points_to_interpolate .* Float32.(new_spacing)
+    points_to_interpolate = points_to_interpolate .+ 1.0f0
 
-    points_to_interpolate = points_to_interpolate .- 1
-    points_to_interpolate = points_to_interpolate .* new_spacing
-    points_to_interpolate = points_to_interpolate .+ 1
-
-    #adding diffrence in origin we act as if moving image has origin 0.0,0.0,0.0 - needed for interpolation
-    origin_diff = (collect(im_fixed.origin) - collect(im_moving.origin))
+    # adding difference in origin
+    origin_diff = Float32.(collect(im_fixed.origin) - collect(im_moving.origin))
     points_to_interpolate = points_to_interpolate .+ origin_diff
 
+    # Move to GPU if needed
+    if backend isa KernelAbstractions.GPU
+        points_to_interpolate = CuArray(points_to_interpolate)
+    end
 
-
-
-
-    interpolated_points = interpolate_my(points_to_interpolate, im_moving.voxel_data, old_spacing, interpolator_enum, false, value_to_extrapolate)
+    interpolated_points = interpolate_my(points_to_interpolate, im_moving.voxel_data, old_spacing, interpolator_enum, false, Float32(value_to_extrapolate))
 
     new_voxel_data = reshape(interpolated_points, (new_size[1], new_size[2], new_size[3]))
     # new_voxel_data=cast_to_array_b_type(new_voxel_data,im_fixed.voxel_data)
@@ -94,65 +99,27 @@ function resample_to_image(im_fixed::BatchedMedImage, im_moving::BatchedMedImage
     # Base indices are same for all (0-based)
     base_indices = get_base_indicies_arr(new_size) # 3 x N
 
-    for b in 1:batch_size
-        # For each batch, transform indices to physical space of fixed image
-        # P_fixed = (Idx - 1) * Spacing_fixed + Origin_fixed
-
-        # Then map to "relative" physical space of moving image assuming moving origin is 0?
-        # Original logic:
-        # points = points .- 1
-        # points = points .* new_spacing
-        # points = points .+ 1  (index -> physical offset from origin 0?)
-        # points = points .+ origin_diff
-
-        # Essentially: target_phys = index_to_phys(fixed)
-        # interpolate_my takes physical points relative to moving image origin?
-        # No, interpolate_my:
-        # real_x = (point - 1) / spacing + 1
-        # It assumes point is 1-based physical coordinate relative to origin?
-        # Wait, Utils.jl `interpolate_kernel`:
-        # real_x = (shared_arr[index_local, 1] - 1.0f0) / Float32(spacing[1]) + 1.0f0
-        # This converts "physical-like" coordinate back to index.
-        # If input point is P, index is (P-1)/S + 1.
-        # This implies P = (I-1)*S + 1.
-        # This is 1-based index converted to physical distance if origin was 1?
-        # Or origin 0? If I=1 -> P=1.
-
-        # Let's trace `resample_to_image` logic:
-        # points = (indices - 1) * new_spacing + 1 + (fixed.origin - moving.origin)
-        # This point P is passed to `interpolate_my`.
-        # Inside `interpolate_my`:
-        # real_x = (P - 1)/old_spacing + 1
-
-        # Let's substitute:
-        # P = (I_fix - 1)*S_fix + 1 + O_fix - O_mov
-        # I_mov = ( (I_fix - 1)*S_fix + 1 + O_fix - O_mov - 1 ) / S_mov + 1
-        #       = ( (I_fix - 1)*S_fix + O_fix - O_mov ) / S_mov + 1
-        # This matches the standard mapping:
-        # P_phys = (I_fix - 1)*S_fix + O_fix
-        # I_mov = (P_phys - O_mov) / S_mov + 1
-
-        # So yes, we need to construct P for each batch b.
-
-        sp_fixed = im_fixed.spacing[b]
-        origin_diff = im_fixed.origin[b] .- im_moving.origin[b]
-
-        for i in 1:n_points
-            # base_indices is 3xN
-            # 1-based index from base_indices
-            ix = base_indices[1, i]
-            iy = base_indices[2, i]
-            iz = base_indices[3, i]
-
-            # Apply formula: (I-1)*S_new + 1 + diff
-            px = (ix - 1) * sp_fixed[1] + 1 + origin_diff[1]
-            py = (iy - 1) * sp_fixed[2] + 1 + origin_diff[2]
-            pz = (iz - 1) * sp_fixed[3] + 1 + origin_diff[3]
-
-            points_to_interpolate[1, i, b] = px
-            points_to_interpolate[2, i, b] = py
-            points_to_interpolate[3, i, b] = pz
-        end
+    # Optimized points_to_interpolate for BatchedMedImage using broadcasting
+    # Calculate origin diffs for all batch items (O_fix - O_mov)
+    od_vecs = [collect(im_fixed.origin[b] .- im_moving.origin[b]) for b in 1:batch_size]
+    od_mat = Float32.(hcat(od_vecs...)) # 3 x B
+    sp_mat = Float32.(hcat([collect(s) for s in im_fixed.spacing]...)) # 3 x B
+    
+    # base_indices is 3 x N (CPU)
+    # Move to GPU if necessary
+    backend = try KernelAbstractions.get_backend(im_fixed.voxel_data) catch; KernelAbstractions.CPU() end
+    
+    if backend isa KernelAbstractions.GPU
+        base_indices = CuArray(Float32.(base_indices))
+        od_mat = CuArray(od_mat)
+        sp_mat = CuArray(sp_mat)
+        points_to_interpolate = (reshape(base_indices, 3, n_points, 1) .- 1.0f0) .* 
+                                reshape(sp_mat, 3, 1, batch_size) .+ 1.0f0 .+ 
+                                reshape(od_mat, 3, 1, batch_size)
+    else
+        points_to_interpolate = (reshape(Float32.(base_indices), 3, n_points, 1) .- 1.0f0) .* 
+                                reshape(sp_mat, 3, 1, batch_size) .+ 1.0f0 .+ 
+                                reshape(od_mat, 3, 1, batch_size)
     end
 
     spacing_arg = im_moving.spacing # Vector of tuples
@@ -183,6 +150,110 @@ function resample_to_image(im_fixed::BatchedMedImage, im_moving::BatchedMedImage
         clinical_data = im_moving.clinical_data,
         is_contrast_administered = im_moving.is_contrast_administered,
         metadata = im_moving.metadata
+    )
+end
+
+"""
+    resample_to_spacing(im::MedImage, new_spacing::Tuple{Float64,Float64,Float64}, interpolator_enum::Interpolator_enum, value_to_extrapolate=Nothing)::MedImage
+
+Resamples a MedImage to a new voxel spacing. 
+Automatically handles multichannel data (4th dimension) by resampling each channel independently.
+"""
+function resample_to_spacing(im::MedImage, new_spacing::Tuple{Float64,Float64,Float64}, interpolator_enum::Interpolator_enum, value_to_extrapolate=Nothing)::MedImage
+    old_spacing = im.spacing
+    old_voxel_data = im.voxel_data
+    
+    is_4d = (ndims(old_voxel_data) == 4)
+    spatial_old_size = is_4d ? size(old_voxel_data)[1:3] : size(old_voxel_data)
+    
+    # Calculate new spatial size
+    new_spatial_size = Tuple{Int,Int,Int}(ceil.((spatial_old_size .* old_spacing) ./ new_spacing))
+    
+    if is_4d
+        num_channels = size(old_voxel_data, 4)
+        # Allocate new 4D array
+        new_voxel_data = similar(old_voxel_data, new_spatial_size..., num_channels)
+        for c in 1:num_channels
+            channel_data = selectdim(old_voxel_data, 4, c)
+            new_voxel_data[:, :, :, c] .= Utils.resample_kernel_launch(channel_data, old_spacing, new_spacing, new_spatial_size, interpolator_enum)
+        end
+    else
+        new_voxel_data = Utils.resample_kernel_launch(old_voxel_data, old_spacing, new_spacing, new_spatial_size, interpolator_enum)
+    end
+
+    return Load_and_save.update_voxel_and_spatial_data(im, new_voxel_data, im.origin, new_spacing, im.direction)
+end
+
+"""
+    resample_to_spacing(im::BatchedMedImage, new_spacing::Union{Tuple{Float64,Float64,Float64}, Vector{Tuple{Float64,Float64,Float64}}}, interpolator_enum::Interpolator_enum)::BatchedMedImage
+
+Resamples a BatchedMedImage to a new voxel spacing.
+Ensures consistent output dimensions across the batch.
+"""
+function resample_to_spacing(im::BatchedMedImage, new_spacing::Union{Tuple{Float64,Float64,Float64}, Vector{Tuple{Float64,Float64,Float64}}}, interpolator_enum::Interpolator_enum)::BatchedMedImage
+    batch_size = size(im.voxel_data, 4)
+    old_spatial_size = size(im.voxel_data)[1:3]
+
+    target_spacings = (new_spacing isa Vector) ? new_spacing : [new_spacing for _ in 1:batch_size]
+
+    # Calculate and verify consistent output size
+    first_new_size = Tuple{Int,Int,Int}(ceil.((old_spatial_size .* im.spacing[1]) ./ target_spacings[1]))
+    
+    for b in 2:batch_size
+        curr_new_size = Tuple{Int,Int,Int}(ceil.((old_spatial_size .* im.spacing[b]) ./ target_spacings[b]))
+        if curr_new_size != first_new_size
+            error("Inconsistent output sizes in batch: $first_new_size vs $curr_new_size. All batch items must have the same output size.")
+        end
+    end
+    
+    # In batched mode, we assume each batch item is 3D (X,Y,Z). 
+    # If we need to support batched multichannel, that would be 5D. 
+    # For now, we stick to the standard BatchedMedImage structure.
+
+    # Use interpolate_my which already supports batches
+    # We generate physical points in the new grid space
+    n_points = prod(first_new_size)
+    points_to_interpolate = zeros(Float32, 3, n_points, batch_size)
+    
+    base_indices = get_base_indicies_arr(first_new_size) # 3 x N
+    
+    for b in 1:batch_size
+        nsp = target_spacings[b]
+        osp = im.spacing[b]
+        
+        # Physical coordinates for each point in the new grid
+        for i in 1:n_points
+            points_to_interpolate[1, i, b] = (Float32(base_indices[1, i]) - 1.0f0) * Float32(nsp[1]) / Float32(osp[1]) + 1.0f0
+            points_to_interpolate[2, i, b] = (Float32(base_indices[2, i]) - 1.0f0) * Float32(nsp[2]) / Float32(osp[2]) + 1.0f0
+            points_to_interpolate[3, i, b] = (Float32(base_indices[3, i]) - 1.0f0) * Float32(nsp[3]) / Float32(osp[3]) + 1.0f0
+        end
+    end
+
+    # Use (1,1,1) for spacing because points are already in index space
+    spacing_arg = [(1.0, 1.0, 1.0) for _ in 1:batch_size]
+    resampled_flat = interpolate_my(points_to_interpolate, im.voxel_data, spacing_arg, interpolator_enum, false, 0.0, true)
+    new_data = reshape(resampled_flat, first_new_size[1], first_new_size[2], first_new_size[3], batch_size)
+
+    return BatchedMedImage(
+        voxel_data = new_data,
+        origin = im.origin,
+        spacing = target_spacings,
+        direction = im.direction,
+        image_type = im.image_type,
+        image_subtype = im.image_subtype,
+        patient_id = im.patient_id,
+        current_device = im.current_device,
+        date_of_saving = im.date_of_saving,
+        acquistion_time = im.acquistion_time,
+        study_uid = im.study_uid,
+        patient_uid = im.patient_uid,
+        series_uid = im.series_uid,
+        study_description = im.study_description,
+        legacy_file_name = im.legacy_file_name,
+        display_data = im.display_data,
+        clinical_data = im.clinical_data,
+        is_contrast_administered = im.is_contrast_administered,
+        metadata = im.metadata
     )
 end
 
