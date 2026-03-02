@@ -143,6 +143,7 @@ mkpath(DEBUG_DIR)
             include("basic_transformations_tests/test_pad_mi.jl")
             include("basic_transformations_tests/test_translate_mi.jl")
             include("basic_transformations_tests/test_scale_mi.jl")
+            include("basic_transformations_tests/test_affine_transform_mi.jl")
         end
     else
         @testset "Basic Transformations Tests" begin
