@@ -26,11 +26,25 @@ end
 
 
 """
-given two MedImage objects and a Interpolator enum value return the moving MedImage object resampled to the fixed MedImage object
-images should have the same orientation origin and spacing; their pixel arrays should have the same shape
-It require multiple steps some idea of implementation is below
-1) check origin of both images as for example in case origin of the moving image is not in the fixed image we need to return zeros
-2) we should define a grid on the basis of locations of the voxels in the fixed image and interpolate voxels from the moving image to the grid using for example GridInterpolations
+    resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator_enum::Interpolator_enum, value_to_extrapolate=Nothing)::MedImage
+
+Resample a 'moving' image to match the grid and spatial metadata of a 'fixed' image.
+
+This function aligns the `im_moving` image to the `im_fixed` image's physical space, matching its
+origin, spacing, direction, and dimensions. This is essential for multi-modal analysis
+where different scans need to be perfectly aligned voxel-by-voxel.
+
+# Arguments
+- `im_fixed::MedImage`: The reference image whose grid will be matched.
+- `im_moving::MedImage`: The image to be resampled/transformed.
+- `interpolator_enum`: Interpolation method (e.g., `Linear_en`).
+- `value_to_extrapolate`: Value to use for points outside the input volume. If `Nothing`, the median of corners is used.
+
+# Returns
+- `MedImage`: The `im_moving` image resampled onto the `im_fixed` image's grid.
+
+# Notes
+- If the images have different orientations, the function automatically runs `change_orientation` first.
 """
 function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator_enum::Interpolator_enum, value_to_extrapolate=Nothing)::MedImage
 
@@ -156,8 +170,26 @@ end
 """
     resample_to_spacing(im::MedImage, new_spacing::Tuple{Float64,Float64,Float64}, interpolator_enum::Interpolator_enum, value_to_extrapolate=Nothing)::MedImage
 
-Resamples a MedImage to a new voxel spacing. 
-Automatically handles multichannel data (4th dimension) by resampling each channel independently.
+Resample a `MedImage` to a new voxel spacing.
+
+This function changes the resolution of the image by interpolating the voxel data onto
+a new grid defined by `new_spacing`. The image dimensions are automatically adjusted
+to keep the same physical extent (field of view).
+
+# Arguments
+- `im::MedImage`: The input image to resample.
+- `new_spacing`: Target spacing in millimeters (Tuple of 3 Float64).
+- `interpolator_enum`: Method used for interpolation (e.g., `Linear_en`).
+- `value_to_extrapolate`: Value for points outside the source image.
+
+# Returns
+- `MedImage`: A new resampled image.
+
+# Examples
+```julia
+# Upsample to 0.5mm isovolumetric spacing
+julia> new_im = resample_to_spacing(im, (0.5, 0.5, 0.5), B_spline_en)
+```
 """
 function resample_to_spacing(im::MedImage, new_spacing::Tuple{Float64,Float64,Float64}, interpolator_enum::Interpolator_enum, value_to_extrapolate=Nothing)::MedImage
     old_spacing = im.spacing

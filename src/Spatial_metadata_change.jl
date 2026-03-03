@@ -24,12 +24,44 @@ end
 
 
 """
-given a MedImage object and desired orientation encoded as 3 letter string (like RAS or LPS) return the MedImage object with the new orientation
+    change_orientation(im::MedImage, goal_orientation::Orientation_code)::MedImage
+    change_orientation(im::MedImage, goal_orientation::String)::MedImage
+
+Change the orientation of a `MedImage` to a target orientation (e.g., "RAS", "LPS").
+
+This function permutes and/or reverses the image axes to match the desired `goal_orientation`.
+It updates both the voxel data and the spatial metadata (origin, spacing, direction)
+consistently.
+
+# Arguments
+- `im::MedImage`: The input image to reorient.
+- `goal_orientation`: Target orientation as an `Orientation_code` enum or a string.
+
+# Returns
+- `MedImage`: A new image object with the requested orientation.
+
+# Examples
+```julia
+# Change to Right-Anterior-Superior (RAS)
+julia> new_im = change_orientation(im, "RAS")
+
+# Change using enum
+julia> new_im = change_orientation(im, ORIENTATION_LPS)
+```
+
+# Notes
+- **Permutation**: If the target orientation requires swapping axes (e.g., sagittal to axial), the `voxel_data` is permuted.
+- **Reversal**: If an axis direction needs to be flipped (e.g., Left to Right), the data along that dimension is reversed.
+- **Metadata**: Origin, spacing, and direction are automatically adjusted to remain physically accurate.
 """
 function change_orientation(im::MedImage, new_orientation::Orientation_code)::MedImage
     old_orientation = Orientation_dicts.number_to_enum_orientation_dict[im.direction]
     reorient_operation = Orientation_dicts.orientation_pair_to_operation_dict[(old_orientation, new_orientation)]
     return change_orientation_main(im, new_orientation, reorient_operation)
+end#change_orientation
+
+function change_orientation(im::MedImage, new_orientation::String)::MedImage
+    return change_orientation(im, Orientation_dicts.string_to_orientation_enum[new_orientation])
 end#change_orientation
 
 # Custom rrule for change_orientation that handles dictionary lookups properly
