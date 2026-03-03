@@ -50,8 +50,37 @@ function extract_corners(arr::AbstractArray{T,3}) where T
 end
 
 """
-return array of cartesian indices for given dimensions in a form of array
-Optimized: uses vectorized broadcasting instead of scalar loops
+    get_base_indicies_arr(dims)
+
+Return an array of Cartesian indices for given dimensions as a 3×N matrix where N = prod(dims).
+
+This function generates all possible index combinations for a 3D array with dimensions `dims`.
+The result is a matrix where each column represents an (i, j, k) coordinate. Useful for
+vectorized operations that require coordinate grids.
+
+# Arguments
+- `dims::Tuple{Int,Int,Int}`: A 3-tuple of dimensions (x, y, z).
+
+# Returns
+- `Matrix{Int32}`: A 3×N matrix where each column is an (i, j, k) coordinate.
+
+# Examples
+```julia
+julia> get_base_indicies_arr((2, 2, 2))
+3×8 Matrix{Int32}:
+ 1  2  1  2  1  2  1  2
+ 1  1  2  2  1  1  2  2
+ 1  1  1  1  2  2  2  2
+
+julia> get_base_indicies_arr((3, 2, 1))
+3×6 Matrix{Int32}:
+ 1  2  3  1  2  3
+ 1  1  1  2  2  2
+ 1  1  1  1  1  1
+```
+
+# Performance
+Optimized using vectorized broadcasting instead of triple-nested loops, making it much faster for large arrays.
 """
 function get_base_indicies_arr(dims)
     n_points = prod(dims)
@@ -78,7 +107,43 @@ ChainRulesCore.@non_differentiable get_base_indicies_arr(::Any)
 ChainRulesCore.@non_differentiable extract_corners(::Any)
 
 """
-cast array a to the value type of array b
+    cast_to_array_b_type(a, b)
+
+Cast array `a` to the element type of array `b`, handling integer conversions safely.
+
+This function converts array `a` to have the same element type as array `b`. When converting
+from floating-point types to integer types, it applies rounding (`round.`) to prevent
+the `InexactError` that would occur with direct truncation-based casting.
+
+# Arguments
+- `a::AbstractArray`: The source array to convert.
+- `b::AbstractArray`: The target array whose element type should be matched.
+
+# Returns
+- `Array{eltype(b)}`: Array `a` converted to the element type of `b`.
+
+# Examples
+```julia
+julia> a = Float32[1.2, 2.7, 3.5]
+julia> b = Int32[0, 0, 0]
+julia> cast_to_array_b_type(a, b)
+3-element Vector{Int32}:
+ 1
+ 3
+ 4
+
+julia> a = Float64[1.5, 2.5, 3.5]
+julia> b = Float32[0.0, 0.0, 0.0]
+julia> cast_to_array_b_type(a, b)
+3-element Vector{Float32}:
+ 1.5
+ 2.5
+ 3.5
+```
+
+# Notes
+- If element types are already identical, the original array `a` is returned.
+- This is vital for preparing arrays for kernels or library calls that require specific bit-depths.
 """
 function cast_to_array_b_type(a, b)
     # Check if array a and b have the same type
@@ -97,8 +162,36 @@ function cast_to_array_b_type(a, b)
 end
 
 """
-interpolate the point in the given space
-keep_begining_same - will keep unmodified first layer of each axis - usefull when changing spacing
+    interpolate_point(point, itp, keep_begining_same=false, extrapolate_value=0)
+
+Interpolate a point in 3D space using an interpolation object.
+
+This function evaluates an interpolation object `itp` at the given `point` coordinates.
+By convention, all negative indices are cast to the `extrapolate_value`.
+
+# Arguments
+- `point::Tuple{Real,Real,Real}`: The (i, j, k) coordinates to interpolate.
+- `itp::AbstractInterpolation`: The interpolation object (e.g., from Interpolations.jl).
+- `keep_begining_same::Bool=false`: If true, indices less than 1 are clamped to 1.
+- `extrapolate_value::Real=0`: Value returned for points outside the defined range (especially negative indices).
+
+# Returns
+- The interpolated value at the specified point.
+
+# Examples
+```julia
+using Interpolations
+data = rand(10, 10, 10)
+itp = interpolate(data, BSpline(Linear()))
+
+# Interpolate within bounds
+julia> interpolate_point((5.5, 5.5, 5.5), itp)
+0.523...
+
+# Negative indices return extrapolation value
+julia> interpolate_point((-1.0, 2.0, 3.0), itp)
+0.0
+```
 """
 function interpolate_point(point, itp, keep_begining_same=false, extrapolate_value=0)
 
@@ -651,13 +744,32 @@ function ChainRulesCore.rrule(::typeof(interpolate_fused_affine), input_array, a
 end
 
 """
-input_array - array we will use to find interpolated val
-input_array_spacing - spacing associated with array from which we will perform interpolation
-Interpolator_enum - enum value defining the type of interpolation
-keep_begining_same - will keep unmodified first layer of each axis - usefull when changing spacing
-extrapolate_value - value to use for extrapolation
+    interpolate_my(points_to_interpolate, input_array, input_array_spacing, interpolator_enum, keep_begining_same, extrapolate_value=0, use_fast=true)
 
-IMPORTANT!!! - by convention if index to interpolate is less than 0 we will use extrapolate_value (we work only on positive indicies here)
+Interpolate multiple points from a 3D/4D medical image array with support for different interpolators.
+
+This function handles non-isovolumetric voxels (different spacing in x, y, z) and
+provides both high-level Interpolations.jl wrappers and fast GPU-ready kernels.
+
+# Arguments
+- `points_to_interpolate::Matrix{Real}`: 3×N matrix of physical coordinates.
+- `input_array::AbstractArray`: Voxel data (3D or 4D batch).
+- `input_array_spacing`: Tuple or Vector of tuples representing voxel spacing (mm).
+- `interpolator_enum::Interpolator_enum`: Choice of interpolation method:
+  - `Nearest_neighbour_en`: Preserves discrete values (labels).
+  - `Linear_en`: Fast and smooth (trilinear).
+  - `B_spline_en`: High resolution cubic spline.
+- `keep_begining_same::Bool`: If true, clamps coordinates to at least 1.0.
+- `extrapolate_value::Real=0`: Value for points outside the source image.
+- `use_fast::Bool=true`: Use optimized KernelAbstractions kernels (recommended for GPU).
+
+# Returns
+- `AbstractArray`: Interpolated values.
+
+# Notes
+- **Non-isovolumetric Spacing**: Correctly maps physical points to index space using `input_array_spacing`.
+- **Extrapolation**: Negative indices are always cast to `extrapolate_value`.
+- **Interpolators**: Nearest neighbor is recommended for segmentation masks; Linear/B-spline for grayscale images.
 """
 function interpolate_my(points_to_interpolate, input_array, input_array_spacing, interpolator_enum, keep_begining_same, extrapolate_value=0, use_fast=true)
 
@@ -711,12 +823,68 @@ end#interpolate_my
 
 
 
+"""
+    TransformIndexToPhysicalPoint_julia(index, origin, spacing)
+
+Transform voxel indices to physical coordinates in millimeters.
+
+This function converts voxel indices (i, j, k) to physical coordinates in the patient's
+coordinate system, accounting for image origin and voxel spacing. Note that this
+simplified version assumes a default identity direction matrix.
+
+# Arguments
+- `index::Tuple{Int,Int,Int}`: Voxel indices (1-based indexing).
+- `origin::Tuple{Float64,Float64,Float64}`: Image origin in physical space (mm).
+- `spacing::Tuple{Float64,Float64,Float64}`: Voxel spacing in (x, y, z) directions (mm).
+
+# Returns
+- `Tuple{Float64,Float64,Float64}`: Physical coordinates in millimeters.
+
+# Examples
+```julia
+# Origin at (0,0,0), unit spacing
+julia> TransformIndexToPhysicalPoint_julia((1, 1, 1), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0))
+(1.0, 1.0, 1.0)
+
+# Non-zero origin shifts the result
+julia> TransformIndexToPhysicalPoint_julia((1, 1, 1), (10.0, 20.0, 30.0), (1.0, 1.0, 1.0))
+(11.0, 21.0, 31.0)
+```
+
+# Notes
+- Formula: `physical = origin + (index * spacing)`
+- This function is a fundamental building block for spatial image analysis.
+"""
 function TransformIndexToPhysicalPoint_julia(index::Tuple{Int,Int,Int}, origin::Tuple{Float64,Float64,Float64}, spacing::Tuple{Float64,Float64,Float64})
 
     # return origin .+ ((collect(index) .- 1) .* collect(spacing))
     return collect(collect(origin) .+ ((collect(index)) .* collect(spacing)))
 end
 
+"""
+    ensure_tuple(arr)
+
+Convert an array or list to a tuple.
+
+This utility function ensures that input is a tuple, converting from arrays or lists if necessary.
+It is primarily used because the `MedImage` struct requires tuples for spatial fields
+(spacing, origin, direction).
+
+# Arguments
+- `arr`: Input to convert (Tuple, AbstractArray, or other iterable).
+
+# Returns
+- `Tuple`: The input converted to a tuple.
+
+# Examples
+```julia
+julia> ensure_tuple([1.0, 2.0, 3.0])
+(1.0, 2.0, 3.0)
+
+julia> ensure_tuple((1.0, 2.0, 3.0))
+(1.0, 2.0, 3.0)
+```
+"""
 function ensure_tuple(arr)
     if isa(arr, Tuple)
         return arr
