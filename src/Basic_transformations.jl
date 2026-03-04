@@ -66,6 +66,16 @@ ChainRulesCore.@non_differentiable get_real_center_Julia(::Any)
 ChainRulesCore.@non_differentiable computeIndexToPhysicalPointMatrices_Julia(::Any)
 ChainRulesCore.@non_differentiable transformIndexToPhysicalPoint_Julia(::Any, ::Any)
 
+"""
+    Rodrigues_rotation_matrix(direction::NTuple{9,Float64}, axis::Int, angle::Float64)::Matrix{Float64}
+
+Compute a 3x3 rotation matrix for a given axis and angle, adjusted for image direction.
+
+# Arguments
+- `direction`: The direction cosine matrix from `MedImage`.
+- `axis`: Rotation axis index (1=X, 2=Y, 3=Z).
+- `angle`: Rotation angle in radians.
+"""
 function Rodrigues_rotation_matrix(direction::NTuple{9,Float64}, axis::Int, angle::Float64)::Matrix{Float64}
   img_direction = direction
   axis_angle = if axis == 3
@@ -119,6 +129,21 @@ function build_rotation_transform(image::MedImage, axis::Int, angle::Float64)
 end
 ChainRulesCore.@non_differentiable build_rotation_transform(::Any, ::Any, ::Any)
 
+"""
+    rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator_enum, crop::Bool=true)::MedImage
+
+Rotate a `MedImage` around a specified axis and angle.
+
+# Arguments
+- `image`: The input `MedImage`.
+- `axis`: Axis index (1, 2, or 3).
+- `angle`: Angle in radians.
+- `Interpolator`: Interpolation method to use.
+- `crop`: If `true`, the image is cropped to maintain dimensions (default: `true`).
+
+# Returns
+- `MedImage`: The rotated image.
+"""
 function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator_enum, crop::Bool=true)::MedImage
   combined_transformation = build_rotation_transform(image, axis, angle)
 
@@ -151,6 +176,20 @@ function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Int
 end
 
 
+"""
+    crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::MedImage
+
+Crop a `MedImage` starting from `crop_beg` with dimensions `crop_size`.
+
+# Arguments
+- `im`: The input `MedImage`.
+- `crop_beg`: 0-based starting indices (x, y, z).
+- `crop_size`: Target dimensions (width, height, depth).
+- `Interpolator`: Interpolation method (used if resizing).
+
+# Returns
+- `MedImage`: The cropped image with updated origin.
+"""
 function crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::MedImage
 
   julia_beg = crop_beg .+ 1
@@ -218,6 +257,21 @@ function ChainRulesCore.rrule(::typeof(pad_dim), arr, dim, l, r, val)
     return y, pad_dim_pullback
 end
 
+"""
+    pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64}, pad_val, Interpolator::Interpolator_enum)::MedImage
+
+Pad a `MedImage` at the beginning and end of each axis.
+
+# Arguments
+- `im`: The input `MedImage`.
+- `pad_beg`: Number of voxels to add at the start of (x, y, z).
+- `pad_end`: Number of voxels to add at the end of (x, y, z).
+- `pad_val`: Value used for padding.
+- `Interpolator`: Interpolation method.
+
+# Returns
+- `MedImage`: The padded image with updated origin.
+"""
 function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64}, pad_val, Interpolator::Interpolator_enum)::MedImage
 
   data = im.voxel_data
@@ -285,6 +339,20 @@ function pad_or_crop_mi(im::MedImage, target_dims::Tuple{Int, Int, Int})
 end
 
 
+"""
+    translate_mi(im::MedImage, translate_by::Int64, translate_in_axis::Int64, Interpolator::Interpolator_enum)::MedImage
+
+Translate a `MedImage` by shifting its origin.
+
+# Arguments
+- `im`: The input `MedImage`.
+- `translate_by`: Number of voxels to translate by.
+- `translate_in_axis`: Axis index (1, 2, or 3).
+- `Interpolator`: Interpolation method (used if resizing).
+
+# Returns
+- `MedImage`: The translated image with a new origin.
+"""
 function translate_mi(im::MedImage, translate_by::Int64, translate_in_axis::Int64, Interpolator::Interpolator_enum)::MedImage
   origin_val = im.origin[translate_in_axis] + translate_by * im.spacing[translate_in_axis]
   translated_origin = ntuple(i -> i == translate_in_axis ? origin_val : im.origin[i], 3)
@@ -312,6 +380,19 @@ function build_scale_points(old_size, scale_tuple)
 end
 ChainRulesCore.@non_differentiable build_scale_points(::Any, ::Any)
 
+"""
+    scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::MedImage
+
+Scale a `MedImage` by a given factor, resampling the voxel data.
+
+# Arguments
+- `im`: The input `MedImage`.
+- `scale`: Scaling factor (scalar or 3-tuple).
+- `Interpolator`: Interpolation method to use.
+
+# Returns
+- `MedImage`: The scaled image with updated dimensions and spacing.
+"""
 function scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::MedImage
 
   scale_tuple = scale isa Float64 ? (scale, scale, scale) : scale
