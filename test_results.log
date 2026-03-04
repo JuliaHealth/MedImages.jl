@@ -1,0 +1,26 @@
+ERROR: LoadError: Some tests did not pass: 17 passed, 0 failed, 1 errored, 0 broken.
+in expression starting at /home/jm/project_ssd/MedImages.jl/test/preprocessing_tests/test_preprocessing.jl:7
+Preprocessing Utilities: Error During Test at /home/jm/project_ssd/MedImages.jl/test/preprocessing_tests/test_preprocessing.jl:7
+  Got exception outside of a @test
+  UndefVarError: `CT` not defined
+  Stacktrace:
+   [1] getproperty(x::Module, f::Symbol)
+     @ Base ./Base.jl:31
+   [2] macro expansion
+     @ ~/project_ssd/MedImages.jl/test/preprocessing_tests/test_preprocessing.jl:90 [inlined]
+   [3] macro expansion
+     @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [4] top-level scope
+     @ ~/project_ssd/MedImages.jl/test/preprocessing_tests/test_preprocessing.jl:9
+   [5] include(mod::Module, _path::String)
+     @ Base ./Base.jl:495
+   [6] exec_options(opts::Base.JLOptions)
+     @ Base ./client.jl:323
+   [7] _start()
+     @ Base ./client.jl:557
+Test Summary:              | Pass  Error  Total   Time
+Preprocessing Utilities    |   17      1     18  10.5s
+  one_hot_encode           |    6             6   5.7s
+  calculate_barycenter     |    3             3   1.9s
+  calculate_max_radius     |    2             2   2.1s
+  extract_points_from_mask |    6             6   0.2s
