@@ -1,0 +1,117 @@
+ERROR: LoadError: Some tests did not pass: 6 passed, 3 failed, 2 errored, 0 broken.
+in expression starting at /home/jm/project_ssd/MedImages.jl/test/test_suv.jl:7
+Single MedImage SUV: Test Failed at /home/jm/project_ssd/MedImages.jl/test/test_suv.jl:58
+  Expression: factor !== nothing
+   Evaluated: nothing !== nothing
+
+Stacktrace:
+ [1] macro expansion
+   @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:672 [inlined]
+ [2] macro expansion
+   @ ~/project_ssd/MedImages.jl/test/test_suv.jl:58 [inlined]
+ [3] macro expansion
+   @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+ [4] macro expansion
+   @ ~/project_ssd/MedImages.jl/test/test_suv.jl:46 [inlined]
+ [5] macro expansion
+   @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+ [6] top-level scope
+   @ ~/project_ssd/MedImages.jl/test/test_suv.jl:16
+Single MedImage SUV: Error During Test at /home/jm/project_ssd/MedImages.jl/test/test_suv.jl:59
+  Test threw exception
+  Expression: isapprox(factor, expected_factor, rtol = 1.0e-5)
+  MethodError: no method matching isapprox(::Nothing, ::Float64; rtol::Float64)
+  
+  Closest candidates are:
+    isapprox(!Matched::Missing, ::Any; kwargs...)
+     @ Base missing.jl:90
+    isapprox(::Any, !Matched::Missing; kwargs...)
+     @ Base missing.jl:91
+    isapprox(!Matched::Number, ::Number; atol, rtol, nans, norm)
+     @ Base floatfuncs.jl:304
+    ...
+  
+  Stacktrace:
+   [1] eval_test(evaluated::Expr, quoted::Expr, source::LineNumberNode, negate::Bool)
+     @ Test ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:367
+   [2] macro expansion
+     @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:669 [inlined]
+   [3] macro expansion
+     @ ~/project_ssd/MedImages.jl/test/test_suv.jl:59 [inlined]
+   [4] macro expansion
+     @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [5] macro expansion
+     @ ~/project_ssd/MedImages.jl/test/test_suv.jl:46 [inlined]
+   [6] macro expansion
+     @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [7] top-level scope
+     @ ~/project_ssd/MedImages.jl/test/test_suv.jl:16
+BatchedMedImage SUV: Test Failed at /home/jm/project_ssd/MedImages.jl/test/test_suv.jl:88
+  Expression: factors[1] !== nothing
+   Evaluated: nothing !== nothing
+
+Stacktrace:
+ [1] macro expansion
+   @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:672 [inlined]
+ [2] macro expansion
+   @ ~/project_ssd/MedImages.jl/test/test_suv.jl:88 [inlined]
+ [3] macro expansion
+   @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+ [4] macro expansion
+   @ ~/project_ssd/MedImages.jl/test/test_suv.jl:67 [inlined]
+ [5] macro expansion
+   @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+ [6] top-level scope
+   @ ~/project_ssd/MedImages.jl/test/test_suv.jl:16
+BatchedMedImage SUV: Error During Test at /home/jm/project_ssd/MedImages.jl/test/test_suv.jl:89
+  Test threw exception
+  Expression: isapprox(factors[1], expected_factor, rtol = 1.0e-5)
+  MethodError: no method matching isapprox(::Nothing, ::Float64; rtol::Float64)
+  
+  Closest candidates are:
+    isapprox(!Matched::Missing, ::Any; kwargs...)
+     @ Base missing.jl:90
+    isapprox(::Any, !Matched::Missing; kwargs...)
+     @ Base missing.jl:91
+    isapprox(!Matched::Number, ::Number; atol, rtol, nans, norm)
+     @ Base floatfuncs.jl:304
+    ...
+  
+  Stacktrace:
+   [1] eval_test(evaluated::Expr, quoted::Expr, source::LineNumberNode, negate::Bool)
+     @ Test ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:367
+   [2] macro expansion
+     @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:669 [inlined]
+   [3] macro expansion
+     @ ~/project_ssd/MedImages.jl/test/test_suv.jl:89 [inlined]
+   [4] macro expansion
+     @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [5] macro expansion
+     @ ~/project_ssd/MedImages.jl/test/test_suv.jl:67 [inlined]
+   [6] macro expansion
+     @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+   [7] top-level scope
+     @ ~/project_ssd/MedImages.jl/test/test_suv.jl:16
+Time Parsing and Crossover: Test Failed at /home/jm/project_ssd/MedImages.jl/test/test_suv.jl:147
+  Expression: isapprox(factor, expected_cross, rtol = 1.0e-5)
+   Evaluated: isapprox(0.0, 0.0004324580481919237; rtol = 1.0e-5)
+
+Stacktrace:
+ [1] macro expansion
+   @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:672 [inlined]
+ [2] macro expansion
+   @ ~/project_ssd/MedImages.jl/test/test_suv.jl:147 [inlined]
+ [3] macro expansion
+   @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+ [4] macro expansion
+   @ ~/project_ssd/MedImages.jl/test/test_suv.jl:125 [inlined]
+ [5] macro expansion
+   @ ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/Test/src/Test.jl:1577 [inlined]
+ [6] top-level scope
+   @ ~/project_ssd/MedImages.jl/test/test_suv.jl:16
+Test Summary:                | Pass  Fail  Error  Total  Time
+SUV Calculation Tests        |    6     3      2     11  2.9s
+  Single MedImage SUV        |          1      1      2  2.6s
+  BatchedMedImage SUV        |    2     1      1      4  0.1s
+  Missing Metadata Scenarios |    3                   3  0.0s
+  Time Parsing and Crossover |    1     1             2  0.0s
