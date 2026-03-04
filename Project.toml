@@ -6,6 +6,7 @@ version = "2.0.1"
 [deps]
 Accessors = "7d9f7c33-5ae7-4f3b-8dc6-eff91059b697"
 Atomix = "a9b6321e-bd34-4604-b9c9-b65b8de01458"
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
