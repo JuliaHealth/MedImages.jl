@@ -7,7 +7,7 @@ using ChainRulesCore
 using ..MedImage_data_struct
 using ..MedImage_data_struct: Nearest_neighbour_en, Linear_en, B_spline_en
 using ..Load_and_save: update_voxel_data, update_voxel_and_spatial_data
-using ..Utils: interpolate_my, generate_affine_coords, is_cuda_array, interpolate_fused_affine
+using ..Utils: interpolate_my, generate_affine_coords, is_cuda_array, interpolate_fused_affine, create_batched_medimage, unbatch_medimage
 using KernelAbstractions
 using CUDA
 
@@ -507,6 +507,20 @@ function compose_affine_matrices(matrices...)
         # So we update result = m * result.
     end
     return result
+end
+
+"""
+    affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, Interpolator::Interpolator_enum; output_size=nothing, center_of_rotation=nothing)
+
+Applies an affine transformation to a single image.
+Transform is applied in index space relative to the image center (default) or `center_of_rotation` if supplied.
+"""
+function affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, Interpolator::Interpolator_enum; output_size=nothing, center_of_rotation=nothing)::MedImage
+    # Reuse the batched implementation to ensure consistency
+    # We wrap the single image in a vector, batch it, transform, then unbatch
+    batched = create_batched_medimage([image])
+    res_batched = affine_transform_mi(batched, affine_matrix, Interpolator; output_size=output_size, center_of_rotation=center_of_rotation)
+    return unbatch_medimage(res_batched)[1]
 end
 
 """
