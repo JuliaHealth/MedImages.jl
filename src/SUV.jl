@@ -5,6 +5,16 @@ using ..MedImage_data_struct: MedImage, BatchedMedImage
 export calculate_suv_factor
 
 """
+    calculate_suv_factor(mi::MedImage)
+
+Calculates the SUV factor for a single MedImage.
+Returns Float64 or Nothing if calculation fails.
+"""
+function calculate_suv_factor(mi::MedImage)::Union{Float64, Nothing}
+    return _calculate_suv_from_metadata(mi.metadata)
+end
+
+"""
     calculate_suv_factor(batched_image::BatchedMedImage)
 
 Calculates SUV factors for a batch of images.
@@ -16,6 +26,67 @@ function calculate_suv_factor(batched_image::BatchedMedImage)::Vector{Union{Floa
         res[i] = _calculate_suv_from_metadata(batched_image.metadata[i])
     end
     return res
+end
+
+"""
+Internal helper to calculate SUV factor from a metadata dictionary.
+Standard formula: SUVbw = (PixelValue * Weight[g]) / (TotalDose[Bq] * DecayCorrection)
+"""
+function _calculate_suv_from_metadata(metadata::Dict)::Union{Float64, Nothing}
+    try
+        # 1. Patient Weight (kg -> g)
+        weight_kg = get(metadata, "PatientWeight", nothing)
+        if weight_kg === nothing
+            return nothing
+        end
+        weight_g = Float64(weight_kg) * 1000.0
+
+        # 2. Radiopharmaceutical Information
+        radio_seq = get(metadata, "RadiopharmaceuticalInformationSequence", nothing)
+        if radio_seq === nothing || isempty(radio_seq)
+            return nothing
+        end
+        entry = radio_seq[1]
+
+        total_dose = get(entry, "RadionuclideTotalDose", nothing)
+        half_life = get(entry, "RadionuclideHalfLife", nothing)
+        inj_time_str = get(entry, "RadiopharmaceuticalStartTime", nothing)
+
+        if total_dose === nothing || half_life === nothing || inj_time_str === nothing
+            return nothing
+        end
+
+        # 3. Scan Time
+        # Prefer AcquisitionTime, fallback to SeriesTime
+        scan_time_str = get(metadata, "AcquisitionTime", get(metadata, "SeriesTime", nothing))
+        if scan_time_str === nothing
+            return nothing
+        end
+
+        # 4. Parse Times and Calculate Delta
+        t_inj = parse_dicom_time(string(inj_time_str))
+        t_scan = parse_dicom_time(string(scan_time_str))
+
+        delta_s = Float64((t_scan - t_inj).value) / 1_000_000_000.0 # Nanoseconds to seconds
+
+        # Midnight crossover handling
+        if delta_s < 0
+            delta_s += 24.0 * 3600.0
+        end
+
+        # 5. Decay Correction
+        decay = 2.0^(-delta_s / Float64(half_life))
+        actual_dose = Float64(total_dose) * decay
+
+        if actual_dose == 0
+            return nothing
+        end
+
+        return weight_g / actual_dose
+
+    catch
+        return nothing
+    end
 end
 
 function parse_dicom_time(t_str::AbstractString)
@@ -116,7 +187,7 @@ function calculate_suv_statistics(batched_image::BatchedMedImage, mask::MedImage
 
     # Check if spatial dimensions match
     if img_size[1:3] != mask_size
-        throw(DimensionMismatch("Image batch slice dimensions $(img_size[1:3]) and mask dimensions \$mask_size do not match"))
+        throw(DimensionMismatch("Image batch slice dimensions $(img_size[1:3]) and mask dimensions $mask_size do not match"))
     end
 
     batch_size = img_size[4]
@@ -130,7 +201,7 @@ function calculate_suv_statistics(batched_image::BatchedMedImage, mask::MedImage
     for i in 1:batch_size
         factor = suv_factors[i]
         if factor === nothing
-             error("SUV calculation failed for batch index \$i: Missing or invalid metadata")
+             error("SUV calculation failed for batch index $i: Missing or invalid metadata")
         end
 
         if voxel_count == 0
@@ -164,7 +235,7 @@ function calculate_suv_statistics(batched_image::BatchedMedImage, mask::BatchedM
     mask_size = size(mask.voxel_data)
 
     if img_size != mask_size
-        throw(DimensionMismatch("Image batch dimensions \$img_size and mask batch dimensions \$mask_size do not match"))
+        throw(DimensionMismatch("Image batch dimensions $img_size and mask batch dimensions $mask_size do not match"))
     end
 
     batch_size = img_size[4]
@@ -175,7 +246,7 @@ function calculate_suv_statistics(batched_image::BatchedMedImage, mask::BatchedM
     for i in 1:batch_size
         factor = suv_factors[i]
         if factor === nothing
-             error("SUV calculation failed for batch index \$i: Missing or invalid metadata")
+             error("SUV calculation failed for batch index $i: Missing or invalid metadata")
         end
 
         slice = view(batched_image.voxel_data, :, :, :, i)

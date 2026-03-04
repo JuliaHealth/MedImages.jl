@@ -11,7 +11,7 @@ using ..Utils: interpolate_my, generate_affine_coords, is_cuda_array, interpolat
 using KernelAbstractions
 using CUDA
 
-export rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, computeIndexToPhysicalPointMatrices_Julia, transformIndexToPhysicalPoint_Julia, get_voxel_center_Julia, get_real_center_Julia, Rodrigues_rotation_matrix, crop_image_around_center
+export rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, computeIndexToPhysicalPointMatrices_Julia, transformIndexToPhysicalPoint_Julia, get_voxel_center_Julia, get_real_center_Julia, Rodrigues_rotation_matrix, crop_image_around_center, pad_or_crop_mi
 export affine_transform_mi, create_affine_matrix, compose_affine_matrices
 
 function computeIndexToPhysicalPointMatrices_Julia(im::MedImage)::Matrix{Float64}
@@ -229,6 +229,58 @@ function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{
 
   padded_im = update_voxel_and_spatial_data(im, data, padded_origin, im.spacing, im.direction)
   return padded_im
+end
+
+"""
+    pad_or_crop_mi(im::MedImage, target_dims::Tuple{Int, Int, Int})
+
+Resizes the MedImage to the target dimensions by centrally padding or cropping.
+Corrects the spatial origin to maintain physical alignment.
+Supports 3D and 4D (multichannel) voxel data.
+"""
+function pad_or_crop_mi(im::MedImage, target_dims::Tuple{Int, Int, Int})
+    data = im.voxel_data
+    curr_dims = size(data)
+    
+    is_4d = (ndims(data) == 4)
+    spatial_dims = is_4d ? curr_dims[1:3] : curr_dims
+    
+    # Calculate difference
+    diffs = target_dims .- spatial_dims
+    
+    # Center the resizing
+    offsets_beg = floor.(Int, diffs ./ 2)
+    offsets_end = diffs .- offsets_beg
+    
+    new_data = data
+    new_origin = collect(im.origin)
+    
+    # Direction diagonals for origin shift
+    dir_diag = (im.direction[1], im.direction[5], im.direction[9])
+    
+    for i in 1:3
+        d = diffs[i]
+        if d > 0
+            # Pad
+            new_data = pad_dim(new_data, i, offsets_beg[i], offsets_end[i], zero(eltype(new_data)))
+            new_origin[i] -= im.spacing[i] * offsets_beg[i] * dir_diag[i]
+        elseif d < 0
+            # Crop (offsets_beg is negative)
+            skip = -offsets_beg[i]
+            take = target_dims[i]
+            
+            # Bounds check for safety (should not exceed current size)
+            skip = min(skip, spatial_dims[i] - take)
+            
+            new_data = selectdim(new_data, i, (skip + 1):(skip + take))
+            new_origin[i] += im.spacing[i] * skip * dir_diag[i]
+        end
+    end
+    
+    # Copy to ensure it's a standard array and not just a view
+    new_data = copy(new_data)
+    
+    return update_voxel_and_spatial_data(im, new_data, Tuple(new_origin), im.spacing, im.direction)
 end
 
 
@@ -521,6 +573,17 @@ function affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, In
     batched = create_batched_medimage([image])
     res_batched = affine_transform_mi(batched, affine_matrix, Interpolator; output_size=output_size, center_of_rotation=center_of_rotation)
     return unbatch_medimage(res_batched)[1]
+
+    affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, Interpolator::Interpolator_enum; output_size=nothing)
+
+Applies an affine transformation to a single MedImage.
+Transform is applied in index space relative to the image center.
+"""
+function affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, Interpolator::Interpolator_enum; output_size=nothing, center_of_rotation=nothing)::MedImage
+    batched = create_batched_medimage([image])
+    transformed_batched = affine_transform_mi(batched, affine_matrix, Interpolator; output_size=output_size, center_of_rotation=center_of_rotation)
+    return unbatch_medimage(transformed_batched)[1]
+
 end
 
 """
