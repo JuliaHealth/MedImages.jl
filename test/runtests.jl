@@ -135,6 +135,10 @@ mkpath(DEBUG_DIR)
         end
     end
 
+    @testset "Non-Isovolumetric Rotation Tests" begin
+        include("test_rotation_non_iso.jl")
+    end
+
     # Basic Transformations Tests - require test data and PyCall
     if isfile(TEST_NIFTI_FILE) && PYCALL_AVAILABLE
         @testset "Basic Transformations Tests" begin
