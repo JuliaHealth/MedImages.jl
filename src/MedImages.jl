@@ -27,6 +27,9 @@ export Nearest_neighbour_en, Linear_en, B_spline_en
 # Export orientation enum values
 export ORIENTATION_RPI, ORIENTATION_LPI, ORIENTATION_RAI, ORIENTATION_LAI
 export ORIENTATION_RPS, ORIENTATION_LPS, ORIENTATION_RAS, ORIENTATION_LAS
+export MRI_type, PET_type, CT_type
+export CT_subtype, ADC_subtype, DWI_subtype, T1_subtype, T2_subtype, FLAIR_subtype, FDG_subtype, PSMA_subtype
+export CPU_current_device, CUDA_current_device, AMD_current_device, ONEAPI_current_device
 
 include("MedImage_data_struct.jl")
 include("Orientation_dicts.jl")
@@ -48,6 +51,9 @@ using .MedImage_data_struct: Interpolator_enum, Mode_mi, Orientation_code
 using .MedImage_data_struct: Nearest_neighbour_en, Linear_en, B_spline_en
 using .MedImage_data_struct: ORIENTATION_RPI, ORIENTATION_LPI, ORIENTATION_RAI, ORIENTATION_LAI
 using .MedImage_data_struct: ORIENTATION_RPS, ORIENTATION_LPS, ORIENTATION_RAS, ORIENTATION_LAS
+using .MedImage_data_struct: MRI_type, PET_type, CT_type
+using .MedImage_data_struct: CT_subtype, ADC_subtype, DWI_subtype, T1_subtype, T2_subtype, FLAIR_subtype, FDG_subtype, PSMA_subtype
+using .MedImage_data_struct: CPU_current_device, CUDA_current_device, AMD_current_device, ONEAPI_current_device
 using .Orientation_dicts: string_to_orientation_enum, orientation_enum_to_string
 using .Spatial_metadata_change: resample_to_spacing, change_orientation
 using .Resample_to_target: resample_to_image
