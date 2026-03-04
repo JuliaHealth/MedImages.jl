@@ -75,24 +75,148 @@ Optimized KernelAbstractions kernel for computing organ registration loss.
 - `affine_params`: (15, Num_Organs, Batch) - Predicted transform parameters.
 - `gold_vol`: (X, Y, Z, Num_Organs) - One-hot encoded Gold Standard volume.
 """
-@kernel function organ_loss_kernel_optimized!(loss_out, @Const(points_tensor), @Const(affine_params), @Const(gold_vol), @Const(barycenters), @Const(radii), batch_size, num_organs, vol_sx, vol_sy, vol_sz)
-    # Workgroup size must be power of 2 for tree reduction (e.g., 512)
-    # One Workgroup per (Organ * Batch)
+@kernel function gpu_full_organ_warp_kernel!(
+    out_vol, @Const(in_vol), @Const(affine_params), @Const(barycenters), @Const(radii)
+)
+    # out_vol: (sx, sy, sz, 1, batch) - batch dimension here corresponds to organs
+    # in_vol: (sx, sy, sz, 1, batch)
+    # affine_params: (15, batch)
+    
+    i, j, k, _, b = @index(Global, NTuple)
+    sx_v, sy_v, sz_v = size(out_vol)[1:3]
+    
+    # Load Params for this organ
+    rx = affine_params[1, b]; ry = affine_params[2, b]; rz = affine_params[3, b]
+    tx = affine_params[4, b]; ty = affine_params[5, b]; tz = affine_params[6, b]
+    sx = affine_params[7, b]; sy = affine_params[8, b]; sz = affine_params[9, b]
+    sh_xy = affine_params[10, b]; sh_xz = affine_params[11, b]; sh_yz = affine_params[12, b]
+    cx = affine_params[13, b]; cy = affine_params[14, b]; cz = affine_params[15, b]
 
+    # Target Coord (i, j, k) -> Source Coord (nx, ny, nz)
+    # This matches the logic in gpu_organ_loss_kernel_optimized!
+    # px = (nx - cx) * sx ...
+    # Wait, for warping we need the inverse? 
+    # Usually: I_warped(x) = I_orig(T(x))
+    # T is the transform Patient -> Atlas (model predicts how to deform atlas to match patient)
+    
+    # Let's apply Exactly the same as in loss:
+    px = (Float32(i) - cx) * sx
+    py = (Float32(j) - cy) * sy
+    pz = (Float32(k) - cz) * sz
+    
+    px_s = px + sh_xy * py + sh_xz * pz
+    py_s = py + sh_yz * pz
+    pz_s = pz
+
+    s_rx = sin(rx); c_rx = cos(rx)
+    py_r1 = py_s * c_rx - pz_s * s_rx
+    pz_r1 = py_s * s_rx + pz_s * c_rx
+    
+    s_ry = sin(ry); c_ry = cos(ry)
+    px_r2 = px_s * c_ry + pz_r1 * s_ry
+    pz_r2 = -px_s * s_ry + pz_r1 * c_ry
+    
+    s_rz = sin(rz); c_rz = cos(rz)
+    px_r3 = px_r2 * c_rz - py_r1 * s_rz
+    py_r3 = px_r2 * s_rz + py_r1 * c_rz
+    
+    nx = px_r3 + cx + tx
+    ny = py_r3 + cy + ty
+    nz = pz_r2 + cz + tz
+    
+    # Trilinear interpolation
+    interp_val = 0.0f0
+    if nx >= 1.0f0 && nx <= Float32(sx_v) && ny >= 1.0f0 && ny <= Float32(sy_v) && nz >= 1.0f0 && nz <= Float32(sz_v)
+        x0 = floor(Int, nx); y0 = floor(Int, ny); z0 = floor(Int, nz)
+        x1 = min(x0 + 1, sx_v); y1 = min(y0 + 1, sy_v); z1 = min(z0 + 1, sz_v)
+        xd = nx - Float32(x0); yd = ny - Float32(y0); zd = nz - Float32(z0)
+        
+        v000 = in_vol[x0, y0, z0, 1, b]
+        v100 = in_vol[x1, y0, z0, 1, b]
+        v010 = in_vol[x0, y1, z0, 1, b]
+        v110 = in_vol[x1, y1, z0, 1, b]
+        v001 = in_vol[x0, y0, z1, 1, b]
+        v101 = in_vol[x1, y0, z1, 1, b]
+        v011 = in_vol[x0, y1, z1, 1, b]
+        v111 = in_vol[x1, y1, z1, 1, b]
+        
+        c00 = v000 * (1.0f0 - xd) + v100 * xd
+        c10 = v010 * (1.0f0 - xd) + v110 * xd
+        c01 = v001 * (1.0f0 - xd) + v101 * xd
+        c11 = v011 * (1.0f0 - xd) + v111 * xd
+        c0 = c00 * (1.0f0 - yd) + c10 * yd
+        c1 = c01 * (1.0f0 - yd) + c11 * yd
+        interp_val = c0 * (1.0f0 - zd) + c1 * zd
+    end
+    
+    out_vol[i, j, k, 1, b] = interp_val
+end
+
+@kernel function gpu_batch_affine_warp_kernel!(
+    out_vol, @Const(in_vol), @Const(affine_matrices), @Const(centers)
+)
+    # out_vol: (sx, sy, sz, num_channels, batch)
+    # in_vol: (sx, sy, sz, num_channels, batch)
+    # affine_matrices: (3, 4, batch) -> [R | T]
+    # centers: (3, batch)
+    
+    i, j, k, c, b = @index(Global, NTuple)
+    
+    sx, sy, sz = size(out_vol)[1:3]
+    
+    # 1-based to center-relative
+    cx, cy, cz = centers[1, b], centers[2, b], centers[3, b]
+    px = Float32(i) - cx
+    py = Float32(j) - cy
+    pz = Float32(k) - cz
+    
+    # Apply Affine: x_new = R * x + T + center
+    nx = affine_matrices[1,1,b] * px + affine_matrices[1,2,b] * py + affine_matrices[1,3,b] * pz + affine_matrices[1,4,b] + cx
+    ny = affine_matrices[2,1,b] * px + affine_matrices[2,2,b] * py + affine_matrices[2,3,b] * pz + affine_matrices[2,4,b] + cy
+    nz = affine_matrices[3,1,b] * px + affine_matrices[3,2,b] * py + affine_matrices[3,3,b] * pz + affine_matrices[3,4,b] + cz
+    
+    # Trilinear interpolation
+    interp_val = 0.0f0
+    if nx >= 1.0f0 && nx <= Float32(sx) && ny >= 1.0f0 && ny <= Float32(sy) && nz >= 1.0f0 && nz <= Float32(sz)
+        x0 = floor(Int, nx)
+        y0 = floor(Int, ny)
+        z0 = floor(Int, nz)
+        
+        x1 = min(x0 + 1, sx)
+        y1 = min(y0 + 1, sy)
+        z1 = min(z0 + 1, sz)
+        
+        xd = nx - Float32(x0)
+        yd = ny - Float32(y0)
+        zd = nz - Float32(z0)
+        
+        # neighbors
+        v000 = in_vol[x0, y0, z0, c, b]
+        v100 = in_vol[x1, y0, z0, c, b]
+        v010 = in_vol[x0, y1, z0, c, b]
+        v110 = in_vol[x1, y1, z0, c, b]
+        v001 = in_vol[x0, y0, z1, c, b]
+        v101 = in_vol[x1, y0, z1, c, b]
+        v011 = in_vol[x0, y1, z1, c, b]
+        v111 = in_vol[x1, y1, z1, c, b]
+        
+        c00 = v000 * (1.0f0 - xd) + v100 * xd
+        c10 = v010 * (1.0f0 - xd) + v110 * xd
+        c01 = v001 * (1.0f0 - xd) + v101 * xd
+        c11 = v011 * (1.0f0 - xd) + v111 * xd
+        
+        c0 = c00 * (1.0f0 - yd) + c10 * yd
+        c1 = c01 * (1.0f0 - yd) + c11 * yd
+        
+        interp_val = c0 * (1.0f0 - zd) + c1 * zd
+    end
+    
+    out_vol[i, j, k, c, b] = interp_val
+end
+
+@kernel function gpu_organ_loss_kernel_optimized!(loss_out, @Const(points_tensor), @Const(affine_params), @Const(gold_vol), @Const(barycenters), @Const(radii), batch_size, num_organs, vol_sx, vol_sy, vol_sz)
     tid = @index(Local)
     gid = @index(Group)
-
-    # Shared Memory for Reduction
-    shared_l1 = @localmem Float32 512
-    shared_l2 = @localmem Float32 512
-    shared_valid = @localmem Float32 512 # Using float for easier summation
-
-    # Calculate indices purely locally to avoid closure issues
-    # gid is 1-based group index (corresponds to one Organ in one Batch)
-    # Mapping: gid = (batch_idx - 1) * num_organs + organ_idx
-    # So:
-    # organ_idx = (gid - 1) % num_organs + 1
-    # batch_idx = (gid - 1) ÷ num_organs + 1
 
     organ_idx = (gid - 1) % num_organs + 1
     batch_idx = (gid - 1) ÷ num_organs + 1
@@ -103,29 +227,21 @@ Optimized KernelAbstractions kernel for computing organ registration loss.
     p_z = points_tensor[3, tid, organ_idx]
 
     l1_val = 0.0f0
-    l2_val = 0.0f0
-    valid_val = 0.0f0
 
     if p_x > -0.5f0
-        valid_val = 1.0f0
-
         # Load Affine Params
         rx = affine_params[1, organ_idx, batch_idx]
         ry = affine_params[2, organ_idx, batch_idx]
         rz = affine_params[3, organ_idx, batch_idx]
-
         tx = affine_params[4, organ_idx, batch_idx]
         ty = affine_params[5, organ_idx, batch_idx]
         tz = affine_params[6, organ_idx, batch_idx]
-
         sx = affine_params[7, organ_idx, batch_idx]
         sy = affine_params[8, organ_idx, batch_idx]
         sz = affine_params[9, organ_idx, batch_idx]
-
         sh_xy = affine_params[10, organ_idx, batch_idx]
         sh_xz = affine_params[11, organ_idx, batch_idx]
         sh_yz = affine_params[12, organ_idx, batch_idx]
-
         cx = affine_params[13, organ_idx, batch_idx]
         cy = affine_params[14, organ_idx, batch_idx]
         cz = affine_params[15, organ_idx, batch_idx]
@@ -139,128 +255,91 @@ Optimized KernelAbstractions kernel for computing organ registration loss.
         py_s = py + sh_yz * pz
         pz_s = pz
 
-        # Rotation Rx
-        s_rx, c_rx = sincos(rx)
+        s_rx = sin(rx)
+        c_rx = cos(rx)
         py_r1 = py_s * c_rx - pz_s * s_rx
         pz_r1 = py_s * s_rx + pz_s * c_rx
-        px_r1 = px_s
-
-        # Rotation Ry
-        s_ry, c_ry = sincos(ry)
-        px_r2 = px_r1 * c_ry + pz_r1 * s_ry
-        pz_r2 = -px_r1 * s_ry + pz_r1 * c_ry
-        py_r2 = py_r1
-
-        # Rotation Rz
-        s_rz, c_rz = sincos(rz)
-        px_r3 = px_r2 * c_rz - py_r2 * s_rz
-        py_r3 = px_r2 * s_rz + py_r2 * c_rz
-        pz_r3 = pz_r2
-
+        
+        s_ry = sin(ry)
+        c_ry = cos(ry)
+        px_r2 = px_s * c_ry + pz_r1 * s_ry
+        pz_r2 = -px_s * s_ry + pz_r1 * c_ry
+        
+        s_rz = sin(rz)
+        c_rz = cos(rz)
+        px_r3 = px_r2 * c_rz - py_r1 * s_rz
+        py_r3 = px_r2 * s_rz + py_r1 * c_rz
+        
         fin_x = px_r3 + cx + tx
         fin_y = py_r3 + cy + ty
-        fin_z = pz_r3 + cz + tz
+        fin_z = pz_r2 + cz + tz # Note Ry only affects X and Z
 
-        # Metric 1
+        # Metric 1: Distance to barycenter
         bx = barycenters[1, organ_idx]
         by = barycenters[2, organ_idx]
         bz = barycenters[3, organ_idx]
         max_r = radii[organ_idx]
 
-        dist = sqrt((fin_x - bx)^2 + (fin_y - by)^2 + (fin_z - bz)^2)
-        l1_val = softplus_kernel(dist - max_r)
+        dist_sq = (fin_x - bx)^2 + (fin_y - by)^2 + (fin_z - bz)^2
+        dist = sqrt(max(dist_sq, 0.0f0))
+        
+        # Metric 1: Distance Penalty
+        l1_val = max(0.0f0, dist - max_r)
 
-        # Metric 2
-        interp_val = trilinear_interp_kernel(gold_vol, fin_x, fin_y, fin_z, organ_idx, vol_sx, vol_sy, vol_sz)
-        l2_val = (1.0f0 - interp_val)^2
+        # Metric 2: Trilinear Interpolation (Unrolled)
+        # vol is (sx, sy, sz, num_organs)
+        # fin_x, fin_y, fin_z are coordinates
+        
+        interp_val = 0.0f0
+        if fin_x >= 1.0f0 && fin_x <= Float32(vol_sx) && fin_y >= 1.0f0 && fin_y <= Float32(vol_sy) && fin_z >= 1.0f0 && fin_z <= Float32(vol_sz)
+            
+            x0 = floor(Int, fin_x)
+            y0 = floor(Int, fin_y)
+            z0 = floor(Int, fin_z)
+
+            x1 = min(x0 + 1, vol_sx)
+            y1 = min(y0 + 1, vol_sy)
+            z1 = min(z0 + 1, vol_sz)
+
+            xd = fin_x - Float32(x0)
+            yd = fin_y - Float32(y0)
+            zd = fin_z - Float32(z0)
+
+            # Read 8 neighbors
+            v000 = gold_vol[x0, y0, z0, organ_idx]
+            v100 = gold_vol[x1, y0, z0, organ_idx]
+            v010 = gold_vol[x0, y1, z0, organ_idx]
+            v110 = gold_vol[x1, y1, z0, organ_idx]
+            v001 = gold_vol[x0, y0, z1, organ_idx]
+            v101 = gold_vol[x1, y0, z1, organ_idx]
+            v011 = gold_vol[x0, y1, z1, organ_idx]
+            v111 = gold_vol[x1, y1, z1, organ_idx]
+
+            c00 = v000 * (1.0f0 - xd) + v100 * xd
+            c10 = v010 * (1.0f0 - xd) + v110 * xd
+            c01 = v001 * (1.0f0 - xd) + v101 * xd
+            c11 = v011 * (1.0f0 - xd) + v111 * xd
+
+            c0 = c00 * (1.0f0 - yd) + c10 * yd
+            c1 = c01 * (1.0f0 - yd) + c11 * yd
+
+            interp_val = c0 * (1.0f0 - zd) + c1 * zd
+        end
+        
+        # Target value for interpolation is 1.0 (inside organ)
+        # Penalty is squared error
+        l1_val += (1.0f0 - interp_val)^2
     end
-
-    shared_l1[tid] = l1_val
-    shared_l2[tid] = l2_val
-    shared_valid[tid] = valid_val
-
-    @synchronize
-
-    # Tree Reduction (512 -> 1)
-
-    if tid <= 256
-        shared_l1[tid] += shared_l1[tid + 256]
-        shared_l2[tid] += shared_l2[tid + 256]
-        shared_valid[tid] += shared_valid[tid + 256]
-    end
-    @synchronize
-
-    if tid <= 128
-        shared_l1[tid] += shared_l1[tid + 128]
-        shared_l2[tid] += shared_l2[tid + 128]
-        shared_valid[tid] += shared_valid[tid + 128]
-    end
-    @synchronize
-
-    if tid <= 64
-        shared_l1[tid] += shared_l1[tid + 64]
-        shared_l2[tid] += shared_l2[tid + 64]
-        shared_valid[tid] += shared_valid[tid + 64]
-    end
-    @synchronize
-
-    if tid <= 32
-        shared_l1[tid] += shared_l1[tid + 32]
-        shared_l2[tid] += shared_l2[tid + 32]
-        shared_valid[tid] += shared_valid[tid + 32]
-    end
-    @synchronize
-
-    if tid <= 16
-        shared_l1[tid] += shared_l1[tid + 16]
-        shared_l2[tid] += shared_l2[tid + 16]
-        shared_valid[tid] += shared_valid[tid + 16]
-    end
-    @synchronize
-
-    if tid <= 8
-        shared_l1[tid] += shared_l1[tid + 8]
-        shared_l2[tid] += shared_l2[tid + 8]
-        shared_valid[tid] += shared_valid[tid + 8]
-    end
-    @synchronize
-
-    if tid <= 4
-        shared_l1[tid] += shared_l1[tid + 4]
-        shared_l2[tid] += shared_l2[tid + 4]
-        shared_valid[tid] += shared_valid[tid + 4]
-    end
-    @synchronize
-
-    if tid <= 2
-        shared_l1[tid] += shared_l1[tid + 2]
-        shared_l2[tid] += shared_l2[tid + 2]
-        shared_valid[tid] += shared_valid[tid + 2]
-    end
-    @synchronize
 
     if tid == 1
-        total_l1 = shared_l1[1] + shared_l1[2]
-        total_l2 = shared_l2[1] + shared_l2[2]
-        total_cnt = shared_valid[1] + shared_valid[2]
-
-        # We need to recalculate indices for writing output
-        # to ensure scope
-        idx_o = (gid - 1) % num_organs + 1
-        idx_b = (gid - 1) ÷ num_organs + 1
-
-        if total_cnt > 0.5f0
-            loss_out[idx_o, idx_b] = (total_l1 + total_l2) / total_cnt
-        else
-            loss_out[idx_o, idx_b] = 0.0f0
-        end
+        loss_out[organ_idx, batch_idx] = l1_val
     end
 end
 
 # --- Differentiable Launcher ---
 
 """
-    compute_organ_loss(points_tensor, affine_params, gold_vol, organ_meta_list)
+    compute_organ_loss(points_tensor, affine_params, gold_vol, barycenters, radii)
 
 High-level, differentiable wrapper for the fused registration loss.
 
@@ -272,25 +351,16 @@ High-level, differentiable wrapper for the fused registration loss.
 - `points_tensor`: Preprocessed Atlas points.
 - `affine_params`: Predicted parameters from the model.
 - `gold_vol`: Target Gold Standard volume.
-- `organ_meta_list`: List of `OrganMetadata` (barycenters, radii).
+- `barycenters`: Pre-calculated organ barycenters (3, Num_Organs).
+- `radii`: Pre-calculated organ radii (Num_Organs).
 
 # Returns
 Scalar mean loss across all organs and batch items.
 """
-function compute_organ_loss(points_tensor, affine_params, gold_vol, organ_meta_list)
+function compute_organ_loss(points_tensor, affine_params, gold_vol, barycenters, radii)
     batch_size = size(affine_params, 3)
     num_organs = size(points_tensor, 3)
     vol_sx, vol_sy, vol_sz, _ = size(gold_vol)
-
-    # Convert Metadata
-    barycenters = zeros(Float32, 3, num_organs)
-    radii = zeros(Float32, num_organs)
-    for (i, m) in enumerate(organ_meta_list)
-        barycenters[1, i] = m.barycenter[1]
-        barycenters[2, i] = m.barycenter[2]
-        barycenters[3, i] = m.barycenter[3]
-        radii[i] = m.max_radius
-    end
 
     backend = KernelAbstractions.get_backend(affine_params)
     if backend isa KernelAbstractions.GPU
@@ -303,7 +373,7 @@ function compute_organ_loss(points_tensor, affine_params, gold_vol, organ_meta_l
     groups = batch_size * num_organs
     threads = 512
 
-    kernel = organ_loss_kernel_optimized!(backend, threads)
+    kernel = gpu_organ_loss_kernel_optimized!(backend, threads)
     kernel(loss_out, points_tensor, affine_params, gold_vol, barycenters, radii, batch_size, num_organs, vol_sx, vol_sy, vol_sz, ndrange=groups*threads)
     KernelAbstractions.synchronize(backend)
 
@@ -312,8 +382,8 @@ end
 
 # --- Enzyme Rule ---
 
-function ChainRulesCore.rrule(::typeof(compute_organ_loss), points_tensor, affine_params, gold_vol, organ_meta_list)
-    y = compute_organ_loss(points_tensor, affine_params, gold_vol, organ_meta_list)
+function ChainRulesCore.rrule(::typeof(compute_organ_loss), points_tensor, affine_params, gold_vol, barycenters, radii)
+    y = compute_organ_loss(points_tensor, affine_params, gold_vol, barycenters, radii)
 
     function compute_loss_pullback(d_y)
         d_affine = zero(affine_params)
@@ -321,15 +391,6 @@ function ChainRulesCore.rrule(::typeof(compute_organ_loss), points_tensor, affin
         batch_size = size(affine_params, 3)
         num_organs = size(points_tensor, 3)
         vol_sx, vol_sy, vol_sz, _ = size(gold_vol)
-
-        barycenters = zeros(Float32, 3, num_organs)
-        radii = zeros(Float32, num_organs)
-        for (i, m) in enumerate(organ_meta_list)
-            barycenters[1, i] = m.barycenter[1]
-            barycenters[2, i] = m.barycenter[2]
-            barycenters[3, i] = m.barycenter[3]
-            radii[i] = m.max_radius
-        end
 
         backend = KernelAbstractions.get_backend(affine_params)
         if backend isa KernelAbstractions.GPU
@@ -351,7 +412,7 @@ function ChainRulesCore.rrule(::typeof(compute_organ_loss), points_tensor, affin
         threads = 512
 
         function kernel_wrapper(l, pt, ap, gv, bc, r, bs, no, vsx, vsy, vsz)
-             organ_loss_kernel_optimized!(backend, threads)(l, pt, ap, gv, bc, r, bs, no, vsx, vsy, vsz, ndrange=groups*threads)
+             gpu_organ_loss_kernel_optimized!(backend, threads)(l, pt, ap, gv, bc, r, bs, no, vsx, vsy, vsz, ndrange=groups*threads)
              return nothing
         end
 
@@ -371,7 +432,7 @@ function ChainRulesCore.rrule(::typeof(compute_organ_loss), points_tensor, affin
             Const(vol_sz)
         )
 
-        return NoTangent(), NoTangent(), d_affine, NoTangent(), NoTangent()
+        return NoTangent(), NoTangent(), d_affine, NoTangent(), NoTangent(), NoTangent()
     end
 
     return y, compute_loss_pullback
