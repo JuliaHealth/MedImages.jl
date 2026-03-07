@@ -17,7 +17,7 @@ end
 
 
 
-function resample_to_spacing(im, new_spacing::Tuple{Float64,Float64,Float64}, interpolator_enum, use_cuda=false)::MedImage
+function resample_to_spacing(im::MedImage, new_spacing::Tuple{Float64,Float64,Float64}, interpolator_enum::Interpolator_enum, use_cuda=false)::MedImage
     old_spacing = im.spacing
     old_size = size(im.voxel_data)
 
@@ -35,7 +35,7 @@ function resample_to_spacing(im, new_spacing::Tuple{Float64,Float64,Float64}, in
     return new_im
 end#resample_to_spacing
 
-function resample_to_spacing(im::BatchedMedImage, new_spacing::Union{Tuple{Float64,Float64,Float64}, Vector{Tuple{Float64,Float64,Float64}}}, interpolator_enum)::BatchedMedImage
+function resample_to_spacing(im::BatchedMedImage, new_spacing::Union{Tuple{Float64,Float64,Float64}, Vector{Tuple{Float64,Float64,Float64}}}, interpolator_enum::Interpolator_enum)::BatchedMedImage
     batch_size = size(im.voxel_data, 4)
     old_size = size(im.voxel_data)[1:3]
 
@@ -97,54 +97,35 @@ function resample_to_spacing(im::BatchedMedImage, new_spacing::Union{Tuple{Float
     # No, that's slow on GPU.
 
     # I should use `interpolate_my` which I ALREADY updated to support batches!
-    # `resample_to_spacing` is effectively: generate grid points for new spacing, interpolate.
-
-    points = Utils.get_base_indicies_arr(first_new_size) # 3 x N
-    n_points = size(points, 2)
-    points_to_interpolate = zeros(Float64, 3, n_points, batch_size)
-
+    # Calculate affine matrices for the entire batch
+    # M maps Target Index -> Source Index
+    # rx = (ix - 1) * nsp / osp + 1 = ix * (nsp/osp) + (1 - nsp/osp)
+    
+    M_batch = zeros(Float32, 4, 4, batch_size)
     for b in 1:batch_size
         nsp = target_spacings[b]
         osp = im.spacing[b]
-
-        # Mapping index x_new to physical: (x_new - 1)*nsp
-        # Mapping physical to x_old: phys / osp + 1
-        # Combined: (x_new - 1) * nsp / osp + 1
-
-        # Optimized loop
-        for i in 1:n_points
-            ix = points[1, i]
-            iy = points[2, i]
-            iz = points[3, i]
-
-            rx = (ix - 1.0) * nsp[1] / osp[1] + 1.0
-            ry = (iy - 1.0) * nsp[2] / osp[2] + 1.0
-            rz = (iz - 1.0) * nsp[3] / osp[3] + 1.0
-
-            points_to_interpolate[1, i, b] = rx
-            points_to_interpolate[2, i, b] = ry
-            points_to_interpolate[3, i, b] = rz
-        end
+        
+        m11 = nsp[1] / osp[1]
+        m22 = nsp[2] / osp[2]
+        m33 = nsp[3] / osp[3]
+        
+        M_batch[1, 1, b] = m11; M_batch[2, 2, b] = m22; M_batch[3, 3, b] = m33
+        M_batch[1, 4, b] = 1.0f0 - m11
+        M_batch[2, 4, b] = 1.0f0 - m22
+        M_batch[3, 4, b] = 1.0f0 - m33
+        M_batch[4, 4, b] = 1.0f0
     end
-
-    # Use (1,1,1) spacing for interpolate_my because points are already in index space of source?
-    # No, interpolate_my takes points in PHYSICAL space (relative to origin/spacing of source).
-    # But `interpolate_pure` (fast path) usually takes points in index space?
-    # Let's check `Utils.jl`:
-    # `interpolate_kernel`:
-    # real_x = (shared_arr... - 1.0) / spacing + 1.0
-    # So it expects PHYSICAL points.
-
-    # My calculation above `rx = ...` is calculating INDEX in source.
-    # If I pass `spacing=(1,1,1)` to interpolate_my, then:
-    # real_x = (rx - 1) / 1 + 1 = rx.
-    # Correct.
-
-    spacing_arg = [ (1.0, 1.0, 1.0) for _ in 1:batch_size ]
-
-    resampled_flat = interpolate_my(points_to_interpolate, im.voxel_data, spacing_arg, interpolator_enum, false, 0.0, true)
-
-    new_data = reshape(resampled_flat, first_new_size[1], first_new_size[2], first_new_size[3], batch_size)
+    
+    device_M = is_cuda_array(im.voxel_data) ? CuArray(M_batch) : M_batch
+    
+    # Call the fused kernel
+    new_data = interpolate_fused_affine(im.voxel_data, device_M, first_new_size, interpolator_enum)
+    
+    # Cast back to original type if needed
+    if eltype(im.voxel_data) != Float32
+        new_data = cast_to_array_b_type(new_data, im.voxel_data)
+    end
 
     return BatchedMedImage(
         voxel_data = new_data,
