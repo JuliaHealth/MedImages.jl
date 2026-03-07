@@ -18,6 +18,7 @@ export create_nii_from_medimage
 export resample_kernel_launch
 export is_cuda_array, extract_corners
 export create_batched_medimage, unbatch_medimage
+export interpolate_fused_affine
 export generate_affine_coords
 
 import ..MedImage_data_struct: MedImage, BatchedMedImage, Interpolator_enum, Mode_mi, Orientation_code, Nearest_neighbour_en, Linear_en, B_spline_en
@@ -860,6 +861,137 @@ end
         end
     end
 end
+@kernel function fused_affine_kernel!(out, src, M, tx, ty, tz, sx, sy, sz, is_nearest)
+    i = @index(Global, Linear)
+    iz = (i - 1) ÷ (tx * ty) + 1
+    rem_z = (i - 1) % (tx * ty)
+    iy = rem_z ÷ tx + 1
+    ix = rem_z % tx + 1
+    m11 = M[1, 1]; m12 = M[1, 2]; m13 = M[1, 3]; m14 = M[1, 4]
+    m21 = M[2, 1]; m22 = M[2, 2]; m23 = M[2, 3]; m24 = M[2, 4]
+    m31 = M[3, 1]; m32 = M[3, 2]; m33 = M[3, 3]; m34 = M[3, 4]
+    px = Float32(ix) * m11 + Float32(iy) * m12 + Float32(iz) * m13 + m14
+    py = Float32(ix) * m21 + Float32(iy) * m22 + Float32(iz) * m23 + m24
+    pz = Float32(ix) * m31 + Float32(iy) * m32 + Float32(iz) * m33 + m34
+    if px < 1.0f0 || py < 1.0f0 || pz < 1.0f0 || px > Float32(sx) || py > Float32(sy) || pz > Float32(sz)
+        @inbounds out[i] = 0.0f0
+    else
+        if is_nearest
+            nx, ny, nz = round(Int, px), round(Int, py), round(Int, pz)
+            nx = clamp(nx, 1, Int(sx)); ny = clamp(ny, 1, Int(sy)); nz = clamp(nx, 1, Int(sz))
+            @inbounds out[i] = Float32(src[nx, ny, nz])
+        else
+            x0, y0, z0 = floor(Int, px), floor(Int, py), floor(Int, pz)
+            dx = px - Float32(x0); dy = py - Float32(y0); dz = pz - Float32(z0)
+            x1 = clamp(x0 + 1, 1, Int(sx)); y1 = clamp(y0 + 1, 1, Int(sy)); z1 = clamp(z0 + 1, 1, Int(sz))
+            x0 = clamp(x0, 1, Int(sx)); y0 = clamp(y0, 1, Int(sy)); z0 = clamp(z0, 1, Int(sz))
+            c000 = src[x0, y0, z0]; c100 = src[x1, y0, z0]; c010 = src[x0, y1, z0]; c110 = src[x1, y1, z0]
+            c001 = src[x0, y0, z1]; c101 = src[x1, y0, z1]; c011 = src[x0, y1, z1]; c111 = src[x1, y1, z1]
+            c00 = c000 * (1.0f0 - dx) + c100 * dx; c10 = c010 * (1.0f0 - dx) + c110 * dx
+            c01 = c001 * (1.0f0 - dx) + c101 * dx; c11 = c011 * (1.0f0 - dx) + c111 * dx
+            c0 = c00 * (1.0f0 - dy) + c10 * dy; c1 = c01 * (1.0f0 - dy) + c11 * dy
+            @inbounds out[i] = c0 * (1.0f0 - dz) + c1 * dz
+        end
+    end
+end
+@kernel function fused_affine_kernel_item!(out, src, M_batch, tx, ty, tz, sx, sy, sz, is_nearest, b)
+    i = @index(Global, Linear)
+    iz = (i - 1) ÷ (tx * ty) + 1
+    rem_z = (i - 1) % (tx * ty)
+    iy = rem_z ÷ tx + 1
+    ix = rem_z % tx + 1
+    m11 = M_batch[1, 1, b]; m12 = M_batch[1, 2, b]; m13 = M_batch[1, 3, b]; m14 = M_batch[1, 4, b]
+    m21 = M_batch[2, 1, b]; m22 = M_batch[2, 2, b]; m23 = M_batch[2, 3, b]; m24 = M_batch[2, 4, b]
+    m31 = M_batch[3, 1, b]; m32 = M_batch[3, 2, b]; m33 = M_batch[3, 3, b]; m34 = M_batch[3, 4, b]
+    px = Float32(ix) * m11 + Float32(iy) * m12 + Float32(iz) * m13 + m14
+    py = Float32(ix) * m21 + Float32(iy) * m22 + Float32(iz) * m23 + m24
+    pz = Float32(ix) * m31 + Float32(iy) * m32 + Float32(iz) * m33 + m34
+    if px < 1.0f0 || py < 1.0f0 || pz < 1.0f0 || px > Float32(sx) || py > Float32(sy) || pz > Float32(sz)
+        @inbounds out[ix, iy, iz, b] = 0.0f0
+    else
+        if is_nearest
+            nx, ny, nz = round(Int, px), round(Int, py), round(Int, pz)
+            nx = clamp(nx, 1, Int(sx)); ny = clamp(ny, 1, Int(sy)); nz = clamp(nz, 1, Int(sz))
+            @inbounds out[ix, iy, iz, b] = Float32(src[nx, ny, nz, b])
+        else
+            x0, y0, z0 = floor(Int, px), floor(Int, py), floor(Int, pz)
+            dx = px - Float32(x0); dy = py - Float32(y0); dz = pz - Float32(z0)
+            x1 = clamp(x0 + 1, 1, Int(sx)); y1 = clamp(y0 + 1, 1, Int(sy)); z1 = clamp(z0 + 1, 1, Int(sz))
+            x0 = clamp(x0, 1, Int(sx)); y0 = clamp(y0, 1, Int(sy)); z0 = clamp(z0, 1, Int(sz))
+            c000 = src[x0, y0, z0, b]; c100 = src[x1, y0, z0, b]; c010 = src[x0, y1, z0, b]; c110 = src[x1, y1, z0, b]
+            c001 = src[x0, y0, z1, b]; c101 = src[x1, y0, z1, b]; c011 = src[x0, y1, z1, b]; c111 = src[x1, y1, z1, b]
+            c00 = c000 * (1.0f0 - dx) + c100 * dx; c10 = c010 * (1.0f0 - dx) + c110 * dx
+            c01 = c001 * (1.0f0 - dx) + c101 * dx; c11 = c011 * (1.0f0 - dx) + c111 * dx
+            c0 = c00 * (1.0f0 - dy) + c10 * dy; c1 = c01 * (1.0f0 - dy) + c11 * dy
+            @inbounds out[ix, iy, iz, b] = c0 * (1.0f0 - dz) + c1 * dz
+        end
+    end
+end
+
+function fused_affine_kernel_item_launcher!(out, src, M_batch, tx, ty, tz, sx, sy, sz, is_nearest, nrange, b)
+    backend = KernelAbstractions.get_backend(out)
+    kernel = fused_affine_kernel_item!(backend, 256)
+    kernel(out, src, M_batch, tx, ty, tz, sx, sy, sz, is_nearest, b, ndrange=nrange)
+    return nothing
+end
+@kernel function batched_fused_affine_kernel!(out, src, M_batch, tx, ty, tz, sx, sy, sz, is_nearest)
+    i_v, ib = @index(Global, Cartesian).I
+    iz = (i_v - 1) ÷ (tx * ty) + 1
+    rem_z = (i_v - 1) % (tx * ty)
+    iy = rem_z ÷ tx + 1
+    ix = rem_z % tx + 1
+    m11 = M_batch[1, 1, ib]; m12 = M_batch[1, 2, ib]; m13 = M_batch[1, 3, ib]; m14 = M_batch[1, 4, ib]
+    m21 = M_batch[2, 1, ib]; m22 = M_batch[2, 2, ib]; m23 = M_batch[2, 3, ib]; m24 = M_batch[2, 4, ib]
+    m31 = M_batch[3, 1, ib]; m32 = M_batch[3, 2, ib]; m33 = M_batch[3, 3, ib]; m34 = M_batch[3, 4, ib]
+    px = Float32(ix) * m11 + Float32(iy) * m12 + Float32(iz) * m13 + m14
+    py = Float32(ix) * m21 + Float32(iy) * m22 + Float32(iz) * m23 + m24
+    pz = Float32(ix) * m31 + Float32(iy) * m32 + Float32(iz) * m33 + m34
+    if px < 1.0f0 || py < 1.0f0 || pz < 1.0f0 || px > Float32(sx) || py > Float32(sy) || pz > Float32(sz)
+        @inbounds out[ix, iy, iz, ib] = 0.0f0
+    else
+        if is_nearest
+            nx = Int(round(px)); ny = Int(round(py)); nz = Int(round(pz))
+            nx = clamp(nx, 1, Int(sx)); ny = clamp(ny, 1, Int(sy)); nz = clamp(nz, 1, Int(sz))
+            @inbounds out[ix, iy, iz, ib] = Float32(src[nx, ny, nz, ib])
+        else
+            x0 = floor(Int, px); y0 = floor(Int, py); z0 = floor(Int, pz)
+            x1 = clamp(x0 + 1, 1, Int(sx)); y1 = clamp(y0 + 1, 1, Int(sy)); z1 = clamp(z0 + 1, 1, Int(sz))
+            x0 = clamp(x0, 1, Int(sx)); y0 = clamp(y0, 1, Int(sy)); z0 = clamp(z0, 1, Int(sz))
+            xd = px - Float32(x0); yd = py - Float32(y0); zd = pz - Float32(z0)
+            @inbounds begin
+                v000 = Float32(src[x0, y0, z0, ib]); v100 = Float32(src[x1, y0, z0, ib])
+                v010 = Float32(src[x0, y1, z0, ib]); v110 = Float32(src[x1, y1, z0, ib])
+                v001 = Float32(src[x0, y0, z1, ib]); v101 = Float32(src[x1, y0, z1, ib])
+                v011 = Float32(src[x0, y1, z1, ib]); v111 = Float32(src[x1, y1, z1, ib])
+                c00 = v000 * (1.0f0 - xd) + v100 * xd
+                c10 = v010 * (1.0f0 - xd) + v110 * xd
+                c01 = v001 * (1.0f0 - xd) + v101 * xd
+                c11 = v011 * (1.0f0 - xd) + v111 * xd
+                c0 = c00 * (1.0f0 - yd) + c10 * yd
+                c1 = c01 * (1.0f0 - yd) + c11 * yd
+                out[ix, iy, iz, ib] = c0 * (1.0f0 - zd) + c1 * zd
+            end
+        end
+    end
+end
+
+function interpolate_fused_affine(src, M, target_size, interpolator_enum)
+    backend = get_backend(src)
+    is_batched = ndims(M) == 3
+    is_nearest = (interpolator_enum == Nearest_neighbour_en)
+    tx, ty, tz = Int32.(target_size)
+    sx, sy, sz = Int32.(size(src)[1:3])
+    if is_batched
+        batch_size = size(M, 3)
+        out = KernelAbstractions.zeros(backend, Float32, target_size..., batch_size)
+        batched_fused_affine_kernel!(backend, 256)(out, src, M, tx, ty, tz, sx, sy, sz, is_nearest, ndrange=(prod(target_size), batch_size))
+    else
+        out = KernelAbstractions.zeros(backend, Float32, target_size...)
+        fused_affine_kernel!(backend, 256)(out, src, M, tx, ty, tz, sx, sy, sz, is_nearest, ndrange=prod(target_size))
+    end
+    synchronize(backend)
+    return out
+end
 
 @kernel function nearest_resample_enzyme_kernel!(output, image_data, old_spacing_arr, new_spacing_arr, new_dims_arr, src_dims_arr)
     i = @index(Global, Linear)
@@ -910,6 +1042,27 @@ function nearest_enzyme_launcher!(out, img, osp_arr, nsp_arr, ndims_arr, src_dim
     backend = KernelAbstractions.get_backend(out)
     kernel = nearest_resample_enzyme_kernel!(backend, 256)
     kernel(out, img, osp_arr, nsp_arr, ndims_arr, src_dims_arr, ndrange=ndrange_val)
+    return nothing
+end
+
+function fused_affine_enzyme_launcher!(out, src, M, tx, ty, tz, sx, sy, sz, is_nearest, nrange)
+    backend = KernelAbstractions.get_backend(out)
+    kernel = fused_affine_kernel!(backend, 256)
+    kernel(out, src, M, tx, ty, tz, sx, sy, sz, is_nearest, ndrange=nrange)
+    return nothing
+end
+
+function batched_fused_affine_enzyme_launcher!(out, src, M_batch, tx, ty, tz, sx, sy, sz, is_nearest, n_voxels, b_size)
+    backend = KernelAbstractions.get_backend(out)
+    kernel = batched_fused_affine_kernel!(backend, 256)
+    kernel(out, src, M_batch, tx, ty, tz, sx, sy, sz, is_nearest, ndrange=(Int(n_voxels), Int(b_size)))
+    return nothing
+end
+
+# CPU specific wrapper for single subject fused affine (to avoid KA overhead in AD if possible)
+function fused_affine_cpu_wrapper!(out, src, M, tx, ty, tz, sx, sy, sz, is_nearest, nrange)
+    kernel = fused_affine_kernel!(KernelAbstractions.CPU(), 256)
+    kernel(out, src, M, tx, ty, tz, sx, sy, sz, is_nearest, ndrange=nrange)
     return nothing
 end
 
@@ -1314,6 +1467,91 @@ function unbatch_medimage(batched_image::BatchedMedImage)::Vector{MedImage}
         )
     end
     return med_images
+end
+
+function ChainRulesCore.rrule(::typeof(interpolate_fused_affine), src, M, target_size, interpolator_enum)
+    output = interpolate_fused_affine(src, M, target_size, interpolator_enum)
+
+    function interpolate_pullback(d_output_unthunked)
+        d_output_raw = unthunk(d_output_unthunked)
+        d_src = zero(src)
+        d_M = zero(M)
+
+        backend = get_backend(output)
+        is_batched = ndims(M) == 3
+        is_nearest = (interpolator_enum == Nearest_neighbour_en)
+
+        tx, ty, tz = Int32.(target_size)
+        sx, sy, sz = Int32.(size(src)[1:3])
+        ndrange_single = prod(target_size)
+        
+        if backend isa KernelAbstractions.CPU
+            tx, ty, tz = Int32.(target_size)
+            sx, sy, sz = Int32.(size(src)[1:3])
+            ndrange_single = prod(target_size)
+
+            # Enzyme CPU often fails on batched views or complex closures.
+            # For CPU batched, we provide a simpler path if possible, or just the single-subject one if not batched.
+            if !is_batched
+                Enzyme.autodiff(Reverse, fused_affine_cpu_wrapper!, Const,
+                    Duplicated(output, d_output_raw),
+                    Duplicated(src, d_src),
+                    Duplicated(M, d_M),
+                    Const(tx), Const(ty), Const(tz), Const(sx), Const(sy), Const(sz), 
+                    Const(is_nearest), Const(Int(ndrange_single)))
+            else
+                # For batched CPU, we currently don't have a stable high-perf Enzyme path 
+                # that doesn't produce 'iterate' errors. 
+                # We could implement a manual loop but that might be slow.
+                # However, for verification we can use a loop.
+                for b in 1:size(M, 3)
+                    # We use itemized kernel with NO views passed to Enzyme
+                    Enzyme.autodiff(Reverse, fused_affine_kernel_item_launcher!, Const,
+                        Duplicated(output, d_output_raw),
+                        Duplicated(src, d_src),
+                        Duplicated(M, d_M),
+                        Const(tx), Const(ty), Const(tz), Const(sx), Const(sy), Const(sz), 
+                        Const(is_nearest), Const(Int(ndrange_single)), Const(Int(b)))
+                end
+            end
+        else
+            # GPU backward pass via looping pullback over batch
+            # Ensure gradients are on GPU
+            d_out = is_cuda_array(output) && !is_cuda_array(d_output_raw) ? CuArray(d_output_raw) : d_output_raw
+            d_src = is_cuda_array(src) && !is_cuda_array(d_src) ? CuArray(d_src) : d_src
+            d_M = is_cuda_array(M) && !is_cuda_array(d_M) ? CuArray(d_M) : d_M
+
+            if is_batched
+                batch_size = size(M, 3)
+                for b in 1:batch_size
+                    Enzyme.autodiff(Reverse, fused_affine_kernel_item_launcher!,
+                        Duplicated(output, d_out),
+                        Duplicated(src, d_src),
+                        Duplicated(M, d_M),
+                        Const(tx), Const(ty), Const(tz), Const(sx), Const(sy), Const(sz), 
+                        Const(is_nearest),
+                        Const(Int(ndrange_single)),
+                        Const(Int(b)))
+                end
+            else
+                Enzyme.autodiff(Reverse, fused_affine_enzyme_launcher!,
+                    Duplicated(output, d_out),
+                    Duplicated(src, d_src),
+                    Duplicated(M, d_M),
+                    Const(tx), Const(ty), Const(tz), Const(sx), Const(sy), Const(sz), 
+                    Const(is_nearest),
+                    Const(Int(ndrange_single)))
+            end
+            synchronize(backend)
+        end
+
+        # Return gradients
+        d_src_out = is_cuda_array(d_src) ? Array(d_src) : d_src
+        d_M_out = is_cuda_array(d_M) ? Array(d_M) : d_M
+        
+        return NoTangent(), d_src_out, d_M_out, NoTangent(), NoTangent()
+    end
+    return output, interpolate_pullback
 end
 
 function ChainRulesCore.rrule(::typeof(resample_kernel_launch), image_data, old_spacing, new_spacing, new_dims, interpolator_enum)
