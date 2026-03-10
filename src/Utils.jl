@@ -7,6 +7,7 @@ using Enzyme
 using ChainRulesCore
 import Random
 using LinearAlgebra
+using Statistics
 
 export interpolate_point
 export get_base_indicies_arr
@@ -1067,7 +1068,7 @@ function fused_affine_cpu_wrapper!(out, src, M, tx, ty, tz, sx, sy, sz, is_neare
 end
 
 # CPU version of trilinear resample loop (Enzyme compatible)
-function trilinear_resample_cpu_loop!(output, image_data, old_spacing, new_spacing, new_dims)
+function trilinear_resample_cpu_loop!(output, image_data, old_spacing, new_spacing, new_dims, extrapolate_value=0)
     n_points = prod(new_dims)
     stride_z = new_dims[1] * new_dims[2]
     sx, sy, sz = size(image_data)
@@ -1083,7 +1084,7 @@ function trilinear_resample_cpu_loop!(output, image_data, old_spacing, new_spaci
         real_z = (Float32(iz) - 1.0f0) * (Float32(new_spacing[3]) / Float32(old_spacing[3])) + 1.0f0
 
         if real_x < 1.0f0 || real_y < 1.0f0 || real_z < 1.0f0 || real_x > Float32(sx) || real_y > Float32(sy) || real_z > Float32(sz)
-            output[i] = 0
+            output[i] = extrapolate_value
         else
             x0 = floor(Int, real_x)
             y0 = floor(Int, real_y)
@@ -1112,7 +1113,7 @@ function trilinear_resample_cpu_loop!(output, image_data, old_spacing, new_spaci
 end
 
 # CPU version of nearest resample loop (Enzyme compatible)
-function nearest_resample_cpu_loop!(output, image_data, old_spacing, new_spacing, new_dims)
+function nearest_resample_cpu_loop!(output, image_data, old_spacing, new_spacing, new_dims, extrapolate_value=0)
     n_points = prod(new_dims)
     stride_z = new_dims[1] * new_dims[2]
     sx, sy, sz = size(image_data)
@@ -1132,7 +1133,7 @@ function nearest_resample_cpu_loop!(output, image_data, old_spacing, new_spacing
         nz = Int(round(real_z))
 
         if nx < 1 || ny < 1 || nz < 1 || nx > sx || ny > sy || nz > sz
-            output[i] = 0
+            output[i] = extrapolate_value
         else
             output[i] = image_data[nx, ny, nz]
         end
@@ -1144,18 +1145,23 @@ function resample_kernel_launch(image_data, old_spacing, new_spacing, new_dims, 
     # Output array
     output = similar(image_data, new_dims)
 
+    # Compute extrapolation value as median of the 8 corners
+    corners = extract_corners(image_data)
+    extrap_val = median(corners)
+
     # Select backend
     backend = get_backend(output)
 
     if backend isa KernelAbstractions.CPU
         # Use pure Julia loops on CPU for Enzyme compatibility
         if interpolator_enum == Nearest_neighbour_en
-            nearest_resample_cpu_loop!(vec(output), image_data, old_spacing, new_spacing, new_dims)
+            nearest_resample_cpu_loop!(vec(output), image_data, old_spacing, new_spacing, new_dims, extrap_val)
         else
-            trilinear_resample_cpu_loop!(vec(output), image_data, old_spacing, new_spacing, new_dims)
+            trilinear_resample_cpu_loop!(vec(output), image_data, old_spacing, new_spacing, new_dims, extrap_val)
         end
     else
         # Use KA kernels on GPU
+        # Note: GPU kernels use their own extrapolate_value parameter (handled separately)
         if interpolator_enum == Nearest_neighbour_en
             kernel = nearest_resample_kernel(backend, 256)
         else
