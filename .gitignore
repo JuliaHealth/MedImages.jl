@@ -13,3 +13,6 @@ test/new/
 test/*/outputs/
 test/visual_output/
 test_data/dataset_Lu/
+test_data/autoPET-III-Lite/
+experiments/suv_consistency/**/*.nii.gz
+test_data/
