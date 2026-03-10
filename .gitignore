@@ -19,3 +19,5 @@ test_data/dataset_uncorrected/
 test_data/combined.nii.gz
 dataset_unified.h5
 checkpoint_best.jld
+test_data/debug.h5
+dataset_unified_monai.h5
