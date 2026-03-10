@@ -105,13 +105,13 @@ end
 ChainRulesCore.@non_differentiable Rodrigues_rotation_matrix(::Any, ::Any, ::Any)
 
 function crop_image_around_center(image::AbstractArray{T,3}, new_dims::Tuple{Int,Int,Int}, center::Tuple{Int,Int,Int}) where {T}
-  start_z = max(1, center[1] - new_dims[1] ÷ 2)
+  start_z = max(1, center[1] - div(new_dims[1], 2))
   end_z = min(size(image, 1), start_z + new_dims[1] - 1)
 
-  start_y = max(1, center[2] - new_dims[2] ÷ 2)
+  start_y = max(1, center[2] - div(new_dims[2], 2))
   end_y = min(size(image, 2), start_y + new_dims[2] - 1)
 
-  start_x = max(1, center[3] - new_dims[3] ÷ 2)
+  start_x = max(1, center[3] - div(new_dims[3], 2))
   end_x = min(size(image, 3), start_x + new_dims[3] - 1)
   cropped_image = image[start_z:end_z, start_y:end_y, start_x:end_x]
   return cropped_image
@@ -124,8 +124,8 @@ function build_rotation_transform(image::MedImage, axis::Int, angle::Float64)
   v_center = collect(get_voxel_center_Julia(image.voxel_data))
   rotation_transformation = LinearMap(RotXYZ(R))
   translation = Translation(v_center...)
-  transkation_center = Translation(-v_center...)
-  return translation ∘ rotation_transformation ∘ transkation_center
+  translation_center = Translation(-v_center...)
+  return compose(translation, rotation_transformation, translation_center)
 end
 ChainRulesCore.@non_differentiable build_rotation_transform(::Any, ::Any, ::Any)
 
@@ -145,34 +145,33 @@ Rotate a `MedImage` around a specified axis and angle.
 - `MedImage`: The rotated image.
 """
 function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator_enum, crop::Bool=true)::MedImage
-  combined_transformation = build_rotation_transform(image, axis, angle)
-
-  img = image.voxel_data
-
-  if crop
-      out_size = size(img)
-      indices = CartesianIndices(out_size)
-      indices_vec = vec(collect(indices))
-
-      points_vec = map(idx -> begin
-          pt = [Float64(idx[1]), Float64(idx[2]), Float64(idx[3])]
-          combined_transformation(pt)
-      end, indices_vec)
-
-      points_to_interpolate = reduce(hcat, points_vec)
-
-      # Interpolate
-      # Use spacing (1,1,1) so that points are treated as indices
-      resampled_flat = interpolate_my(points_to_interpolate, img, (1.0,1.0,1.0), Interpolator, false, 0.0, true)
-
-      resampled_image = reshape(resampled_flat, out_size)
-
-      image = update_voxel_data(image, resampled_image)
-  else
-      error("rotate_mi with crop=false is not fully supported in this patch")
+  if !crop
+      error("rotate_mi with crop=false is not fully supported currently")
   end
 
-  return image
+  # Compute rotation matrix in physical space
+  R_phys = Rodrigues_rotation_matrix(image, axis, angle)
+  
+  # Compute Index-to-Physical matrix M
+  M_mat = computeIndexToPhysicalPointMatrices_Julia(image)
+  
+  # Compute index-space rotation matrix: A = M^-1 * R * M
+  # This correctly handles non-isovolumetric spacing and different directions
+  A_idx = inv(M_mat) * R_phys * M_mat
+  
+  # Prepare 4x4 affine matrix for affine_transform_mi
+  # Note: affine_transform_mi expects a matrix that maps index-offsets
+  affine_matrix = Matrix{Float64}(I, 4, 4)
+  affine_matrix[1:3, 1:3] = A_idx
+  affine_matrix[4, 4] = 1.0
+  
+  # Compute index-space center of rotation (1-based)
+  # This is the physical center mapped back to index space
+  C_phys = collect(get_real_center_Julia(image))
+  C_idx = inv(M_mat) * (C_phys .- collect(image.origin)) .+ 1.0
+  
+  # Use the high-performance fused affine transform
+  return affine_transform_mi(image, affine_matrix, Interpolator; center_of_rotation=Tuple(C_idx))
 end
 
 
@@ -424,11 +423,22 @@ function rotate_mi(image::BatchedMedImage, axis::Int, angle::Union{Float64, Abst
     matrices = map(1:batch_size) do b
         current_angle = (angle isa AbstractVector) ? angle[b] : angle
         current_direction = image.direction[b]
-        R_sub = Rodrigues_rotation_matrix(current_direction, axis, current_angle)
+        current_spacing = image.spacing[b]
+        
+        # Physical rotation matrix
+        R_phys = Rodrigues_rotation_matrix(current_direction, axis, current_angle)
+        
+        # Index-to-Physical matrix M = D * S
+        D = reshape(collect(current_direction), 3, 3)
+        S = Diagonal(collect(current_spacing))
+        M = D * S
+        
+        # Index-space matrix: A = M^-1 * R * M
+        A_idx = inv(M) * R_phys * M
 
-        return [R_sub[1,1] R_sub[1,2] R_sub[1,3] 0.0;
-                R_sub[2,1] R_sub[2,2] R_sub[2,3] 0.0;
-                R_sub[3,1] R_sub[3,2] R_sub[3,3] 0.0;
+        return [A_idx[1,1] A_idx[1,2] A_idx[1,3] 0.0;
+                A_idx[2,1] A_idx[2,2] A_idx[2,3] 0.0;
+                A_idx[3,1] A_idx[3,2] A_idx[3,3] 0.0;
                 0.0        0.0        0.0        1.0]
     end
 
@@ -633,6 +643,18 @@ function compose_affine_matrices(matrices...)
 end
 
 """
+    affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, Interpolator::Interpolator_enum; output_size=nothing, center_of_rotation=nothing)
+
+Applies an affine transformation to a single image.
+Transform is applied in index space relative to the image center (default) or `center_of_rotation` if supplied.
+"""
+function affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, Interpolator::Interpolator_enum; output_size=nothing, center_of_rotation=nothing)::MedImage
+    # Reuse the batched implementation to ensure consistency
+    # We wrap the single image in a vector, batch it, transform, then unbatch
+    batched = create_batched_medimage([image])
+    res_batched = affine_transform_mi(batched, affine_matrix, Interpolator; output_size=output_size, center_of_rotation=center_of_rotation)
+    return unbatch_medimage(res_batched)[1]
+
     affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, Interpolator::Interpolator_enum; output_size=nothing)
 
 Applies an affine transformation to a single MedImage.
@@ -642,6 +664,7 @@ function affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, In
     batched = create_batched_medimage([image])
     transformed_batched = affine_transform_mi(batched, affine_matrix, Interpolator; output_size=output_size, center_of_rotation=center_of_rotation)
     return unbatch_medimage(transformed_batched)[1]
+
 end
 
 """
