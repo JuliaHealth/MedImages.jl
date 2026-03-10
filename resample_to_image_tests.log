@@ -1,0 +1,6 @@
+Test Summary:           | Pass  Total   Time
+resample_to_image Tests |   15     15  10.1s
+Test Summary:                     | Pass  Total  Time
+resample_to_image Dimension Tests |    3      3  2.7s
+Test Summary:                         | Pass  Total  Time
+resample_to_image Extrapolation Tests |    4      4  3.3s
