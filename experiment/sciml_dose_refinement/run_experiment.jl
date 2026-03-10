@@ -199,17 +199,8 @@ function run_all_experiments()
 
     # 3. UDE Model
     # We will use the UDE approach which solves a differential equation.
-    # For Zygote to work with in-place ODEs (`ode_func!`), it requires specific adjoints.
-    # Since in-place mutation (`du .= ...`) is not Zygote-friendly, we rewrite the UDE to be out-of-place.
-
-    function ode_func(u, p, t)
-        A_fixed = A_global
-        CT_fixed = CT_global
-        nn_input = cat(A_fixed, CT_fixed, u; dims=4)
-        mech_term = A_fixed .* CT_fixed .* 0.01f0
-        neural_term, _ = ude_model(nn_input, p, ude_st)
-        return mech_term .+ neural_term
-    end
+    # For Zygote to work with in-place ODEs, it requires specific adjoints.
+    # Since in-place mutation is not Zygote-friendly with arbitrary arrays, we write the UDE to be out-of-place.
 
     function out_of_place_ude_loss(model, ps, st, x, y)
         D_init = x[:, :, :, 1:1, :]
