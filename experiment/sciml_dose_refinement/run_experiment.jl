@@ -168,10 +168,14 @@ function train_model!(model_name, model, loss_func, loader; epochs=5, lr=1e-2)
             loss_val, back = Zygote.pullback(p -> loss_func(model, p, st, x, y), ps)
             grads = back((1.0f0, nothing))[1]
 
+            # Extract state update if using stateful layers like BatchNorm
+            # For purely convolutional/dense this st stays the same, but it's good practice
+            current_loss, st = loss_val
+
             # Update parameters
             opt_state, ps = Optimisers.update(opt_state, ps, grads)
 
-            total_loss += loss_val[1]
+            total_loss += current_loss
             batches += 1
         end
 
@@ -184,7 +188,12 @@ end
 
 # 6. Execute experiments
 function run_all_experiments()
-    # Create the dataloader
+    # =========================================================================
+    # REAL DATA ADAPTATION POINT:
+    # To run on actual NIfTI/DICOM volumes, replace `create_dummy_data` here
+    # with a function that builds a 5D array (W, H, D, Channels, Batch) using
+    # MedImages.jl (see README.md for the snippet).
+    # =========================================================================
     loader = create_dummy_data(; W=16, H=16, D=16, C_in=3, C_out=1, N=4, num_samples=8)
 
     # 1. PINN Model
