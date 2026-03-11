@@ -1,0 +1,21 @@
+name: julia_registration_env
+channels:
+  - conda-forge
+  - pytorch
+  - nvidia
+  - defaults
+dependencies:
+  - julia=1.10
+  - hdf5
+  - openmpi
+  - python=3.10
+  - numpy
+  - simpleitk
+  - nibabel
+  - matplotlib
+  - tqdm
+  - pip
+  - pip:
+      - pydicom
+      - h5py
+      - wandb
