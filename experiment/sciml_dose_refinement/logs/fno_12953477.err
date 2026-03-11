@@ -1,0 +1,53 @@
+  Activating project at `/mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement`
+   Resolving package versions...
+ERROR: LoadError: Error when installing package ArnoldiMethod:
+IOError: rm("/user/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/packages/ArnoldiMethod/jWXk3/.github"): directory not empty (ENOTEMPTY)
+Stacktrace:
+  [1] uv_error
+    @ ./libuv.jl:100 [inlined]
+  [2] rm(path::String; force::Bool, recursive::Bool)
+    @ Base.Filesystem ./file.jl:307
+  [3] rm(path::String; force::Bool, recursive::Bool)
+    @ Base.Filesystem ./file.jl:294
+  [4] rm
+    @ ./file.jl:273 [inlined]
+  [5] checkfor_mv_cp_cptree(src::String, dst::String, txt::String; force::Bool)
+    @ Base.Filesystem ./file.jl:332
+  [6] checkfor_mv_cp_cptree
+    @ ./file.jl:318 [inlined]
+  [7] #mv#15
+    @ ./file.jl:427 [inlined]
+  [8] mv
+    @ ./file.jl:426 [inlined]
+  [9] install_archive(urls::Vector{Pair{String, Bool}}, hash::Base.SHA1, version_path::String; io::IOStream)
+    @ Pkg.Operations /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/Operations.jl:654
+ [10] (::Pkg.Operations.var"#47#52"{Bool, Pkg.Types.Context, Tuple{SubString{String}, Dict{Base.UUID, Base.SHA1}}, Channel{Any}, Channel{@NamedTuple{pkg::Pkg.Types.PackageEntry, urls::Set{String}, path::String}}})()
+    @ Pkg.Operations /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/Operations.jl:852
+Stacktrace:
+  [1] pkgerror(::String, ::Vararg{String})
+    @ Pkg.Types /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/Types.jl:70
+  [2] macro expansion
+    @ /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/Operations.jl:874 [inlined]
+  [3] macro expansion
+    @ ./task.jl:479 [inlined]
+  [4] download_source(ctx::Pkg.Types.Context; readonly::Bool)
+    @ Pkg.Operations /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/Operations.jl:815
+  [5] download_source
+    @ /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/Operations.jl:791 [inlined]
+  [6] develop(ctx::Pkg.Types.Context, pkgs::Vector{Pkg.Types.PackageSpec}, new_git::Set{Base.UUID}; preserve::Pkg.Types.PreserveLevel, platform::Base.BinaryPlatforms.Platform)
+    @ Pkg.Operations /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/Operations.jl:1413
+  [7] develop
+    @ /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/Operations.jl:1403 [inlined]
+  [8] develop(ctx::Pkg.Types.Context, pkgs::Vector{Pkg.Types.PackageSpec}; shared::Bool, preserve::Pkg.Types.PreserveLevel, platform::Base.BinaryPlatforms.Platform, kwargs::@Kwargs{io::IOStream})
+    @ Pkg.API /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/API.jl:225
+  [9] develop(pkgs::Vector{Pkg.Types.PackageSpec}; io::IOStream, kwargs::@Kwargs{})
+    @ Pkg.API /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/API.jl:159
+ [10] develop(pkgs::Vector{Pkg.Types.PackageSpec})
+    @ Pkg.API /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/API.jl:148
+ [11] develop
+    @ /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/API.jl:146 [inlined]
+ [12] develop(; name::Nothing, uuid::Nothing, version::Nothing, url::Nothing, rev::Nothing, path::String, mode::Pkg.Types.PackageMode, subdir::Nothing, kwargs::@Kwargs{})
+    @ Pkg.API /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/API.jl:176
+ [13] top-level scope
+    @ /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/run_experiment_lu.jl:9
+in expression starting at /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/run_experiment_lu.jl:9
