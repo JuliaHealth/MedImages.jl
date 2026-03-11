@@ -1,0 +1,243 @@
+  Activating project at `/mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement`
+   Resolving package versions...
+   Installed StatsFuns ─────────────────────────── v1.5.2
+   Installed OrdinaryDiffEqRKN ─────────────────── v1.9.0
+   Installed OrdinaryDiffEqRosenbrock ──────────── v1.23.0
+   Installed FFTW ──────────────────────────────── v1.10.0
+   Installed DifferentialEquations ─────────────── v7.17.0
+   Installed HypergeometricFunctions ───────────── v0.3.28
+   Installed OrdinaryDiffEqStabilizedRK ────────── v1.8.0
+   Installed AlmostBlockDiagonals ──────────────── v0.1.10
+   Installed LoggingExtras ─────────────────────── v1.2.0
+   Installed FastGaussQuadrature ───────────────── v1.1.0
+   Installed BoundaryValueDiffEqFIRK ───────────── v1.9.0
+   Installed SciMLLogging ──────────────────────── v1.8.0
+   Installed OrdinaryDiffEqSDIRK ───────────────── v1.12.0
+   Installed NonlinearSolve ────────────────────── v4.15.0
+   Installed SciMLSensitivity ──────────────────── v7.94.0
+   Installed PDMats ────────────────────────────── v0.11.37
+   Installed SciMLJacobianOperators ────────────── v0.1.12
+   Installed Polyester ─────────────────────────── v0.7.18
+   Installed TimerOutputs ──────────────────────── v0.5.29
+   Installed OrdinaryDiffEqPRK ─────────────────── v1.8.0
+   Installed EnumX ─────────────────────────────── v1.0.6
+   Installed Sundials_jll ──────────────────────── v7.5.0+0
+   Installed BoundaryValueDiffEqMIRK ───────────── v1.9.0
+   Installed FunctionWrappers ──────────────────── v1.1.3
+   Installed MaybeInplace ──────────────────────── v0.1.4
+   Installed NeuralOperators ───────────────────── v0.6.2
+   Installed RecursiveArrayTools ───────────────── v3.47.0
+   Installed OrdinaryDiffEqCore ────────────────── v3.4.1
+   Installed OrdinaryDiffEqAdamsBashforthMoulton ─ v1.9.0
+   Installed OpenBLAS32_jll ────────────────────── v0.3.24+0
+   Installed IntelOpenMP_jll ───────────────────── v2025.2.0+0
+   Installed OrdinaryDiffEqSSPRK ───────────────── v1.11.0
+   Installed OrdinaryDiffEqVerner ──────────────── v1.11.0
+   Installed FunctionProperties ────────────────── v0.1.2
+   Installed MuladdMacro ───────────────────────── v0.2.4
+   Installed SteadyStateDiffEq ─────────────────── v2.9.0
+   Installed SIMDTypes ─────────────────────────── v0.1.0
+   Installed FastPower ─────────────────────────── v1.3.1
+   Installed FiniteDiff ────────────────────────── v2.29.0
+   Installed BoundaryValueDiffEqCore ───────────── v1.11.1
+   Installed ArnoldiMethod ─────────────────────── v0.4.0
+   Installed BoundaryValueDiffEq ───────────────── v5.18.0
+   Installed OrdinaryDiffEqFIRK ────────────────── v1.22.0
+   Installed DiffEqBase ────────────────────────── v6.200.0
+   Installed BandedMatrices ────────────────────── v1.11.0
+   Installed SciMLBase ─────────────────────────── v2.136.0
+   Installed NonlinearSolveQuasiNewton ─────────── v1.12.0
+   Installed BoundaryValueDiffEqMIRKN ──────────── v1.8.0
+   Installed OrdinaryDiffEqNonlinearSolve ──────── v1.20.0
+   Installed BracketingNonlinearSolve ──────────── v1.6.2
+   Installed SimpleNonlinearSolve ──────────────── v2.10.0
+   Installed LineSearch ────────────────────────── v0.1.6
+   Installed NonlinearSolveSpectralMethods ─────── v1.6.0
+   Installed LinearSolve ───────────────────────── v3.58.0
+   Installed ThreadingUtilities ────────────────── v0.5.5
+   Installed DiffEqNoiseProcess ────────────────── v5.26.0
+   Installed ManualMemory ──────────────────────── v0.1.8
+   Installed NLSolversBase ─────────────────────── v8.0.0
+   Installed LevyArea ──────────────────────────── v1.0.0
+   Installed SparseMatrixColorings ─────────────── v0.4.23
+   Installed SparseConnectivityTracer ──────────── v1.1.3
+   Installed JumpProcesses ─────────────────────── v9.21.1
+   Installed Rmath_jll ─────────────────────────── v0.5.1+0
+   Installed FastAlmostBandedMatrices ──────────── v0.1.6
+   Installed LazyArrays ────────────────────────── v2.9.5
+   Installed ArrayLayouts ──────────────────────── v1.12.2
+   Installed Tracker ───────────────────────────── v0.2.38
+   Installed MatrixFactorizations ──────────────── v3.1.3
+   Installed OrdinaryDiffEqLinear ──────────────── v1.10.0
+   Installed BitTwiddlingConvenienceFunctions ──── v0.1.6
+   Installed SciMLStructures ───────────────────── v1.10.0
+   Installed FunctionWrappersWrappers ──────────── v0.1.3
+   Installed GenericSchur ──────────────────────── v0.5.6
+   Installed Graphs ────────────────────────────── v1.13.4
+   Installed oneTBB_jll ────────────────────────── v2022.0.0+1
+   Installed OrdinaryDiffEqExplicitRK ──────────── v1.8.0
+   Installed StochasticDiffEq ──────────────────── v6.93.0
+   Installed OrdinaryDiffEqPDIRK ───────────────── v1.11.0
+   Installed OrdinaryDiffEqQPRK ────────────────── v1.8.0
+   Installed Sundials ──────────────────────────── v5.1.0
+   Installed LayoutPointers ────────────────────── v0.1.17
+   Installed OrdinaryDiffEqFunctionMap ─────────── v1.9.0
+   Installed OrdinaryDiffEqLowOrderRK ──────────── v1.10.0
+   Installed Inflate ───────────────────────────── v0.1.5
+   Installed SciMLOperators ────────────────────── v1.15.1
+   Installed DiffEqCallbacks ───────────────────── v4.12.0
+   Installed MKL_jll ───────────────────────────── v2025.2.0+0
+   Installed NonlinearSolveBase ────────────────── v2.11.2
+   Installed OrdinaryDiffEq ────────────────────── v6.108.0
+   Installed NonlinearSolveFirstOrder ──────────── v1.11.1
+   Installed ExproniconLite ────────────────────── v0.10.14
+   Installed BoundaryValueDiffEqShooting ───────── v1.9.0
+   Installed DelayDiffEq ───────────────────────── v5.68.0
+   Installed OrdinaryDiffEqExponentialRK ───────── v1.13.0
+   Installed LineSearches ──────────────────────── v7.6.0
+   Installed PolyesterWeave ────────────────────── v0.2.2
+   Installed OrdinaryDiffEqTsit5 ───────────────── v1.9.0
+   Installed SuiteSparse32_jll ─────────────────── v5.10.1+0
+   Installed OrdinaryDiffEqExtrapolation ───────── v1.15.0
+   Installed OrdinaryDiffEqLowStorageRK ────────── v1.12.0
+   Installed CloseOpenIntervals ────────────────── v0.1.13
+   Installed CommonSolve ───────────────────────── v0.2.6
+   Installed PreallocationTools ────────────────── v0.4.34
+   Installed Krylov ────────────────────────────── v0.10.5
+   Installed OrdinaryDiffEqStabilizedIRK ───────── v1.11.0
+   Installed OrdinaryDiffEqBDF ─────────────────── v1.16.0
+   Installed OrdinaryDiffEqDifferentiation ─────── v2.0.0
+   Installed Rmath ─────────────────────────────── v0.9.0
+   Installed StrideArraysCore ──────────────────── v0.5.8
+   Installed ExponentialUtilities ──────────────── v1.30.0
+   Installed OrdinaryDiffEqHighOrderRK ─────────── v1.9.0
+   Installed OrdinaryDiffEqFeagin ──────────────── v1.8.0
+   Installed RuntimeGeneratedFunctions ─────────── v0.5.17
+   Installed Cassette ──────────────────────────── v0.3.14
+   Installed RecipesBase ───────────────────────── v1.3.4
+   Installed Jieko ─────────────────────────────── v0.2.1
+   Installed TruncatedStacktraces ──────────────── v1.4.0
+   Installed BoundaryValueDiffEqAscher ─────────── v1.8.0
+   Installed ReverseDiff ───────────────────────── v1.16.2
+   Installed PoissonRandom ─────────────────────── v0.4.7
+   Installed DifferentiationInterface ──────────── v0.7.16
+   Installed QuadGK ────────────────────────────── v2.11.2
+   Installed Moshi ─────────────────────────────── v0.3.7
+   Installed SymbolicIndexingInterface ─────────── v0.3.46
+   Installed OrdinaryDiffEqSymplecticRK ────────── v1.11.0
+   Installed ResettableStacks ──────────────────── v1.2.0
+   Installed OrdinaryDiffEqDefault ─────────────── v1.12.0
+   Installed OrdinaryDiffEqIMEXMultistep ───────── v1.12.0
+   Installed OrdinaryDiffEqNordsieck ───────────── v1.9.0
+   Installed FastBroadcast ─────────────────────── v0.3.5
+   Installed Distributions ─────────────────────── v0.25.123
+    Updating `/mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/Project.toml`
+  [052768ef] ↓ CUDA v5.9.7 ⇒ v5.9.6
+  [b0b7db55] ↓ ComponentArrays v0.15.32 ⇒ v0.15.31
+  [fbff095b] ~ MedImages v2.0.1 `/media/jm/hddData/projects_new/MedImages.jl/experiment/sciml_dose_refinement/../..` ⇒ v2.0.1 `/mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/../..`
+  [1ed8b502] ↓ SciMLSensitivity v7.98.1 ⇒ v7.94.0
+    Updating `/mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/Manifest.toml`
+  [79e6a3ab] ↓ Adapt v4.5.0 ⇒ v4.4.0
+  [4fba245c] ↓ ArrayInterface v7.23.0 ⇒ v7.22.0
+  [198e06fe] ↓ BangBang v0.4.8 ⇒ v0.4.7
+  [764a87c0] ↓ BoundaryValueDiffEq v5.20.0 ⇒ v5.18.0
+  [7227322d] ↓ BoundaryValueDiffEqAscher v1.11.0 ⇒ v1.8.0
+  [56b672f2] ↓ BoundaryValueDiffEqCore v2.1.0 ⇒ v1.11.1
+  [85d9eb09] ↓ BoundaryValueDiffEqFIRK v1.12.0 ⇒ v1.9.0
+  [1a22d4ce] ↓ BoundaryValueDiffEqMIRK v1.12.0 ⇒ v1.9.0
+  [9255f1d6] ↓ BoundaryValueDiffEqMIRKN v1.11.0 ⇒ v1.8.0
+  [ed55bfe0] ↓ BoundaryValueDiffEqShooting v1.12.0 ⇒ v1.9.0
+  [70df07ce] ↓ BracketingNonlinearSolve v1.11.0 ⇒ v1.6.2
+  [052768ef] ↓ CUDA v5.9.7 ⇒ v5.9.6
+  [082447d4] ↓ ChainRules v1.73.0 ⇒ v1.72.6
+  [b0b7db55] ↓ ComponentArrays v0.15.32 ⇒ v0.15.31
+  [a93c6f00] + DataFrames v1.8.1
+  [bcd4f6db] ↓ DelayDiffEq v5.69.0 ⇒ v5.68.0
+  [2b5f629d] ↓ DiffEqBase v6.210.1 ⇒ v6.200.0
+  [77a26b50] ↓ DiffEqNoiseProcess v5.27.0 ⇒ v5.26.0
+  [e30172f5] ↓ Documenter v1.17.0 ⇒ v1.16.1
+  [4710194d] ↓ DocumenterVitepress v0.3.2 ⇒ v0.3.0
+  [4e289a0a] ↓ EnumX v1.0.7 ⇒ v1.0.6
+  [21656369] ↓ ExpressionExplorer v1.1.4 ⇒ v1.1.3
+  [0c68f7d7] ↓ GPUArrays v11.4.1 ⇒ v11.4.0
+  [86223c79] ↓ Graphs v1.14.0 ⇒ v1.13.4
+  [19dc6840] - HCubature v1.8.0
+  [842dd82b] + InlineStrings v1.4.5
+  [18e54dd8] - IntegerMathUtils v0.1.3
+  [de52edbc] - Integrals v5.1.0
+  [41ab1584] + InvertedIndices v1.3.1
+  [ccbc3e58] ↓ JumpProcesses v9.23.1 ⇒ v9.21.1
+  [63c18a36] ↓ KernelAbstractions v0.9.40 ⇒ v0.9.39
+  [ba0b0d4f] ↓ Krylov v0.10.6 ⇒ v0.10.5
+  [73f95e8e] - LatticeRules v0.0.1
+  [7ed4a6bd] ↓ LinearSolve v3.65.0 ⇒ v3.58.0
+  [d0879d2d] ↓ MarkdownAST v0.1.3 ⇒ v0.1.2
+  [fbff095b] ~ MedImages v2.0.1 `/media/jm/hddData/projects_new/MedImages.jl/experiment/sciml_dose_refinement/../..` ⇒ v2.0.1 `/mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/../..`
+  [0b3b1443] ↓ MicroMamba v0.1.15 ⇒ v0.1.14
+  [4886b29c] - MonteCarloIntegration v0.2.0
+  [8913a72c] ↓ NonlinearSolve v4.16.0 ⇒ v4.15.0
+  [be0214bd] ↓ NonlinearSolveBase v2.15.0 ⇒ v2.11.2
+  [5959db7a] ↓ NonlinearSolveFirstOrder v2.0.0 ⇒ v1.11.1
+  [bca83a33] - OptimizationBase v5.0.0
+  [6ad6398a] ↓ OrdinaryDiffEqBDF v1.22.0 ⇒ v1.16.0
+  [bbf590c4] ↓ OrdinaryDiffEqCore v3.17.0 ⇒ v3.4.1
+  [50262376] ↓ OrdinaryDiffEqDefault v1.13.0 ⇒ v1.12.0
+  [4302a76b] ↓ OrdinaryDiffEqDifferentiation v2.2.1 ⇒ v2.0.0
+  [9286f039] ↓ OrdinaryDiffEqExplicitRK v1.9.0 ⇒ v1.8.0
+  [becaefa8] ↓ OrdinaryDiffEqExtrapolation v1.16.0 ⇒ v1.15.0
+  [5960d6e9] ↓ OrdinaryDiffEqFIRK v1.23.0 ⇒ v1.22.0
+  [127b3ac7] ↓ OrdinaryDiffEqNonlinearSolve v1.23.0 ⇒ v1.20.0
+  [af6ede74] ↓ OrdinaryDiffEqRKN v1.10.0 ⇒ v1.9.0
+  [43230ef6] ↓ OrdinaryDiffEqRosenbrock v1.25.0 ⇒ v1.23.0
+  [f517fe37] ↓ Polyester v0.7.19 ⇒ v0.7.18
+  [2dfb63ee] + PooledArrays v1.4.3
+⌅ [d236fae5] ↓ PreallocationTools v1.1.2 ⇒ v0.4.34
+  [21216c6a] ↓ Preferences v1.5.2 ⇒ v1.5.1
+  [08abe8d2] ↓ PrettyTables v3.2.3 ⇒ v3.1.2
+  [27ebfcd6] - Primes v0.5.7
+  [43287f4e] ↓ PtrArrays v1.4.0 ⇒ v1.3.0
+  [8a4e6c94] - QuasiMonteCarlo v0.3.5
+  [731186ca] ↓ RecursiveArrayTools v3.48.0 ⇒ v3.47.0
+  [0bca4576] ↓ SciMLBase v2.149.0 ⇒ v2.136.0
+  [a6db7da4] ↓ SciMLLogging v1.9.1 ⇒ v1.8.0
+  [1ed8b502] ↓ SciMLSensitivity v7.98.1 ⇒ v7.94.0
+  [7e506255] ↓ ScopedValues v1.6.0 ⇒ v1.5.0
+  [91c51154] + SentinelArrays v1.4.9
+  [727e6d20] ↓ SimpleNonlinearSolve v2.11.0 ⇒ v2.10.0
+  [ed01d8cd] - Sobol v1.5.0
+  [9f842d2f] ↓ SparseConnectivityTracer v1.2.1 ⇒ v1.1.3
+  [0a514795] ↓ SparseMatrixColorings v0.4.24 ⇒ v0.4.23
+  [276daf66] ↓ SpecialFunctions v2.7.1 ⇒ v2.6.1
+  [0d7ed370] ↓ StaticArrayInterface v1.9.0 ⇒ v1.8.0
+  [90137ffa] ↓ StaticArrays v1.9.17 ⇒ v1.9.16
+  [789caeaf] ↓ StochasticDiffEq v6.96.0 ⇒ v6.93.0
+  [892a3eda] ↓ StringManipulation v0.4.4 ⇒ v0.4.2
+  [4ee394cb] ↓ CUDA_Driver_jll v13.1.1+0 ⇒ v13.1.0+2
+  [e33a78d0] ↓ Hwloc_jll v2.13.0+0 ⇒ v2.12.2+0
+  [7cb0a576] ↓ MPICH_jll v5.0.0+0 ⇒ v4.3.2+0
+  [f1f71cc9] ↓ MPItrampoline_jll v5.5.5+0 ⇒ v5.5.4+0
+  [b53b4c65] ↓ libpng_jll v1.6.55+0 ⇒ v1.6.54+0
+⌅ [f8abcde7] ↓ micromamba_jll v2.3.1+0 ⇒ v1.5.12+0
+  [05823500] ↓ OpenLibm_jll v0.8.5+0 ⇒ v0.8.1+2
+  [8e850b90] ↓ libblastrampoline_jll v5.11.0+0 ⇒ v5.8.0+1
+        Info Packages marked with ⌅ have new versions available but compatibility constraints restrict them from upgrading. To see why use `status --outdated -m`
+
+[2936810] signal (6.-6): Aborted
+in expression starting at /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/run_experiment_lu.jl:10
+gsignal at /lib64/libc.so.6 (unknown line)
+abort at /lib64/libc.so.6 (unknown line)
+uv__io_poll at /workspace/srcdir/libuv/src/unix/epoll.c:166
+uv_run at /workspace/srcdir/libuv/src/unix/core.c:400
+ijl_process_events at /usr/local/src/conda/julia-1.10.4/src/jl_uv.c:283
+process_events at ./libuv.jl:119 [inlined]
+wait at ./task.jl:996
+#wait#645 at ./condition.jl:130
+wait at ./condition.jl:125 [inlined]
+_wait at /home/conda/feedstock_root/build_artifacts/julia_1718579682237/work/usr/share/julia/stdlib/v1.10/FileWatching/src/FileWatching.jl:562
+wait at /home/conda/feedstock_root/build_artifacts/julia_1718579682237/work/usr/share/julia/stdlib/v1.10/FileWatching/src/FileWatching.jl:590
+#58 at /home/conda/feedstock_root/build_artifacts/julia_1718579682237/work/usr/share/julia/stdlib/v1.10/Downloads/src/Curl/Multi.jl:188
+jfptr_YY.58_92826.1 at /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/lib/julia/sys.so (unknown line)
+jl_apply at /usr/local/src/conda/julia-1.10.4/src/julia.h:1982 [inlined]
+start_task at /usr/local/src/conda/julia-1.10.4/src/task.c:1238
+Allocations: 22256095 (Pool: 22188390; Big: 67705); GC: 21
+/var/spool/slurmd/job12953476/slurm_script: line 42: 2936810 Aborted                 (core dumped) julia --project=. run_experiment_lu.jl pinn
