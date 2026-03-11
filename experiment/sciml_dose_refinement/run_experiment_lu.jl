@@ -123,21 +123,42 @@ end
 
 # ── Main ────────────────────────────────────────────────────────────────────
 
-function run_all_experiments_lu()
-    base_dir = "/home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu"
-    loader = create_lu_data_loader(base_dir; num_samples=4, target_size=(32, 32, 32), batchsize=2)
+# ── Main ────────────────────────────────────────────────────────────────────
 
-    # 1. PINN Model
-    pinn_model = create_pinn_model()
-    train_model!("PINN-style CNN", pinn_model, pinn_loss, loader; epochs=3)
+function run_selected_experiment()
+    # Default values or from command line
+    model_type = length(ARGS) >= 1 ? ARGS[1] : "all"
+    base_dir = length(ARGS) >= 2 ? ARGS[2] : (get(ENV, "LU_DATA_DIR", "/home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu"))
+    
+    # Hyperparameters for full training (can be adjusted via Slurm)
+    num_samples = parse(Int, get(ENV, "LU_NUM_SAMPLES", "100"))
+    target_size = (64, 64, 64)
+    batchsize = parse(Int, get(ENV, "LU_BATCH_SIZE", "4"))
+    epochs = parse(Int, get(ENV, "LU_EPOCHS", "20"))
 
-    # 2. FNO Model
-    fno_model = create_fno_model()
-    train_model!("FNO-style Spectral Proxy", fno_model, fno_loss, loader; epochs=3)
+    println("--- Lu-177 SciML Training ---")
+    println("Model Type: $model_type")
+    println("Data Dir:   $base_dir")
+    println("Samples:    $num_samples")
+    println("Epochs:     $epochs")
+    println("Batch Size: $batchsize")
 
-    # 3. UDE Model
-    ude_model = create_ude_neural_term()
-    train_model!("UDE Hybrid Model", ude_model, out_of_place_ude_loss, loader; epochs=3)
+    loader = create_lu_data_loader(base_dir; num_samples=num_samples, target_size=target_size, batchsize=batchsize)
+
+    if model_type == "pinn" || model_type == "all"
+        pinn_model = create_pinn_model()
+        train_model!("PINN-style CNN", pinn_model, pinn_loss, loader; epochs=epochs)
+    end
+
+    if model_type == "fno" || model_type == "all"
+        fno_model = create_fno_model()
+        train_model!("FNO-style Spectral Proxy", fno_model, fno_loss, loader; epochs=epochs)
+    end
+
+    if model_type == "ude" || model_type == "all"
+        ude_model = create_ude_neural_term()
+        train_model!("UDE Hybrid Model", ude_model, out_of_place_ude_loss, loader; epochs=epochs)
+    end
 end
 
-run_all_experiments_lu()
+run_selected_experiment()
