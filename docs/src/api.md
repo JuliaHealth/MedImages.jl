@@ -22,7 +22,7 @@ This page provides comprehensive documentation for all public functions, types, 
 The primary data structure for representing medical images with comprehensive metadata.
 
 ```julia
-mutable struct MedImage
+struct MedImage
     voxel_data                                   # Multidimensional array of image data
     origin::Tuple{Float64,Float64,Float64}       # Physical origin coordinates (x,y,z) in mm
     spacing::Tuple{Float64,Float64,Float64}      # Voxel spacing (x,y,z) in mm
@@ -117,7 +117,7 @@ create_nii_from_medimage(processed_image, "/output/processed")
 ### update_voxel_data
 
 ```julia
-update_voxel_data(old_image, new_voxel_data::AbstractArray)
+update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
 ```
 
 Create a new MedImage with updated voxel data while preserving all spatial metadata.
@@ -142,7 +142,7 @@ new_image = update_voxel_data(image, processed_data)
 
 ```julia
 update_voxel_and_spatial_data(old_image, new_voxel_data::AbstractArray,
-                               new_origin, new_spacing, new_direction)
+                               new_origin, new_spacing, new_direction=nothing)
 ```
 
 Create a new MedImage with updated voxel data and spatial metadata.
@@ -328,7 +328,7 @@ scaled = scale_mi(image, (1.0, 0.5, 0.5), Linear_en)
 
 ```julia
 resample_to_spacing(im, new_spacing::Tuple{Float64,Float64,Float64},
-                    interpolator_enum, use_cuda=false)::MedImage
+                    interpolator_enum, value_to_extrapolate=Nothing)::MedImage
 ```
 
 Resample an image to new voxel spacing.

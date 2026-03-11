@@ -160,6 +160,7 @@ mkpath(DEBUG_DIR)
         @testset "Spatial Metadata Change Tests" begin
             include("spatial_metadata_change_tests/test_resample_to_spacing.jl")
             include("spatial_metadata_change_tests/test_change_orientation.jl")
+            include("integrated_spatial_tests.jl")
         end
     else
         @testset "Spatial Metadata Change Tests" begin
