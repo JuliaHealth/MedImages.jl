@@ -2,7 +2,7 @@
 
 julia_version = "1.10.10"
 manifest_format = "2.0"
-project_hash = "e1c2766c362633c3c7bf64b7a6108e8683dbe957"
+project_hash = "243a470c39201a300d9c710a8d333b974d35e954"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "f7304359109c768cf32dc5fa2d371565bb63b68a"
@@ -495,6 +495,12 @@ deps = ["Downloads", "JSON", "VersionParsing"]
 git-tree-sha1 = "8f06b0cfa4c514c7b9546756dbae91fcfbc92dc9"
 uuid = "8f4d0f93-b110-5947-807f-2305c1781a2d"
 version = "1.10.3"
+
+[[deps.CondaPkg]]
+deps = ["JSON3", "Markdown", "MicroMamba", "Pidfile", "Pkg", "Preferences", "Scratch", "TOML", "pixi_jll"]
+git-tree-sha1 = "bd491d55b97a036caae1d78729bdb70bf7dababc"
+uuid = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
+version = "0.2.33"
 
 [[deps.ConstructionBase]]
 git-tree-sha1 = "b4b092499347b18a015186eae3042f72267106cb"
@@ -1315,6 +1321,18 @@ git-tree-sha1 = "31e996f0a15c7b280ba9f76636b3ff9e2ae58c9a"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.4"
 
+[[deps.JSON3]]
+deps = ["Dates", "Mmap", "Parsers", "PrecompileTools", "StructTypes", "UUIDs"]
+git-tree-sha1 = "411eccfe8aba0814ffa0fdf4860913ed09c34975"
+uuid = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
+version = "1.14.3"
+
+    [deps.JSON3.extensions]
+    JSON3ArrowExt = ["ArrowTypes"]
+
+    [deps.JSON3.weakdeps]
+    ArrowTypes = "31f734f8-188a-4ce0-8406-c8a06bd891cd"
+
 [[deps.Jieko]]
 deps = ["ExproniconLite"]
 git-tree-sha1 = "2f05ed29618da60c06a87e9c033982d4f71d0b6c"
@@ -1862,7 +1880,7 @@ uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
 version = "2.28.2+1"
 
 [[deps.MedImages]]
-deps = ["Accessors", "Atomix", "CUDA", "ChainRulesCore", "ColorTypes", "Combinatorics", "ComponentArrays", "CoordinateTransformations", "Dates", "Dictionaries", "Documenter", "DocumenterVitepress", "Enzyme", "FiniteDifferences", "Flux", "ForwardDiff", "HDF5", "ITKIOWrapper", "ImageTransformations", "Interpolations", "JLD", "JSON", "KernelAbstractions", "LinearAlgebra", "Lux", "LuxCUDA", "Optimisers", "Parameters", "ProgressMeter", "PyCall", "Random", "Rotations", "Setfield", "StaticArrays", "Statistics", "UUIDs", "Zygote"]
+deps = ["Accessors", "Atomix", "CUDA", "ChainRulesCore", "ColorTypes", "Combinatorics", "ComponentArrays", "CoordinateTransformations", "Dates", "Dictionaries", "Documenter", "DocumenterVitepress", "Enzyme", "FiniteDifferences", "Flux", "ForwardDiff", "HDF5", "ITKIOWrapper", "ImageTransformations", "Interpolations", "JLD", "JSON", "KernelAbstractions", "LinearAlgebra", "Lux", "LuxCUDA", "Optimisers", "Parameters", "ProgressMeter", "PyCall", "Random", "Rotations", "Setfield", "StaticArrays", "Statistics", "UUIDs", "Wandb", "Zygote"]
 path = "/media/jm/hddData/projects_new/MedImages.jl/experiment/sciml_dose_refinement/../.."
 uuid = "fbff095b-7891-4fc4-b5e5-3cd99b9dd225"
 version = "2.0.1"
@@ -1872,6 +1890,12 @@ deps = ["Accessors", "BangBang", "InitialValues"]
 git-tree-sha1 = "44d32db644e84c75dab479f1bc15ee76a1a3618f"
 uuid = "128add7d-3638-4c79-886c-908ea0c25c34"
 version = "0.2.0"
+
+[[deps.MicroMamba]]
+deps = ["Pkg", "Scratch", "micromamba_jll"]
+git-tree-sha1 = "535656ce55266bfed0575cd051acc4f36dc869a0"
+uuid = "0b3b1443-0f03-428d-bdfb-f27f9c1191ea"
+version = "0.1.15"
 
 [[deps.MicrosoftMPI_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2403,6 +2427,12 @@ weakdeps = ["StatsBase"]
     [deps.PDMats.extensions]
     StatsBaseExt = "StatsBase"
 
+[[deps.PackageExtensionCompat]]
+git-tree-sha1 = "fb28e33b8a95c4cee25ce296c817d89cc2e53518"
+uuid = "65ce6f38-6b18-4e1d-a461-8949797d7930"
+version = "1.0.2"
+weakdeps = ["Requires", "TOML"]
+
 [[deps.PaddedViews]]
 deps = ["OffsetArrays"]
 git-tree-sha1 = "0fac6313486baae819364c52b4f483450a9d793f"
@@ -2420,6 +2450,12 @@ deps = ["Dates", "PrecompileTools", "UUIDs"]
 git-tree-sha1 = "7d2f8f21da5db6a806faf7b9b292296da42b2810"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "2.8.3"
+
+[[deps.Pidfile]]
+deps = ["FileWatching", "Test"]
+git-tree-sha1 = "2d8aaf8ee10df53d0dfb9b8ee44ae7c04ced2b03"
+uuid = "fa939f87-e72e-5be4-a000-7fc836dbe307"
+version = "1.3.0"
 
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
@@ -2517,6 +2553,20 @@ deps = ["Conda", "Dates", "Libdl", "LinearAlgebra", "MacroTools", "Serialization
 git-tree-sha1 = "9816a3826b0ebf49ab4926e2b18842ad8b5c8f04"
 uuid = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 version = "1.96.4"
+
+[[deps.PythonCall]]
+deps = ["CondaPkg", "Dates", "Libdl", "MacroTools", "Markdown", "Pkg", "Serialization", "Tables", "UnsafePointers"]
+git-tree-sha1 = "982f3f017f08d31202574ef6bdcf8b3466430bea"
+uuid = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
+version = "0.9.31"
+
+    [deps.PythonCall.extensions]
+    CategoricalArraysExt = "CategoricalArrays"
+    PyCallExt = "PyCall"
+
+    [deps.PythonCall.weakdeps]
+    CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
+    PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 
 [[deps.QuadGK]]
 deps = ["DataStructures", "LinearAlgebra"]
@@ -3028,6 +3078,12 @@ git-tree-sha1 = "c581be48ae1cbf83e899b14c07a807e1787512cc"
 uuid = "53d494c1-5632-5724-8f4c-31dff12d585f"
 version = "0.3.1"
 
+[[deps.StructTypes]]
+deps = ["Dates", "UUIDs"]
+git-tree-sha1 = "159331b30e94d7b11379037feeb9b690950cace8"
+uuid = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
+version = "1.11.0"
+
 [[deps.SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
 uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
@@ -3191,10 +3247,29 @@ weakdeps = ["LLVM"]
     [deps.UnsafeAtomics.extensions]
     UnsafeAtomicsLLVM = ["LLVM"]
 
+[[deps.UnsafePointers]]
+git-tree-sha1 = "c81331b3b2e60a982be57c046ec91f599ede674a"
+uuid = "e17b2a0c-0bdf-430a-bd0c-3a23cae4ff39"
+version = "1.0.0"
+
 [[deps.VersionParsing]]
 git-tree-sha1 = "58d6e80b4ee071f5efd07fda82cb9fbe17200868"
 uuid = "81def892-9a0e-5fdd-b105-ffc91e053289"
 version = "1.3.0"
+
+[[deps.Wandb]]
+deps = ["CondaPkg", "PackageExtensionCompat", "PythonCall", "Random"]
+git-tree-sha1 = "3793678b9377f5c0e36301a03cbc24b26b1a9d10"
+uuid = "ad70616a-06c9-5745-b1f1-6a5f42545108"
+version = "0.5.6"
+
+    [deps.Wandb.extensions]
+    WandbFluxTrainingExt = "FluxTraining"
+    WandbMPIExt = "MPI"
+
+    [deps.Wandb.weakdeps]
+    FluxTraining = "7bf95e4d-ca32-48da-9824-f0dc5310474f"
+    MPI = "da04e1cc-30fd-572f-bb4f-1f8673147195"
 
 [[deps.WeightInitializers]]
 deps = ["ConcreteStructs", "GPUArraysCore", "LinearAlgebra", "Random", "SpecialFunctions", "Statistics"]
@@ -3310,6 +3385,12 @@ git-tree-sha1 = "e015f211ebb898c8180887012b938f3851e719ac"
 uuid = "b53b4c65-9356-5827-b1ea-8c7a1a84506f"
 version = "1.6.55+0"
 
+[[deps.micromamba_jll]]
+deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl"]
+git-tree-sha1 = "717df6f6892af4ee13279a73aa58474e58a88667"
+uuid = "f8abcde7-e9b7-5caa-b8af-a437887ae8e4"
+version = "2.3.1+0"
+
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
@@ -3325,3 +3406,9 @@ version = "2022.0.0+1"
 deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 version = "17.4.0+2"
+
+[[deps.pixi_jll]]
+deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl"]
+git-tree-sha1 = "f349584316617063160a947a82638f7611a8ef0f"
+uuid = "4d7b5844-a134-5dcd-ac86-c8f19cd51bed"
+version = "0.41.3+0"
