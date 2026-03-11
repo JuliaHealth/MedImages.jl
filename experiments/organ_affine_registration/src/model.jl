@@ -37,20 +37,20 @@ function MultiScaleCNN(in_channels::Int, num_organs::Int)
     # 3D Convolution branches
     # Branch 1: 3x3x3
     b1 = Chain(
-        Conv((3, 3, 3), in_channels => 16, relu; stride=2, pad=1),
-        Conv((3, 3, 3), 16 => 32, relu; stride=2, pad=1)
+        Conv((3, 3, 3), in_channels => 32, relu; stride=2, pad=1),
+        Conv((3, 3, 3), 32 => 64, relu; stride=2, pad=1)
     )
 
     # Branch 2: 5x5x5
     b2 = Chain(
-        Conv((5, 5, 5), in_channels => 16, relu; stride=2, pad=2),
-        Conv((5, 5, 5), 16 => 32, relu; stride=2, pad=2)
+        Conv((5, 5, 5), in_channels => 32, relu; stride=2, pad=2),
+        Conv((5, 5, 5), 32 => 64, relu; stride=2, pad=2)
     )
 
     # Branch 3: 7x7x7
     b3 = Chain(
-        Conv((7, 7, 7), in_channels => 16, relu; stride=2, pad=3),
-        Conv((7, 7, 7), 16 => 32, relu; stride=2, pad=3)
+        Conv((7, 7, 7), in_channels => 32, relu; stride=2, pad=3),
+        Conv((7, 7, 7), 32 => 64, relu; stride=2, pad=3)
     )
 
     # After stride 2 twice, size is W/4, H/4, D/4.
@@ -61,7 +61,7 @@ function MultiScaleCNN(in_channels::Int, num_organs::Int)
         Chain(b2, GlobalMeanPool(), FlattenLayer()),
         Chain(b3, GlobalMeanPool(), FlattenLayer())
     )
-    # Output of branches: 32 + 32 + 32 = 96 features (per batch item)
+    # Output of branches: 64 + 64 + 64 = 192 features (per batch item)
 
     # MLP Head
     # Output size: num_organs * 15 parameters
@@ -69,8 +69,9 @@ function MultiScaleCNN(in_channels::Int, num_organs::Int)
     out_dim = num_organs * 15
 
     dense = Chain(
-        Dense(96 => 256, relu),
-        Dense(256 => 256, relu),
+        Dense(192 => 512, relu),
+        Dense(512 => 512, relu),
+        Dense(512 => 256, relu),
         Dense(256 => out_dim)
     )
 
