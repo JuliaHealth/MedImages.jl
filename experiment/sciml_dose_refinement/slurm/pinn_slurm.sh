@@ -6,7 +6,7 @@
 #SBATCH -G 1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=64G
+#SBATCH --mem=128G
 #SBATCH --output=logs/pinn_%j.out
 #SBATCH --error=logs/pinn_%j.err
 
@@ -28,9 +28,11 @@ conda activate "$CONDA_ENV_PATH"
 
 # Data Path on Slurm
 export LU_DATA_DIR="/user/joanna.wybranska/u10867/.project/dir.project/ollama_data/dataset_Lu/home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu"
-export LU_EPOCHS=50
+export LU_EPOCHS=100
 export LU_NUM_SAMPLES=100
-export LU_BATCH_SIZE=4
+export LU_BATCH_SIZE=1
+export LU_TARGET_SIZE=256
+export LU_LR=1e-3
 
 # --- Execution ---
 cd "$EXP_DIR"
