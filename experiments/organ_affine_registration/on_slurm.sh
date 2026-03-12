@@ -46,6 +46,14 @@ fi
 echo "Activating Conda environment..."
 conda activate "$CONDA_ENV_PATH"
 
+# --- Environment Stabilization (Fixes for Precompilation Races & Cache Errors) ---
+# Prevent precompilation race conditions and MKL_jll hangs
+export JULIA_PKG_PRECOMPILE_AUTO=0
+
+# Clean stale package caches that cause ENOTEMPTY errors
+echo "Cleaning stale package caches..."
+find "$CONDA_ENV_PATH/share/julia/packages" -name ".github" -type d -exec rm -rf {} + 2>/dev/null || true
+
 # --- Python Environment Stabilization ---
 export PYTHON=$(which python)
 export JULIA_PYTHONCALL_EXE="$PYTHON"
