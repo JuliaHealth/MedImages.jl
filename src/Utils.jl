@@ -936,7 +936,7 @@ function fused_affine_kernel_item_launcher!(out, src, M_batch, tx, ty, tz, sx, s
     return nothing
 end
 @kernel function batched_fused_affine_kernel!(out, src, M_batch, tx, ty, tz, sx, sy, sz, is_nearest)
-    i_v, ib = @index(Global, Cartesian).I
+    i_v, ib = @index(Global, NTuple)
     iz = (i_v - 1) ÷ (tx * ty) + 1
     rem_z = (i_v - 1) % (tx * ty)
     iy = rem_z ÷ tx + 1
