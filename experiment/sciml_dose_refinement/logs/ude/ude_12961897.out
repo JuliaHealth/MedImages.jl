@@ -8,3 +8,3168 @@ Pre-initializing Julia environment...
 Environment ready
 Precompiling packages...
 Starting UDE Training on Slurm...
+--- Lu-177 SciML High-Resolution Quantitative Dosimetry ---
+Goal: Attenuation Correction & Scatter Refinement
+Model Type:  ude
+Data Dir:    /user/joanna.wybranska/u10867/.project/dir.project/ollama_data/dataset_Lu/home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu
+Resolution:  (256, 256, 256)
+Samples:     100
+Epochs:      100
+Batch Size:  1
+Learn Rate:  0.001
+Device:      CUDADevice{Nothing, Missing}(nothing)
+Loading 100 patients from /user/joanna.wybranska/u10867/.project/dir.project/ollama_data/dataset_Lu/home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu...
+Patient 1/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_0__Pat116
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0012197869, 1.0]
+  ✓ Loaded successfully
+Patient 2/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_2__Pat49
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0010047669, 1.0]
+  ✓ Loaded successfully
+Patient 3/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_3__Pat49
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0016920823, 1.0]
+  ✓ Loaded successfully
+Patient 4/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat10
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 203) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00051032513, 1.0]
+  ✓ Loaded successfully
+Patient 5/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat101
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00024138465, 1.0]
+  ✓ Loaded successfully
+Patient 6/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat102
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00057622243, 1.0]
+  ✓ Loaded successfully
+Patient 7/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat103
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00028525846, 1.0]
+  ✓ Loaded successfully
+Patient 8/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat104
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0006704019, 1.0]
+  ✓ Loaded successfully
+Patient 9/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat105
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00024388549, 1.0]
+  ✓ Loaded successfully
+Patient 10/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat106
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00064957934, 1.0]
+  ✓ Loaded successfully
+Patient 11/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat108
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0002486053, 1.0]
+  ✓ Loaded successfully
+Patient 12/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat109
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 203) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00014689547, 1.0]
+  ✓ Loaded successfully
+Patient 13/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat11
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-8.784152e-5, 1.0]
+  ✓ Loaded successfully
+Patient 14/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat110
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0010832399, 1.0]
+  ✓ Loaded successfully
+Patient 15/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat111
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00018269767, 1.0]
+  ✓ Loaded successfully
+Patient 16/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat112
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0007440529, 1.0]
+  ✓ Loaded successfully
+Patient 17/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat114
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0009081695, 1.0]
+  ✓ Loaded successfully
+Patient 18/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat115
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0006712718, 1.0]
+  ✓ Loaded successfully
+Patient 19/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat117
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00055142114, 1.0]
+  ✓ Loaded successfully
+Patient 20/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat118
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 203) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00016597171, 1.0]
+  ✓ Loaded successfully
+Patient 21/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat119
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0008036151, 1.0]
+  ✓ Loaded successfully
+Patient 22/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat120
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 750) CT=(512, 512, 299) Dose=(256, 256, 750)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 6.474234396591783)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0013207534, 1.0]
+  ✓ Loaded successfully
+Patient 23/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat121
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-4.534728e-5, 1.0]
+  ✓ Loaded successfully
+Patient 24/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat122
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.001032694, 1.0]
+  ✓ Loaded successfully
+Patient 25/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat123
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00021114646, 1.0]
+  ✓ Loaded successfully
+Patient 26/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat124
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0007781303, 1.0]
+  ✓ Loaded successfully
+Patient 27/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat125
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00055352354, 1.0]
+  ✓ Loaded successfully
+Patient 28/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat127
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00091117993, 1.0]
+  ✓ Loaded successfully
+Patient 29/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat128
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0002903588, 1.0]
+  ✓ Loaded successfully
+Patient 30/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat13
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00015201338, 1.0]
+  ✓ Loaded successfully
+Patient 31/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat139
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.2090299129486084, 2.2090299129486084, 3.6587057933211327)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00020739202, 1.0]
+  ✓ Loaded successfully
+Patient 32/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat14
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00010938884, 1.0]
+  ✓ Loaded successfully
+Patient 33/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat142
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.2090299129486084, 2.2090299129486084, 3.6587057933211327)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.000209416, 1.0]
+  ✓ Loaded successfully
+Patient 34/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat145
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00070595153, 1.0]
+  ✓ Loaded successfully
+Patient 35/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat15
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 203) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-2.9099177e-5, 1.0]
+  ✓ Loaded successfully
+Patient 36/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat16
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00021298711, 1.0]
+  ✓ Loaded successfully
+Patient 37/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat17
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00016308876, 1.0]
+  ✓ Loaded successfully
+Patient 38/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat19
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0003562653, 1.0]
+  ✓ Loaded successfully
+Patient 39/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat2
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-4.7962094e-5, 1.0]
+  ✓ Loaded successfully
+Patient 40/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat20
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00011371197, 1.0]
+  ✓ Loaded successfully
+Patient 41/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat21
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00020033149, 1.0]
+  ✓ Loaded successfully
+Patient 42/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat22
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00079623505, 1.0]
+  ✓ Loaded successfully
+Patient 43/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat24
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0011675571, 1.0]
+  ✓ Loaded successfully
+Patient 44/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat25
+Patient 45/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat27
+Patient 46/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat28
+Patient 47/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat29
+Patient 48/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat3
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00012589271, 1.0]
+  ✓ Loaded successfully
+Patient 49/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat30
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0007582491, 1.0]
+  ✓ Loaded successfully
+Patient 50/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat31
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.000691101, 1.0]
+  ✓ Loaded successfully
+Patient 51/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat32
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0013560266, 1.0]
+  ✓ Loaded successfully
+Patient 52/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat33
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0009002284, 1.0]
+  ✓ Loaded successfully
+Patient 53/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat34
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00062267744, 1.0]
+  ✓ Loaded successfully
+Patient 54/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat35
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0005848838, 1.0]
+  ✓ Loaded successfully
+Patient 55/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat4
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00046317448, 1.0]
+  ✓ Loaded successfully
+Patient 56/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat44
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00041871733, 1.0]
+  ✓ Loaded successfully
+Patient 57/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat45
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00025882683, 1.0]
+  ✓ Loaded successfully
+Patient 58/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat46
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00057269057, 1.0]
+  ✓ Loaded successfully
+Patient 59/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat47
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0005652307, 1.0]
+  ✓ Loaded successfully
+Patient 60/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat48
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00027265926, 1.0]
+  ✓ Loaded successfully
+Patient 61/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat49
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 203) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00048145157, 1.0]
+  ✓ Loaded successfully
+Patient 62/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat5
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00082517555, 1.0]
+  ✓ Loaded successfully
+Patient 63/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat50
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00072086003, 1.0]
+  ✓ Loaded successfully
+Patient 64/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat51
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-5.2766187e-5, 1.0]
+  ✓ Loaded successfully
+Patient 65/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat52
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00026112163, 1.0]
+  ✓ Loaded successfully
+Patient 66/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat53
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0005164607, 1.0]
+  ✓ Loaded successfully
+Patient 67/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat54
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00020989394, 1.0]
+  ✓ Loaded successfully
+Patient 68/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat55
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0009105039, 1.0]
+  ✓ Loaded successfully
+Patient 69/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat56
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0002858778, 1.0]
+  ✓ Loaded successfully
+Patient 70/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat58
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0003176064, 1.0]
+  ✓ Loaded successfully
+Patient 71/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat6
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 203) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-8.409419e-5, 1.0]
+  ✓ Loaded successfully
+Patient 72/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat60
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0003830727, 1.0]
+  ✓ Loaded successfully
+Patient 73/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat61
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00010120776, 1.0]
+  ✓ Loaded successfully
+Patient 74/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat64
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00097367994, 1.0]
+  ✓ Loaded successfully
+Patient 75/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat65
+Patient 76/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat67
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 405) CT=(512, 512, 200) Dose=(256, 256, 405)
+  Resampling SPECT to spacing (2.4600000381469727, 2.4600000381469727, 3.891796935349703)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0007223387, 1.0]
+  ✓ Loaded successfully
+Patient 77/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat68
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 203) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.000112856505, 1.0]
+  ✓ Loaded successfully
+Patient 78/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat7
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00015340802, 1.0]
+  ✓ Loaded successfully
+Patient 79/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat74
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 203) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00073926686, 1.0]
+  ✓ Loaded successfully
+Patient 80/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat75
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00025934368, 1.0]
+  ✓ Loaded successfully
+Patient 81/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat76
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0005164747, 1.0]
+  ✓ Loaded successfully
+Patient 82/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat79
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 203) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00018592307, 1.0]
+  ✓ Loaded successfully
+Patient 83/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat8
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-5.6071556e-5, 1.0]
+  ✓ Loaded successfully
+Patient 84/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat82
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0002872106, 1.0]
+  ✓ Loaded successfully
+Patient 85/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat83
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00035981365, 1.0]
+  ✓ Loaded successfully
+Patient 86/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat84
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00017327332, 1.0]
+  ✓ Loaded successfully
+Patient 87/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat86
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00024892163, 1.0]
+  ✓ Loaded successfully
+Patient 88/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat87
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 203) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00094607554, 1.0]
+  ✓ Loaded successfully
+Patient 89/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat88
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00030223548, 1.0]
+  ✓ Loaded successfully
+Patient 90/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat89
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 203) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0010092297, 1.0]
+  ✓ Loaded successfully
+Patient 91/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat9
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0019071046, 1.0]
+  ✓ Loaded successfully
+Patient 92/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat90
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0004269872, 1.0]
+  ✓ Loaded successfully
+Patient 93/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat91
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00052672933, 1.0]
+  ✓ Loaded successfully
+Patient 94/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat93
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 300) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0005112303, 1.0]
+  ✓ Loaded successfully
+Patient 95/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat94
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00057707675, 1.0]
+  ✓ Loaded successfully
+Patient 96/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat96
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00035660347, 1.0]
+  ✓ Loaded successfully
+Patient 97/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat97
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 3.6601005122065544)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.0009552135, 1.0]
+  ✓ Loaded successfully
+Patient 98/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat98
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00063666474, 1.0]
+  ✓ Loaded successfully
+Patient 99/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_10__Pat2
+Patient 100/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_10__Pat25
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (2.209872007369995, 2.209872007369995, 5.0671674543991685)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(256, 256, 256) CT=(256, 256, 256) Dose=(256, 256, 256)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00014188192, 1.0]
+  ✓ Loaded successfully
+Successfully loaded 94/100 patients.
+
+=== Starting training for UDE Hybrid Model (High-Res GPU) ===
+Using Device: CUDADevice{Nothing, Missing}(nothing)
+  Batch 5 - Current Loss: 0.04671734
+  Batch 10 - Current Loss: 0.0133631835
+  Batch 15 - Current Loss: 0.002575279
+  Batch 20 - Current Loss: 0.0016797825
+  Batch 25 - Current Loss: 0.0017470885
+  Batch 30 - Current Loss: 0.0015519463
+  Batch 35 - Current Loss: 0.0012660023
+  Batch 40 - Current Loss: 0.00085036963
+  Batch 45 - Current Loss: 0.0008768624
+  Batch 50 - Current Loss: 0.0005935742
+  Batch 55 - Current Loss: 0.0006281894
+  Batch 60 - Current Loss: 0.00051891775
+  Batch 65 - Current Loss: 7.5673797e-6
+  Batch 70 - Current Loss: 0.0006198813
+  Batch 75 - Current Loss: 0.0005806809
+  Batch 80 - Current Loss: 0.00038325303
+  Batch 85 - Current Loss: 0.0003695971
+  Batch 90 - Current Loss: 0.00036858968
+  Batch 95 - Current Loss: 0.00034758254
+  Batch 100 - Current Loss: 0.00040409382
+Epoch 1/100 - Average Loss: 0.0066915861618508645
+  Batch 5 - Current Loss: 0.0003775955
+  Batch 10 - Current Loss: 0.0003802355
+  Batch 15 - Current Loss: 0.0002830782
+  Batch 20 - Current Loss: 0.00042022468
+  Batch 25 - Current Loss: 0.00029388623
+  Batch 30 - Current Loss: 0.0002771102
+  Batch 35 - Current Loss: 0.00034960825
+  Batch 40 - Current Loss: 0.000349134
+  Batch 45 - Current Loss: 0.00030854475
+  Batch 50 - Current Loss: 0.00033293688
+  Batch 55 - Current Loss: 0.00044668032
+  Batch 60 - Current Loss: 0.0002949042
+  Batch 65 - Current Loss: 0.00022683304
+  Batch 70 - Current Loss: 0.00026415603
+  Batch 75 - Current Loss: 0.00029028291
+  Batch 80 - Current Loss: 7.001526e-6
+  Batch 85 - Current Loss: 6.0337516e-6
+  Batch 90 - Current Loss: 0.0002109599
+  Batch 95 - Current Loss: 0.00024992024
+  Batch 100 - Current Loss: 0.00020235067
+Epoch 2/100 - Average Loss: 0.00027960171006270686
+  Batch 5 - Current Loss: 0.0003020186
+  Batch 10 - Current Loss: 0.00021395164
+  Batch 15 - Current Loss: 0.0003245695
+  Batch 20 - Current Loss: 0.00020823756
+  Batch 25 - Current Loss: 0.00020457637
+  Batch 30 - Current Loss: 0.00016997317
+  Batch 35 - Current Loss: 0.00020021055
+  Batch 40 - Current Loss: 0.00022227688
+  Batch 45 - Current Loss: 0.0001607728
+  Batch 50 - Current Loss: 0.00019074747
+  Batch 55 - Current Loss: 0.00011819361
+  Batch 60 - Current Loss: 0.00022587049
+  Batch 65 - Current Loss: 0.00018004148
+  Batch 70 - Current Loss: 0.00014773541
+  Batch 75 - Current Loss: 0.00012016849
+  Batch 80 - Current Loss: 9.320414e-5
+  Batch 85 - Current Loss: 0.00012451322
+  Batch 90 - Current Loss: 0.00010747631
+  Batch 95 - Current Loss: 0.000112966336
+  Batch 100 - Current Loss: 0.0001785348
+Epoch 3/100 - Average Loss: 0.00017822392438120006
+  Batch 5 - Current Loss: 0.00014062713
+  Batch 10 - Current Loss: 0.000110775356
+  Batch 15 - Current Loss: 0.00014637719
+  Batch 20 - Current Loss: 9.761449e-5
+  Batch 25 - Current Loss: 0.00012542374
+  Batch 30 - Current Loss: 0.0001262805
+  Batch 35 - Current Loss: 7.497201e-5
+  Batch 40 - Current Loss: 0.00012274238
+  Batch 45 - Current Loss: 8.254688e-5
+  Batch 50 - Current Loss: 0.00010328206
+  Batch 55 - Current Loss: 0.00014107516
+  Batch 60 - Current Loss: 8.633019e-5
+  Batch 65 - Current Loss: 0.00018837946
+  Batch 70 - Current Loss: 7.9854304e-5
+  Batch 75 - Current Loss: 0.00018266981
+  Batch 80 - Current Loss: 0.0001746137
+  Batch 85 - Current Loss: 4.0972745e-6
+  Batch 90 - Current Loss: 0.00012510591
+  Batch 95 - Current Loss: 0.00011823174
+  Batch 100 - Current Loss: 8.8037734e-5
+Epoch 4/100 - Average Loss: 0.00012677741708102985
+  Batch 5 - Current Loss: 6.317583e-5
+  Batch 10 - Current Loss: 0.000112550086
+  Batch 15 - Current Loss: 0.00020592836
+  Batch 20 - Current Loss: 0.00021987858
+  Batch 25 - Current Loss: 3.4710474e-6
+  Batch 30 - Current Loss: 3.8977655e-6
+  Batch 35 - Current Loss: 8.8362445e-5
+  Batch 40 - Current Loss: 6.4197884e-5
+  Batch 45 - Current Loss: 6.4464286e-5
+  Batch 50 - Current Loss: 0.00012913125
+  Batch 55 - Current Loss: 8.79471e-5
+  Batch 60 - Current Loss: 7.765746e-5
+  Batch 65 - Current Loss: 9.206284e-5
+  Batch 70 - Current Loss: 0.00011408137
+  Batch 75 - Current Loss: 0.00014536666
+  Batch 80 - Current Loss: 0.00016095095
+  Batch 85 - Current Loss: 4.8823622e-5
+  Batch 90 - Current Loss: 5.073141e-5
+  Batch 95 - Current Loss: 5.0819814e-5
+  Batch 100 - Current Loss: 0.0001250166
+Epoch 5/100 - Average Loss: 9.779975694300447e-5
+  Batch 5 - Current Loss: 0.00011708147
+  Batch 10 - Current Loss: 0.00014900176
+  Batch 15 - Current Loss: 6.9946254e-5
+  Batch 20 - Current Loss: 2.951784e-5
+  Batch 25 - Current Loss: 2.9713017e-5
+  Batch 30 - Current Loss: 7.4972464e-5
+  Batch 35 - Current Loss: 2.5165089e-5
+  Batch 40 - Current Loss: 3.418661e-5
+  Batch 45 - Current Loss: 6.657501e-5
+  Batch 50 - Current Loss: 5.007998e-5
+  Batch 55 - Current Loss: 3.808429e-5
+  Batch 60 - Current Loss: 7.178408e-5
+  Batch 65 - Current Loss: 2.0738138e-5
+  Batch 70 - Current Loss: 0.00015879022
+  Batch 75 - Current Loss: 3.4830144e-5
+  Batch 80 - Current Loss: 7.1536575e-5
+  Batch 85 - Current Loss: 0.00017306316
+  Batch 90 - Current Loss: 0.000134058
+  Batch 95 - Current Loss: 0.00014496058
+  Batch 100 - Current Loss: 2.846918e-5
+Epoch 6/100 - Average Loss: 6.474516511616457e-5
+  Batch 5 - Current Loss: 1.9730795e-5
+  Batch 10 - Current Loss: 1.6648088e-5
+  Batch 15 - Current Loss: 0.0001403445
+  Batch 20 - Current Loss: 6.0312803e-5
+  Batch 25 - Current Loss: 0.000146468
+  Batch 30 - Current Loss: 0.00013316475
+  Batch 35 - Current Loss: 4.0962095e-5
+  Batch 40 - Current Loss: 3.1606647e-5
+  Batch 45 - Current Loss: 2.980847e-5
+  Batch 50 - Current Loss: 2.3779923e-5
+  Batch 55 - Current Loss: 4.3069733e-5
+  Batch 60 - Current Loss: 1.437375e-5
+  Batch 65 - Current Loss: 2.8478475e-5
+  Batch 70 - Current Loss: 4.543784e-5
+  Batch 75 - Current Loss: 1.4463567e-5
+  Batch 80 - Current Loss: 1.4458803e-5
+  Batch 85 - Current Loss: 2.119218e-5
+  Batch 90 - Current Loss: 9.105842e-5
+  Batch 95 - Current Loss: 0.00026668696
+  Batch 100 - Current Loss: 8.9825786e-5
+Epoch 7/100 - Average Loss: 5.057769423274294e-5
+  Batch 5 - Current Loss: 5.3565185e-5
+  Batch 10 - Current Loss: 3.5035846e-5
+  Batch 15 - Current Loss: 6.395098e-5
+  Batch 20 - Current Loss: 2.379707e-5
+  Batch 25 - Current Loss: 4.90984e-5
+  Batch 30 - Current Loss: 3.290786e-5
+  Batch 35 - Current Loss: 1.4428077e-5
+  Batch 40 - Current Loss: 3.657478e-5
+  Batch 45 - Current Loss: 2.532374e-5
+  Batch 50 - Current Loss: 4.3085947e-5
+  Batch 55 - Current Loss: 5.6521567e-5
+  Batch 60 - Current Loss: 3.5463654e-5
+  Batch 65 - Current Loss: 1.6530981e-5
+  Batch 70 - Current Loss: 1.5813972e-5
+  Batch 75 - Current Loss: 1.892182e-5
+  Batch 80 - Current Loss: 1.8368153e-5
+  Batch 85 - Current Loss: 0.00016559719
+  Batch 90 - Current Loss: 0.00016551136
+  Batch 95 - Current Loss: 2.127328e-5
+  Batch 100 - Current Loss: 1.2123187e-5
+Epoch 8/100 - Average Loss: 5.109235618192542e-5
+  Batch 5 - Current Loss: 2.7017271e-5
+  Batch 10 - Current Loss: 4.3449007e-5
+  Batch 15 - Current Loss: 0.000100592435
+  Batch 20 - Current Loss: 1.8931574e-5
+  Batch 25 - Current Loss: 6.0038e-5
+  Batch 30 - Current Loss: 4.820108e-5
+  Batch 35 - Current Loss: 3.0116034e-5
+  Batch 40 - Current Loss: 5.1910774e-5
+  Batch 45 - Current Loss: 2.577807e-5
+  Batch 50 - Current Loss: 0.00013484019
+  Batch 55 - Current Loss: 0.00015558569
+  Batch 60 - Current Loss: 2.0447438e-5
+  Batch 65 - Current Loss: 3.897535e-5
+  Batch 70 - Current Loss: 1.829726e-5
+  Batch 75 - Current Loss: 7.541561e-6
+  Batch 80 - Current Loss: 2.9844397e-5
+  Batch 85 - Current Loss: 1.5255002e-5
+  Batch 90 - Current Loss: 9.215282e-5
+  Batch 95 - Current Loss: 5.5826327e-5
+  Batch 100 - Current Loss: 5.8481874e-5
+Epoch 9/100 - Average Loss: 4.518130360224859e-5
+  Batch 5 - Current Loss: 1.00283405e-5
+  Batch 10 - Current Loss: 1.2549748e-5
+  Batch 15 - Current Loss: 8.1546576e-5
+  Batch 20 - Current Loss: 0.00019285199
+  Batch 25 - Current Loss: 3.4386256e-5
+  Batch 30 - Current Loss: 1.4390213e-5
+  Batch 35 - Current Loss: 1.7500621e-6
+  Batch 40 - Current Loss: 8.524016e-6
+  Batch 45 - Current Loss: 1.7169277e-5
+  Batch 50 - Current Loss: 4.217617e-5
+  Batch 55 - Current Loss: 8.069314e-5
+  Batch 60 - Current Loss: 1.9285006e-5
+  Batch 65 - Current Loss: 8.158739e-5
+  Batch 70 - Current Loss: 3.7815407e-5
+  Batch 75 - Current Loss: 3.465123e-5
+  Batch 80 - Current Loss: 3.6009616e-5
+  Batch 85 - Current Loss: 6.8121786e-5
+  Batch 90 - Current Loss: 3.5951525e-5
+  Batch 95 - Current Loss: 9.4920026e-5
+  Batch 100 - Current Loss: 0.0001331861
+Epoch 10/100 - Average Loss: 4.02212890719511e-5
+  Batch 5 - Current Loss: 3.3903965e-5
+  Batch 10 - Current Loss: 5.875094e-5
+  Batch 15 - Current Loss: 1.268422e-5
+  Batch 20 - Current Loss: 5.286104e-5
+  Batch 25 - Current Loss: 2.7223355e-6
+  Batch 30 - Current Loss: 1.668539e-5
+  Batch 35 - Current Loss: 0.00018884637
+  Batch 40 - Current Loss: 2.490177e-5
+  Batch 45 - Current Loss: 3.97796e-5
+  Batch 50 - Current Loss: 2.9960362e-5
+  Batch 55 - Current Loss: 1.5175226e-5
+  Batch 60 - Current Loss: 2.4760171e-5
+  Batch 65 - Current Loss: 2.9604198e-5
+  Batch 70 - Current Loss: 7.435469e-5
+  Batch 75 - Current Loss: 2.3927096e-5
+  Batch 80 - Current Loss: 1.9139825e-5
+  Batch 85 - Current Loss: 1.4095727e-5
+  Batch 90 - Current Loss: 2.6043066e-5
+  Batch 95 - Current Loss: 1.3830906e-5
+  Batch 100 - Current Loss: 1.0349885e-5
+Epoch 11/100 - Average Loss: 4.364328139558893e-5
+  Batch 5 - Current Loss: 3.118323e-5
+  Batch 10 - Current Loss: 3.864407e-5
+  Batch 15 - Current Loss: 0.00012953952
+  Batch 20 - Current Loss: 1.382823e-5
+  Batch 25 - Current Loss: 3.44319e-5
+  Batch 30 - Current Loss: 2.9529841e-5
+  Batch 35 - Current Loss: 6.9699476e-5
+  Batch 40 - Current Loss: 9.886644e-7
+  Batch 45 - Current Loss: 1.2302548e-5
+  Batch 50 - Current Loss: 5.2174284e-5
+  Batch 55 - Current Loss: 1.3246445e-5
+  Batch 60 - Current Loss: 1.3570964e-5
+  Batch 65 - Current Loss: 7.702411e-5
+  Batch 70 - Current Loss: 4.5037094e-5
+  Batch 75 - Current Loss: 5.86797e-6
+  Batch 80 - Current Loss: 0.00013427663
+  Batch 85 - Current Loss: 9.582252e-6
+  Batch 90 - Current Loss: 2.1557675e-5
+  Batch 95 - Current Loss: 0.00019885317
+  Batch 100 - Current Loss: 5.158279e-5
+Epoch 12/100 - Average Loss: 4.468777767442589e-5
+  Batch 5 - Current Loss: 5.7173647e-6
+  Batch 10 - Current Loss: 8.241487e-6
+  Batch 15 - Current Loss: 1.643215e-5
+  Batch 20 - Current Loss: 6.5321404e-7
+  Batch 25 - Current Loss: 7.036782e-6
+  Batch 30 - Current Loss: 6.2884087e-6
+  Batch 35 - Current Loss: 2.7738099e-5
+  Batch 40 - Current Loss: 7.88689e-5
+  Batch 45 - Current Loss: 1.1457507e-5
+  Batch 50 - Current Loss: 7.289943e-6
+  Batch 55 - Current Loss: 7.611875e-5
+  Batch 60 - Current Loss: 0.00015696516
+  Batch 65 - Current Loss: 1.3408879e-5
+  Batch 70 - Current Loss: 1.2268576e-5
+  Batch 75 - Current Loss: 1.0206278e-5
+  Batch 80 - Current Loss: 3.9053644e-5
+  Batch 85 - Current Loss: 1.0034153e-5
+  Batch 90 - Current Loss: 4.385354e-5
+  Batch 95 - Current Loss: 3.0837153e-5
+  Batch 100 - Current Loss: 6.3048166e-5
+Epoch 13/100 - Average Loss: 3.809623527843087e-5
+  Batch 5 - Current Loss: 7.8757774e-5
+  Batch 10 - Current Loss: 4.790246e-5
+  Batch 15 - Current Loss: 1.3084874e-5
+  Batch 20 - Current Loss: 1.3257033e-5
+  Batch 25 - Current Loss: 1.307045e-5
+  Batch 30 - Current Loss: 5.5725883e-5
+  Batch 35 - Current Loss: 4.171469e-5
+  Batch 40 - Current Loss: 2.1056896e-5
+  Batch 45 - Current Loss: 0.00013329551
+  Batch 50 - Current Loss: 7.59351e-5
+  Batch 55 - Current Loss: 2.2711352e-5
+  Batch 60 - Current Loss: 6.8356334e-5
+  Batch 65 - Current Loss: 1.3922967e-5
+  Batch 70 - Current Loss: 2.7647864e-5
+  Batch 75 - Current Loss: 3.564226e-5
+  Batch 80 - Current Loss: 7.512339e-6
+  Batch 85 - Current Loss: 0.00016518409
+  Batch 90 - Current Loss: 1.6205275e-5
+  Batch 95 - Current Loss: 9.432505e-6
+  Batch 100 - Current Loss: 8.894454e-6
+Epoch 14/100 - Average Loss: 3.916909298339988e-5
+  Batch 5 - Current Loss: 5.0521183e-5
+  Batch 10 - Current Loss: 1.1042338e-5
+  Batch 15 - Current Loss: 4.9584174e-5
+  Batch 20 - Current Loss: 2.4903622e-7
+  Batch 25 - Current Loss: 4.1189698e-5
+  Batch 30 - Current Loss: 1.0142473e-5
+  Batch 35 - Current Loss: 1.2708149e-5
+  Batch 40 - Current Loss: 1.6119651e-5
+  Batch 45 - Current Loss: 2.550552e-7
+  Batch 50 - Current Loss: 0.00010166886
+  Batch 55 - Current Loss: 9.900685e-6
+  Batch 60 - Current Loss: 6.743539e-5
+  Batch 65 - Current Loss: 7.3348574e-6
+  Batch 70 - Current Loss: 1.6688698e-5
+  Batch 75 - Current Loss: 1.600258e-5
+  Batch 80 - Current Loss: 2.6295234e-5
+  Batch 85 - Current Loss: 0.00014556375
+  Batch 90 - Current Loss: 6.470908e-5
+  Batch 95 - Current Loss: 1.2296535e-5
+  Batch 100 - Current Loss: 4.820178e-7
+Epoch 15/100 - Average Loss: 3.694416664984601e-5
+  Batch 5 - Current Loss: 1.4308117e-5
+  Batch 10 - Current Loss: 2.222304e-5
+  Batch 15 - Current Loss: 0.00013850612
+  Batch 20 - Current Loss: 4.177758e-6
+  Batch 25 - Current Loss: 1.2578098e-5
+  Batch 30 - Current Loss: 9.8396295e-6
+  Batch 35 - Current Loss: 5.8836413e-6
+  Batch 40 - Current Loss: 8.847167e-6
+  Batch 45 - Current Loss: 1.86237e-5
+  Batch 50 - Current Loss: 2.2460148e-5
+  Batch 55 - Current Loss: 1.0432927e-5
+  Batch 60 - Current Loss: 1.2377556e-5
+  Batch 65 - Current Loss: 6.7056985e-6
+  Batch 70 - Current Loss: 1.4300567e-5
+  Batch 75 - Current Loss: 4.8021342e-5
+  Batch 80 - Current Loss: 8.786747e-6
+  Batch 85 - Current Loss: 1.9213943e-5
+  Batch 90 - Current Loss: 4.881694e-6
+  Batch 95 - Current Loss: 1.3314446e-5
+  Batch 100 - Current Loss: 2.960757e-5
+Epoch 16/100 - Average Loss: 3.79319342194151e-5
+  Batch 5 - Current Loss: 4.5373956e-5
+  Batch 10 - Current Loss: 1.6543687e-5
+  Batch 15 - Current Loss: 1.42441895e-5
+  Batch 20 - Current Loss: 4.36514e-5
+  Batch 25 - Current Loss: 1.089303e-5
+  Batch 30 - Current Loss: 1.0890348e-5
+  Batch 35 - Current Loss: 8.29011e-5
+  Batch 40 - Current Loss: 1.27311505e-5
+  Batch 45 - Current Loss: 5.1384464e-5
+  Batch 50 - Current Loss: 8.273934e-6
+  Batch 55 - Current Loss: 4.786079e-5
+  Batch 60 - Current Loss: 3.0541887e-5
+  Batch 65 - Current Loss: 2.329169e-8
+  Batch 70 - Current Loss: 2.8936707e-5
+  Batch 75 - Current Loss: 6.8567656e-6
+  Batch 80 - Current Loss: 3.479429e-6
+  Batch 85 - Current Loss: 8.292045e-6
+  Batch 90 - Current Loss: 1.3750651e-5
+  Batch 95 - Current Loss: 3.7886969e-6
+  Batch 100 - Current Loss: 1.9602599e-6
+Epoch 17/100 - Average Loss: 3.802169497923558e-5
+  Batch 5 - Current Loss: 3.3041848e-5
+  Batch 10 - Current Loss: 1.0106037e-5
+  Batch 15 - Current Loss: 1.0476659e-5
+  Batch 20 - Current Loss: 2.8075166e-5
+  Batch 25 - Current Loss: 2.981941e-6
+  Batch 30 - Current Loss: 3.0830444e-5
+  Batch 35 - Current Loss: 2.234611e-6
+  Batch 40 - Current Loss: 2.4524254e-5
+  Batch 45 - Current Loss: 5.1620234e-5
+  Batch 50 - Current Loss: 5.1533832e-5
+  Batch 55 - Current Loss: 7.3496075e-8
+  Batch 60 - Current Loss: 8.626205e-5
+  Batch 65 - Current Loss: 6.602064e-6
+  Batch 70 - Current Loss: 8.766065e-6
+  Batch 75 - Current Loss: 1.0083312e-5
+  Batch 80 - Current Loss: 1.9657444e-5
+  Batch 85 - Current Loss: 4.555558e-6
+  Batch 90 - Current Loss: 1.3846383e-6
+  Batch 95 - Current Loss: 7.3161327e-6
+  Batch 100 - Current Loss: 3.3649064e-6
+Epoch 18/100 - Average Loss: 3.5104968914136946e-5
+  Batch 5 - Current Loss: 1.2910341e-5
+  Batch 10 - Current Loss: 8.5757594e-5
+  Batch 15 - Current Loss: 3.3034463e-5
+  Batch 20 - Current Loss: 8.686192e-5
+  Batch 25 - Current Loss: 1.5549628e-6
+  Batch 30 - Current Loss: 6.599471e-5
+  Batch 35 - Current Loss: 5.962999e-5
+  Batch 40 - Current Loss: 1.9614534e-5
+  Batch 45 - Current Loss: 3.1888005e-6
+  Batch 50 - Current Loss: 3.293141e-5
+  Batch 55 - Current Loss: 0.00018028758
+  Batch 60 - Current Loss: 8.214216e-5
+  Batch 65 - Current Loss: 3.9722668e-6
+  Batch 70 - Current Loss: 1.717879e-5
+  Batch 75 - Current Loss: 3.2828261e-6
+  Batch 80 - Current Loss: 2.9603461e-5
+  Batch 85 - Current Loss: 1.590405e-6
+  Batch 90 - Current Loss: 6.5252125e-6
+  Batch 95 - Current Loss: 4.7088593e-6
+  Batch 100 - Current Loss: 9.609812e-5
+Epoch 19/100 - Average Loss: 3.487823100085663e-5
+  Batch 5 - Current Loss: 5.1288353e-6
+  Batch 10 - Current Loss: 2.4292362e-5
+  Batch 15 - Current Loss: 6.129701e-5
+  Batch 20 - Current Loss: 1.6705735e-5
+  Batch 25 - Current Loss: 1.05811905e-5
+  Batch 30 - Current Loss: 4.913521e-6
+  Batch 35 - Current Loss: 8.266157e-5
+  Batch 40 - Current Loss: 5.865146e-6
+  Batch 45 - Current Loss: 1.4520332e-8
+  Batch 50 - Current Loss: 4.078655e-6
+  Batch 55 - Current Loss: 6.3277726e-6
+  Batch 60 - Current Loss: 4.165646e-5
+  Batch 65 - Current Loss: 6.487452e-6
+  Batch 70 - Current Loss: 6.869779e-5
+  Batch 75 - Current Loss: 2.1877117e-5
+  Batch 80 - Current Loss: 9.1106405e-5
+  Batch 85 - Current Loss: 6.2954214e-6
+  Batch 90 - Current Loss: 1.2932439e-5
+  Batch 95 - Current Loss: 4.5227484e-8
+  Batch 100 - Current Loss: 3.5581237e-5
+Epoch 20/100 - Average Loss: 3.514846020761908e-5
+  Batch 5 - Current Loss: 8.752613e-6
+  Batch 10 - Current Loss: 1.1398263e-5
+  Batch 15 - Current Loss: 5.018599e-6
+  Batch 20 - Current Loss: 4.4615612e-5
+  Batch 25 - Current Loss: 2.1528938e-6
+  Batch 30 - Current Loss: 1.9768071e-5
+  Batch 35 - Current Loss: 4.9266742e-5
+  Batch 40 - Current Loss: 2.0739166e-5
+  Batch 45 - Current Loss: 2.4077097e-5
+  Batch 50 - Current Loss: 1.1924703e-6
+  Batch 55 - Current Loss: 2.8396578e-5
+  Batch 60 - Current Loss: 3.6935286e-5
+  Batch 65 - Current Loss: 4.959745e-6
+  Batch 70 - Current Loss: 0.00013847613
+  Batch 75 - Current Loss: 0.00014128404
+  Batch 80 - Current Loss: 9.571006e-5
+  Batch 85 - Current Loss: 2.385282e-5
+  Batch 90 - Current Loss: 7.870838e-6
+  Batch 95 - Current Loss: 4.2056312e-5
+  Batch 100 - Current Loss: 7.045484e-6
+Epoch 21/100 - Average Loss: 3.426122347336858e-5
+  Batch 5 - Current Loss: 1.1495479e-5
+  Batch 10 - Current Loss: 4.494596e-5
+  Batch 15 - Current Loss: 8.424693e-6
+  Batch 20 - Current Loss: 2.996109e-5
+  Batch 25 - Current Loss: 5.8121943e-5
+  Batch 30 - Current Loss: 4.679142e-6
+  Batch 35 - Current Loss: 7.564147e-8
+  Batch 40 - Current Loss: 8.490022e-6
+  Batch 45 - Current Loss: 3.9800016e-5
+  Batch 50 - Current Loss: 1.0607274e-5
+  Batch 55 - Current Loss: 1.0375017e-5
+  Batch 60 - Current Loss: 8.729185e-6
+  Batch 65 - Current Loss: 6.091906e-5
+  Batch 70 - Current Loss: 1.1144103e-5
+  Batch 75 - Current Loss: 4.4389057e-5
+  Batch 80 - Current Loss: 2.9099352e-5
+  Batch 85 - Current Loss: 6.028083e-8
+  Batch 90 - Current Loss: 1.9715808e-6
+  Batch 95 - Current Loss: 4.5556867e-6
+  Batch 100 - Current Loss: 2.6398257e-6
+Epoch 22/100 - Average Loss: 3.4867355417498306e-5
+  Batch 5 - Current Loss: 8.3989735e-6
+  Batch 10 - Current Loss: 3.441839e-5
+  Batch 15 - Current Loss: 0.00010070967
+  Batch 20 - Current Loss: 9.46113e-9
+  Batch 25 - Current Loss: 2.9333696e-6
+  Batch 30 - Current Loss: 5.5651846e-5
+  Batch 35 - Current Loss: 3.0458792e-5
+  Batch 40 - Current Loss: 1.5518479e-5
+  Batch 45 - Current Loss: 3.598241e-6
+  Batch 50 - Current Loss: 2.335437e-5
+  Batch 55 - Current Loss: 2.9829222e-5
+  Batch 60 - Current Loss: 5.5046285e-6
+  Batch 65 - Current Loss: 9.154398e-6
+  Batch 70 - Current Loss: 1.4433034e-5
+  Batch 75 - Current Loss: 1.1031319e-5
+  Batch 80 - Current Loss: 9.821993e-5
+  Batch 85 - Current Loss: 4.0196308e-5
+  Batch 90 - Current Loss: 5.0494047e-5
+  Batch 95 - Current Loss: 4.640212e-5
+  Batch 100 - Current Loss: 4.304942e-6
+Epoch 23/100 - Average Loss: 3.4362424692266916e-5
+  Batch 5 - Current Loss: 2.852271e-5
+  Batch 10 - Current Loss: 2.5810998e-5
+  Batch 15 - Current Loss: 5.8738588e-5
+  Batch 20 - Current Loss: 0.000106422434
+  Batch 25 - Current Loss: 1.112873e-5
+  Batch 30 - Current Loss: 2.898723e-5
+  Batch 35 - Current Loss: 7.624751e-5
+  Batch 40 - Current Loss: 1.9206695e-5
+  Batch 45 - Current Loss: 3.1148418e-6
+  Batch 50 - Current Loss: 1.3097187e-5
+  Batch 55 - Current Loss: 1.06806265e-5
+  Batch 60 - Current Loss: 0.00013170503
+  Batch 65 - Current Loss: 6.66094e-5
+  Batch 70 - Current Loss: 6.501783e-5
+  Batch 75 - Current Loss: 4.8386602e-5
+  Batch 80 - Current Loss: 1.27416575e-8
+  Batch 85 - Current Loss: 1.6059323e-6
+  Batch 90 - Current Loss: 5.151863e-9
+  Batch 95 - Current Loss: 1.0954164e-5
+  Batch 100 - Current Loss: 3.4990367e-6
+Epoch 24/100 - Average Loss: 3.458071789449679e-5
+  Batch 5 - Current Loss: 1.5228153e-5
+  Batch 10 - Current Loss: 6.474087e-5
+  Batch 15 - Current Loss: 3.460576e-5
+  Batch 20 - Current Loss: 3.7115242e-5
+  Batch 25 - Current Loss: 0.00010456376
+  Batch 30 - Current Loss: 1.1151763e-5
+  Batch 35 - Current Loss: 5.017483e-6
+  Batch 40 - Current Loss: 1.9750329e-5
+  Batch 45 - Current Loss: 0.000101402125
+  Batch 50 - Current Loss: 2.2515782e-5
+  Batch 55 - Current Loss: 6.501551e-5
+  Batch 60 - Current Loss: 0.00011598964
+  Batch 65 - Current Loss: 4.4117907e-5
+  Batch 70 - Current Loss: 6.7054127e-9
+  Batch 75 - Current Loss: 0.00012764429
+  Batch 80 - Current Loss: 5.9693148e-6
+  Batch 85 - Current Loss: 4.9960786e-6
+  Batch 90 - Current Loss: 0.000119839584
+  Batch 95 - Current Loss: 0.0001700267
+  Batch 100 - Current Loss: 4.6578152e-5
+Epoch 25/100 - Average Loss: 3.435709388916131e-5
+  Batch 5 - Current Loss: 1.9129255e-5
+  Batch 10 - Current Loss: 1.4713714e-8
+  Batch 15 - Current Loss: 8.932827e-6
+  Batch 20 - Current Loss: 2.9023526e-5
+  Batch 25 - Current Loss: 6.491157e-5
+  Batch 30 - Current Loss: 1.3620587e-5
+  Batch 35 - Current Loss: 4.126173e-6
+  Batch 40 - Current Loss: 5.7932142e-5
+  Batch 45 - Current Loss: 8.670735e-6
+  Batch 50 - Current Loss: 3.8817037e-5
+  Batch 55 - Current Loss: 6.8959785e-6
+  Batch 60 - Current Loss: 7.4329128e-6
+  Batch 65 - Current Loss: 3.6331832e-5
+  Batch 70 - Current Loss: 4.877792e-6
+  Batch 75 - Current Loss: 8.848245e-6
+  Batch 80 - Current Loss: 4.891128e-5
+  Batch 85 - Current Loss: 7.774654e-5
+  Batch 90 - Current Loss: 3.1405085e-5
+  Batch 95 - Current Loss: 6.775075e-6
+  Batch 100 - Current Loss: 2.8665563e-5
+Epoch 26/100 - Average Loss: 3.379733225434833e-5
+  Batch 5 - Current Loss: 1.7143971e-5
+  Batch 10 - Current Loss: 8.986741e-6
+  Batch 15 - Current Loss: 3.367592e-5
+  Batch 20 - Current Loss: 4.0945088e-6
+  Batch 25 - Current Loss: 2.8519156e-5
+  Batch 30 - Current Loss: 1.4397793e-5
+  Batch 35 - Current Loss: 6.4302662e-6
+  Batch 40 - Current Loss: 9.363332e-6
+  Batch 45 - Current Loss: 1.688198e-5
+  Batch 50 - Current Loss: 6.317525e-6
+  Batch 55 - Current Loss: 4.1077103e-5
+  Batch 60 - Current Loss: 3.786039e-6
+  Batch 65 - Current Loss: 4.5259094e-6
+  Batch 70 - Current Loss: 2.5727728e-5
+  Batch 75 - Current Loss: 1.0521631e-5
+  Batch 80 - Current Loss: 1.9848712e-5
+  Batch 85 - Current Loss: 0.00020049684
+  Batch 90 - Current Loss: 1.860735e-5
+  Batch 95 - Current Loss: 7.653572e-6
+  Batch 100 - Current Loss: 1.5738306e-6
+Epoch 27/100 - Average Loss: 3.474907239564562e-5
+  Batch 5 - Current Loss: 7.730185e-6
+  Batch 10 - Current Loss: 7.153807e-5
+  Batch 15 - Current Loss: 4.113727e-5
+  Batch 20 - Current Loss: 8.901339e-6
+  Batch 25 - Current Loss: 5.1781913e-5
+  Batch 30 - Current Loss: 9.5892705e-5
+  Batch 35 - Current Loss: 1.0496176e-5
+  Batch 40 - Current Loss: 0.00010251942
+  Batch 45 - Current Loss: 1.3339325e-5
+  Batch 50 - Current Loss: 1.8251987e-5
+  Batch 55 - Current Loss: 4.9866785e-6
+  Batch 60 - Current Loss: 5.183768e-6
+  Batch 65 - Current Loss: 7.3719406e-5
+  Batch 70 - Current Loss: 5.631002e-5
+  Batch 75 - Current Loss: 6.4049254e-6
+  Batch 80 - Current Loss: 2.7132403e-6
+  Batch 85 - Current Loss: 6.339272e-5
+  Batch 90 - Current Loss: 4.147977e-6
+  Batch 95 - Current Loss: 7.129653e-6
+  Batch 100 - Current Loss: 2.752905e-6
+Epoch 28/100 - Average Loss: 3.42439555251306e-5
+  Batch 5 - Current Loss: 2.8714074e-5
+  Batch 10 - Current Loss: 1.7036704e-5
+  Batch 15 - Current Loss: 7.161711e-6
+  Batch 20 - Current Loss: 5.5704477e-5
+  Batch 25 - Current Loss: 0.00011072755
+  Batch 30 - Current Loss: 5.172444e-5
+  Batch 35 - Current Loss: 0.000114475726
+  Batch 40 - Current Loss: 2.0364946e-6
+  Batch 45 - Current Loss: 6.66691e-5
+  Batch 50 - Current Loss: 1.6625005e-5
+  Batch 55 - Current Loss: 0.00018624742
+  Batch 60 - Current Loss: 1.7194257e-5
+  Batch 65 - Current Loss: 1.119285e-5
+  Batch 70 - Current Loss: 3.2117073e-6
+  Batch 75 - Current Loss: 3.9472648e-6
+  Batch 80 - Current Loss: 6.698934e-6
+  Batch 85 - Current Loss: 6.989241e-5
+  Batch 90 - Current Loss: 0.00019704041
+  Batch 95 - Current Loss: 6.315227e-6
+  Batch 100 - Current Loss: 1.5358787e-6
+Epoch 29/100 - Average Loss: 3.587919808704543e-5
+  Batch 5 - Current Loss: 1.7894126e-6
+  Batch 10 - Current Loss: 0.000109572116
+  Batch 15 - Current Loss: 7.9656595e-5
+  Batch 20 - Current Loss: 3.582275e-5
+  Batch 25 - Current Loss: 8.7321074e-5
+  Batch 30 - Current Loss: 0.000114293565
+  Batch 35 - Current Loss: 4.3815962e-5
+  Batch 40 - Current Loss: 6.73012e-5
+  Batch 45 - Current Loss: 1.6171698e-6
+  Batch 50 - Current Loss: 6.881411e-6
+  Batch 55 - Current Loss: 6.581734e-6
+  Batch 60 - Current Loss: 3.9213082e-6
+  Batch 65 - Current Loss: 1.4341084e-5
+  Batch 70 - Current Loss: 3.0547776e-6
+  Batch 75 - Current Loss: 9.341532e-6
+  Batch 80 - Current Loss: 5.052936e-6
+  Batch 85 - Current Loss: 6.343533e-5
+  Batch 90 - Current Loss: 8.80952e-5
+  Batch 95 - Current Loss: 5.3774285e-5
+  Batch 100 - Current Loss: 1.2605133e-5
+Epoch 30/100 - Average Loss: 3.4409053025687975e-5
+  Batch 5 - Current Loss: 1.2401822e-5
+  Batch 10 - Current Loss: 0.00011879673
+  Batch 15 - Current Loss: 1.6172208e-6
+  Batch 20 - Current Loss: 1.4417197e-5
+  Batch 25 - Current Loss: 1.6750564e-5
+  Batch 30 - Current Loss: 9.269048e-6
+  Batch 35 - Current Loss: 1.2989167e-6
+  Batch 40 - Current Loss: 4.4078868e-5
+  Batch 45 - Current Loss: 0.00013812118
+  Batch 50 - Current Loss: 5.012319e-6
+  Batch 55 - Current Loss: 2.5953415e-5
+  Batch 60 - Current Loss: 0.00020220215
+  Batch 65 - Current Loss: 1.2499557e-6
+  Batch 70 - Current Loss: 2.0945459e-8
+  Batch 75 - Current Loss: 9.0357225e-6
+  Batch 80 - Current Loss: 3.0182131e-5
+  Batch 85 - Current Loss: 4.626157e-5
+  Batch 90 - Current Loss: 0.00014230904
+  Batch 95 - Current Loss: 4.3823904e-5
+  Batch 100 - Current Loss: 0.0001362943
+Epoch 31/100 - Average Loss: 3.368389979126363e-5
+  Batch 5 - Current Loss: 8.4720545e-5
+  Batch 10 - Current Loss: 0.00017825108
+  Batch 15 - Current Loss: 8.1064145e-6
+  Batch 20 - Current Loss: 2.6320082e-5
+  Batch 25 - Current Loss: 8.098298e-6
+  Batch 30 - Current Loss: 7.080765e-6
+  Batch 35 - Current Loss: 5.339437e-5
+  Batch 40 - Current Loss: 8.3625404e-5
+  Batch 45 - Current Loss: 3.3165255e-5
+  Batch 50 - Current Loss: 5.164041e-5
+  Batch 55 - Current Loss: 9.306857e-6
+  Batch 60 - Current Loss: 6.66384e-6
+  Batch 65 - Current Loss: 9.479354e-6
+  Batch 70 - Current Loss: 2.2226894e-5
+  Batch 75 - Current Loss: 0.000105161045
+  Batch 80 - Current Loss: 2.7926972e-5
+  Batch 85 - Current Loss: 5.8194523e-6
+  Batch 90 - Current Loss: 3.213065e-8
+  Batch 95 - Current Loss: 2.102342e-5
+  Batch 100 - Current Loss: 7.0985225e-6
+Epoch 32/100 - Average Loss: 3.460892058300885e-5
+  Batch 5 - Current Loss: 0.00010028083
+  Batch 10 - Current Loss: 5.8432535e-5
+  Batch 15 - Current Loss: 0.00010502532
+  Batch 20 - Current Loss: 1.2018103e-5
+  Batch 25 - Current Loss: 6.488268e-5
+  Batch 30 - Current Loss: 4.9433298e-11
+  Batch 35 - Current Loss: 3.6657213e-5
+  Batch 40 - Current Loss: 6.0498664e-6
+  Batch 45 - Current Loss: 5.9077094e-5
+  Batch 50 - Current Loss: 1.8520803e-5
+  Batch 55 - Current Loss: 1.0326321e-5
+  Batch 60 - Current Loss: 1.4313153e-5
+  Batch 65 - Current Loss: 1.0671363e-5
+  Batch 70 - Current Loss: 3.3078788e-6
+  Batch 75 - Current Loss: 0.00015819937
+  Batch 80 - Current Loss: 4.7266803e-5
+  Batch 85 - Current Loss: 5.2040145e-5
+  Batch 90 - Current Loss: 4.9432465e-6
+  Batch 95 - Current Loss: 4.3772616e-6
+  Batch 100 - Current Loss: 6.534083e-6
+Epoch 33/100 - Average Loss: 3.5217348923372094e-5
+  Batch 5 - Current Loss: 5.3918706e-5
+  Batch 10 - Current Loss: 8.360357e-6
+  Batch 15 - Current Loss: 7.495718e-5
+  Batch 20 - Current Loss: 3.5454934e-5
+  Batch 25 - Current Loss: 7.223368e-5
+  Batch 30 - Current Loss: 3.7447826e-5
+  Batch 35 - Current Loss: 3.544546e-5
+  Batch 40 - Current Loss: 2.377617e-5
+  Batch 45 - Current Loss: 6.2164972e-6
+  Batch 50 - Current Loss: 1.9414629e-6
+  Batch 55 - Current Loss: 2.0468213e-5
+  Batch 60 - Current Loss: 9.662315e-6
+  Batch 65 - Current Loss: 8.307546e-5
+  Batch 70 - Current Loss: 5.1256095e-5
+  Batch 75 - Current Loss: 1.0568448e-7
+  Batch 80 - Current Loss: 1.0450596e-5
+  Batch 85 - Current Loss: 2.9516006e-5
+  Batch 90 - Current Loss: 0.00017011457
+  Batch 95 - Current Loss: 1.2041722e-5
+  Batch 100 - Current Loss: 0.0001204062
+Epoch 34/100 - Average Loss: 3.481472775473282e-5
+  Batch 5 - Current Loss: 1.8026707e-5
+  Batch 10 - Current Loss: 9.040414e-6
+  Batch 15 - Current Loss: 6.297392e-6
+  Batch 20 - Current Loss: 8.697552e-5
+  Batch 25 - Current Loss: 3.5210753e-5
+  Batch 30 - Current Loss: 1.23165955e-5
+  Batch 35 - Current Loss: 3.2289503e-5
+  Batch 40 - Current Loss: 0.0001580227
+  Batch 45 - Current Loss: 3.7293295e-5
+  Batch 50 - Current Loss: 2.6312513e-5
+  Batch 55 - Current Loss: 6.486215e-6
+  Batch 60 - Current Loss: 5.0636586e-6
+  Batch 65 - Current Loss: 5.2592284e-5
+  Batch 70 - Current Loss: 1.4879779e-5
+  Batch 75 - Current Loss: 2.8421893e-5
+  Batch 80 - Current Loss: 9.463505e-5
+  Batch 85 - Current Loss: 8.7582564e-5
+  Batch 90 - Current Loss: 5.7672838e-5
+  Batch 95 - Current Loss: 6.62166e-6
+  Batch 100 - Current Loss: 5.111027e-5
+Epoch 35/100 - Average Loss: 3.4433984002180384e-5
+  Batch 5 - Current Loss: 5.5525e-6
+  Batch 10 - Current Loss: 0.00018250087
+  Batch 15 - Current Loss: 8.929863e-6
+  Batch 20 - Current Loss: 8.603509e-6
+  Batch 25 - Current Loss: 1.7589886e-5
+  Batch 30 - Current Loss: 4.6674075e-5
+  Batch 35 - Current Loss: 6.786715e-6
+  Batch 40 - Current Loss: 1.1325478e-5
+  Batch 45 - Current Loss: 6.493259e-6
+  Batch 50 - Current Loss: 1.01668675e-5
+  Batch 55 - Current Loss: 9.573687e-5
+  Batch 60 - Current Loss: 6.6668406e-7
+  Batch 65 - Current Loss: 4.5380813e-5
+  Batch 70 - Current Loss: 0.00012757005
+  Batch 75 - Current Loss: 8.775416e-6
+  Batch 80 - Current Loss: 2.843443e-5
+  Batch 85 - Current Loss: 1.0670496e-5
+  Batch 90 - Current Loss: 2.6897294e-5
+  Batch 95 - Current Loss: 2.754028e-6
+  Batch 100 - Current Loss: 9.9009685e-6
+Epoch 36/100 - Average Loss: 3.469201623662821e-5
+  Batch 5 - Current Loss: 0.0001279719
+  Batch 10 - Current Loss: 1.2317576e-6
+  Batch 15 - Current Loss: 2.4184743e-5
+  Batch 20 - Current Loss: 6.996208e-5
+  Batch 25 - Current Loss: 5.7823818e-5
+  Batch 30 - Current Loss: 0.00010704408
+  Batch 35 - Current Loss: 2.629609e-6
+  Batch 40 - Current Loss: 7.944387e-6
+  Batch 45 - Current Loss: 4.485965e-5
+  Batch 50 - Current Loss: 0.00011292763
+  Batch 55 - Current Loss: 1.962003e-7
+  Batch 60 - Current Loss: 3.9146733e-5
+  Batch 65 - Current Loss: 4.5164146e-5
+  Batch 70 - Current Loss: 6.2138395e-5
+  Batch 75 - Current Loss: 1.955563e-5
+  Batch 80 - Current Loss: 1.8468187e-5
+  Batch 85 - Current Loss: 0.0001456893
+  Batch 90 - Current Loss: 7.616033e-6
+  Batch 95 - Current Loss: 2.0661413e-5
+  Batch 100 - Current Loss: 1.4014984e-5
+Epoch 37/100 - Average Loss: 3.424117093075552e-5
+  Batch 5 - Current Loss: 6.787637e-6
+  Batch 10 - Current Loss: 5.5405894e-6
+  Batch 15 - Current Loss: 4.9559156e-5
+  Batch 20 - Current Loss: 1.3412059e-5
+  Batch 25 - Current Loss: 3.6555146e-5
+  Batch 30 - Current Loss: 7.06431e-8
+  Batch 35 - Current Loss: 1.5045719e-6
+  Batch 40 - Current Loss: 4.868647e-6
+  Batch 45 - Current Loss: 1.739041e-5
+  Batch 50 - Current Loss: 0.00018060242
+  Batch 55 - Current Loss: 7.059227e-6
+  Batch 60 - Current Loss: 9.03303e-5
+  Batch 65 - Current Loss: 6.578534e-8
+  Batch 70 - Current Loss: 8.266518e-6
+  Batch 75 - Current Loss: 1.2426138e-5
+  Batch 80 - Current Loss: 5.2554915e-6
+  Batch 85 - Current Loss: 2.4048371e-5
+  Batch 90 - Current Loss: 9.3397975e-5
+  Batch 95 - Current Loss: 2.3027942e-6
+  Batch 100 - Current Loss: 7.220832e-5
+Epoch 38/100 - Average Loss: 3.684045421161075e-5
+  Batch 5 - Current Loss: 5.3775734e-6
+  Batch 10 - Current Loss: 8.6181e-6
+  Batch 15 - Current Loss: 7.54437e-5
+  Batch 20 - Current Loss: 8.0238215e-6
+  Batch 25 - Current Loss: 4.5433888e-5
+  Batch 30 - Current Loss: 2.1219025e-6
+  Batch 35 - Current Loss: 5.27779e-6
+  Batch 40 - Current Loss: 2.83055e-5
+  Batch 45 - Current Loss: 1.4126937e-5
+  Batch 50 - Current Loss: 4.271578e-6
+  Batch 55 - Current Loss: 0.00021799836
+  Batch 60 - Current Loss: 3.1511205e-5
+  Batch 65 - Current Loss: 8.387887e-6
+  Batch 70 - Current Loss: 3.3556767e-6
+  Batch 75 - Current Loss: 2.3713154e-8
+  Batch 80 - Current Loss: 4.383462e-6
+  Batch 85 - Current Loss: 2.7593935e-6
+  Batch 90 - Current Loss: 8.247358e-6
+  Batch 95 - Current Loss: 3.762908e-6
+  Batch 100 - Current Loss: 2.858331e-5
+Epoch 39/100 - Average Loss: 3.665903656447839e-5
+  Batch 5 - Current Loss: 0.00010944141
+  Batch 10 - Current Loss: 4.0975887e-5
+  Batch 15 - Current Loss: 0.00014315883
+  Batch 20 - Current Loss: 1.0700575e-5
+  Batch 25 - Current Loss: 6.2217216e-5
+  Batch 30 - Current Loss: 1.4856222e-6
+  Batch 35 - Current Loss: 0.00014844035
+  Batch 40 - Current Loss: 4.656344e-6
+  Batch 45 - Current Loss: 7.569129e-8
+  Batch 50 - Current Loss: 7.052615e-5
+  Batch 55 - Current Loss: 9.248633e-6
+  Batch 60 - Current Loss: 1.8647706e-5
+  Batch 65 - Current Loss: 5.4210996e-5
+  Batch 70 - Current Loss: 6.517991e-5
+  Batch 75 - Current Loss: 6.0171615e-6
+  Batch 80 - Current Loss: 1.0049122e-5
+  Batch 85 - Current Loss: 6.5541326e-6
+  Batch 90 - Current Loss: 9.947735e-5
+  Batch 95 - Current Loss: 4.2766404e-9
+  Batch 100 - Current Loss: 1.1629016e-5
+Epoch 40/100 - Average Loss: 3.355198952382399e-5
+  Batch 5 - Current Loss: 6.9004323e-6
+  Batch 10 - Current Loss: 1.0155993e-5
+  Batch 15 - Current Loss: 7.276115e-6
+  Batch 20 - Current Loss: 0.00011569123
+  Batch 25 - Current Loss: 1.0959402e-5
+  Batch 30 - Current Loss: 8.099275e-5
+  Batch 35 - Current Loss: 0.00018596092
+  Batch 40 - Current Loss: 1.6648271e-5
+  Batch 45 - Current Loss: 6.511454e-6
+  Batch 50 - Current Loss: 5.508643e-6
+  Batch 55 - Current Loss: 1.5871658e-5
+  Batch 60 - Current Loss: 2.552706e-5
+  Batch 65 - Current Loss: 4.387622e-6
+  Batch 70 - Current Loss: 3.776116e-6
+  Batch 75 - Current Loss: 3.6834078e-6
+  Batch 80 - Current Loss: 1.9398141e-5
+  Batch 85 - Current Loss: 9.902665e-6
+  Batch 90 - Current Loss: 5.869574e-8
+  Batch 95 - Current Loss: 4.5965295e-5
+  Batch 100 - Current Loss: 1.19956785e-5
+Epoch 41/100 - Average Loss: 3.395934559216718e-5
+  Batch 5 - Current Loss: 1.0555745e-5
+  Batch 10 - Current Loss: 2.8115155e-5
+  Batch 15 - Current Loss: 2.2973618e-6
+  Batch 20 - Current Loss: 0.000101393074
+  Batch 25 - Current Loss: 3.149248e-5
+  Batch 30 - Current Loss: 1.0575182e-5
+  Batch 35 - Current Loss: 8.938267e-6
+  Batch 40 - Current Loss: 4.465495e-6
+  Batch 45 - Current Loss: 5.416065e-5
+  Batch 50 - Current Loss: 6.1495252e-6
+  Batch 55 - Current Loss: 9.758751e-5
+  Batch 60 - Current Loss: 4.0449977e-5
+  Batch 65 - Current Loss: 8.300473e-6
+  Batch 70 - Current Loss: 7.066479e-5
+  Batch 75 - Current Loss: 4.869949e-9
+  Batch 80 - Current Loss: 2.0487469e-5
+  Batch 85 - Current Loss: 2.4218249e-5
+  Batch 90 - Current Loss: 1.1921745e-5
+  Batch 95 - Current Loss: 6.5918284e-5
+  Batch 100 - Current Loss: 2.3504275e-5
+Epoch 42/100 - Average Loss: 3.4032140691415693e-5
+  Batch 5 - Current Loss: 7.1143936e-6
+  Batch 10 - Current Loss: 2.2976907e-5
+  Batch 15 - Current Loss: 2.7520806e-5
+  Batch 20 - Current Loss: 1.4140488e-6
+  Batch 25 - Current Loss: 1.8974157e-5
+  Batch 30 - Current Loss: 5.65316e-6
+  Batch 35 - Current Loss: 8.1538365e-6
+  Batch 40 - Current Loss: 2.4504376e-7
+  Batch 45 - Current Loss: 2.081949e-5
+  Batch 50 - Current Loss: 3.8768434e-5
+  Batch 55 - Current Loss: 4.1927096e-6
+  Batch 60 - Current Loss: 0.00013462747
+  Batch 65 - Current Loss: 2.5987343e-5
+  Batch 70 - Current Loss: 4.0301587e-5
+  Batch 75 - Current Loss: 9.972343e-9
+  Batch 80 - Current Loss: 5.0762287e-6
+  Batch 85 - Current Loss: 2.0997595e-6
+  Batch 90 - Current Loss: 1.9848935e-8
+  Batch 95 - Current Loss: 5.8162357e-5
+  Batch 100 - Current Loss: 5.376982e-6
+Epoch 43/100 - Average Loss: 3.45730067427958e-5
+  Batch 5 - Current Loss: 9.994197e-6
+  Batch 10 - Current Loss: 2.1084494e-5
+  Batch 15 - Current Loss: 5.4407796e-5
+  Batch 20 - Current Loss: 2.0425008e-5
+  Batch 25 - Current Loss: 2.4863119e-5
+  Batch 30 - Current Loss: 1.0358244e-5
+  Batch 35 - Current Loss: 2.921563e-6
+  Batch 40 - Current Loss: 1.0293011e-5
+  Batch 45 - Current Loss: 2.909861e-5
+  Batch 50 - Current Loss: 5.6029658e-5
+  Batch 55 - Current Loss: 1.907095e-5
+  Batch 60 - Current Loss: 5.4140173e-6
+  Batch 65 - Current Loss: 7.4139075e-6
+  Batch 70 - Current Loss: 4.553409e-6
+  Batch 75 - Current Loss: 3.0290892e-5
+  Batch 80 - Current Loss: 6.521846e-5
+  Batch 85 - Current Loss: 2.0703726e-5
+  Batch 90 - Current Loss: 5.290219e-5
+  Batch 95 - Current Loss: 4.808743e-6
+  Batch 100 - Current Loss: 3.6724585e-5
+Epoch 44/100 - Average Loss: 3.3083965861839816e-5
+  Batch 5 - Current Loss: 1.4832571e-5
+  Batch 10 - Current Loss: 3.487948e-5
+  Batch 15 - Current Loss: 1.3768448e-5
+  Batch 20 - Current Loss: 6.277847e-6
+  Batch 25 - Current Loss: 4.850786e-6
+  Batch 30 - Current Loss: 0.00019468406
+  Batch 35 - Current Loss: 0.000104397295
+  Batch 40 - Current Loss: 0.00012490906
+  Batch 45 - Current Loss: 0.0001399646
+  Batch 50 - Current Loss: 1.0775598e-5
+  Batch 55 - Current Loss: 6.185161e-8
+  Batch 60 - Current Loss: 2.4183405e-6
+  Batch 65 - Current Loss: 5.6777417e-6
+  Batch 70 - Current Loss: 2.5575817e-5
+  Batch 75 - Current Loss: 2.453813e-6
+  Batch 80 - Current Loss: 6.472059e-8
+  Batch 85 - Current Loss: 3.385642e-6
+  Batch 90 - Current Loss: 1.0143126e-6
+  Batch 95 - Current Loss: 1.5749968e-6
+  Batch 100 - Current Loss: 0.000101008074
+Epoch 45/100 - Average Loss: 3.524183058820851e-5
+  Batch 5 - Current Loss: 8.973227e-6
+  Batch 10 - Current Loss: 4.0053266e-5
+  Batch 15 - Current Loss: 4.4285087e-5
+  Batch 20 - Current Loss: 5.733632e-5
+  Batch 25 - Current Loss: 5.8407582e-5
+  Batch 30 - Current Loss: 1.9991672e-5
+  Batch 35 - Current Loss: 3.3399305e-5
+  Batch 40 - Current Loss: 1.3838842e-5
+  Batch 45 - Current Loss: 2.1420934e-5
+  Batch 50 - Current Loss: 2.4718112e-5
+  Batch 55 - Current Loss: 4.1167054e-6
+  Batch 60 - Current Loss: 2.5504432e-6
+  Batch 65 - Current Loss: 8.356067e-5
+  Batch 70 - Current Loss: 3.5219637e-5
+  Batch 75 - Current Loss: 6.4427666e-5
+  Batch 80 - Current Loss: 6.340653e-6
+  Batch 85 - Current Loss: 3.2950593e-5
+  Batch 90 - Current Loss: 2.9051982e-6
+  Batch 95 - Current Loss: 6.537605e-9
+  Batch 100 - Current Loss: 4.5256056e-5
+Epoch 46/100 - Average Loss: 3.495088293933968e-5
+  Batch 5 - Current Loss: 9.316032e-6
+  Batch 10 - Current Loss: 7.1233026e-6
+  Batch 15 - Current Loss: 9.088299e-6
+  Batch 20 - Current Loss: 1.6349974e-5
+  Batch 25 - Current Loss: 2.7426466e-5
+  Batch 30 - Current Loss: 2.3342029e-5
+  Batch 35 - Current Loss: 4.569389e-6
+  Batch 40 - Current Loss: 1.0589751e-5
+  Batch 45 - Current Loss: 3.0521445e-5
+  Batch 50 - Current Loss: 8.226773e-6
+  Batch 55 - Current Loss: 2.7838853e-6
+  Batch 60 - Current Loss: 1.5474375e-6
+  Batch 65 - Current Loss: 4.363019e-6
+  Batch 70 - Current Loss: 4.41706e-6
+  Batch 75 - Current Loss: 2.1712618e-5
+  Batch 80 - Current Loss: 4.881849e-5
+  Batch 85 - Current Loss: 3.366479e-5
+  Batch 90 - Current Loss: 3.2373067e-5
+  Batch 95 - Current Loss: 1.6467647e-9
+  Batch 100 - Current Loss: 9.031835e-6
+Epoch 47/100 - Average Loss: 3.427633214199033e-5
+  Batch 5 - Current Loss: 8.848159e-5
+  Batch 10 - Current Loss: 5.7162153e-5
+  Batch 15 - Current Loss: 8.2549195e-6
+  Batch 20 - Current Loss: 8.449976e-6
+  Batch 25 - Current Loss: 0.00020644984
+  Batch 30 - Current Loss: 2.0579084e-7
+  Batch 35 - Current Loss: 5.3708923e-6
+  Batch 40 - Current Loss: 5.559198e-6
+  Batch 45 - Current Loss: 4.0890875e-5
+  Batch 50 - Current Loss: 8.824956e-5
+  Batch 55 - Current Loss: 1.0184178e-5
+  Batch 60 - Current Loss: 1.3878527e-5
+  Batch 65 - Current Loss: 2.493415e-6
+  Batch 70 - Current Loss: 6.0876596e-6
+  Batch 75 - Current Loss: 6.115723e-6
+  Batch 80 - Current Loss: 1.6018745e-5
+  Batch 85 - Current Loss: 7.001291e-5
+  Batch 90 - Current Loss: 8.4653975e-6
+  Batch 95 - Current Loss: 3.7560432e-5
+  Batch 100 - Current Loss: 0.00013466971
+Epoch 48/100 - Average Loss: 3.511399834022662e-5
+  Batch 5 - Current Loss: 0.00010335729
+  Batch 10 - Current Loss: 5.82923e-5
+  Batch 15 - Current Loss: 3.0931853e-9
+  Batch 20 - Current Loss: 5.38777e-5
+  Batch 25 - Current Loss: 7.983427e-6
+  Batch 30 - Current Loss: 8.460832e-5
+  Batch 35 - Current Loss: 4.5172787e-6
+  Batch 40 - Current Loss: 4.122432e-6
+  Batch 45 - Current Loss: 8.558524e-6
+  Batch 50 - Current Loss: 7.127136e-5
+  Batch 55 - Current Loss: 2.6570031e-5
+  Batch 60 - Current Loss: 5.388754e-5
+  Batch 65 - Current Loss: 8.248005e-9
+  Batch 70 - Current Loss: 4.7221652e-5
+  Batch 75 - Current Loss: 5.3274e-6
+  Batch 80 - Current Loss: 1.032989e-5
+  Batch 85 - Current Loss: 2.0352742e-5
+  Batch 90 - Current Loss: 2.3769695e-5
+  Batch 95 - Current Loss: 6.643511e-5
+  Batch 100 - Current Loss: 0.00011443852
+Epoch 49/100 - Average Loss: 3.469449147703918e-5
+  Batch 5 - Current Loss: 4.8895094e-5
+  Batch 10 - Current Loss: 1.6455093e-7
+  Batch 15 - Current Loss: 9.408504e-5
+  Batch 20 - Current Loss: 2.3058888e-6
+  Batch 25 - Current Loss: 5.4304473e-5
+  Batch 30 - Current Loss: 3.2755672e-6
+  Batch 35 - Current Loss: 9.637965e-5
+  Batch 40 - Current Loss: 1.6322373e-6
+  Batch 45 - Current Loss: 7.988554e-5
+  Batch 50 - Current Loss: 6.566403e-5
+  Batch 55 - Current Loss: 5.718867e-6
+  Batch 60 - Current Loss: 1.7978762e-5
+  Batch 65 - Current Loss: 6.84199e-6
+  Batch 70 - Current Loss: 2.4788744e-6
+  Batch 75 - Current Loss: 4.238873e-6
+  Batch 80 - Current Loss: 1.0925275e-5
+  Batch 85 - Current Loss: 2.219341e-5
+  Batch 90 - Current Loss: 8.00327e-5
+  Batch 95 - Current Loss: 4.556565e-6
+  Batch 100 - Current Loss: 1.3316744e-5
+Epoch 50/100 - Average Loss: 3.34746739749292e-5
+  Batch 5 - Current Loss: 2.3091875e-6
+  Batch 10 - Current Loss: 2.6556136e-6
+  Batch 15 - Current Loss: 4.9531238e-5
+  Batch 20 - Current Loss: 1.0186003e-5
+  Batch 25 - Current Loss: 5.652144e-5
+  Batch 30 - Current Loss: 1.575872e-5
+  Batch 35 - Current Loss: 4.9561564e-5
+  Batch 40 - Current Loss: 4.4007615e-5
+  Batch 45 - Current Loss: 6.888597e-6
+  Batch 50 - Current Loss: 1.8812878e-5
+  Batch 55 - Current Loss: 2.1602498e-5
+  Batch 60 - Current Loss: 2.085489e-5
+  Batch 65 - Current Loss: 3.0314925e-6
+  Batch 70 - Current Loss: 1.7095612e-6
+  Batch 75 - Current Loss: 5.7493653e-5
+  Batch 80 - Current Loss: 1.4152109e-5
+  Batch 85 - Current Loss: 2.0962092e-5
+  Batch 90 - Current Loss: 1.1645823e-5
+  Batch 95 - Current Loss: 0.00019258814
+  Batch 100 - Current Loss: 6.3124676e-6
+Epoch 51/100 - Average Loss: 3.6737278812211116e-5
+  Batch 5 - Current Loss: 0.00011589011
+  Batch 10 - Current Loss: 3.6206098e-9
+  Batch 15 - Current Loss: 9.603233e-6
+  Batch 20 - Current Loss: 4.750909e-5
+  Batch 25 - Current Loss: 1.27676585e-5
+  Batch 30 - Current Loss: 1.7288323e-5
+  Batch 35 - Current Loss: 2.5224192e-6
+  Batch 40 - Current Loss: 2.3513272e-5
+  Batch 45 - Current Loss: 5.0017163e-5
+  Batch 50 - Current Loss: 5.4979762e-5
+  Batch 55 - Current Loss: 0.0001690214
+  Batch 60 - Current Loss: 2.446659e-5
+  Batch 65 - Current Loss: 1.8350676e-6
+  Batch 70 - Current Loss: 1.7141383e-5
+  Batch 75 - Current Loss: 1.8902123e-5
+  Batch 80 - Current Loss: 3.7575817e-5
+  Batch 85 - Current Loss: 1.0540456e-5
+  Batch 90 - Current Loss: 7.3192714e-6
+  Batch 95 - Current Loss: 1.1549256e-5
+  Batch 100 - Current Loss: 0.00011946571
+Epoch 52/100 - Average Loss: 3.348622348713137e-5
+  Batch 5 - Current Loss: 2.1396552e-6
+  Batch 10 - Current Loss: 1.1033637e-5
+  Batch 15 - Current Loss: 0.00019286858
+  Batch 20 - Current Loss: 3.2579766e-5
+  Batch 25 - Current Loss: 9.19006e-5
+  Batch 30 - Current Loss: 1.1542667e-5
+  Batch 35 - Current Loss: 7.982589e-9
+  Batch 40 - Current Loss: 0.00020008125
+  Batch 45 - Current Loss: 1.1474883e-6
+  Batch 50 - Current Loss: 9.386021e-6
+  Batch 55 - Current Loss: 3.9935505e-5
+  Batch 60 - Current Loss: 4.5736774e-6
+  Batch 65 - Current Loss: 2.1324686e-6
+  Batch 70 - Current Loss: 4.849644e-7
+  Batch 75 - Current Loss: 9.189826e-5
+  Batch 80 - Current Loss: 3.4198652e-6
+  Batch 85 - Current Loss: 2.8069668e-5
+  Batch 90 - Current Loss: 1.5990723e-6
+  Batch 95 - Current Loss: 6.893639e-8
+  Batch 100 - Current Loss: 5.538191e-5
+Epoch 53/100 - Average Loss: 3.7089576287510086e-5
+  Batch 5 - Current Loss: 1.1068394e-5
+  Batch 10 - Current Loss: 9.173444e-5
+  Batch 15 - Current Loss: 0.00020610556
+  Batch 20 - Current Loss: 2.8104073e-6
+  Batch 25 - Current Loss: 3.7728354e-5
+  Batch 30 - Current Loss: 6.2495733e-6
+  Batch 35 - Current Loss: 5.3138712e-5
+  Batch 40 - Current Loss: 7.182728e-6
+  Batch 45 - Current Loss: 1.4979964e-5
+  Batch 50 - Current Loss: 1.6677343e-6
+  Batch 55 - Current Loss: 5.6610565e-6
+  Batch 60 - Current Loss: 1.016502e-5
+  Batch 65 - Current Loss: 9.856881e-5
+  Batch 70 - Current Loss: 2.5864168e-5
+  Batch 75 - Current Loss: 1.996939e-5
+  Batch 80 - Current Loss: 2.317974e-5
+  Batch 85 - Current Loss: 9.238408e-6
+  Batch 90 - Current Loss: 2.8655213e-6
+  Batch 95 - Current Loss: 1.02482e-5
+  Batch 100 - Current Loss: 5.689099e-6
+Epoch 54/100 - Average Loss: 3.540975708523852e-5
+  Batch 5 - Current Loss: 7.4944983e-6
+  Batch 10 - Current Loss: 9.528919e-5
+  Batch 15 - Current Loss: 1.965887e-6
+  Batch 20 - Current Loss: 2.0707452e-5
+  Batch 25 - Current Loss: 1.06230855e-5
+  Batch 30 - Current Loss: 1.2736763e-5
+  Batch 35 - Current Loss: 2.304279e-8
+  Batch 40 - Current Loss: 8.778752e-6
+  Batch 45 - Current Loss: 0.00013558469
+  Batch 50 - Current Loss: 3.672734e-5
+  Batch 55 - Current Loss: 1.05029285e-5
+  Batch 60 - Current Loss: 5.8342894e-6
+  Batch 65 - Current Loss: 0.00015257142
+  Batch 70 - Current Loss: 3.8239577e-5
+  Batch 75 - Current Loss: 1.5077815e-5
+  Batch 80 - Current Loss: 4.9402417e-5
+  Batch 85 - Current Loss: 4.023514e-8
+  Batch 90 - Current Loss: 0.0001549596
+  Batch 95 - Current Loss: 0.00016322754
+  Batch 100 - Current Loss: 6.357874e-6
+Epoch 55/100 - Average Loss: 3.451596761099296e-5
+  Batch 5 - Current Loss: 2.2011305e-5
+  Batch 10 - Current Loss: 8.96813e-6
+  Batch 15 - Current Loss: 6.594948e-6
+  Batch 20 - Current Loss: 4.6151523e-5
+  Batch 25 - Current Loss: 0.0001961264
+  Batch 30 - Current Loss: 5.5603312e-5
+  Batch 35 - Current Loss: 3.0025678e-5
+  Batch 40 - Current Loss: 1.9572155e-5
+  Batch 45 - Current Loss: 5.307906e-6
+  Batch 50 - Current Loss: 3.221237e-5
+  Batch 55 - Current Loss: 6.158696e-6
+  Batch 60 - Current Loss: 1.208833e-7
+  Batch 65 - Current Loss: 9.425116e-5
+  Batch 70 - Current Loss: 1.6580005e-5
+  Batch 75 - Current Loss: 0.00013215755
+  Batch 80 - Current Loss: 4.322384e-5
+  Batch 85 - Current Loss: 9.969075e-6
+  Batch 90 - Current Loss: 6.0827035e-5
+  Batch 95 - Current Loss: 7.5613214e-5
+  Batch 100 - Current Loss: 2.7999931e-6
+Epoch 56/100 - Average Loss: 3.385614850243357e-5
+  Batch 5 - Current Loss: 1.732846e-5
+  Batch 10 - Current Loss: 0.00015624166
+  Batch 15 - Current Loss: 0.00015818031
+  Batch 20 - Current Loss: 5.7796882e-5
+  Batch 25 - Current Loss: 5.8539576e-6
+  Batch 30 - Current Loss: 2.4763604e-6
+  Batch 35 - Current Loss: 2.7797072e-5
+  Batch 40 - Current Loss: 8.706564e-6
+  Batch 45 - Current Loss: 4.144376e-5
+  Batch 50 - Current Loss: 1.9514766e-5
+  Batch 55 - Current Loss: 2.2192135e-5
+  Batch 60 - Current Loss: 5.019078e-6
+  Batch 65 - Current Loss: 1.4123113e-5
+  Batch 70 - Current Loss: 2.7023194e-5
+  Batch 75 - Current Loss: 1.8733845e-5
+  Batch 80 - Current Loss: 4.2251493e-5
+  Batch 85 - Current Loss: 2.956764e-6
+  Batch 90 - Current Loss: 5.8988826e-5
+  Batch 95 - Current Loss: 1.0839748e-5
+  Batch 100 - Current Loss: 9.727404e-6
+Epoch 57/100 - Average Loss: 3.4182417984069956e-5
+  Batch 5 - Current Loss: 6.9338316e-6
+  Batch 10 - Current Loss: 0.00010559523
+  Batch 15 - Current Loss: 2.5917318e-6
+  Batch 20 - Current Loss: 0.00017563964
+  Batch 25 - Current Loss: 5.572018e-6
+  Batch 30 - Current Loss: 5.6283334e-5
+  Batch 35 - Current Loss: 9.185533e-5
+  Batch 40 - Current Loss: 3.684818e-5
+  Batch 45 - Current Loss: 4.516626e-5
+  Batch 50 - Current Loss: 6.848539e-6
+  Batch 55 - Current Loss: 3.7184236e-5
+  Batch 60 - Current Loss: 1.206802e-5
+  Batch 65 - Current Loss: 2.5825277e-5
+  Batch 70 - Current Loss: 1.43818625e-5
+  Batch 75 - Current Loss: 3.830971e-5
+  Batch 80 - Current Loss: 7.7574994e-5
+  Batch 85 - Current Loss: 1.4119476e-5
+  Batch 90 - Current Loss: 6.4334955e-8
+  Batch 95 - Current Loss: 0.00018054014
+  Batch 100 - Current Loss: 3.574961e-5
+Epoch 58/100 - Average Loss: 3.30961079752054e-5
+  Batch 5 - Current Loss: 2.6471003e-5
+  Batch 10 - Current Loss: 1.5616237e-5
+  Batch 15 - Current Loss: 9.967477e-5
+  Batch 20 - Current Loss: 1.1052313e-5
+  Batch 25 - Current Loss: 2.168853e-6
+  Batch 30 - Current Loss: 1.7147291e-6
+  Batch 35 - Current Loss: 2.6158825e-6
+  Batch 40 - Current Loss: 1.4819945e-5
+  Batch 45 - Current Loss: 6.0007665e-6
+  Batch 50 - Current Loss: 5.9146596e-6
+  Batch 55 - Current Loss: 6.115309e-5
+  Batch 60 - Current Loss: 3.4517736e-5
+  Batch 65 - Current Loss: 5.1358886e-5
+  Batch 70 - Current Loss: 0.00010813539
+  Batch 75 - Current Loss: 8.731549e-6
+  Batch 80 - Current Loss: 2.802141e-5
+  Batch 85 - Current Loss: 6.994453e-6
+  Batch 90 - Current Loss: 9.092399e-5
+  Batch 95 - Current Loss: 5.0457174e-6
+  Batch 100 - Current Loss: 1.1993486e-5
+Epoch 59/100 - Average Loss: 3.4231030295583945e-5
+  Batch 5 - Current Loss: 0.00010685687
+  Batch 10 - Current Loss: 2.6525831e-6
+  Batch 15 - Current Loss: 1.884124e-5
+  Batch 20 - Current Loss: 5.3554186e-6
+  Batch 25 - Current Loss: 6.795204e-6
+  Batch 30 - Current Loss: 7.0994934e-6
+  Batch 35 - Current Loss: 3.066481e-5
+  Batch 40 - Current Loss: 2.959924e-8
+  Batch 45 - Current Loss: 1.2617369e-6
+  Batch 50 - Current Loss: 6.225319e-5
+  Batch 55 - Current Loss: 6.1515875e-6
+  Batch 60 - Current Loss: 6.003338e-5
+  Batch 65 - Current Loss: 1.4614102e-6
+  Batch 70 - Current Loss: 6.2219515e-6
+  Batch 75 - Current Loss: 7.662186e-5
+  Batch 80 - Current Loss: 0.00013073135
+  Batch 85 - Current Loss: 6.7379306e-6
+  Batch 90 - Current Loss: 8.2515646e-5
+  Batch 95 - Current Loss: 0.00019401575
+  Batch 100 - Current Loss: 8.641004e-5
+Epoch 60/100 - Average Loss: 3.4009378786468147e-5
+  Batch 5 - Current Loss: 9.76926e-6
+  Batch 10 - Current Loss: 4.5805613e-5
+  Batch 15 - Current Loss: 1.4817106e-5
+  Batch 20 - Current Loss: 0.00025415397
+  Batch 25 - Current Loss: 4.2332173e-5
+  Batch 30 - Current Loss: 3.6404683e-6
+  Batch 35 - Current Loss: 4.9195267e-5
+  Batch 40 - Current Loss: 2.2330812e-6
+  Batch 45 - Current Loss: 2.4279894e-5
+  Batch 50 - Current Loss: 1.549319e-5
+  Batch 55 - Current Loss: 1.5979786e-5
+  Batch 60 - Current Loss: 1.1206185e-5
+  Batch 65 - Current Loss: 7.2827816e-6
+  Batch 70 - Current Loss: 1.8986754e-6
+  Batch 75 - Current Loss: 8.301184e-5
+  Batch 80 - Current Loss: 8.023176e-5
+  Batch 85 - Current Loss: 2.2135915e-5
+  Batch 90 - Current Loss: 9.933382e-6
+  Batch 95 - Current Loss: 5.6813644e-7
+  Batch 100 - Current Loss: 2.3327777e-5
+Epoch 61/100 - Average Loss: 3.579526558466828e-5
+  Batch 5 - Current Loss: 8.120066e-6
+  Batch 10 - Current Loss: 7.177117e-5
+  Batch 15 - Current Loss: 5.9745595e-5
+  Batch 20 - Current Loss: 2.195758e-5
+  Batch 25 - Current Loss: 1.0884883e-5
+  Batch 30 - Current Loss: 0.00021138779
+  Batch 35 - Current Loss: 1.94638e-6
+  Batch 40 - Current Loss: 5.7604984e-6
+  Batch 45 - Current Loss: 7.71738e-5
+  Batch 50 - Current Loss: 4.896994e-5
+  Batch 55 - Current Loss: 6.100211e-5
+  Batch 60 - Current Loss: 8.839683e-5
+  Batch 65 - Current Loss: 4.730661e-5
+  Batch 70 - Current Loss: 0.00010988083
+  Batch 75 - Current Loss: 9.8177115e-6
+  Batch 80 - Current Loss: 5.2632884e-5
+  Batch 85 - Current Loss: 5.5668565e-6
+  Batch 90 - Current Loss: 7.163897e-5
+  Batch 95 - Current Loss: 9.18148e-6
+  Batch 100 - Current Loss: 3.5077135e-6
+Epoch 62/100 - Average Loss: 3.539104718909059e-5
+  Batch 5 - Current Loss: 1.1166986e-5
+  Batch 10 - Current Loss: 5.647667e-5
+  Batch 15 - Current Loss: 8.7577355e-6
+  Batch 20 - Current Loss: 1.5157438e-5
+  Batch 25 - Current Loss: 0.0001669581
+  Batch 30 - Current Loss: 7.1213417e-6
+  Batch 35 - Current Loss: 1.5286238e-5
+  Batch 40 - Current Loss: 2.077161e-5
+  Batch 45 - Current Loss: 1.5735448e-5
+  Batch 50 - Current Loss: 3.5069836e-6
+  Batch 55 - Current Loss: 1.1405149e-5
+  Batch 60 - Current Loss: 7.603028e-5
+  Batch 65 - Current Loss: 5.6513672e-5
+  Batch 70 - Current Loss: 0.00018839103
+  Batch 75 - Current Loss: 0.00012612
+  Batch 80 - Current Loss: 9.175138e-5
+  Batch 85 - Current Loss: 2.7453007e-5
+  Batch 90 - Current Loss: 0.00012354468
+  Batch 95 - Current Loss: 0.00010220276
+  Batch 100 - Current Loss: 2.3097558e-5
+Epoch 63/100 - Average Loss: 3.588422920582701e-5
+  Batch 5 - Current Loss: 2.2166387e-5
+  Batch 10 - Current Loss: 6.473338e-5
+  Batch 15 - Current Loss: 1.291519e-5
+  Batch 20 - Current Loss: 2.1196936e-5
+  Batch 25 - Current Loss: 1.9783163e-5
+  Batch 30 - Current Loss: 3.6744798e-6
+  Batch 35 - Current Loss: 4.2600146e-5
+  Batch 40 - Current Loss: 1.3932611e-5
+  Batch 45 - Current Loss: 1.1156972e-5
+  Batch 50 - Current Loss: 6.265202e-5
+  Batch 55 - Current Loss: 9.431141e-5
+  Batch 60 - Current Loss: 1.6454547e-7
+  Batch 65 - Current Loss: 9.5532276e-5
+  Batch 70 - Current Loss: 3.4696262e-5
+  Batch 75 - Current Loss: 2.090067e-5
+  Batch 80 - Current Loss: 0.00014741642
+  Batch 85 - Current Loss: 2.7004327e-5
+  Batch 90 - Current Loss: 2.6471926e-5
+  Batch 95 - Current Loss: 2.5614145e-5
+  Batch 100 - Current Loss: 9.958979e-5
+Epoch 64/100 - Average Loss: 3.488011511931857e-5
+  Batch 5 - Current Loss: 1.9880413e-6
+  Batch 10 - Current Loss: 2.0639683e-7
+  Batch 15 - Current Loss: 1.10653855e-5
+  Batch 20 - Current Loss: 1.4436947e-5
+  Batch 25 - Current Loss: 5.5743094e-5
+  Batch 30 - Current Loss: 2.6819663e-8
+  Batch 35 - Current Loss: 6.335684e-6
+  Batch 40 - Current Loss: 7.645635e-6
+  Batch 45 - Current Loss: 1.559205e-7
+  Batch 50 - Current Loss: 3.4729746e-5
+  Batch 55 - Current Loss: 2.6085982e-5
+  Batch 60 - Current Loss: 2.4932378e-5
+  Batch 65 - Current Loss: 5.184546e-5
+  Batch 70 - Current Loss: 6.7277524e-6
+  Batch 75 - Current Loss: 2.093089e-5
+  Batch 80 - Current Loss: 9.038341e-6
+  Batch 85 - Current Loss: 1.9395431e-5
+  Batch 90 - Current Loss: 1.2068475e-5
+  Batch 95 - Current Loss: 1.1817479e-5
+  Batch 100 - Current Loss: 0.00010625628
+Epoch 65/100 - Average Loss: 3.478737151688116e-5
+  Batch 5 - Current Loss: 1.7398486e-5
+  Batch 10 - Current Loss: 1.199858e-5
+  Batch 15 - Current Loss: 3.4476605e-5
+  Batch 20 - Current Loss: 8.483889e-6
+  Batch 25 - Current Loss: 3.3958615e-5
+  Batch 30 - Current Loss: 0.00016492025
+  Batch 35 - Current Loss: 4.3815613e-5
+  Batch 40 - Current Loss: 5.9891183e-5
+  Batch 45 - Current Loss: 1.1048605e-7
+  Batch 50 - Current Loss: 4.7802332e-5
+  Batch 55 - Current Loss: 5.9807226e-5
+  Batch 60 - Current Loss: 4.9401213e-5
+  Batch 65 - Current Loss: 2.489722e-5
+  Batch 70 - Current Loss: 8.51419e-5
+  Batch 75 - Current Loss: 6.041955e-6
+  Batch 80 - Current Loss: 1.299244e-5
+  Batch 85 - Current Loss: 2.2611962e-6
+  Batch 90 - Current Loss: 4.911215e-6
+  Batch 95 - Current Loss: 1.505443e-5
+  Batch 100 - Current Loss: 1.088396e-5
+Epoch 66/100 - Average Loss: 3.443217611277305e-5
+  Batch 5 - Current Loss: 2.465951e-5
+  Batch 10 - Current Loss: 1.0204262e-5
+  Batch 15 - Current Loss: 5.8088057e-7
+  Batch 20 - Current Loss: 2.7705182e-5
+  Batch 25 - Current Loss: 1.541948e-5
+  Batch 30 - Current Loss: 5.3195894e-5
+  Batch 35 - Current Loss: 4.138093e-7
+  Batch 40 - Current Loss: 9.50008e-6
+  Batch 45 - Current Loss: 2.2141767e-6
+  Batch 50 - Current Loss: 2.7807078e-5
+  Batch 55 - Current Loss: 0.00018791629
+  Batch 60 - Current Loss: 2.8409204e-5
+  Batch 65 - Current Loss: 1.3229772e-5
+  Batch 70 - Current Loss: 7.133849e-5
+  Batch 75 - Current Loss: 0.00010113165
+  Batch 80 - Current Loss: 1.7446504e-6
+  Batch 85 - Current Loss: 2.2266217e-5
+  Batch 90 - Current Loss: 1.04905175e-5
+  Batch 95 - Current Loss: 1.723166e-5
+  Batch 100 - Current Loss: 4.5404617e-5
+Epoch 67/100 - Average Loss: 3.4847611446406914e-5
+  Batch 5 - Current Loss: 3.8851863e-6
+  Batch 10 - Current Loss: 0.000106920656
+  Batch 15 - Current Loss: 2.8448352e-5
+  Batch 20 - Current Loss: 3.2429776e-5
+  Batch 25 - Current Loss: 1.3847522e-6
+  Batch 30 - Current Loss: 9.952745e-5
+  Batch 35 - Current Loss: 4.1040556e-5
+  Batch 40 - Current Loss: 9.951519e-5
+  Batch 45 - Current Loss: 2.09271e-6
+  Batch 50 - Current Loss: 6.5607936e-5
+  Batch 55 - Current Loss: 2.0697682e-8
+  Batch 60 - Current Loss: 3.0128622e-6
+  Batch 65 - Current Loss: 7.710885e-6
+  Batch 70 - Current Loss: 1.8430894e-5
+  Batch 75 - Current Loss: 6.3134844e-6
+  Batch 80 - Current Loss: 1.0883615e-5
+  Batch 85 - Current Loss: 8.598368e-5
+  Batch 90 - Current Loss: 2.9755784e-5
+  Batch 95 - Current Loss: 2.8277467e-5
+  Batch 100 - Current Loss: 6.7596875e-6
+Epoch 68/100 - Average Loss: 3.409403569496483e-5
+  Batch 5 - Current Loss: 1.4403839e-5
+  Batch 10 - Current Loss: 7.558363e-5
+  Batch 15 - Current Loss: 0.00018258231
+  Batch 20 - Current Loss: 7.3592846e-6
+  Batch 25 - Current Loss: 4.8227477e-5
+  Batch 30 - Current Loss: 0.00014510418
+  Batch 35 - Current Loss: 2.4952453e-5
+  Batch 40 - Current Loss: 4.293059e-5
+  Batch 45 - Current Loss: 6.363207e-6
+  Batch 50 - Current Loss: 5.7275247e-6
+  Batch 55 - Current Loss: 3.049087e-6
+  Batch 60 - Current Loss: 4.245714e-6
+  Batch 65 - Current Loss: 1.8261696e-6
+  Batch 70 - Current Loss: 2.1050186e-5
+  Batch 75 - Current Loss: 1.0599626e-7
+  Batch 80 - Current Loss: 5.0517476e-5
+  Batch 85 - Current Loss: 3.4476667e-5
+  Batch 90 - Current Loss: 0.00012952239
+  Batch 95 - Current Loss: 7.87887e-6
+  Batch 100 - Current Loss: 2.744365e-6
+Epoch 69/100 - Average Loss: 3.4437333215064925e-5
+  Batch 5 - Current Loss: 1.581685e-6
+  Batch 10 - Current Loss: 4.7057158e-5
+  Batch 15 - Current Loss: 5.7526963e-6
+  Batch 20 - Current Loss: 0.00010872679
+  Batch 25 - Current Loss: 1.099879e-5
+  Batch 30 - Current Loss: 6.782949e-6
+  Batch 35 - Current Loss: 4.2492065e-5
+  Batch 40 - Current Loss: 8.873325e-6
+  Batch 45 - Current Loss: 1.790019e-5
+  Batch 50 - Current Loss: 3.0450301e-5
+  Batch 55 - Current Loss: 3.1648997e-5
+  Batch 60 - Current Loss: 4.422962e-5
+  Batch 65 - Current Loss: 8.309412e-5
+  Batch 70 - Current Loss: 2.4086917e-6
+  Batch 75 - Current Loss: 1.5992207e-5
+  Batch 80 - Current Loss: 1.9736349e-6
+  Batch 85 - Current Loss: 6.378746e-5
+  Batch 90 - Current Loss: 2.3675166e-6
+  Batch 95 - Current Loss: 1.6439908e-5
+  Batch 100 - Current Loss: 4.1158502e-5
+Epoch 70/100 - Average Loss: 3.485467429805489e-5
+  Batch 5 - Current Loss: 4.9898986e-6
+  Batch 10 - Current Loss: 1.0520554e-5
+  Batch 15 - Current Loss: 7.834547e-6
+  Batch 20 - Current Loss: 5.9831636e-6
+  Batch 25 - Current Loss: 3.001905e-5
+  Batch 30 - Current Loss: 2.7523845e-5
+  Batch 35 - Current Loss: 4.5699846e-5
+  Batch 40 - Current Loss: 6.489939e-5
+  Batch 45 - Current Loss: 4.4288587e-5
+  Batch 50 - Current Loss: 0.0001441922
+  Batch 55 - Current Loss: 6.517324e-5
+  Batch 60 - Current Loss: 9.123677e-6
+  Batch 65 - Current Loss: 1.2036235e-5
+  Batch 70 - Current Loss: 8.520197e-6
+  Batch 75 - Current Loss: 4.8981707e-5
+  Batch 80 - Current Loss: 0.00010756464
+  Batch 85 - Current Loss: 1.2441989e-5
+  Batch 90 - Current Loss: 7.159997e-6
+  Batch 95 - Current Loss: 3.723706e-6
+  Batch 100 - Current Loss: 0.00010025252
+Epoch 71/100 - Average Loss: 3.372409893124484e-5
+  Batch 5 - Current Loss: 3.2973036e-5
+  Batch 10 - Current Loss: 1.6679029e-5
+  Batch 15 - Current Loss: 5.1629104e-5
+  Batch 20 - Current Loss: 6.38046e-6
+  Batch 25 - Current Loss: 3.4455756e-5
+  Batch 30 - Current Loss: 3.1335438e-7
+  Batch 35 - Current Loss: 8.202929e-10
+  Batch 40 - Current Loss: 1.9326224e-5
+  Batch 45 - Current Loss: 3.157327e-5
+  Batch 50 - Current Loss: 0.00018382563
+  Batch 55 - Current Loss: 7.85322e-6
+  Batch 60 - Current Loss: 0.00018889907
+  Batch 65 - Current Loss: 3.978277e-5
+  Batch 70 - Current Loss: 8.345174e-6
+  Batch 75 - Current Loss: 6.635656e-5
+  Batch 80 - Current Loss: 8.797257e-5
+  Batch 85 - Current Loss: 1.25046945e-5
+  Batch 90 - Current Loss: 6.312669e-5
+  Batch 95 - Current Loss: 1.3856439e-5
+  Batch 100 - Current Loss: 8.823081e-6
+Epoch 72/100 - Average Loss: 3.465290742429489e-5
+  Batch 5 - Current Loss: 3.1214702e-5
+  Batch 10 - Current Loss: 9.290621e-6
+  Batch 15 - Current Loss: 4.1155883e-5
+  Batch 20 - Current Loss: 0.00020799132
+  Batch 25 - Current Loss: 7.88838e-6
+  Batch 30 - Current Loss: 7.747851e-5
+  Batch 35 - Current Loss: 8.79884e-6
+  Batch 40 - Current Loss: 1.934797e-5
+  Batch 45 - Current Loss: 6.446591e-5
+  Batch 50 - Current Loss: 2.7207312e-5
+  Batch 55 - Current Loss: 2.5934054e-5
+  Batch 60 - Current Loss: 9.1437345e-5
+  Batch 65 - Current Loss: 1.1555681e-5
+  Batch 70 - Current Loss: 1.0017478e-5
+  Batch 75 - Current Loss: 8.41225e-5
+  Batch 80 - Current Loss: 9.869462e-5
+  Batch 85 - Current Loss: 1.669221e-5
+  Batch 90 - Current Loss: 2.0308762e-5
+  Batch 95 - Current Loss: 9.0494555e-5
+  Batch 100 - Current Loss: 9.232768e-5
+Epoch 73/100 - Average Loss: 3.451371046889307e-5
+  Batch 5 - Current Loss: 6.70839e-5
+  Batch 10 - Current Loss: 1.8250435e-7
+  Batch 15 - Current Loss: 1.0500002e-5
+  Batch 20 - Current Loss: 2.0141442e-5
+  Batch 25 - Current Loss: 3.8220158e-5
+  Batch 30 - Current Loss: 4.8302823e-5
+  Batch 35 - Current Loss: 1.18072385e-5
+  Batch 40 - Current Loss: 7.951618e-5
+  Batch 45 - Current Loss: 1.7127768e-5
+  Batch 50 - Current Loss: 5.806085e-6
+  Batch 55 - Current Loss: 7.643995e-6
+  Batch 60 - Current Loss: 6.882901e-5
+  Batch 65 - Current Loss: 0.00015940751
+  Batch 70 - Current Loss: 2.7988794e-6
+  Batch 75 - Current Loss: 5.2565983e-6
+  Batch 80 - Current Loss: 5.6727808e-5
+  Batch 85 - Current Loss: 5.4230462e-5
+  Batch 90 - Current Loss: 3.7128557e-6
+  Batch 95 - Current Loss: 1.0067842e-5
+  Batch 100 - Current Loss: 2.1361743e-8
+Epoch 74/100 - Average Loss: 3.35317328135113e-5
+  Batch 5 - Current Loss: 2.4280293e-5
+  Batch 10 - Current Loss: 7.642682e-6
+  Batch 15 - Current Loss: 5.0643474e-5
+  Batch 20 - Current Loss: 4.418163e-6
+  Batch 25 - Current Loss: 6.0819416e-6
+  Batch 30 - Current Loss: 1.4352471e-5
+  Batch 35 - Current Loss: 2.7268334e-5
+  Batch 40 - Current Loss: 3.238729e-5
+  Batch 45 - Current Loss: 2.8050801e-5
+  Batch 50 - Current Loss: 1.0469551e-5
+  Batch 55 - Current Loss: 0.00012899081
+  Batch 60 - Current Loss: 1.6929998e-5
+  Batch 65 - Current Loss: 1.8627214e-5
+  Batch 70 - Current Loss: 1.0604664e-5
+  Batch 75 - Current Loss: 9.172269e-6
+  Batch 80 - Current Loss: 3.372835e-5
+  Batch 85 - Current Loss: 2.096908e-5
+  Batch 90 - Current Loss: 0.00010528723
+  Batch 95 - Current Loss: 1.4173811e-5
+  Batch 100 - Current Loss: 5.6967423e-5
+Epoch 75/100 - Average Loss: 3.339523747649835e-5
+  Batch 5 - Current Loss: 5.043659e-5
+  Batch 10 - Current Loss: 1.8339199e-5
+  Batch 15 - Current Loss: 2.9641697e-5
+  Batch 20 - Current Loss: 2.696146e-5
+  Batch 25 - Current Loss: 7.9259895e-5
+  Batch 30 - Current Loss: 5.1441766e-6
+  Batch 35 - Current Loss: 5.6357556e-5
+  Batch 40 - Current Loss: 6.842052e-5
+  Batch 45 - Current Loss: 0.00013233103
+  Batch 50 - Current Loss: 9.035663e-8
+  Batch 55 - Current Loss: 0.00010531051
+  Batch 60 - Current Loss: 4.0295046e-5
+  Batch 65 - Current Loss: 5.692435e-6
+  Batch 70 - Current Loss: 0.00010539855
+  Batch 75 - Current Loss: 2.4179619e-5
+  Batch 80 - Current Loss: 3.9706397e-6
+  Batch 85 - Current Loss: 7.294537e-7
+  Batch 90 - Current Loss: 4.0884242e-5
+  Batch 95 - Current Loss: 2.2828945e-5
+  Batch 100 - Current Loss: 1.0847226e-5
+Epoch 76/100 - Average Loss: 3.380688791658315e-5
+  Batch 5 - Current Loss: 5.6402358e-5
+  Batch 10 - Current Loss: 8.746505e-6
+  Batch 15 - Current Loss: 3.000919e-5
+  Batch 20 - Current Loss: 1.0207721e-5
+  Batch 25 - Current Loss: 0.00018360085
+  Batch 30 - Current Loss: 1.0849193e-5
+  Batch 35 - Current Loss: 2.4686952e-7
+  Batch 40 - Current Loss: 1.7949555e-5
+  Batch 45 - Current Loss: 2.4452305e-7
+  Batch 50 - Current Loss: 6.6587636e-5
+  Batch 55 - Current Loss: 4.982486e-7
+  Batch 60 - Current Loss: 4.7769636e-6
+  Batch 65 - Current Loss: 2.6560727e-5
+  Batch 70 - Current Loss: 5.082353e-6
+  Batch 75 - Current Loss: 3.8939847e-6
+  Batch 80 - Current Loss: 1.567956e-5
+  Batch 85 - Current Loss: 5.875892e-5
+  Batch 90 - Current Loss: 3.236174e-5
+  Batch 95 - Current Loss: 8.530388e-6
+  Batch 100 - Current Loss: 1.4497757e-6
+Epoch 77/100 - Average Loss: 3.4260348139749654e-5
+  Batch 5 - Current Loss: 6.925575e-5
+  Batch 10 - Current Loss: 4.586746e-5
+  Batch 15 - Current Loss: 5.179467e-5
+  Batch 20 - Current Loss: 8.2852544e-5
+  Batch 25 - Current Loss: 7.275733e-5
+  Batch 30 - Current Loss: 2.9322371e-5
+  Batch 35 - Current Loss: 1.907162e-6
+  Batch 40 - Current Loss: 5.8060697e-5
+  Batch 45 - Current Loss: 6.829797e-6
+  Batch 50 - Current Loss: 1.4547553e-5
+  Batch 55 - Current Loss: 4.7436286e-9
+  Batch 60 - Current Loss: 1.4331098e-7
+  Batch 65 - Current Loss: 1.2345759e-5
+  Batch 70 - Current Loss: 9.8294684e-8
+  Batch 75 - Current Loss: 1.9232887e-6
+  Batch 80 - Current Loss: 1.5586722e-5
+  Batch 85 - Current Loss: 1.3418494e-5
+  Batch 90 - Current Loss: 3.253941e-8
+  Batch 95 - Current Loss: 0.00013429078
+  Batch 100 - Current Loss: 1.3554353e-5
+Epoch 78/100 - Average Loss: 3.487399902140975e-5
+  Batch 5 - Current Loss: 1.0350514e-5
+  Batch 10 - Current Loss: 2.066104e-6
+  Batch 15 - Current Loss: 0.00021296821
+  Batch 20 - Current Loss: 4.164275e-5
+  Batch 25 - Current Loss: 0.00011039573
+  Batch 30 - Current Loss: 0.00020289648
+  Batch 35 - Current Loss: 6.966183e-5
+  Batch 40 - Current Loss: 1.0998008e-5
+  Batch 45 - Current Loss: 1.6991284e-5
+  Batch 50 - Current Loss: 7.198771e-6
+  Batch 55 - Current Loss: 1.948191e-5
+  Batch 60 - Current Loss: 0.00016793302
+  Batch 65 - Current Loss: 3.983562e-5
+  Batch 70 - Current Loss: 3.2336357e-5
+  Batch 75 - Current Loss: 8.281365e-6
+  Batch 80 - Current Loss: 4.72521e-5
+  Batch 85 - Current Loss: 3.965475e-7
+  Batch 90 - Current Loss: 3.8392114e-5
+  Batch 95 - Current Loss: 1.40019865e-5
+  Batch 100 - Current Loss: 4.3225023e-6
+Epoch 79/100 - Average Loss: 3.475026394804459e-5
+  Batch 5 - Current Loss: 9.847687e-6
+  Batch 10 - Current Loss: 1.49354355e-5
+  Batch 15 - Current Loss: 9.9814564e-8
+  Batch 20 - Current Loss: 2.5071836e-6
+  Batch 25 - Current Loss: 2.1375914e-5
+  Batch 30 - Current Loss: 5.0964078e-5
+  Batch 35 - Current Loss: 0.00020308828
+  Batch 40 - Current Loss: 4.8326277e-5
+  Batch 45 - Current Loss: 2.1716007e-5
+  Batch 50 - Current Loss: 1.0085215e-5
+  Batch 55 - Current Loss: 0.00014076909
+  Batch 60 - Current Loss: 4.1236166e-5
+  Batch 65 - Current Loss: 0.00010607274
+  Batch 70 - Current Loss: 7.95376e-5
+  Batch 75 - Current Loss: 8.073426e-6
+  Batch 80 - Current Loss: 6.7672327e-6
+  Batch 85 - Current Loss: 5.6841036e-5
+  Batch 90 - Current Loss: 8.028484e-5
+  Batch 95 - Current Loss: 7.1090935e-6
+  Batch 100 - Current Loss: 7.692167e-9
+Epoch 80/100 - Average Loss: 3.4284398369823775e-5
+  Batch 5 - Current Loss: 1.6461687e-6
+  Batch 10 - Current Loss: 9.594045e-5
+  Batch 15 - Current Loss: 5.978555e-6
+  Batch 20 - Current Loss: 1.5878582e-5
+  Batch 25 - Current Loss: 2.9203982e-6
+  Batch 30 - Current Loss: 5.3497162e-5
+  Batch 35 - Current Loss: 1.0838093e-5
+  Batch 40 - Current Loss: 5.0602994e-5
+  Batch 45 - Current Loss: 4.3981694e-7
+  Batch 50 - Current Loss: 6.332047e-6
+  Batch 55 - Current Loss: 0.00013094483
+  Batch 60 - Current Loss: 1.0884776e-5
+  Batch 65 - Current Loss: 3.8110475e-6
+  Batch 70 - Current Loss: 3.472818e-6
+  Batch 75 - Current Loss: 2.5379915e-8
+  Batch 80 - Current Loss: 0.00010078219
+  Batch 85 - Current Loss: 1.2157934e-5
+  Batch 90 - Current Loss: 3.1319598e-6
+  Batch 95 - Current Loss: 1.9996365e-5
+  Batch 100 - Current Loss: 1.481332e-5
+Epoch 81/100 - Average Loss: 3.386623862684957e-5
+  Batch 5 - Current Loss: 1.9884163e-5
+  Batch 10 - Current Loss: 1.878715e-5
+  Batch 15 - Current Loss: 1.6502416e-5
+  Batch 20 - Current Loss: 1.4122379e-5
+  Batch 25 - Current Loss: 9.357861e-6
+  Batch 30 - Current Loss: 9.258798e-6
+  Batch 35 - Current Loss: 0.00013135192
+  Batch 40 - Current Loss: 4.1335967e-5
+  Batch 45 - Current Loss: 4.792382e-5
+  Batch 50 - Current Loss: 3.575068e-5
+  Batch 55 - Current Loss: 2.6946322e-5
+  Batch 60 - Current Loss: 2.5136302e-5
+  Batch 65 - Current Loss: 6.705353e-6
+  Batch 70 - Current Loss: 1.1423358e-5
+  Batch 75 - Current Loss: 5.882826e-6
+  Batch 80 - Current Loss: 6.7058085e-5
+  Batch 85 - Current Loss: 1.9641666e-6
+  Batch 90 - Current Loss: 0.00019720678
+  Batch 95 - Current Loss: 6.905514e-7
+  Batch 100 - Current Loss: 6.1681654e-5
+Epoch 82/100 - Average Loss: 3.4179946906647275e-5
+  Batch 5 - Current Loss: 8.2894685e-6
+  Batch 10 - Current Loss: 3.5062378e-6
+  Batch 15 - Current Loss: 4.641507e-10
+  Batch 20 - Current Loss: 1.0002446e-5
+  Batch 25 - Current Loss: 2.2842291e-6
+  Batch 30 - Current Loss: 6.1627984e-6
+  Batch 35 - Current Loss: 4.4349845e-6
+  Batch 40 - Current Loss: 7.6456425e-5
+  Batch 45 - Current Loss: 1.0194032e-5
+  Batch 50 - Current Loss: 6.853764e-6
+  Batch 55 - Current Loss: 0.00015604314
+  Batch 60 - Current Loss: 7.3444203e-6
+  Batch 65 - Current Loss: 5.134406e-5
+  Batch 70 - Current Loss: 0.00011271363
+  Batch 75 - Current Loss: 3.563044e-5
+  Batch 80 - Current Loss: 7.644566e-6
+  Batch 85 - Current Loss: 1.1694434e-5
+  Batch 90 - Current Loss: 5.3606505e-5
+  Batch 95 - Current Loss: 2.1128839e-5
+  Batch 100 - Current Loss: 1.0328338e-5
+Epoch 83/100 - Average Loss: 3.338855654163114e-5
+  Batch 5 - Current Loss: 2.9793622e-5
+  Batch 10 - Current Loss: 2.532853e-6
+  Batch 15 - Current Loss: 1.0183225e-5
+  Batch 20 - Current Loss: 7.2972944e-6
+  Batch 25 - Current Loss: 6.8137642e-6
+  Batch 30 - Current Loss: 1.1009293e-5
+  Batch 35 - Current Loss: 3.3797098e-9
+  Batch 40 - Current Loss: 6.838797e-5
+  Batch 45 - Current Loss: 3.67939e-5
+  Batch 50 - Current Loss: 4.626478e-5
+  Batch 55 - Current Loss: 9.3318165e-5
+  Batch 60 - Current Loss: 4.991498e-6
+  Batch 65 - Current Loss: 9.085283e-6
+  Batch 70 - Current Loss: 1.999829e-6
+  Batch 75 - Current Loss: 3.911402e-5
+  Batch 80 - Current Loss: 1.3328548e-5
+  Batch 85 - Current Loss: 4.0669187e-5
+  Batch 90 - Current Loss: 7.5814824e-6
+  Batch 95 - Current Loss: 5.967295e-6
+  Batch 100 - Current Loss: 3.162338e-5
+Epoch 84/100 - Average Loss: 3.4546122644458775e-5
+  Batch 5 - Current Loss: 1.5855365e-5
+  Batch 10 - Current Loss: 2.6392754e-6
+  Batch 15 - Current Loss: 1.0464267e-5
+  Batch 20 - Current Loss: 3.3058397e-5
+  Batch 25 - Current Loss: 0.00014331966
+  Batch 30 - Current Loss: 0.00020202542
+  Batch 35 - Current Loss: 2.117457e-6
+  Batch 40 - Current Loss: 8.9952e-5
+  Batch 45 - Current Loss: 4.403101e-6
+  Batch 50 - Current Loss: 3.2367652e-6
+  Batch 55 - Current Loss: 1.5909673e-5
+  Batch 60 - Current Loss: 9.4476545e-6
+  Batch 65 - Current Loss: 2.1134263e-5
+  Batch 70 - Current Loss: 3.749247e-5
+  Batch 75 - Current Loss: 6.080343e-6
+  Batch 80 - Current Loss: 1.1413113e-5
+  Batch 85 - Current Loss: 1.9184766e-10
+  Batch 90 - Current Loss: 8.649894e-6
+  Batch 95 - Current Loss: 6.2176423e-6
+  Batch 100 - Current Loss: 4.781317e-6
+Epoch 85/100 - Average Loss: 3.440708318543942e-5
+  Batch 5 - Current Loss: 6.317109e-6
+  Batch 10 - Current Loss: 0.00012597528
+  Batch 15 - Current Loss: 0.00019049822
+  Batch 20 - Current Loss: 2.1434353e-6
+  Batch 25 - Current Loss: 1.2900845e-5
+  Batch 30 - Current Loss: 7.707656e-5
+  Batch 35 - Current Loss: 9.455686e-6
+  Batch 40 - Current Loss: 4.971019e-5
+  Batch 45 - Current Loss: 0.000100979785
+  Batch 50 - Current Loss: 4.4533022e-5
+  Batch 55 - Current Loss: 0.00016325293
+  Batch 60 - Current Loss: 2.2158742e-5
+  Batch 65 - Current Loss: 2.1283435e-5
+  Batch 70 - Current Loss: 2.6116193e-5
+  Batch 75 - Current Loss: 0.00010420515
+  Batch 80 - Current Loss: 4.3333753e-6
+  Batch 85 - Current Loss: 2.8269253e-5
+  Batch 90 - Current Loss: 5.785077e-5
+  Batch 95 - Current Loss: 4.4445344e-5
+  Batch 100 - Current Loss: 4.0954823e-5
+Epoch 86/100 - Average Loss: 3.4986259070510785e-5
+  Batch 5 - Current Loss: 5.713655e-6
+  Batch 10 - Current Loss: 3.2192e-5
+  Batch 15 - Current Loss: 4.955624e-5
+  Batch 20 - Current Loss: 0.00019727368
+  Batch 25 - Current Loss: 3.0615836e-6
+  Batch 30 - Current Loss: 1.18637045e-5
+  Batch 35 - Current Loss: 8.446813e-5
+  Batch 40 - Current Loss: 4.8790887e-5
+  Batch 45 - Current Loss: 1.18940525e-5
+  Batch 50 - Current Loss: 3.0444466e-5
+  Batch 55 - Current Loss: 9.577777e-7
+  Batch 60 - Current Loss: 2.6117516e-6
+  Batch 65 - Current Loss: 5.7159323e-5
+  Batch 70 - Current Loss: 6.7111882e-6
+  Batch 75 - Current Loss: 4.4188164e-6
+  Batch 80 - Current Loss: 1.7901328e-5
+  Batch 85 - Current Loss: 0.000114676055
+  Batch 90 - Current Loss: 5.40509e-5
+  Batch 95 - Current Loss: 9.5174555e-6
+  Batch 100 - Current Loss: 3.1557196e-5
+Epoch 87/100 - Average Loss: 3.438286731232745e-5
+  Batch 5 - Current Loss: 5.5775868e-6
+  Batch 10 - Current Loss: 1.0374458e-5
+  Batch 15 - Current Loss: 6.3444477e-6
+  Batch 20 - Current Loss: 7.774559e-6
+  Batch 25 - Current Loss: 7.195685e-5
+  Batch 30 - Current Loss: 5.8516316e-6
+  Batch 35 - Current Loss: 2.330884e-6
+  Batch 40 - Current Loss: 3.7434977e-5
+  Batch 45 - Current Loss: 2.0491188e-5
+  Batch 50 - Current Loss: 2.3944207e-5
+  Batch 55 - Current Loss: 1.9486311e-10
+  Batch 60 - Current Loss: 5.06962e-6
+  Batch 65 - Current Loss: 5.1853887e-5
+  Batch 70 - Current Loss: 1.7916425e-5
+  Batch 75 - Current Loss: 3.3962428e-5
+  Batch 80 - Current Loss: 2.864002e-5
+  Batch 85 - Current Loss: 2.3102108e-5
+  Batch 90 - Current Loss: 0.00012057427
+  Batch 95 - Current Loss: 4.0389364e-6
+  Batch 100 - Current Loss: 2.8075033e-6
+Epoch 88/100 - Average Loss: 3.292826469527874e-5
+  Batch 5 - Current Loss: 1.4985919e-5
+  Batch 10 - Current Loss: 4.0927323e-5
+  Batch 15 - Current Loss: 4.441568e-5
+  Batch 20 - Current Loss: 1.448722e-5
+  Batch 25 - Current Loss: 3.351165e-5
+  Batch 30 - Current Loss: 0.000108944274
+  Batch 35 - Current Loss: 5.7164934e-6
+  Batch 40 - Current Loss: 3.5836947e-6
+  Batch 45 - Current Loss: 5.7822126e-6
+  Batch 50 - Current Loss: 3.4513837e-6
+  Batch 55 - Current Loss: 0.00010771108
+  Batch 60 - Current Loss: 4.121282e-5
+  Batch 65 - Current Loss: 1.6722528e-5
+  Batch 70 - Current Loss: 9.8832525e-6
+  Batch 75 - Current Loss: 2.6146206e-5
+  Batch 80 - Current Loss: 1.0716022e-5
+  Batch 85 - Current Loss: 2.0570136e-5
+  Batch 90 - Current Loss: 3.626047e-5
+  Batch 95 - Current Loss: 6.8319925e-5
+  Batch 100 - Current Loss: 2.3242817e-5
+Epoch 89/100 - Average Loss: 3.3100458001820156e-5
+  Batch 5 - Current Loss: 1.7473603e-5
+  Batch 10 - Current Loss: 2.6798332e-5
+  Batch 15 - Current Loss: 6.1224737e-6
+  Batch 20 - Current Loss: 5.3694315e-5
+  Batch 25 - Current Loss: 3.1768457e-5
+  Batch 30 - Current Loss: 1.1907116e-7
+  Batch 35 - Current Loss: 5.7057747e-5
+  Batch 40 - Current Loss: 4.6887886e-5
+  Batch 45 - Current Loss: 6.333531e-5
+  Batch 50 - Current Loss: 4.0140885e-6
+  Batch 55 - Current Loss: 1.3649895e-5
+  Batch 60 - Current Loss: 4.5099073e-6
+  Batch 65 - Current Loss: 9.788604e-6
+  Batch 70 - Current Loss: 3.5105673e-5
+  Batch 75 - Current Loss: 8.4401045e-6
+  Batch 80 - Current Loss: 5.531769e-7
+  Batch 85 - Current Loss: 1.1153955e-5
+  Batch 90 - Current Loss: 2.9049559e-6
+  Batch 95 - Current Loss: 3.831534e-5
+  Batch 100 - Current Loss: 1.728992e-5
+Epoch 90/100 - Average Loss: 3.550202480317566e-5
+  Batch 5 - Current Loss: 5.7560937e-5
+  Batch 10 - Current Loss: 4.9711634e-5
+  Batch 15 - Current Loss: 5.817972e-5
+  Batch 20 - Current Loss: 7.425477e-5
+  Batch 25 - Current Loss: 2.1941037e-6
+  Batch 30 - Current Loss: 5.5131753e-5
+  Batch 35 - Current Loss: 3.691288e-5
+  Batch 40 - Current Loss: 1.0535714e-5
+  Batch 45 - Current Loss: 2.0248834e-5
+  Batch 50 - Current Loss: 1.9092895e-5
+  Batch 55 - Current Loss: 3.9723513e-5
+  Batch 60 - Current Loss: 7.0197966e-5
+  Batch 65 - Current Loss: 4.4516537e-6
+  Batch 70 - Current Loss: 7.814962e-5
+  Batch 75 - Current Loss: 1.9515272e-5
+  Batch 80 - Current Loss: 7.993411e-6
+  Batch 85 - Current Loss: 4.62188e-8
+  Batch 90 - Current Loss: 9.974682e-5
+  Batch 95 - Current Loss: 4.54353e-5
+  Batch 100 - Current Loss: 3.8878848e-6
+Epoch 91/100 - Average Loss: 3.3806004338825524e-5
+  Batch 5 - Current Loss: 3.7749563e-5
+  Batch 10 - Current Loss: 4.205721e-5
+  Batch 15 - Current Loss: 4.755742e-5
+  Batch 20 - Current Loss: 2.346678e-5
+  Batch 25 - Current Loss: 4.926239e-5
+  Batch 30 - Current Loss: 5.0585782e-5
+  Batch 35 - Current Loss: 1.2517412e-5
+  Batch 40 - Current Loss: 3.691152e-5
+  Batch 45 - Current Loss: 6.553443e-6
+  Batch 50 - Current Loss: 8.693912e-6
+  Batch 55 - Current Loss: 6.79108e-5
+  Batch 60 - Current Loss: 3.054873e-6
+  Batch 65 - Current Loss: 3.258022e-6
+  Batch 70 - Current Loss: 8.916969e-5
+  Batch 75 - Current Loss: 1.0815817e-5
+  Batch 80 - Current Loss: 3.2927683e-6
+  Batch 85 - Current Loss: 8.9502784e-5
+  Batch 90 - Current Loss: 1.6091442e-5
+  Batch 95 - Current Loss: 1.0498983e-5
+  Batch 100 - Current Loss: 7.101041e-5
+Epoch 92/100 - Average Loss: 3.634528345376475e-5
+  Batch 5 - Current Loss: 1.6129161e-5
+  Batch 10 - Current Loss: 2.855646e-5
+  Batch 15 - Current Loss: 1.12085545e-5
+  Batch 20 - Current Loss: 6.41991e-6
+  Batch 25 - Current Loss: 4.7363174e-6
+  Batch 30 - Current Loss: 4.7085823e-6
+  Batch 35 - Current Loss: 3.0550666e-5
+  Batch 40 - Current Loss: 0.0002088995
+  Batch 45 - Current Loss: 2.5230436e-5
+  Batch 50 - Current Loss: 6.3154134e-6
+  Batch 55 - Current Loss: 1.9770287e-5
+  Batch 60 - Current Loss: 2.233934e-6
+  Batch 65 - Current Loss: 2.9873272e-6
+  Batch 70 - Current Loss: 6.8001245e-5
+  Batch 75 - Current Loss: 4.558266e-5
+  Batch 80 - Current Loss: 6.9643385e-5
+  Batch 85 - Current Loss: 1.2698098e-5
+  Batch 90 - Current Loss: 3.7962348e-6
+  Batch 95 - Current Loss: 0.00014164305
+  Batch 100 - Current Loss: 0.00012447372
+Epoch 93/100 - Average Loss: 3.4438267344689685e-5
+  Batch 5 - Current Loss: 6.575671e-5
+  Batch 10 - Current Loss: 7.902556e-6
+  Batch 15 - Current Loss: 6.307549e-6
+  Batch 20 - Current Loss: 6.8189606e-6
+  Batch 25 - Current Loss: 6.53127e-5
+  Batch 30 - Current Loss: 3.2925975e-5
+  Batch 35 - Current Loss: 0.00010221705
+  Batch 40 - Current Loss: 7.862039e-6
+  Batch 45 - Current Loss: 2.220794e-5
+  Batch 50 - Current Loss: 5.4138483e-5
+  Batch 55 - Current Loss: 1.6624042e-6
+  Batch 60 - Current Loss: 3.1976542e-6
+  Batch 65 - Current Loss: 6.5015047e-7
+  Batch 70 - Current Loss: 1.2430474e-5
+  Batch 75 - Current Loss: 3.0707004e-5
+  Batch 80 - Current Loss: 8.462989e-6
+  Batch 85 - Current Loss: 1.564456e-5
+  Batch 90 - Current Loss: 3.0132504e-5
+  Batch 95 - Current Loss: 4.2054777e-5
+  Batch 100 - Current Loss: 2.0051966e-6
+Epoch 94/100 - Average Loss: 3.3629300188735556e-5
+  Batch 5 - Current Loss: 3.8542876e-5
+  Batch 10 - Current Loss: 2.529591e-5
+  Batch 15 - Current Loss: 2.8757484e-5
+  Batch 20 - Current Loss: 3.8823223e-6
+  Batch 25 - Current Loss: 1.574123e-5
+  Batch 30 - Current Loss: 4.7749614e-5
+  Batch 35 - Current Loss: 4.7540047e-6
+  Batch 40 - Current Loss: 1.0336888e-5
+  Batch 45 - Current Loss: 9.527296e-5
+  Batch 50 - Current Loss: 4.261512e-6
+  Batch 55 - Current Loss: 3.0310204e-7
+  Batch 60 - Current Loss: 7.160919e-5
+  Batch 65 - Current Loss: 3.9234168e-5
+  Batch 70 - Current Loss: 6.432226e-5
+  Batch 75 - Current Loss: 2.756857e-8
+  Batch 80 - Current Loss: 4.0286854e-5
+  Batch 85 - Current Loss: 1.2159614e-5
+  Batch 90 - Current Loss: 9.431539e-6
+  Batch 95 - Current Loss: 6.50738e-6
+  Batch 100 - Current Loss: 5.3420565e-5
+Epoch 95/100 - Average Loss: 3.438470184860876e-5
+  Batch 5 - Current Loss: 4.2548763e-6
+  Batch 10 - Current Loss: 3.8356514e-9
+  Batch 15 - Current Loss: 2.5127914e-5
+  Batch 20 - Current Loss: 5.3519007e-6
+  Batch 25 - Current Loss: 9.883041e-6
+  Batch 30 - Current Loss: 1.47709015e-5
+  Batch 35 - Current Loss: 2.5083937e-6
+  Batch 40 - Current Loss: 7.212603e-6
+  Batch 45 - Current Loss: 2.6931707e-6
+  Batch 50 - Current Loss: 2.3090925e-5
+  Batch 55 - Current Loss: 0.00011033578
+  Batch 60 - Current Loss: 1.401907e-6
+  Batch 65 - Current Loss: 2.2981256e-5
+  Batch 70 - Current Loss: 8.500449e-6
+  Batch 75 - Current Loss: 1.8300378e-5
+  Batch 80 - Current Loss: 5.525215e-5
+  Batch 85 - Current Loss: 1.9048435e-5
+  Batch 90 - Current Loss: 0.00014531148
+  Batch 95 - Current Loss: 7.083493e-6
+  Batch 100 - Current Loss: 2.5552368e-5
+Epoch 96/100 - Average Loss: 3.1589796558546545e-5
+  Batch 5 - Current Loss: 9.491099e-5
+  Batch 10 - Current Loss: 2.7634847e-5
+  Batch 15 - Current Loss: 5.019276e-5
+  Batch 20 - Current Loss: 9.3132316e-5
+  Batch 25 - Current Loss: 4.1308476e-6
+  Batch 30 - Current Loss: 9.584755e-6
+  Batch 35 - Current Loss: 7.26416e-6
+  Batch 40 - Current Loss: 0.0001158033
+  Batch 45 - Current Loss: 7.794382e-5
+  Batch 50 - Current Loss: 3.0573377e-5
+  Batch 55 - Current Loss: 4.5206652e-6
+  Batch 60 - Current Loss: 6.1933993e-6
+  Batch 65 - Current Loss: 9.298669e-6
+  Batch 70 - Current Loss: 6.193278e-6
+  Batch 75 - Current Loss: 1.6445678e-5
+  Batch 80 - Current Loss: 9.598248e-5
+  Batch 85 - Current Loss: 4.016894e-5
+  Batch 90 - Current Loss: 8.77103e-6
+  Batch 95 - Current Loss: 1.0007757e-6
+  Batch 100 - Current Loss: 4.4892827e-6
+Epoch 97/100 - Average Loss: 3.494259707181868e-5
+  Batch 5 - Current Loss: 1.4746363e-6
+  Batch 10 - Current Loss: 3.277451e-5
+  Batch 15 - Current Loss: 4.6805046e-5
+  Batch 20 - Current Loss: 3.740417e-5
+  Batch 25 - Current Loss: 3.4522793e-5
+  Batch 30 - Current Loss: 9.238003e-5
+  Batch 35 - Current Loss: 9.189106e-6
+  Batch 40 - Current Loss: 1.6898644e-5
+  Batch 45 - Current Loss: 5.5391206e-6
+  Batch 50 - Current Loss: 4.2363794e-5
+  Batch 55 - Current Loss: 2.4537676e-6
+  Batch 60 - Current Loss: 4.891089e-5
+  Batch 65 - Current Loss: 7.5445532e-6
+  Batch 70 - Current Loss: 9.792854e-6
+  Batch 75 - Current Loss: 6.8586683e-6
+  Batch 80 - Current Loss: 3.9800158e-5
+  Batch 85 - Current Loss: 4.04124e-6
+  Batch 90 - Current Loss: 0.00012134488
+  Batch 95 - Current Loss: 1.9516541e-5
+  Batch 100 - Current Loss: 4.145575e-6
+Epoch 98/100 - Average Loss: 3.222947629834216e-5
+  Batch 5 - Current Loss: 4.6078814e-5
+  Batch 10 - Current Loss: 8.572003e-5
+  Batch 15 - Current Loss: 0.000217594
+  Batch 20 - Current Loss: 5.380954e-7
+  Batch 25 - Current Loss: 4.382981e-6
+  Batch 30 - Current Loss: 3.4629324e-5
+  Batch 35 - Current Loss: 5.50681e-6
+  Batch 40 - Current Loss: 2.7311742e-7
+  Batch 45 - Current Loss: 2.3478349e-6
+  Batch 50 - Current Loss: 4.1790336e-5
+  Batch 55 - Current Loss: 9.865019e-5
+  Batch 60 - Current Loss: 2.9557345e-5
+  Batch 65 - Current Loss: 7.928888e-6
+  Batch 70 - Current Loss: 5.8504455e-5
+  Batch 75 - Current Loss: 4.8211958e-5
+  Batch 80 - Current Loss: 2.345777e-5
+  Batch 85 - Current Loss: 1.731957e-5
+  Batch 90 - Current Loss: 6.7634746e-6
+  Batch 95 - Current Loss: 6.580996e-5
+  Batch 100 - Current Loss: 2.791583e-5
+Epoch 99/100 - Average Loss: 3.303323854233042e-5
+  Batch 5 - Current Loss: 8.277971e-6
+  Batch 10 - Current Loss: 1.9059682e-5
+  Batch 15 - Current Loss: 1.6856247e-5
+  Batch 20 - Current Loss: 3.8044614e-5
+  Batch 25 - Current Loss: 1.6593222e-5
+  Batch 30 - Current Loss: 5.562197e-7
+  Batch 35 - Current Loss: 7.2233786e-5
+  Batch 40 - Current Loss: 2.8671607e-6
+  Batch 45 - Current Loss: 5.5412733e-5
+  Batch 50 - Current Loss: 1.9411153e-5
+  Batch 55 - Current Loss: 4.3115388e-6
+  Batch 60 - Current Loss: 3.9638846e-5
+  Batch 65 - Current Loss: 3.0233957e-6
+  Batch 70 - Current Loss: 2.445945e-5
+  Batch 75 - Current Loss: 4.789863e-8
+  Batch 80 - Current Loss: 1.8080264e-5
+  Batch 85 - Current Loss: 4.9828445e-6
+  Batch 90 - Current Loss: 2.2027525e-6
+  Batch 95 - Current Loss: 8.296956e-6
+  Batch 100 - Current Loss: 1.7891964e-5
+Epoch 100/100 - Average Loss: 3.289902899480168e-5
+=== Finished training for UDE Hybrid Model ===
+
+============ Job Information ===================================================
+Submitted: 2026-03-11T15:44:59
+Started: 2026-03-12T20:04:36
+Ended: 2026-03-13T01:01:26
+Elapsed: 297 min, Limit: 1440 min, Difference: 1143 min
+CPUs: 16, Nodes: 1
+Estimated Consumption: 5197.50 core-hours
+================================================================================
