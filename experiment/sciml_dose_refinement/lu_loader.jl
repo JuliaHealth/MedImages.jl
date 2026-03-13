@@ -4,9 +4,9 @@ using Statistics
 using Random
 
 function load_patient_data(patient_dir::String; target_size=(64, 64, 64))
-    spect_recon_path = joinpath(patient_dir, "SPECT_DATA", "SPECT_Recon_WholeBody.nii.gz")
-    ct_path = joinpath(patient_dir, "SPECT_DATA", "CT.nii.gz")
-    dose_path = joinpath(patient_dir, "SPECT_DATA", "Dosemap.nii.gz")
+    spect_recon_path = joinpath(patient_dir, "SPECT_DATA", "nifti_files", "SPECT_Recon_WholeBody.nii.gz")
+    ct_path = joinpath(patient_dir, "SPECT_DATA", "nifti_files", "CT.nii.gz")
+    dose_path = joinpath(patient_dir, "SPECT_DATA", "nifti_files", "Dosemap.nii.gz")
 
     if !isfile(spect_recon_path) || !isfile(ct_path) || !isfile(dose_path)
         @warn "Missing files in $patient_dir"

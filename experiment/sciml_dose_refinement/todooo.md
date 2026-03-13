@@ -39,19 +39,48 @@ Channel 2: CT
 4. Running the Experiments
 You can run individual models or the entire suite.
 
-Local Execution
-bash
-# Run PINN refinement
-julia --project=. run_experiment_lu.jl pinn /path/to/data
-# Run UDE refinement
-julia --project=. run_experiment_lu.jl ude /path/to/data
-Slurm Deployment
-Use the provided batch scripts for H100 GPU acceleration. These scripts include automatic cache cleanup and race-condition prevention:
+Local Execution (Single GPU)
+On this machine, you can run experiments directly using the single H100 GPU. The data is located in `/DATA`.
 
-bash
+First, ensure the environment is ready:
+```bash
+# Create and activate conda environment
+conda create -n sciml_env -c conda-forge julia=1.10 -y
+conda activate sciml_env
+
+# Setup Julia project
+cd experiment/sciml_dose_refinement
+julia --project=. -e 'using Pkg; Pkg.develop(path="../../"); Pkg.instantiate()'
+```
+
+Run specific models:
+```bash
+# Set data directory and run
+export LU_DATA_DIR="/DATA"
+conda activate sciml_env
+
+# Run PINN refinement
+julia --project=. run_experiment_lu.jl pinn
+
+# Run FNO refinement
+julia --project=. run_experiment_lu.jl fno
+
+# Run UDE refinement
+julia --project=. run_experiment_lu.jl ude
+```
+
+You can also override hyperparameters via environment variables:
+```bash
+LU_EPOCHS=100 LU_NUM_SAMPLES=100 LU_BATCH_SIZE=1 julia --project=. run_experiment_lu.jl pinn
+```
+
+Slurm Deployment (Cluster)
+If deploying to a cluster, use the provided batch scripts in `slurm/`. These are pre-configured for H100 GPU acceleration.
+```bash
 sbatch experiment/sciml_dose_refinement/slurm/pinn_slurm.sh
 sbatch experiment/sciml_dose_refinement/slurm/fno_slurm.sh
 sbatch experiment/sciml_dose_refinement/slurm/ude_slurm.sh
+```
 5. Model Details
 PINN: Physics-Informed CNN
 The PINN uses a 3D-CNN architecture. Its loss function is defined as: $$Loss = Loss_{Data} + \lambda \cdot Loss_{Physics}$$ where $Loss_{Physics}$ enforces that the total predicted energy $(\sum Dose)$ remains consistent with the total input activity $(\sum SPECT)$.
