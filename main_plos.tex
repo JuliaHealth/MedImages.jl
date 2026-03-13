@@ -139,7 +139,7 @@ MedImages.jl provides a comprehensive set of functionalities optimized for 3D me
 \end{itemize}
 
 \section*{Results}
-To demonstrate that MedImages.jl resolves the four core challenges, our results are structured accordingly. We first address computational performance (Speed and Volume), followed by clinical fidelity (Metadata Management), and conclude with advanced SciML pipelines (Differentiability).
+To demonstrate that MedImages.jl resolves the four core challenges, our results are structured accordingly. We first address computational performance (Volume and Speed), followed by advanced SciML pipelines (Differentiability), and conclude with clinical fidelity (Metadata Management).
 
 \subsection*{Challenge 1: Volume -- Scaling to 100 Cases (HDF5 vs. MONAI)}
 To evaluate the framework under high-throughout production loads, we benchmarked a 100-case preprocessing pipeline involving PET/CT alignment and resampling to a $512 \times 512 \times 512$ grid. For a fair comparison with MONAI's \texttt{PersistentDataset}, we evaluate performance for high-frequency training loops (Epochs 2+), assuming data has been cached or pre-loaded.
