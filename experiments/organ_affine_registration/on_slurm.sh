@@ -68,9 +68,15 @@ cd "$REPO_ROOT"
 # Set Julia threads
 export JULIA_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-echo "Sequential Pre-initialization (Building PyCall and Instantiating)..."
-# Run directly on the first node to handle build, precompilation, and CondaPkg setup safely
-julia --project=. -e 'using Pkg; ENV["PYTHON"]=ENV["PYTHON"]; Pkg.build("PyCall"); Pkg.instantiate(); println("Base packages ready")'
+echo "Sequential Pre-initialization (Phase 1: Build & Instantiate)..."
+# Run directly on the first node to handle build and instantiation safely
+julia --project=. -e '
+    using Pkg; 
+    ENV["PYTHON"]=ENV["PYTHON"]; 
+    Pkg.build("PyCall"); 
+    Pkg.instantiate(); 
+    println("Phase 1: Instantiation complete")
+'
 
 # Configure MPI.jl to use the system OpenMPI loaded via module
 OMPI_LIB_DIR=$(dirname $(which mpiexec))/../lib
@@ -83,8 +89,37 @@ julia --project=. -e "
     println(\"MPIPreferences configured for system OpenMPI\")
 "
 
-echo "Verifying MPI configuration..."
-julia --project=. -e 'using MPI; println("MPI loaded successfully"); println("MPI implementation: ", MPI.identify_implementation())'
+# --- Phase 2: Clean stale caches and re-precompile AFTER MPI config ---
+# MPIPreferences.use_system_binary() invalidates all MPI-dependent compiled caches.
+# We MUST re-precompile before srun, or 4 ranks will race to recompile simultaneously.
+echo "Cleaning stale compiled caches after MPI reconfiguration..."
+COMPILED_DIR="$CONDA_ENV_PATH/share/julia/compiled"
+if [ -d "$COMPILED_DIR" ]; then
+    echo "Removing stale compiled caches in $COMPILED_DIR..."
+    rm -rf "$COMPILED_DIR"/v1.10/MPI*
+    rm -rf "$COMPILED_DIR"/v1.10/HDF5*
+    rm -rf "$COMPILED_DIR"/v1.10/JLD*
+    rm -rf "$COMPILED_DIR"/v1.10/MedImages*
+    rm -rf "$COMPILED_DIR"/v1.10/OpenMPI*
+fi
+
+echo "Sequential Pre-initialization (Phase 2: Full Precompile after MPI config)..."
+julia --project=. -e '
+    using Pkg;
+    Pkg.precompile();
+    println("Phase 2: Full precompilation complete")
+'
+
+echo "Verifying all packages load correctly (single process)..."
+julia --project=. -e '
+    using MPI
+    println("MPI loaded: ", MPI.identify_implementation())
+    using HDF5
+    println("HDF5 loaded successfully")
+    using MedImages
+    println("MedImages loaded successfully")
+    println("All packages verified!")
+'
 
 echo "Starting Multi-GPU Training on Slurm..."
 srun --mpi=pmix julia --project=. experiments/organ_affine_registration/train.jl

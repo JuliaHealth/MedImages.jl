@@ -13,6 +13,8 @@ using Dates
 using Serialization
 using Wandb
 using Accessors
+using HDF5
+using Functors: fmap
 
 # Optional: Distributed Utils
 # We check if we are running in distributed mode
@@ -40,16 +42,21 @@ using .Preprocessing
 using .RegistrationModel
 using .FusedLoss
 
-# --- Distributed Helper (Simple AllReduce) ---
-function average_gradients(grads, comm)
+# --- Distributed Helper (AllReduce) ---
+function allreduce_recursive!!(backend, grads)
     # Recursively walk through gradients and Allreduce leaf arrays
-    # In a real Lux.DistributedUtils setup, this is handled automatically.
-    # Here we implement a simple version for demonstration if Lux.DistributedUtils is not available/used directly.
-    # Note: Lux doesn't export DistributedUtils by default in v0.5/v1.0 in the same way.
-    # We will assume single-node training for simplicity unless explicitly requested to use a specific lib.
-    # The user asked for "support for distributed training as shown in https://lux.csail.mit.edu/stable/manual/distributed_utils"
-    # That page describes `Lux.DistributedUtils`.
-
+    # fmap allows us to apply a function to all leaves of a Lux parameter/gradient structure
+    return fmap(grads) do leaf
+        if leaf isa AbstractArray
+            # Perform in-place allreduce on the buffer
+            # We use MPI.Allreduce! 
+            MPI.Allreduce!(leaf, MPI.SUM, MPI.COMM_WORLD)
+            # Average by world size
+            leaf ./= Float32(MPI.Comm_size(MPI.COMM_WORLD))
+        end
+        return leaf
+    end
+end
 function visualize_validation(epoch, model, ps, st, valid_train, f, device, ka_backend, rank, dataset_path, num_organs)
     if rank != 0 return end
     
@@ -216,7 +223,7 @@ function run_training_experiment(args=ARGS)
         if rank == 0 println("ERROR: HDF5 file not found. Run preprocess_data.jl first.") end
         return
     end
-    gold_vol[10, 5, 5, 1] = 1.0f0
+    gold_vol = zeros(Float32, 1, 1, 1, 1) # Placeholder for scope if needed
 
     f = h5open(hdf5_path, "r")
     train_list = read(f["train_list"])
@@ -267,7 +274,8 @@ function run_training_experiment(args=ARGS)
     atlas_points = atlas_points_cpu |> device
 
     # 4. Training Loop
-    ka_backend = KernelAbstractions.get_backend(ps.dense_layers.layer_1.weight)
+    backend = KernelAbstractions.get_backend(ps.dense_layers.layer_1.weight)
+    device = backend isa KernelAbstractions.GPU ? Lux.gpu_device() : Lux.cpu_device()
     
     # Pre-read Atlas Image once, then free the raw buffer
     hp_atlas = read(f["atlas_image"])
@@ -333,7 +341,7 @@ function run_training_experiment(args=ARGS)
             centers = reshape(centers, 3, 1)
             
             x_aug, gold_aug, am_meta = Zygote.ignore() do
-                apply_random_augmentation(x_raw, gold_raw, centers, ka_backend)
+                apply_random_augmentation(x_raw, gold_raw, centers, backend)
             end
 
             # Gradient Step
@@ -375,8 +383,8 @@ function run_training_experiment(args=ARGS)
             bary_gpu = nothing
             radii_gpu = nothing
             GC.gc()
-            if ka_backend isa LuxCUDA.CUDABackend
-                CUDA.reclaim()
+            if backend isa KernelAbstractions.GPU
+                # CUDA.reclaim() # Only if using CUDA.jl directly
             end
         end
         
@@ -394,7 +402,7 @@ function run_training_experiment(args=ARGS)
         end
 
         dataset_path = "/mnt/vast-kisski/projects/ovgu_medicine_llm/ollama_data/dataset_Lu"
-        visualize_validation(epoch, model, ps, st, valid_train, f, device, ka_backend, rank, dataset_path, num_organs)
+        visualize_validation(epoch, model, ps, st, valid_train, f, device, backend, rank, dataset_path, num_organs)
     end
     
     close(f)
@@ -403,24 +411,6 @@ function run_training_experiment(args=ARGS)
     end
 end
 
-    if rank == 0
-        initial_loss = losses[1]
-        final_loss = losses[end]
-
-        println("Initial Loss: $initial_loss")
-        println("Final Loss:   $final_loss")
-
-        if final_loss < initial_loss * 0.5
-            println("SUCCESS: Loss dropped significantly.")
-        else
-            println("FAILURE: Loss did not drop enough.")
-        end
-
-        # Analyze Params
-        params_final, _ = model(x_input, ps, st)
-        tx = params_final[4, 1, 1]
-        println("Final Translation X: $tx | Expected ~ 5.0")
-    end
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
