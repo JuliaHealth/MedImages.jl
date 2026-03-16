@@ -1,0 +1,2304 @@
+Discuss what these sources say about NURBS Hybrid Phantoms, in the larger context of Computational Phantoms.
+
+Computational phantoms are mathematical representations of the human body used in dosimetry to model organs and the whole body for calculating absorbed radiation doses
+ \cite{FinocchiaroBerenato2020}
+ \cite{DieudonnHobbs2010}. Historically, dosimetry relied on standardized, stylized phantoms consisting of simple geometric shapes (such as the Christy-Eckerman phantoms)
+ \cite{RamonahengQebetu2024}
+ \cite{ChatachotShiratori2021}. While easy to use, these traditional models assume a standardized individual with homogeneous tissue and uniform activity distribution within organs, failing to capture patient-specific anatomy, organ mass variations, and heterogeneous radiotracer uptake
+ \cite{DieudonnHobbs2010}
+
+ \cite{BaileyMarquis2022}
+ \cite{KostDewaraja2015}.
+To address these limitations, dosimetry models have evolved to utilize Non-Uniform Rational B-Splines (NURBS)
+ \cite{RamonahengQebetu2024}
+
+ \cite{ChatachotShiratori2021}
+ \cite{KostDewaraja2015}. These models act as hybrid computational phantoms because they bridge the gap between simple stylized models and rigid voxel-based models: they combine the high-resolution anatomical reality of voxel phantoms with the mathematical flexibility of stylized phantoms
+ \cite{ChatachotShiratori2021}
+ \cite{ChatachotShiratori2021}.
+The sources highlight several key characteristics and benefits of NURBS hybrid phantoms:
+Improved Anatomical Realism: NURBS phantoms provide a much better anatomical representation than older stylized models. For instance, they accurately model tissues that are physically in contact with each other
+ \cite{ChatachotShiratori2021}. One study comparing an older stylized phantom (OLINDA/EXM v. 1.0) with a NURBS computational phantom (OLINDA/EXM v. 2.0) found a 6.37\\\\% difference in absorbed dose estimates, which was attributed to this superior anatomical representation
+ \cite{ChatachotShiratori2021}.
+Deformability and Mass Scaling: Because they are mathematically defined, NURBS phantoms can be easily deformed and scaled
+ \cite{ChatachotShiratori2021}. They can be modified to match standard organ masses, such as those defined in the International Commission on Radiological Protection (ICRP) Publication 89
+ \cite{ChatachotShiratori2021}
+ \cite{KostDewaraja2015}. This flexibility allows clinicians to derive patient weight- and age-specific S-values, facilitating highly personalized dosimetry across different patient populations
+ \cite{ChatachotShiratori2021}.
+Automated Patient-Specific Morphing: In advanced 3D dosimetry applications like VIDA (Voxel-Based Internal Dosimetry Application), NURBS phantoms can be rendered directly over a patient's CT scans
+ \cite{KostDewaraja2015}. Custom transformation algorithms are used to morph the phantom's body contour and organ surfaces to precisely match the individual patient's anatomy
+ \cite{KostDewaraja2015}. The deformed NURBS model is then converted into a voxelized format matching the resolution of the functional SPECT or PET images, which saves significant time by bypassing the need for manual organ segmentation
+ \cite{KostDewaraja2015}.
+Integration into Modern Software: NURBS technology is the foundation of modern standard dosimetry software. For example, OLINDA/EXM version 2.0 utilizes a hybrid computational phantom based on NURBS technology, specifically adapting the RADAR reference adult male NURBS phantom (a modified version of the NCAT cardiac-torso phantom)
+ \cite{ChatachotShiratori2021}
+
+ \cite{ChatachotShiratori2021}
+ \cite{KostDewaraja2015}.
+Preclinical Applications: The flexibility of NURBS is also heavily utilized in small animal dosimetry. The 4D digital mouse body (MOBY) and rat body (ROBY) phantoms rely on NURBS mathematical models to define precise organ boundaries for Monte Carlo simulations in preclinical research
+ \cite{GuptaLee2020}.
+Discuss what these sources say about Voxel-Based Dosimetry, in the larger context of Dosimetry Calculation Methods.
+
+Historically, radiation dosimetry in nuclear medicine relied on the Medical Internal Radiation Dose (MIRD) schema, which estimates mean absorbed doses at the whole-organ level
+ \cite{BashirIqbal2024}
+ \cite{FinocchiaroBerenato2020}. This traditional method assumes a homogeneous activity distribution and uniform tissue density within standard, stylized phantom geometries, failing to account for patient-specific anatomical variations, actual tumor sizes, or heterogeneous disease distributions
+ \cite{FuertesGarca2021}
+
+ \cite{BashirIqbal2024}
+ \cite{KostDewaraja2015}. To overcome these limitations and move towards personalized medicine in targeted radiopharmaceutical therapy (TRT), voxel-based dosimetry has been developed. By dividing the patient's anatomy into microscopic 3D volumetric elements (voxels) utilizing hybrid imaging like SPECT/CT or PET/CT, this approach provides a high-resolution, patient-specific 3D map of radiation dose
+ \cite{GtzLang2021}
+
+ \cite{BashirIqbal2024}
+ \cite{GtzSchmidkonz2019}
+ \cite{BaileyMarquis2022}.
+Within voxel-based dosimetry, several distinct calculation methods offer varying trade-offs between accuracy and computational speed:
+Direct Monte Carlo (MC) Simulations: Widely considered the gold standard for voxel-based dosimetry, MC explicitly models the transport of individual photons and charged particles through heterogeneous tissues derived from a patient's CT scan
+ \cite{GtzLang2021}
+
+ \cite{DieudonnHobbs2012}
+ \cite{GtzSchmidkonz2019}
+ \cite{BaileyMarquis2022}. While it provides the highest accuracy by capturing complex radiation-matter interactions at tissue boundaries, it is exceptionally computationally expensive and time-consuming (often taking hours to days), historically limiting its routine clinical use
+ \cite{BashirIqbal2024}
+
+ \cite{DieudonnHobbs2012}
+ \cite{BaileyMarquis2022}
+ \cite{FinocchiaroBerenato2020}.
+Dose Voxel Kernels (DVK) and Voxel S-Values (VSV): This approach calculates dose by convolving a time-integrated activity (TIA) map with precalculated kernels representing the dose deposited in target voxels per radioactive decay in a source voxel
+ \cite{PistoneAuditore2022}
+
+ \cite{DieudonnHobbs2012}
+ \cite{GtzSchmidkonz2019}
+ \cite{FernndezHnscheid2013}. While much faster than MC simulations because it avoids complex radiation transport calculations, standard VSV methods assume an infinite, uniform medium (usually soft tissue or water)
+ \cite{DieudonnHobbs2012}
+
+ \cite{GtzSchmidkonz2019}
+ \cite{GuptaLee2020}. This can introduce significant errors at tissue interfaces like bone or lung, though advanced scaling techniques can apply voxel-by-voxel density corrections using CT data to mitigate this
+ \cite{DieudonnHobbs2012}
+
+ \cite{GtzSchmidkonz2019}
+ \cite{BaileyMarquis2022}
+ \cite{MahmoudiPirayesh2021}.
+Dose Point Kernel (DPK) Convolution: Conceptually similar to DVKs, DPKs represent the continuous radial distribution of absorbed dose around an isotropic point source
+ \cite{GtzLang2021}
+ \cite{GtzSchmidkonz2019}. They are often discretized and convolved via fast Fourier transforms but face similar limitations regarding tissue heterogeneity unless appropriately scaled
+ \cite{DieudonnHobbs2012}
+
+ \cite{BaileyMarquis2022}
+ \cite{RamonahengQebetu2024}.
+Local Deposition Method (LDM): The simplest voxel-based approximation assumes that all emitted energy is absorbed entirely within the source voxel
+ \cite{GleisnerChouin2022}. While fast and somewhat appropriate for short-range beta emitters like 177Lu, it ignores cross-dose from neighboring voxels and the highly penetrating photon emissions that also contribute to total absorbed dose
+ \cite{GleisnerChouin2022}
+ \cite{ReschFouladgar2023}.
+Advanced and Emerging Solvers: To bridge the gap between the accuracy of MC and the speed of kernel convolutions, newer algorithms have been adapted for TRT. These include Linear Boltzmann Transport Equation (LBTE) solvers (e.g., Acuros MRT or GBBS), which solve transport equations deterministically in heterogeneous media in a fraction of the time
+ \cite{BaileyMarquis2022}
+
+ \cite{BaileyMarquis2022}
+ \cite{MikellKappadath2016}. Other approaches include Collapsed-Cone Superposition (CCS), which scales DPKs dynamically based on tissue densities
+ \cite{TerroPerret2025}
+ \cite{TerroPerret2025}, and Deep Neural Networks (DNNs), which are trained on MC data to predict voxel-level doses or specific DVKs directly from imaging data almost instantaneously
+ \cite{GtzLang2021}
+
+ \cite{StabinMadsen2019}
+ \cite{StabinMadsen2019}
+ \cite{StabinMadsen2019}.
+The primary advantage of voxel-based dosimetry is its ability to reveal spatial non-uniformities in dose deposition that whole-organ averages obscure
+ \cite{BashirIqbal2024}
+
+ \cite{GtzSchmidkonz2019}
+ \cite{FinocchiaroBerenato2020}. This allows for the generation of Dose-Volume Histograms (DVHs) and Dose-Mass Histograms (DMHs), which are critical for evaluating tumor control probabilities and normal-tissue complication probabilities, bringing TRT closer to the standard of care seen in external beam radiotherapy
+ \cite{FinocchiaroBerenato2020}
+
+ \cite{TranGiaSalasRamirez2019}
+ \cite{GustafssonLjungberg2023}
+ \cite{KostDewaraja2015}. By calculating precise doses to highly active tumor sub-regions and evaluating dose gradients in critical organs like the kidneys or bone marrow, clinicians can personalize administered activities, thereby optimizing therapeutic efficacy while sparing healthy tissue
+ \cite{TranGiaSalasRamirez2019}
+
+ \cite{BashirIqbal2024}
+ \cite{BashirIqbal2024}.
+Despite its superiority over organ-level methods, voxel-based dosimetry faces several challenges. Its absolute accuracy is fundamentally limited by the spatial resolution and noise of the underlying SPECT or PET images
+ \cite{TranGiaSalasRamirez2019}
+
+ \cite{ReschFouladgar2023}
+ \cite{MulyadiJung2022}. The Partial Volume Effect (PVE) causes significant image blurring, leading to underestimations of absorbed dose in small structures or tumors
+ \cite{TranGiaSalasRamirez2019}
+
+ \cite{RamonahengQebetu2024}
+ \cite{RamonahengQebetu2024}
+ \cite{MulyadiJung2022}. Furthermore, the full voxel-dosimetry workflow requires sequential imaging, accurate rigid or deformable image registration across multiple time points, and complex curve fitting, which can be burdensome for both patients and clinical staff
+ \cite{FinocchiaroBerenato2020}
+
+ \cite{DelkerFendler2015}
+ \cite{KarimzadehSchatz2024}
+ \cite{KostDewaraja2015}.
+Discuss what these sources say about Tumour Sink Effect, in the larger context of Pharmacokinetic (PK) Modelling.
+
+The tumour sink effect describes the phenomenon where large tumor masses (a high total tumor volume or burden) significantly influence the pharmacokinetics of radiopharmaceuticals by acting as "antigen sinks"
+ \cite{KlettingSchimmel2015}
+ \cite{BegumThieme2018}. Because these large tumor masses contain a vast number of specific receptor binding sites, they absorb a massive proportion of the administered radioligand
+ \cite{KlettingSchimmel2015}.
+This effect has major implications for how radiation is distributed throughout the body during targeted radionuclide therapy (TRT):
+Impact on Healthy Organs: A high tumor burden draws the radiopharmaceutical away from healthy tissues, which can lead to decreased activity concentrations and lower radiation-absorbed doses in dose-limiting organs at risk (OARs), such as the kidneys and salivary glands
+ \cite{BegumThieme2018}
+ \cite{XueGafita2022}. Conversely, there have been concerns that patients with low-volume disease might suffer from unfavorable radioligand distribution, leading to higher toxicity in normal organs because the "sink" is absent
+ \cite{PetersPriv2021}. However, recent studies suggest that the lack of a tumor sink effect in low-volume disease may actually be of less concern than expected, as the tumor-to-organ uptake ratio can remain favorable
+ \cite{PetersPriv2021}.
+Impact on the Tumor: While the sink effect protects healthy tissue, it also disperses the radioligand across a massive volume of cancer cells. This dispersion carries the risk of decreasing the activity concentration within the tumor itself, potentially resulting in tumor underdosing and a less effective treatment
+ \cite{BegumThieme2018}.
+The Role of Pharmacokinetic (PK) Modelling Because the tumour sink effect creates high interpatient pharmacokinetic variability, the standard "one-activity-fits-all" approach to administering radiopharmaceuticals is often suboptimal
+ \cite{BegumThieme2018}. To account for this variability, Physiologically Based Pharmacokinetic (PBPK) models are highly suitable because they can explicitly model both the patient's individual organ physiology and the tumor's pathophysiology
+ \cite{BegumThieme2018}
+ \cite{BegumThieme2018}.
+In the context of the tumour sink effect, PBPK modeling provides several critical insights:
+Quantitative Simulation of Tumor Volume: PBPK models systematically investigate the sink effect by simulating how different Total Tumor Volumes (TTV) impact the biologically effective doses (BEDs) delivered to the tumor and OARs
+ \cite{BegumThieme2018}
+ \cite{BegumThieme2018}.
+Treatment Individualization: PBPK models have demonstrated that patients with a large, PSMA-positive tumor mass can safely be administered higher activities and higher peptide amounts of the radiopharmaceutical
+ \cite{BegumThieme2018}
+ \cite{BegumThieme2018}. Because the tumor sink effect protects their healthy organs, the therapy can be personalized to maximize the radiation dose to the tumor without exceeding the critical toxicity limits for the OARs
+ \cite{XueGafita2022}
+ \cite{BegumThieme2018}.
+Dynamic Adaptation to Disease Progression: As a patient undergoes therapy, the disease may progress or regress, which fundamentally changes the tumor volume and the number of specific binding sites available
+ \cite{KlettingSchimmel2015}. This means the intensity of the tumour sink effect will shift over time, altering the patient's biodistribution and renal clearance
+ \cite{KlettingSchimmel2015}. PK modeling allows clinicians to track these spatiotemporal changes and extrapolate them to adapt therapeutic doses cycle by cycle
+ \cite{KlettingSchimmel2015}
+ \cite{XueGafita2022}.
+Discuss what these sources say about Averaging Strategies, in the larger context of Dosimetry Calculation Methods.
+
+In radiopharmaceutical therapy, dosimetry calculation methods range from global, organ-level approaches to highly personalized, voxel-level calculations. Traditional organ-level dosimetry (such as the standard MIRD formalism) utilizes mathematical phantoms to estimate the mean absorbed dose across whole organs, assuming uniform activity and homogeneous tissue density
+ \cite{GtzLang2021},
+ \cite{FuertesGarca2021},
+ \cite{GtzSchmidkonz2019}. In contrast, advanced voxel-based dosimetry—including dose voxel kernels (DVK) and direct Monte Carlo (MC) simulations—divides the patient's anatomy into microscopic 3D volumes (voxels) to account for patient-specific tissue heterogeneities and non-uniform distributions of radioactivity
+ \cite{BashirIqbal2024},
+ \cite{GtzSchmidkonz2019},
+ \cite{BaileyMarquis2022}.
+Even when employing high-resolution voxel-based calculations, clinical practice frequently requires aggregating these voxel-wise doses into scalar averages to evaluate entire organs, paired organs (like kidneys), or multiple tumor lesions
+ \cite{GustafssonLjungberg2023},
+ \cite{GustafssonLjungberg2023}. The sources identify that the specific averaging strategies used to aggregate these doses can drastically alter the final reported values, leading to significant inconsistencies if not properly defined
+ \cite{GustafssonLjungberg2023},
+ \cite{GustafssonLjungberg2023}.
+The sources categorize averaging strategies into two primary domains: averaging within a specific region and averaging between multiple regions.
+Averaging Within Regions When calculating the average absorbed dose inside a single volume of interest (such as a single organ or tumor), two primary definitions are used:
+Density-weighted region-average: This method weights the point-wise absorbed doses by the mass density of the tissue, effectively dividing the total absorbed energy by the total mass of the region
+ \cite{GustafssonLjungberg2023}. The sources strongly endorse this strategy because it aligns with the formal ICRU definition of mean absorbed dose and is mathematically consistent with the MIRD formalism
+ \cite{GustafssonLjungberg2023},
+ \cite{GustafssonLjungberg2023},
+ \cite{GustafssonLjungberg2023}.
+Region-average (unweighted): This is a simple spatial average across the region's volume, regardless of tissue density
+ \cite{GustafssonLjungberg2023},
+ \cite{GustafssonLjungberg2023}.
+While both strategies yield identical results in perfectly homogeneous tissues, they diverge significantly when applied to regions with markedly non-uniform mass densities (such as tumors situated near bone or lung interfaces)
+ \cite{GustafssonLjungberg2023},
+ \cite{GustafssonLjungberg2023}. Furthermore, these distinct strategies correlate with different graphical representations of dose distribution: the unweighted region-average corresponds to traditional Dose-Volume Histograms (DVHs), whereas the density-weighted average corresponds to Dose-Mass Histograms (DMHs)
+ \cite{GustafssonLjungberg2023}. DMHs are argued to be a much more physically meaningful way to represent absorbed-dose non-uniformity
+ \cite{GustafssonLjungberg2023}.
+Averaging Between Regions When calculating a single mean absorbed dose across anatomically separated regions—such as combining the left and right kidneys or evaluating multiple metastatic tumors—the sources identify three averaging strategies:
+Mass-weighted average: This combines the total absorbed energy of all sub-regions and divides it by their combined mass. It is logically coherent to pair this with the density-weighted average used within individual regions
+ \cite{GustafssonLjungberg2023},
+ \cite{GustafssonLjungberg2023}.
+Volume-weighted average: Averages the regions based on their respective physical volumes
+ \cite{GustafssonLjungberg2023},
+ \cite{GustafssonLjungberg2023}.
+Unweighted average: This strategy averages the mean doses of the individual regions equally, entirely disregarding their differences in size or mass
+ \cite{GustafssonLjungberg2023}.
+The choice of strategy between regions can heavily skew dosimetric results. For example, mass-weighted and volume-weighted averages generally yield similar outcomes, but an unweighted average can drastically understate or overstate the true dose
+ \cite{GustafssonLjungberg2023},
+ \cite{GustafssonLjungberg2023}. If a patient has multiple tumors where one massive lesion accounts for 70\\\\% of the total tumor burden, an unweighted average gives a tiny adjacent lesion the exact same mathematical influence as the massive one, potentially reducing the reported average dose rate by up to 50\\\\%
+ \cite{GustafssonLjungberg2023},
+ \cite{GustafssonLjungberg2023}.
+Conclusion Because these varying strategies—whether within a single organ or across multiple lesions—can lead to substantially different dosimetric estimates, it is crucial to explicitly specify the averaging strategy being applied
+ \cite{GustafssonLjungberg2023},
+ \cite{GustafssonLjungberg2023}. When comparing different dosimetry software platforms or establishing dose-toxicity thresholds, failure to apply consistent averaging strategies can result in highly misleading conclusions that obscure the true physical and biological effects of the therapy
+ \cite{GustafssonLjungberg2023},
+ \cite{GustafssonLjungberg2023}.
+Discuss what these sources say about Population PKPD Models, in the larger context of Pharmacokinetic (PK) Modelling.
+
+Population Pharmacokinetic (PK) models use a collective approach to describe the biokinetics of radiopharmaceuticals by simultaneously fitting data from an entire population of patients, rather than fitting data for each individual separately
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{HardiansyahYousefzadehNowshahr2024}. In traditional PK modelling for internal dosimetry, estimating the time-integrated activity (TIA) of an organ or tumor usually involves fitting mathematical functions (like a sum of exponentials) to individual patient data
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{HardiansyahKletting2020}. However, this individual approach is highly sensitive to noise and requires dense sampling—meaning patients must undergo multiple burdensome imaging sessions over several days
+ \cite{HardiansyahYousefzadehNowshahr2024}
+
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{HardiansyahKletting2020}.
+By utilizing Nonlinear Mixed-Effects Models (NLMEMs), population PK modelling overcomes these limitations because it does not require densely sampled or comprehensive data from every single patient
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{HardiansyahYousefzadehNowshahr2024}. This approach can successfully disentangle residual unexplained variability (such as image noise) from interindividual variability (IIV) and interoccasion or cycle-to-cycle variability (IOV)
+ \cite{SiebingaPriv2023}. Because it draws on population-wide pharmacokinetic trends, NLMEM allows for highly accurate "Single-Time-Point" (STP) dosimetry, drastically reducing the number of scans a patient needs
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{HardiansyahYousefzadehNowshahr2024}.
+In the larger context of PK modelling, population models can be structured as Physiologically Based Pharmacokinetic (PBPK) models
+ \cite{BegumThieme2018}
+ \cite{SiebingaVeen2024}. While standard exponential fits lack physical meaning, PBPK models incorporate anatomically and physiologically relevant mechanisms, such as blood flow, receptor density, cellular internalization, and physical decay
+ \cite{HardiansyahKletting2020}
+
+ \cite{BegumThieme2018}
+ \cite{HardiansyahKletting2020}. When combined with a population approach, these models can be designed "top-down," estimating biological parameters and their variances directly from clinical data rather than relying strictly on predefined assumptions
+ \cite{SiebingaVeen2024}.
+To bridge the gap between radiation exposure and actual treatment outcomes, population PK models are expanded into Pharmacokinetic/Pharmacodynamic (PKPD) models
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaVeen2024}. This is achieved by adding a sequential pharmacodynamic (PD) compartment to the model to represent a biomarker of disease response over time
+ \cite{SiebingaVeen2024}. For example, in the treatment of metastatic castration-resistant prostate cancer with 177Lu-PSMA, the PD compartment tracks individual Prostate-Specific Antigen (PSA) dynamics during and after treatment
+ \cite{SiebingaPriv2023}
+
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}.
+The sources highlight several major insights provided by Population PKPD models:
+Quantifying the Exposure-Response Relationship: PKPD models link the estimated radiopharmaceutical concentration in the tumor directly to PSA changes, proving that higher cumulative absorbed doses yield better treatment responses
+ \cite{SiebingaVeen2024}
+
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}.
+Direct and Delayed Treatment Effects: PKPD analysis reveals that tumor response is governed by both immediate (direct) and delayed effects of the radiation, which is characteristic of late-responding tissues with low alpha/beta ratios
+ \cite{SiebingaVeen2024}
+
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}.
+Identifying Cycle Effects: These population models can quantify structural changes over the course of treatment, such as a significant decline in tumor uptake during subsequent therapy cycles (e.g., dropping to 73\\\\%, 50\\\\%, and 44\\\\% in cycles 2, 3, and 4–7 compared to cycle 1). This is likely caused by radiation-induced cell death or a decrease in receptor expression
+ \cite{SiebingaVeen2024}
+
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}.
+Ultimately, the development of Population PKPD models forms the basis for personalized precision dosing via Bayesian forecasting
+ \cite{SiebingaVeen2024}. Once population parameters and variabilities are established, a patient's baseline characteristics (like initial PSA and tumor volume) and limited early imaging data can be used to predict their specific tumor exposure, expected PSA response, and potential organ toxicity
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaVeen2024}. This enables a therapeutic drug monitoring approach, moving away from "one-size-fits-all" fixed activities toward individualized dose adjustments that maximize tumor destruction while ensuring patient safety
+ \cite{SiebingaPriv2023}
+
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaVeen2024}.
+Discuss what these sources say about Anthropomorphic Stylized Phantoms, in the larger context of Computational Phantoms.
+
+Computational phantoms are mathematical models representing human or animal anatomy used to calculate internal radiation dosimetry
+ \cite{FinocchiaroBerenato2020}. By representing the body's organs and structures, these phantoms allow computational software (such as OLINDA/EXM) to estimate the mean absorbed radiation dose to specific targets using the Medical Internal Radiation Dose (MIRD) formalism and pre-calculated S-values
+ \cite{FinocchiaroBerenato2020}
+ \cite{BaileyMarquis2022}.
+Within this broader context, anthropomorphic stylized phantoms—such as the widely known Cristy-Eckerman series and Oak Ridge National Laboratory (ORNL) models—represent the earliest generation of these computational tools. They define organs using simple, geometric volumes (like cylinders, spheres, and ellipsoids) to represent a "standardized" individual
+ \cite{FernndezHnscheid2013}
+
+ \cite{DieudonnHobbs2010}
+ \cite{ChatachotShiratori2021}.
+The sources highlight several critical characteristics and limitations of these stylized phantoms:
+Lack of Individualization: Because they rely on fixed geometric shapes, stylized phantoms fail to capture patient-specific characteristics such as exact organ size, sex, age, weight, and unique anatomical variations
+ \cite{FernndezHnscheid2013}.
+Homogeneous Assumptions: They operate on the assumption that tissues have uniform density and that radioactivity is homogeneously distributed throughout the entire organ, which rarely reflects real biological or clinical scenarios
+ \cite{BaileyMarquis2022}
+
+ \cite{FernndezHnscheid2013}
+ \cite{MikellKappadath2016}.
+Poor Tumor Modeling: Stylized phantoms typically do not include specific tumor models
+ \cite{MikellKappadath2016}. Instead, when calculating tumor doses, lesions are often approximated as isolated unit-density tissue spheres
+ \cite{DieudonnHobbs2010}
+ \cite{KostDewaraja2015}. This simplification fails to account for the complex "cross-dose" radiation contributions that a tumor might deliver to, or receive from, surrounding healthy tissues
+ \cite{KostDewaraja2015}.
+To address some of the morphological inaccuracies of a one-size-fits-all model, researchers have developed population-specific stylized phantoms. For example, stylized phantoms were created specifically for the Japanese reference male and the Chinese mathematical phantom (CMP) using Asian reference data
+ \cite{ChatachotShiratori2021}. These population-tailored models yielded simulated doses that much more closely matched actual thermoluminescent dosimeter measurements compared to the generic Cristy-Eckerman phantoms
+ \cite{ChatachotShiratori2021}.
+The Evolution to NURBS and Voxel-Based Phantoms To overcome the rigid nature of stylized geometries, computational phantoms have evolved into hybrid models based on Non-Uniform Rational B-Spline (NURBS) technology, such as the NURBS-based cardiac-torso (NCAT) phantom and the RADAR reference adult phantoms
+ \cite{ChatachotShiratori2021}
+
+ \cite{GuptaLee2020}
+ \cite{KostDewaraja2015}. These advanced hybrid phantoms bridge the gap between realistic patient anatomy and the mathematical flexibility of stylized phantoms
+ \cite{ChatachotShiratori2021}. Because their surfaces can be easily deformed, NURBS phantoms can be customized, scaled, or morphed to better match an individual patient's body contour and organ masses
+ \cite{ChatachotShiratori2021}
+
+ \cite{KostDewaraja2015}
+ \cite{KostDewaraja2015}. Upgrading from stylized phantoms to NURBS-based phantoms (for instance, moving from OLINDA/EXM v. 1.0 to v. 2.0) produces more accurate dosimetry because it offers a better anatomical representation where tissues correctly contact one another
+ \cite{ChatachotShiratori2021}.
+Ultimately, the field of internal dosimetry is pivoting away from standardized phantoms entirely, shifting toward patient-specific, voxel-based models
+ \cite{BaileyMarquis2022}
+ \cite{GuptaLee2020}. Voxel-based dosimetry utilizes actual tomographic imaging (like CT or MRI) to create a precise 3D digital model of the individual patient or animal
+ \cite{GuptaLee2020}. The sources note that relying strictly on stylized, generalized phantoms can lead to significant discrepancies. For example, in preclinical mouse models, it was found that calculated S-values could deviate by as much as 80\\\\% from their true value if the specific shape, mass, and relative location of organs were not accurately modeled using voxel-level data
+ \cite{GuptaLee2020}.
+Discuss what these sources say about Voxelized Patient-Specific Models, in the larger context of Computational Phantoms.
+
+Traditional internal dosimetry, such as the organ-level Medical Internal Radiation Dose (MIRD) methodology, relies heavily on standardized reference computational phantoms
+ \cite{FuertesGarca2021}
+
+ \cite{BashirIqbal2024}
+ \cite{StabinMadsen2019}
+ \cite{StabinMadsen2019}. A major limitation of these standard phantoms is that they assume the patient's geometry and organ volumes perfectly match a generic mathematical model, and they calculate doses based on the assumption that radiopharmaceutical activity is distributed homogeneously throughout entire organs
+ \cite{FuertesGarca2021}
+
+ \cite{StabinMadsen2019}
+ \cite{StabinMadsen2019}. Because these standard phantoms cannot account for individual variations in body size, shape, tissue composition, or heterogeneous radiotracer uptake, they often lead to inaccurate dose estimations, particularly for complex anatomical structures and tumors
+ \cite{FuertesGarca2021}
+
+ \cite{StabinMadsen2019}
+ \cite{KlettingSchimmel2015}
+ \cite{BashirIqbal2024}.
+To overcome the limitations of generic computational phantoms, there is a growing shift toward voxelized patient-specific models, which represent the patient's true anatomy
+ \cite{FuertesGarca2021}
+ \cite{BashirIqbal2024}. Instead of relying on a generalized reference model, these approaches utilize 3D imaging data (such as SPECT/CT or PET/CT) to segment the patient's actual body into a 3D matrix of tiny volumetric elements, or "voxels"
+ \cite{BashirIqbal2024}
+
+ \cite{GtzSchmidkonz2019}
+ \cite{BaileyMarquis2022}. The computed tomography (CT) images provide a detailed, voxel-by-voxel map of the patient's specific tissue densities (e.g., differentiating between bone, lung, and soft tissue), while the functional SPECT or PET images provide a highly accurate, non-uniform map of the radioactive decays (time-integrated activity) occurring within those specific tissues
+ \cite{BashirIqbal2024}
+
+ \cite{GtzSchmidkonz2019}
+ \cite{GtzLang2021}
+ \cite{GtzLang2021}
+ \cite{StabinMadsen2019}
+ \cite{StabinMadsen2019}.
+Within these voxelized patient-specific geometries, the radiation transport and absorbed dose can be calculated using specialized techniques:
+Voxel S-Values (VSVs) and Dose Voxel Kernels (DVKs): These methods replace the macroscopic organ-to-organ S-values of traditional phantoms with microscopic voxel-to-voxel calculations
+ \cite{StabinMadsen2019}
+
+ \cite{DieudonnHobbs2012}
+ \cite{FernndezHnscheid2013}
+ \cite{StabinMadsen2019}. To accurately reflect the patient-specific voxelized phantom, base kernels are frequently scaled voxel-by-voxel according to the proper mass densities derived from the patient's individual CT image, allowing the dose model to adapt to tissue inhomogeneities
+ \cite{GtzSchmidkonz2019}
+
+ \cite{GtzSchmidkonz2019}
+ \cite{TerroPerret2025}
+ \cite{TerroPerret2025}.
+Direct Monte Carlo (MC) Simulations: Widely considered the gold standard for voxel-level dosimetry, direct MC simulations feed the patient's 3D voxelized density and activity maps directly into a radiation transport simulator
+ \cite{StabinMadsen2019}
+
+ \cite{PistoneAuditore2022}
+ \cite{DieudonnHobbs2012}
+ \cite{BaileyMarquis2022}
+ \cite{BaileyMarquis2022}. Because MC simulations natively track particle transport through the exact, heterogeneous tissue densities of the individual patient, they entirely bypass the geometric approximations of standard phantoms
+ \cite{StabinMadsen2019}
+
+ \cite{StabinMadsen2019}
+ \cite{DieudonnHobbs2012}
+ \cite{GtzSchmidkonz2019}.
+Ultimately, the implementation of voxelized patient-specific models provides a highly detailed, personalized assessment of the 3D dose distribution within the body
+ \cite{BashirIqbal2024}
+
+ \cite{BashirIqbal2024}
+ \cite{GtzSchmidkonz2019}. By characterizing the dose at the sub-organ or voxel level, these models enable the generation of dose-volume histograms (DVHs) and the precise evaluation of non-uniform doses across tumors and critical organs
+ \cite{BaileyMarquis2022}
+
+ \cite{BashirIqbal2024}
+ \cite{TranGiaSalasRamirez2019}
+ \cite{GustafssonLjungberg2023}
+ \cite{StabinMadsen2019}. This level of personalization is crucial for optimizing targeted radiopharmaceutical therapies, allowing clinicians to tailor treatment plans to maximize tumor destruction while minimizing radiation-induced toxicity to healthy tissues
+ \cite{BashirIqbal2024}
+
+ \cite{BashirIqbal2024}
+ \cite{GleisnerChouin2022}
+ \cite{RamonahengQebetu2024}.
+Discuss what these sources say about Voxelized Patient-Specific Models, in the larger context of Computational Phantoms.
+
+Historically, internal radiation dosimetry heavily relied on computational phantoms representing a standardized, "average" human body for organ-level dose calculations
+ \cite{GtzLang2021}
+
+ \cite{FernndezHnscheid2013}
+ \cite{DieudonnHobbs2010}
+ \cite{StabinMadsen2019}. These mathematical or stylized phantoms model organs as simple, predefined geometric volumes
+ \cite{DieudonnHobbs2010}
+
+ \cite{RamonahengQebetu2024}
+ \cite{GuptaLee2020}. While these standard reference models are easy to use and allow for basic adjustments—such as scaling pre-calculated S-values by the patient's total body weight or organ mass—they exhibit significant limitations for personalized targeted radionuclide therapy
+ \cite{BroschLenzKurkowska2024}
+
+ \cite{BaileyMarquis2022}
+ \cite{DieudonnHobbs2010}
+ \cite{ChatachotShiratori2021}. Because they inherently assume that radiopharmaceutical activity is homogeneously distributed and that tissue density is uniform throughout an organ, standard computational phantoms fail to capture individualized anatomical variations in organ size, shape, and inter-organ relationships
+ \cite{StabinMadsen2019}
+
+ \cite{BaileyMarquis2022}
+ \cite{FuertesGarca2021}
+ \cite{BashirIqbal2024}
+ \cite{FernndezHnscheid2013}
+ \cite{KostDewaraja2015}. Consequently, these models often cannot accurately estimate the doses delivered to complex tumors or predict normal tissue toxicity caused by non-uniform radiation
+ \cite{FuertesGarca2021}
+
+ \cite{FernndezHnscheid2013}
+ \cite{KostDewaraja2015}.
+Voxelized patient-specific models overcome these limitations by discarding generic reference geometries and instead utilizing the patient's own functional and anatomical imaging to create a highly detailed, individualized framework
+ \cite{FuertesGarca2021}
+
+ \cite{BashirIqbal2024}
+ \cite{AmatoMinutoli2012}
+ \cite{BaileyMarquis2022}
+ \cite{DieudonnHobbs2010}. Rather than relying on a generalized phantom, voxel-based dosimetry divides the patient's anatomy into microscopic volumetric elements (voxels) based on the high-resolution data provided by 3D imaging techniques like SPECT/CT and PET/CT
+ \cite{FernndezHnscheid2013}
+
+ \cite{BaileyMarquis2022}
+ \cite{BashirIqbal2024}
+ \cite{KostDewaraja2015}. Within this voxelized model, the physical mass density and exact tissue composition of each voxel are derived from the CT scan, while the localized distribution of radioactive decay is mapped using the coregistered SPECT or PET emission images
+ \cite{BashirIqbal2024}
+
+ \cite{DieudonnHobbs2012}
+ \cite{GtzSchmidkonz2019}
+ \cite{StabinMadsen2019}.
+Advanced software applications often bridge the gap between reference models and patient-specific voxelization. For example, some systems utilize Non-Uniform Rational B-Spline (NURBS) standard phantoms rendered over a patient's individual CT images
+ \cite{KostDewaraja2015}. Custom transformation algorithms can dynamically morph the generic body contours and organ surfaces of the NURBS phantom to perfectly match the patient's distinct anatomy, after which the deformed model is converted into a voxel format matching the spatial resolution of the functional images
+ \cite{KostDewaraja2015}. Similar advancements have occurred in preclinical small-animal dosimetry, transitioning from stylized mathematical mouse phantoms to anatomically realistic voxel-based models built directly from tomographic imaging to avoid errors arising from anatomical variations
+ \cite{GuptaLee2020}
+ \cite{GuptaLee2020}.
+By treating each voxel as an independent radiation point source and target, patient-specific voxelized models enable highly precise radiation transport calculations
+ \cite{BashirIqbal2024}
+
+ \cite{BashirIqbal2024}
+ \cite{FernndezHnscheid2013}. Direct Monte Carlo (MC) simulations or dose voxel kernel (DVK) convolutions can be executed directly over this patient-specific matrix
+ \cite{BashirIqbal2024}
+
+ \cite{DieudonnHobbs2012}
+ \cite{AmatoMinutoli2012}
+ \cite{DieudonnHobbs2010}. Unlike standard phantoms, this allows the dosimetry calculation to account for the scattering of radiation across complex tissue heterogeneities (e.g., at bone, lung, and soft tissue interfaces) and to accurately measure cross-irradiation between closely situated structures with differing activity levels
+ \cite{BashirIqbal2024}
+
+ \cite{DieudonnHobbs2012}
+ \cite{RamonahengQebetu2024}
+ \cite{DieudonnHobbs2010}.
+Ultimately, voxelized patient-specific models allow clinicians to generate three-dimensional absorbed dose maps and dose-volume histograms (DVHs) at a millimeter resolution
+ \cite{DieudonnHobbs2010}
+
+ \cite{BashirIqbal2024}
+ \cite{BashirIqbal2024}
+ \cite{DuongSarno2025}
+ \cite{KostDewaraja2015}. This granular insight provides a realistic assessment of non-uniform energy deposition, facilitating truly personalized treatment planning that can be optimized to maximize tumor control while minimizing toxicity to surrounding organs at risk
+ \cite{KostDewaraja2015}
+
+ \cite{BashirIqbal2024}
+ \cite{DuongSarno2025}
+ \cite{KostDewaraja2015}.
+Discuss what these sources say about Treatment Monitoring, in the larger context of Clinical Application: 177Lu-PSMA.
+
+In the clinical application of 177Lu-PSMA therapy, treatment monitoring is essential for evaluating therapeutic efficacy, predicting patient survival, and personalizing treatment plans to avoid toxic side effects in healthy organs. The sources highlight several key aspects of how treatment monitoring is conducted and analyzed:
+Imaging Modalities for Monitoring SPECT/CT imaging is the primary tool used to visually assess the body distribution of the therapeutic dose and evaluate the patient's response to therapy
+ \cite{KennedyLugassi2020}. Furthermore, quantitative SPECT allows for the non-subjective tracking of treatment response by providing absolute measurements of 177Lu-PSMA uptake in the tumors
+ \cite{KennedyLugassi2020}. To reduce the clinical workload and patient burden associated with multiple-time-point (MTP) imaging, single time-point (STP) dosimetry is emerging as a highly practical approach for monitoring and dose calculation
+ \cite{DewarajaMirando2022}. Studies suggest that a single SPECT/CT scan performed 48 to 72 hours post-injection provides optimal accuracy for determining absorbed doses in both the kidneys and tumor lesions
+ \cite{DewarajaMirando2022}
+
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+ \cite{BroschLenzDelker2023}.
+Tracer Kinetics as a Prognosticator Monitoring the kinetic behavior of the radiopharmaceutical within lesions is highly indicative of therapeutic success. Dual-time-point post-therapy SPECT/CT scans (e.g., at 24 and 48 hours) can identify differing patterns of tracer uptake and washout
+ \cite{StraubKupferschlger2023}
+ \cite{StraubKupferschlger2023}. The rate of 177Lu-PSMA-617 clearance from metastases is a strong prognostic marker for both progression-free survival (PFS) and overall survival (OS)
+ \cite{StraubKupferschlger2023}. A significant drop in activity between scans indicates a rapid washout and a shorter radiopharmaceutical residence time, resulting in a lower delivered radiation dose and a reduced likelihood of a positive response
+ \cite{StraubKupferschlger2023}
+ \cite{StraubKupferschlger2023}. Conversely, patients whose tumor activity remains stable or undergoes only a moderate drop generally respond better to the therapy
+ \cite{StraubKupferschlger2023}
+ \cite{StraubKupferschlger2023}.
+The Absorbed Dose-Response Relationship Treatment response is heavily monitored through changes in serum prostate-specific antigen (PSA) levels and the change in Standardized Uptake Value (SUVmax) on PET/CT scans
+ \cite{GrkovskiKrebs2025}
+ \cite{GrkovskiKrebs2025}. There is a demonstrable correlation between the lesion absorbed dose (AD) and these clinical outcomes
+ \cite{GrkovskiKrebs2025}
+ \cite{GrkovskiKrebs2025}. For instance, patients who receive a higher mean absorbed dose (greater than 7.5 Gy) demonstrate a significantly better PSA response and a longer biochemical progression-free survival compared to those receiving lower doses
+ \cite{GrkovskiKrebs2025}. Because the therapeutic response is heavily dependent on this absorbed dose, monitoring individual lesion dosimetry is pivotal for dynamically adapting the treatment
+ \cite{GrkovskiKrebs2025}
+ \cite{GrkovskiKrebs2025}.
+Pre-therapeutic Prediction of Response Baseline imaging using 68Ga-PSMA-11 PET/CT is a mandatory step for patient selection, but it also serves as a predictive monitoring tool
+ \cite{PetersHofferber2021}. The pre-therapeutic SUVmax of tumor lesions correlates strongly with the subsequently achieved absorbed dose during 177Lu-PSMA treatment
+ \cite{OkamotoThieme2016}
+
+ \cite{OkamotoThieme2016}
+ \cite{WangZang2019}. Utilizing these initial scans to predict individualized dosimetry can help clinicians accurately estimate expected treatment responses before the therapy even begins, potentially identifying patients who might require higher therapeutic activities
+ \cite{PetersHofferber2021}
+
+ \cite{XueGafita2022}
+ \cite{PetersMink2023}.
+Monitoring Organs at Risk (OARs) Because PSMA is physiologically expressed in normal tissues, a critical component of treatment monitoring is ensuring that cumulative radiation doses do not exceed tolerance limits in OARs. The most critical organs monitored during 177Lu-PSMA therapy include the kidneys, salivary glands, lacrimal glands, and bone marrow
+ \cite{OkamotoThieme2016}
+
+ \cite{NautiyalJha2022}
+ \cite{GleisnerChouin2022}. Monitoring these organs through patient-specific dosimetry allows clinicians to safely adjust the administered activity or the number of treatment cycles—maximizing the tumor dose while preventing complications like renal toxicity, xerostomia, or severe bone marrow suppression
+ \cite{NautiyalJha2022}
+
+ \cite{GleisnerChouin2022}
+ \cite{GrobPriv2024}.
+Advanced Pharmacokinetic/Pharmacodynamic (PKPD) Modeling To further optimize treatment monitoring, researchers are developing population PKPD models based on quantitative SPECT/CT data
+ \cite{SiebingaVeen2024}. By mathematically linking estimated 177Lu-PSMA tumor concentrations directly to a patient's PSA dynamics over time, these models can adequately capture individual PSA responses and identify population response rates
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}. Implementing this type of modeling can guide the early prediction of treatment response, helping to quickly identify patients in whom standard radioligand therapy is likely to fail so that alternative regimens can be explored
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}.
+Discuss what these sources say about Target and Risk Organs, in the larger context of Clinical Application: 177Lu-PSMA.
+
+In targeted radioligand therapy, 177Lu-PSMA utilizes the substantial overexpression of prostate-specific membrane antigen (PSMA) on prostate cancer cells to deliver cytotoxic beta radiation directly to the disease sites
+ \cite{KennedyLugassi2020}
+ \cite{OkamotoThieme2016}. A core objective of this treatment is to deliver maximum radiation to the target organs (tumors) while keeping the absorbed doses in healthy risk organs (organs at risk, or OARs) below critical safety thresholds to prevent severe toxicity
+ \cite{OkamotoThieme2016}
+ \cite{zkanUar2020}.
+Target Organs (Tumor Lesions) The primary target regions in 177Lu-PSMA therapy consist of primary prostate tumors, lymph node metastases, bone metastases, and visceral or soft-tissue lesions
+ \cite{EllsGrogan2024}
+ \cite{OkamotoThieme2016}. Because PSMA concentration in prostate carcinoma cells is up to 10 to 1,000 times higher than in noncancerous tissues, the tumor lesions successfully absorb 3 to 6 times more radiation dose than critical risk organs, indicating a highly favorable therapeutic index
+ \cite{NautiyalJha2022}
+
+ \cite{NautiyalJha2022}
+ \cite{zkanUar2020}.
+There is significant interpatient and intrapatient variability in tumor absorbed doses, which depends heavily on lesion size, location, and individual tracer kinetics
+ \cite{NautiyalJha2022}
+
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+ \cite{PetersPriv2021}. Notably, patients with a large "tumor sink effect"—meaning a high overall tumor burden—often demonstrate prolonged radiotracer retention in the tumor lesions, which can actively reduce the unspecific circulating radiotracer and thereby lower the radiation exposure in healthy OARs
+ \cite{NautiyalJha2022}
+
+ \cite{PetersPriv2021}
+ \cite{PetersPriv2021}.
+Risk Organs (Organs at Risk) Because PSMA is also physiologically expressed at basal levels in certain normal tissues, and due to the body's natural elimination pathways, several healthy organs are unavoidably exposed to radiation
+ \cite{zkanUar2020}
+
+ \cite{GleisnerChouin2022}
+ \cite{BrattDrevin2016}. The primary organs at risk in 177Lu-PSMA therapy are the kidneys, salivary glands, lacrimal glands, and the bone marrow
+ \cite{EllsGrogan2024}
+
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{NautiyalJha2022}
+ \cite{NautiyalJha2022}
+ \cite{GleisnerChouin2022}.
+Kidneys: The kidneys are widely regarded as a primary dose-limiting organ due to the renal excretion of the radioligand and physiological PSMA expression in the proximal renal tubules
+ \cite{GleisnerChouin2022}
+
+ \cite{RamonahengQebetu2024}
+ \cite{BrattDrevin2016}
+ \cite{BrattDrevin2016}. Despite this, actual renal toxicity is rare at standard administered activities because the mean absorbed doses (typically ranging from 0.49 to 0.88 Gy/GBq) remain well below the established external-beam radiotherapy safety limits of 23 to 40 Gy
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+
+ \cite{OkamotoThieme2016}
+ \cite{OkamotoThieme2016}
+ \cite{NautiyalJha2022}
+ \cite{GleisnerChouin2022}. Some evidence suggests that 177Lu-PSMA-I&T might deliver a slightly higher absorbed dose to the kidneys than 177Lu-PSMA-617—potentially because its negatively charged DOTAGA chelator increases proximal tubule reabsorption—but this difference is generally not considered clinically dangerous
+ \cite{EllsGrogan2024}
+
+ \cite{UijenPriv2023}
+ \cite{UijenPriv2023}
+ \cite{UijenPriv2023}
+ \cite{UijenPriv2023}.
+Salivary Glands (Parotid and Submandibular): The salivary glands exhibit high radiotracer accumulation, making them a major dose-limiting factor due to the risk of xerostomia (dry mouth)
+ \cite{SarnelliBelli2019}
+
+ \cite{TaBakos2024}
+ \cite{PaganelliSarnelli2020}
+ \cite{KarimzadehSchatz2024}. Uptake in these glands is driven by both specific PSMA binding and non-specific mechanisms, such as passive diffusion
+ \cite{GleisnerChouin2022}
+
+ \cite{TaBakos2024}
+ \cite{TaBakos2024}. To protect these glands, clinical protocols sometimes employ external cooling (ice packs) or orally administered folic polyglutamate tablets, which act as a competitive substrate to reduce 177Lu-PSMA fixation in the salivary glands
+ \cite{NautiyalJha2022}
+
+ \cite{SarnelliBelli2019}
+ \cite{PaganelliSarnelli2020}.
+Lacrimal Glands: Dosimetry studies reveal that the lacrimal glands often receive the highest absolute absorbed dose per administered gigabecquerel among all OARs
+ \cite{NautiyalJha2022}
+
+ \cite{OkamotoThieme2016}
+ \cite{NautiyalJha2022}
+ \cite{GleisnerChouin2022}. However, their very small volume makes accurate dosimetric quantification difficult, and despite the high estimated doses, clinically significant xerophthalmia (dry eyes) is rarely reported by patients
+ \cite{GleisnerChouin2022}
+
+ \cite{OkamotoThieme2016}
+ \cite{GleisnerChouin2022}
+ \cite{GleisnerChouin2022}.
+Bone Marrow: Bone marrow toxicity, resulting in cytopenias like thrombocytopenia and lymphopenia, is a critical concern, especially because many advanced prostate cancer patients are heavily pre-treated or have compromised marrow reserves
+ \cite{GrobPriv2024}
+ \cite{SiebingaVeen2024}. While the direct systemic absorbed dose to the bone marrow is generally very low (e.g., ~0.03 Gy/GBq) and safely below the 2 Gy toxicity threshold, patients with extensive skeletal metastases can receive significantly higher marrow doses due to the "cross-fire" radiation effect from adjacent bone lesions
+ \cite{NautiyalJha2022}
+
+ \cite{NautiyalJha2022}
+ \cite{GleisnerChouin2022}
+ \cite{DelkerFendler2015}
+ \cite{ChatachotShiratori2021}.
+Liver and Spleen: The liver and spleen demonstrate relatively low radioligand uptake and absorbed doses, and are thus rarely considered critical dose-limiting organs for small-molecule therapies like 177Lu-PSMA-617 and I&T
+ \cite{NautiyalJha2022}
+
+ \cite{GleisnerChouin2022}
+ \cite{MahmoudiPirayesh2021}. However, older antibody-based therapies like 177Lu-J591 demonstrate a different profile, with the liver and bone marrow serving as the primary dose-limiting organs due to longer circulation times and hepatic clearance
+ \cite{EllsGrogan2024}
+ \cite{TaBakos2024}.
+In conclusion, 177Lu-PSMA demonstrates an excellent safety profile with highly favorable target-to-risk organ dose ratios
+ \cite{PetersPriv2021}
+ \cite{NautiyalJha2022}. Routine patient-specific dosimetry of these target and risk organs is encouraged by guidelines to individualize therapy, which allows clinicians to safely escalate administered activities for improved tumor control without breaching the safety thresholds of the kidneys and secretory glands
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+
+ \cite{PetersPriv2021}
+ \cite{DelkerFendler2015}.
+Discuss what these sources say about Cycle-Dependent Uptake Decline, in the larger context of Pharmacokinetic (PK) Modelling.
+
+In the context of pharmacokinetic (PK) modelling for radiopharmaceutical therapy (RPT), cycle-dependent uptake decline refers to the phenomenon where the accumulation of a radioligand within target tissues steadily decreases during subsequent treatment cycles. PK models, which mathematically describe the physiological mechanisms of drug distribution, binding, and elimination, are crucial for tracking these inter-cycle variations (often termed inter-occasion variability or IOV)
+ \cite{SiebingaVeen2024}.
+Evidence of Tumour Uptake Decline Clinical data and advanced population PK modelling reveal a clear, gradual decline in tumour uptake over successive therapy cycles. For instance, a PK model analysing 177Lu-PSMA-I&T therapy demonstrated that the tumour uptake rate significantly decreased to 73\\\\%, 50\\\\%, and 44\\\\% in cycles 2, 3, and 4–7, respectively, when compared to the initial cycle
+ \cite{SiebingaVeen2024}
+
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}. Correspondingly, another study observed that the average absorbed dose in tumour lesions dropped from 3.5 Gy/GBq in the first cycle to 3.3, 2.7, and 2.4 Gy/GBq in the second, third, and fourth cycles, respectively
+ \cite{OkamotoThieme2016}
+ \cite{OkamotoThieme2016}.
+Physiological Mechanisms PK models suggest several underlying biological and physiological mechanisms for this cycle-dependent decline:
+Tumour Cell Kill and Receptor Depletion: Tumours effectively act as "antigen sinks"
+ \cite{KlettingSchimmel2015}. As the radiation from earlier cycles successfully kills cancer cells, the overall tumour volume is reduced, leading to a corresponding drop in disease markers (such as PSA) and a decreased presence of target receptors (like PSMA)
+ \cite{OkamotoThieme2016}
+ \cite{SiebingaVeen2024}. Consequently, there are fewer specific binding sites available for the radioligand in later cycles, directly altering the body's biodistribution
+ \cite{KlettingSchimmel2015}.
+Vascular Damage: The cytotoxic radiation damage inflicted on the tumour microenvironment during initial cycles may compromise tumour vascularisation, impairing the delivery and perfusion of the radiopharmaceutical in subsequent treatments
+ \cite{SiebingaVeen2024}.
+Impact on Normal Organs This cycle-dependent decline also impacts the biodistribution of the radiotracer in healthy organs-at-risk:
+The Tumour Sink Effect: In theory, as the tumour mass shrinks and absorbs less of the radioligand, the excess unbound tracer could increasingly accumulate in normal tissues or be excreted via the kidneys, potentially raising the absorbed dose to these organs in later cycles
+ \cite{BrattDrevin2016}. However, some analyses indicate that the absorbed dose in normal organs can remain similar or even decrease in the second cycle, suggesting that the "tumour sink effect" does not uniformly result in higher organ toxicity in later cycles
+ \cite{PetersPriv2021}.
+Tissue Recovery Rates: A PK study on salivary gland uptake noted a slight decline to 84.6\\\\% during the second cycle, indicating that normal tissues may not fully recover from radiation-induced damage within a short (e.g., two-week) interval
+ \cite{SiebingaVeen2024}. Interestingly, by the third cycle (approximately twelve weeks later), uptake rebounded to 98.1\\\\%, suggesting that the cells had eventually restored themselves or compensated through increased expression or perfusion
+ \cite{SiebingaVeen2024}.
+Implications for PK Modelling and Treatment Planning The existence of significant cycle-dependent uptake decline highlights a major limitation in assuming constant pharmacokinetics across an entire treatment regimen. Because disease progression and prior treatments continuously alter biodistribution, relying on a single set of measurements from the first cycle to plan multiple successive cycles is generally inadequate
+ \cite{KlettingSchimmel2015}.
+The gradual decrease in tumour accumulation, coupled with varying recovery rates in normal tissues, strongly advocates for dynamic, personalised dosing schedules over fixed-activity protocols
+ \cite{SiebingaVeen2024}. For example, PK models suggest it may be more clinically effective to administer higher activities of the radiopharmaceutical during the initial cycles when tumour uptake is maximal, and then systematically reduce the dose in later cycles to protect organs-at-risk as tumour targeting declines
+ \cite{BrattDrevin2016}
+
+ \cite{BrattDrevin2016}
+ \cite{SiebingaVeen2024}.
+Discuss what these sources say about Density-Weighted Region Average, in the larger context of Averaging Strategies.
+
+In voxel-based dosimetry, patient-specific 3D absorbed dose distributions often need to be aggregated into scalar averages across entire organs, paired organs, or multiple tumor lesions
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}. Within these averaging strategies, two primary definitions are used for aggregating doses within a single spatial region: the simple region-average (unweighted) and the density-weighted region-average
+ \cite{GustafssonLjungberg2023}.
+The density-weighted region-average calculates the mean absorbed dose by weighting the point-wise absorbed doses by the spatially varying mass density of the tissue
+ \cite{GustafssonLjungberg2023}. Mathematically, this equals the total absorbed energy in the region divided by the region's total mass
+ \cite{GustafssonLjungberg2023}. In contrast, a simple region-average integrates the absorbed dose unweighted over the spatial volume
+ \cite{GustafssonLjungberg2023}.
+The sources highlight several critical points about the density-weighted region-average in the larger context of dosimetry calculations:
+Impact of Tissue Heterogeneity: The simple region-average and the density-weighted region-average only coincide if the tissue density is perfectly uniform throughout the volume of interest
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}. However, in regions with markedly non-uniform density distributions—such as soft tissue mixed with lung or bone—the choice of averaging strategy leads to substantially different absorbed-dose estimates
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}.
+Stability and Consistency: The density-weighted region-average is highly stable and relatively insensitive to variations in activity and density distributions, whereas the unweighted region-average fluctuates depending on how activity is distributed
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}.
+Physical and Formal Validity: From a physics perspective, the density-weighted region-average is the most meaningful measure because ionizing radiation interacts with the actual matter in a region rather than just the spatial volume it occupies
+ \cite{GustafssonLjungberg2023}. Furthermore, it is the only averaging strategy within a region that is strictly consistent with the ICRU's formal definition of mean absorbed dose and the standard MIRD formalism
+ \cite{GustafssonLjungberg2023}
+
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}.
+Graphical Representation (DMHs): When characterizing the non-uniformity of absorbed doses within a region, the density-weighted approach corresponds to generating Dose-Mass Histograms (DMHs)
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}. This is viewed as a physically more meaningful representation of dose non-uniformity than traditional Dose-Volume Histograms (DVHs), which correspond to unweighted region-averages
+ \cite{GustafssonLjungberg2023}
+
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}.
+Coherence Across Multiple Regions: When aggregating doses between multiple separated regions (like multiple metastatic lesions), it is logically coherent to combine the density-weighted region-averages of individual lesions using a mass-weighted average across all lesions
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}. Mixing definitions, such as combining unweighted region-averages within a region with a mass-weighted average across multiple regions, is considered mathematically illogical
+ \cite{GustafssonLjungberg2023}.
+Ultimately, because these strategies can yield drastically different results, specifying that a density-weighted region-average was used is crucial for accurately reporting radionuclide therapy dosimetry, establishing dose-effect relationships, and ensuring valid comparisons between different calculation methods
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}.
+Discuss what these sources say about Grid-based Boltzmann Solver (GBBS), in the larger context of Voxel-Based Dosimetry.
+
+Voxel-based dosimetry seeks to overcome the limitations of traditional organ-averaged models by utilizing patient-specific imaging (SPECT/CT or PET/CT) to map non-uniform radiopharmaceutical distribution and heterogeneous tissue densities
+ \cite{BaileyMarquis2022}
+ \cite{BaileyMarquis2022}. While direct Monte Carlo (MC) radiation transport is considered the gold standard for these calculations due to its high accuracy in heterogeneous media, it requires millions of simulated particle histories and is often too computationally expensive for routine clinical use
+ \cite{BaileyMarquis2022}
+ \cite{BaileyMarquis2022}. Conversely, fast methods like dose voxel kernel (DVK) convolution struggle to accurately account for complex tissue interfaces, even with density scaling
+ \cite{BaileyMarquis2022}.
+Grid-based Boltzmann Solvers (GBBS)—also referred to as deterministic Linear Boltzmann Transport Equation (LBTE) solvers—have emerged as an advanced solution to bridge this gap, offering MC-level accuracy at speeds comparable to convolution methods
+ \cite{BaileyMarquis2022}
+
+ \cite{BaileyMarquis2022}
+ \cite{BaileyMarquis2022}.
+Rather than simulating random individual particle tracks stochastically like MC methods, a GBBS solves the coupled transport equations for electrons and photons deterministically by discretizing phase space variables: space, angle, and energy
+ \cite{BaileyMarquis2022}
+
+ \cite{MikellKappadath2016}
+ \cite{MikellKappadath2016}. Because they do not rely on random sampling, deterministic solvers completely avoid the statistical noise inherent in MC simulations
+ \cite{BaileyMarquis2022}. Theoretically, both MC and deterministic solvers converge to the exact same physical solution in the limit of infinite histories (for MC) or infinite discretization (for GBBS), provided they use the same energy cross-sections
+ \cite{BaileyMarquis2022}.
+The sources highlight two prominent implementations of this technology in the context of nuclear medicine:
+ATTILA (A general-purpose GBBS) Originally utilized for external megavoltage photon beams and high-energy brachytherapy, ATTILA has been evaluated for the much lower energy regimes typical of unsealed nuclear medicine sources
+ \cite{MikellKappadath2016}
+ \cite{MikellKappadath2016}. ATTILA utilizes an unstructured tetrahedral mesh and solves for energy- and angular-dependent particle flux
+ \cite{MikellKappadath2016}.
+Performance and Discretization: The accuracy of ATTILA depends heavily on sufficiently refining its phase-space parameters (mesh size, energy group structures, and angular quadrature orders)
+ \cite{MikellKappadath2016}. In studies comparing ATTILA to MC software (DOSXYZnrc), the converged GBBS agreed with MC to within approximately 5\\\\% for the source voxel for isotopes like 90Y and 131I
+ \cite{MikellKappadath2016}
+ \cite{MikellKappadath2016}.
+Low-Energy Challenges: While agreement was excellent at higher energies, the solver consistently underestimated MC doses by up to 20\\\\% for very low-energy emissions (e.g., 10 keV photons and electrons)
+ \cite{MikellKappadath2016}
+
+ \cite{MikellKappadath2016}
+ \cite{MikellKappadath2016}. Researchers hypothesize that these discrepancies stem from uncertainties in the energy reaction rate cross-sections used by the GBBS to convert local electron spectra to absorbed dose at low energies, which requires further investigation to fully reconcile
+ \cite{MikellKappadath2016}
+ \cite{MikellKappadath2016}.
+Acuros MRT (A clinically integrated LBTE solver) Acuros MRT is a recently developed deterministic solver directly integrated into commercial clinical software (Velocity 4.1) specifically for radiopharmaceutical therapy (RPT) and selective internal radiation therapy (SIRT)
+ \cite{BaileyMarquis2022}
+
+ \cite{BaileyMarquis2022}
+ \cite{BaileyMarquis2022}.
+Adaptive Meshing: To maximize efficiency, Acuros MRT employs an adaptive mesh refinement strategy
+ \cite{BaileyMarquis2022}. It automatically generates highly localized, smaller computational cells in regions where the radioactive source has high or rapidly changing activity gradients, while utilizing larger cells in areas with low activity
+ \cite{BaileyMarquis2022}.
+Clinical Accuracy: When benchmarked across patients treated with 177Lu, 90Y, and 131I, Acuros MRT demonstrated strong agreement with validated MC codes
+ \cite{BaileyMarquis2022}
+ \cite{BaileyMarquis2022}. Crucially, in highly heterogeneous regions like the lung and bone, the LBTE solver agreed significantly better with MC than traditional DVK convolution did
+ \cite{BaileyMarquis2022}
+ \cite{BaileyMarquis2022}.
+The Larger Context Within voxel-based dosimetry, GBBS/LBTE solvers represent a major technological leap toward routine clinical implementation. By deterministically solving radiation transport, these algorithms calculate patient-specific, 3D absorbed dose maps in complex heterogeneous tissues in a fraction of the time required by MC methods
+ \cite{BaileyMarquis2022}
+ \cite{BaileyMarquis2022}. For example, Acuros MRT can compute a full voxel-level dose map for a typical patient matrix in approximately two minutes on a standard desktop computer, making it a highly viable option for fast, personalized treatment planning
+ \cite{BaileyMarquis2022}.
+Discuss what these sources say about Volume-Weighted Average, in the larger context of Averaging Strategies.
+
+In the context of multi-region dosimetry calculation, a volume-weighted average is a specific strategy used to aggregate absorbed doses across anatomically separated areas, such as multiple tumor lesions or paired organs like the kidneys. When calculating the mean dose across a union of several distinct regions, the overall region-average is mathematically equivalent to the volume-weighted average of the individual region-averages
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}.
+This strategy fundamentally contrasts with an unweighted average, which treats every region equally regardless of its physical size
+ \cite{GustafssonLjungberg2023}. The sources illustrate that volume-weighted averages are critical for accurately representing asymmetric disease burdens
+ \cite{GustafssonLjungberg2023}. For example, if a patient has multiple tumors where a single massive lesion accounts for 70\\\\% of the total tumor volume, an unweighted average would give a tiny, mathematically insignificant lesion the exact same influence as the massive one
+ \cite{GustafssonLjungberg2023}. This can drastically skew results, potentially reducing the reported average dose rate by over 50\\\\% (e.g., dropping a reported value from 147 mGy/h down to 71 mGy/h in one clinical case)
+ \cite{GustafssonLjungberg2023}. By weighting the average according to each region's specific volume, the massive tumor appropriately dictates the final calculation, providing a much more realistic reflection of the energy deposited in the overall tumor burden
+ \cite{GustafssonLjungberg2023}.
+Furthermore, the volume-weighted average corresponds directly to the generation of combined Dose-Volume Histograms (DVHs) across multiple sub-regions
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}. When comparing it to other averaging strategies, clinical studies involving therapies like 177Lu-PSMA and 177Lu-DOTA-TATE show that volume-weighted averages yield very similar numerical results to mass-weighted averages
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}. Both strategies similarly track the physical extent of the tissue being irradiated, unlike unweighted histograms (DUHs) which only count the number of regions
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}.
+While volume-weighted averages are highly practical and correspond directly to standard region-average calculations, the sources caution against mixing incompatible averaging frameworks. For example, it is logically coherent to pair a simple region-average within an organ with a volume-weighted average between organs
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}. Conversely, pairing a simple region-average within an organ with a mass-weighted average between organs is considered logically inconsistent
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}.
+Ultimately, because volume-weighted, mass-weighted, and unweighted averages can produce substantially different dosimetric estimates depending on patient anatomy and tumor distribution, it is imperative that clinicians and researchers explicitly state which averaging strategy they employ to ensure valid method comparisons and safe clinical evaluations
+ \cite{GustafssonLjungberg2023}.
+Discuss what these sources say about Mass-Weighted Average, in the larger context of Averaging Strategies.
+
+In clinical dosimetry for radionuclide therapy, it is frequently necessary to aggregate calculated absorbed doses into representative averages. This occurs both within a single spatial region (such as a tumor or an organ) and between anatomically separated but functionally related regions (such as the left and right kidneys, or across multiple tumor lesions)
+ \cite{GustafssonLjungberg2023}
+
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}. The sources emphasize that the specific averaging strategies used can substantially alter the reported dosimetric results
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}.
+Averaging Within Regions To aggregate voxel-wise absorbed doses within a single region, two primary definitions are used:
+Region-average: A simple, unweighted spatial average across the region's volume, corresponding to traditional Dose-Volume Histograms (DVHs)
+ \cite{GustafssonLjungberg2023}.
+Density-weighted region-average: This strategy weights the point-wise absorbed doses by the mass density of the tissue, effectively dividing the absorbed energy by the mass of the region
+ \cite{GustafssonLjungberg2023}. This approach corresponds to Dose-Mass Histograms (DMHs) and is highlighted as the method that aligns with the ICRU definition of mean absorbed dose and the MIRD formalism
+ \cite{GustafssonLjungberg2023}
+
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}.
+Mass-Weighted Average Between Regions When calculating a single mean absorbed dose across multiple separated regions, three methods are commonly defined: the volume-weighted average, the unweighted average, and the mass-weighted average
+ \cite{GustafssonLjungberg2023}.
+The mass-weighted average computes the overall dose by combining the total absorbed energy of all the individual sub-regions and dividing it by their total combined mass
+ \cite{GustafssonLjungberg2023}. The sources highlight several key insights regarding its use:
+Logical Coherence: In practice, averaging strategies are often combined. The sources argue that using a density-weighted average within individual regions is logically coherent when paired with a mass-weighted average between those regions
+ \cite{GustafssonLjungberg2023}. Conversely, pairing a simple spatial region-average with a mass-weighted average across regions is considered illogical
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}.
+Physical Meaningfulness: Because ionizing radiation interacts with physical matter rather than just the spatial volume it occupies, the sources conclude that from a physics perspective, the density-weighted region-average and the mass-weighted average between regions are the most physically meaningful measures of absorbed dose
+ \cite{GustafssonLjungberg2023}.
+Impact on Results vs. Unweighted Averages: When calculating the average dose across multiple tumors, mass-weighted and volume-weighted averages generally yield similar results, but they can differ substantially from unweighted averages
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}. For example, if a patient has multiple lesions where one massive tumor accounts for 70\\\\% of the total tumor burden, an unweighted average gives small lesions the exact same mathematical influence as the massive one
+ \cite{GustafssonLjungberg2023}. This can severely skew the reported data, sometimes resulting in an unweighted average absorbed-dose rate that is up to 50\\\\% lower than what the density- and mass-weighted averages report
+ \cite{GustafssonLjungberg2023}.
+Mass Scaling for Organ S-Values In a related context of mass-based adjustments, when utilizing traditional Organ S-Values (OSVs) rather than voxel-level dosimetry, mass scaling is considered essential
+ \cite{BroschLenzKurkowska2024}. Mass scaling adapts standard-phantom S-values to patient-specific organ masses to yield accurate dose values
+ \cite{BroschLenzKurkowska2024}. If volumes of interest are generated at multiple time points, the sources recommend using the average mass of the organ across those time points for the scaling process
+ \cite{BroschLenzKurkowska2024}.
+Ultimately, because different strategies can lead to drastically different outcomes, the sources strongly recommend that clinicians and researchers explicitly state which averaging strategy (e.g., mass-weighted vs. unweighted) they are using when reporting dosimetry to prevent misleading comparisons
+ \cite{GustafssonLjungberg2023}
+ \cite{GustafssonLjungberg2023}.
+Discuss what these sources say about Monte Carlo (MC) Simulations, in the larger context of Voxel-Based Dosimetry.
+
+Voxel-based dosimetry calculates absorbed radiation doses at a microscopic 3D volumetric level, utilizing patient-specific anatomical data derived from CT scans and functional activity distributions from quantitative SPECT or PET imaging
+ \cite{FuertesGarca2021}
+
+ \cite{DieudonnHobbs2012}
+ \cite{DieudonnHobbs2012}
+ \cite{DewarajaMirando2022}. By abandoning the assumption of a standardized, homogeneous "reference" patient, this approach allows clinicians to evaluate the spatial non-uniformity of radiation dose within tumors and organs at risk
+ \cite{DieudonnHobbs2012}
+
+ \cite{DewarajaMirando2022}
+ \cite{AmatoMinutoli2012}.
+Within this context, direct Monte Carlo (MC) radiation transport simulations are universally regarded as the gold standard for voxel-level dosimetry
+ \cite{DieudonnHobbs2012}
+
+ \cite{GtzLang2021}
+ \cite{BashirIqbal2024}
+ \cite{PistoneAuditore2022}
+ \cite{AmatoMinutoli2012}
+ \cite{BaileyMarquis2022}
+ \cite{StamouliNanos2023}.
+The sources highlight several key aspects of MC simulations in the larger context of voxel-based dosimetry:
+Unmatched Accuracy in Heterogeneous Tissues Unlike traditional organ-level methods or simpler dose voxel kernel (DVK) convolutions—which typically assume radiation travels through an infinite, homogeneous medium like water—MC explicitly models the stochastic, physical interactions of individual particles (electrons, photons) as they traverse a patient's actual anatomy
+ \cite{DieudonnHobbs2012}
+
+ \cite{GtzLang2021}
+ \cite{GtzLang2021}
+ \cite{FernndezHnscheid2013}
+ \cite{RamonahengQebetu2024}. This allows MC to accurately account for highly non-uniform activity distributions and complex tissue heterogeneities
+ \cite{DieudonnHobbs2012}
+
+ \cite{BaileyMarquis2022}
+ \cite{GuptaLee2020}
+ \cite{StabinMadsen2019}. It is uniquely capable of providing precise dose estimates at tissue interfaces with stark density gradients (such as the boundaries between soft tissue and bone, or soft tissue and lung), where charged-particle equilibrium is not achieved and where simpler convolution methods often fail or require heavy corrections
+ \cite{GtzLang2021}
+
+ \cite{FernndezHnscheid2013}
+ \cite{RamonahengQebetu2024}
+ \cite{DewarajaMirando2022}
+ \cite{StabinMadsen2019}.
+The Computational Bottleneck Despite its superior accuracy, direct MC simulation is severely limited by its immense computational burden
+ \cite{BashirIqbal2024}
+
+ \cite{AmatoMinutoli2012}
+ \cite{BaileyMarquis2022}
+ \cite{GuptaLee2020}
+ \cite{StabinMadsen2019}
+ \cite{DieudonnHobbs2012}. Because MC methods rely on statistical probabilities, a massive number of particle histories (typically ranging from 10 million to over a billion) must be simulated to reduce statistical noise to an acceptable level
+ \cite{StabinMadsen2019}
+
+ \cite{DieudonnHobbs2012}
+ \cite{DieudonnHobbs2012}
+ \cite{FernndezHnscheid2013}
+ \cite{MartinovOpara2022}
+ \cite{BaileyMarquis2022}. Depending on the software and hardware, full-body patient MC simulations can take anywhere from several hours to days
+ \cite{DieudonnHobbs2012}
+
+ \cite{FernndezHnscheid2013}
+ \cite{MartinovOpara2022}
+ \cite{BaileyMarquis2022}
+ \cite{StabinMadsen2019}. This prohibitive time cost makes standard MC simulations highly impractical for routine clinical workflows
+ \cite{BashirIqbal2024}
+
+ \cite{AmatoMinutoli2012}
+ \cite{GuptaLee2020}
+ \cite{DieudonnHobbs2012}
+ \cite{FernndezHnscheid2013}
+ \cite{HippelinenTenhunen2017}
+ \cite{RamonahengQebetu2024}
+ \cite{StabinMadsen2019}. Furthermore, regardless of the calculation engine's accuracy, the absolute precision of MC dosimetry remains fundamentally constrained by the poor spatial resolution and partial volume effects inherent to the underlying SPECT or PET imaging
+ \cite{FuertesGarca2021}
+
+ \cite{KimEnger2024}
+ \cite{DewarajaMirando2022}.
+MC as the Foundation for Faster Clinical Alternatives Because direct MC is too slow for everyday clinical use, it serves as the foundational "ground truth" used to develop, train, and benchmark faster voxel-based approximations:
+Pre-calculating Voxel S-Values (VSVs) and Kernels: MC is used to pre-calculate high-resolution dose voxel kernels (DVKs) and dose point kernels (DPKs) for specific radionuclides and tissue densities. These MC-generated kernels can then be rapidly convolved with a patient's activity map using fast Fourier transforms in a matter of seconds, bypassing the need to run a full MC simulation for every patient
+ \cite{GtzLang2021}
+
+ \cite{PistoneAuditore2022}
+ \cite{DieudonnHobbs2012}
+ \cite{DieudonnHobbs2012}
+ \cite{GtzSchmidkonz2019}
+ \cite{FernndezHnscheid2013}
+ \cite{FernndezHnscheid2013}.
+Training Deep Neural Networks (DNNs): Researchers are increasingly using massive datasets of MC-generated whole-body dose maps to train deep learning models (such as U-Net or DblurDoseNet)
+ \cite{BashirIqbal2024}
+
+ \cite{TerroPerret2025}
+ \cite{MulyadiJung2022}
+ \cite{MulyadiJung2022}
+ \cite{StabinMadsen2019}
+ \cite{StabinMadsen2019}. Once trained, these DNNs can predict patient-specific, voxel-level dose distributions almost instantaneously, achieving MC-level accuracy without the associated computational overhead
+ \cite{BashirIqbal2024}
+
+ \cite{MulyadiJung2022}
+ \cite{StabinMadsen2019}.
+Benchmarking Deterministic Solvers: Emerging grid-based deterministic approaches, such as Linear Boltzmann Transport Equation (LBTE) solvers, are validated by benchmarking their results against MC simulations to prove they can match MC accuracy at clinical speeds
+ \cite{BaileyMarquis2022}
+
+ \cite{BaileyMarquis2022}
+ \cite{BaileyMarquis2022}
+ \cite{BaileyMarquis2022}.
+Developing "Fast" MC Codes: To bridge the gap between speed and accuracy, specialized MC codes have been developed (such as the Dose Planning Method (DPM) or egs_mird)
+ \cite{MartinovOpara2022}
+
+ \cite{DewarajaMirando2022}
+ \cite{DewarajaMirando2022}. These codes utilize advanced transport mechanics—like taking longer transport steps across heterogeneous boundaries or employing track-length estimators—to perform highly accurate voxel dosimetry in a fraction of the time, sometimes completing full patient simulations in under 15 minutes
+ \cite{MartinovOpara2022}
+
+ \cite{DewarajaMirando2022}
+ \cite{DewarajaMirando2022}
+ \cite{MartinovOpara2022}
+ \cite{DewarajaMirando2022}.
+Discuss what these sources say about Dose-Voxel Kernels, in the larger context of Voxel-Based Dosimetry.
+
+In voxel-based dosimetry, Dose-Voxel Kernels (DVKs), also widely known as Voxel S-Values (VSVs), represent the mean absorbed radiation dose delivered to a target voxel per radioactive decay occurring in a source voxel
+ \cite{GtzLang2021}
+
+ \cite{GtzLang2021}
+ \cite{PistoneAuditore2022}
+ \cite{FernndezHnscheid2013}. They are essentially discretized versions of continuous Dose Point Kernels (DPKs) that map the complex radiation-matter interactions and energy transport of emitted particles, such as beta electrons and photons
+ \cite{GtzLang2021}
+
+ \cite{BashirIqbal2024}
+ \cite{RamonahengQebetu2024}.
+Within the larger context of internal dosimetry, DVKs serve as the critical bridge between the overly simplistic assumptions of organ-level dosimetry and the immense computational burden of direct Monte Carlo (MC) radiation transport simulations.
+Calculation and Convolution To perform patient-specific voxel dosimetry, DVKs are typically pre-calculated using high-resolution MC simulations (e.g., via Geant4, MCNP, or EGSnrc) for a specific radionuclide (such as 177Lu, 90Y, or 131I) in a standardized medium
+ \cite{KlettingSchimmel2015}
+
+ \cite{GtzLang2021}
+ \cite{AmatoMinutoli2012}
+ \cite{DieudonnHobbs2010}
+ \cite{GuptaLee2020}. Because clinical imaging grid resolutions vary across different SPECT and PET scanners, researchers have developed analytical resampling and interpolation algorithms to rapidly rescale these high-resolution base kernels to match any arbitrary voxel dimension required by the clinical images
+ \cite{PistoneAuditore2022}
+
+ \cite{AmatoMinutoli2012}
+ \cite{FernndezHnscheid2013}
+ \cite{FernndezHnscheid2013}
+ \cite{DieudonnHobbs2010}.
+During treatment planning, a 3D time-integrated activity (TIA) map—derived from the patient's sequential imaging—is convolved with the appropriately sized DVK
+ \cite{KlettingSchimmel2015}
+
+ \cite{KlettingSchimmel2015}
+ \cite{GtzSchmidkonz2019}
+ \cite{GtzSchmidkonz2019}
+ \cite{DieudonnHobbs2010}. Because this convolution can be executed using Fast Fourier Transforms (FFT), DVK methods can compute highly detailed 3D dose distributions in a matter of seconds or minutes. This makes them vastly more practical for routine clinical workflows than direct MC simulations, which can take hours or even days to track millions of particle histories to achieve acceptable statistical noise levels
+ \cite{DieudonnHobbs2012}
+
+ \cite{DieudonnHobbs2012}
+ \cite{DewarajaMirando2022}
+ \cite{DewarajaMirando2022}
+ \cite{DieudonnHobbs2010}
+ \cite{GuptaLee2020}
+ \cite{GuptaLee2020}.
+The Heterogeneity Challenge and Density Scaling The primary limitation of standard DVK dosimetry is that it fundamentally assumes the patient's body is an infinite, perfectly homogeneous medium (usually water or soft tissue)
+ \cite{GtzLang2021}
+
+ \cite{DieudonnHobbs2012}
+ \cite{AmatoMinutoli2012}
+ \cite{GuptaLee2020}. While this assumption works reasonably well for dense, soft-tissue organs in the abdomen, it introduces significant errors in highly heterogeneous anatomical regions, such as the lungs or at bone-to-soft-tissue interfaces
+ \cite{AmatoMinutoli2012}
+
+ \cite{KlettingSchimmel2015}
+ \cite{DieudonnHobbs2012}
+ \cite{DieudonnHobbs2010}
+ \cite{StabinMadsen2019}.
+To overcome this homogeneity assumption without resorting to full MC simulations, several correction strategies are applied:
+Voxel-by-Voxel Density Scaling: The simplest and most common correction involves scaling the standard soft-tissue DVK by the ratio of the reference density to the actual patient mass density derived from a co-registered CT scan
+ \cite{DieudonnHobbs2012}
+
+ \cite{GtzSchmidkonz2019}
+ \cite{BaileyMarquis2022}
+ \cite{MulyadiJung2022}. While this successfully improves accuracy within soft tissues, it generally only corrects for local energy deposition. It struggles to accurately model the complex scattering and cross-dose from highly penetrating photons or energetic beta particles near sharp density interfaces
+ \cite{DieudonnHobbs2012}
+
+ \cite{DieudonnHobbs2012}
+ \cite{BaileyMarquis2022}
+ \cite{StabinMadsen2019}.
+Collapsed-Cone Superposition (CCS): A more advanced convolution method that calculates dose by dynamically adjusting dose-point kernels based on the effective tissue densities along the specific ray paths between source and target points, showing a much higher agreement with MC simulations in heterogeneous regions
+ \cite{TerroPerret2025}
+
+ \cite{TerroPerret2025}
+ \cite{TerroPerret2025}.
+Deep Neural Networks (DNNs): Artificial intelligence is increasingly being used to predict customized, heterogeneous DVKs. Convolutional neural networks (such as U-Nets) can be trained on vast libraries of MC data to take a patient's localized CT density kernel as input and instantly predict a patient- and tissue-specific DVK
+ \cite{GtzLang2021}
+
+ \cite{GtzLang2021}
+ \cite{GtzLang2021}
+ \cite{GtzLang2021}. These NN-predicted kernels drastically outperform simple density scaling and match the accuracy of direct MC simulations while bypassing their massive computational penalty
+ \cite{GtzLang2021}
+
+ \cite{GtzSchmidkonz2019}
+ \cite{StabinMadsen2019}
+ \cite{StabinMadsen2019}
+ \cite{StabinMadsen2019}
+ \cite{StabinMadsen2019}.
+Clinical Impact By enabling the rapid calculation of absorbed dose at the microscopic level, DVKs allow clinicians to evaluate spatial non-uniformities in dose deposition that whole-organ averages completely obscure
+ \cite{DieudonnHobbs2012}
+ \cite{FinocchiaroBerenato2020}. This facilitates the generation of Dose-Volume Histograms (DVHs), enabling precise tumor evaluation and the protection of organs at risk, thereby bringing targeted radiopharmaceutical therapy closer to the rigorous, individualized treatment planning standards of external beam radiotherapy
+ \cite{DieudonnHobbs2012}
+
+ \cite{FinocchiaroBerenato2020}
+ \cite{DieudonnHobbs2010}.
+Discuss what these sources say about Kidneys (Dose Limit 23 Gy), in the larger context of Target and Risk Organs.
+
+In targeted radiopharmaceutical therapy (RPT), the primary goal is to deliver a lethal radiation dose to tumor lesions while sparing healthy tissues, which are designated as Organs at Risk (OARs)
+ \cite{TranGiaSalasRamirez2019}
+
+ \cite{TranGiaSalasRamirez2019}
+ \cite{BashirIqbal2024}. Because radioligands like 177Lu-PSMA and 177Lu-DOTATATE are predominantly eliminated from the body via the renal system—and because the proximal tubules of the kidneys physiologically express the targeted receptors—the kidneys are universally considered a primary dose-limiting OAR
+ \cite{GtzLang2021}
+
+ \cite{OkamotoThieme2016}
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+ \cite{GleisnerChouin2022}
+ \cite{BrattDrevin2016}
+ \cite{BrattDrevin2016}.
+The 23 Gy Dose Limit and Its Origins The widely accepted safety threshold for the maximum tolerable absorbed radiation dose to the kidneys is 23 Gy
+ \cite{DewarajaMirando2022}
+
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{DewarajaMirando2022}
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+ \cite{GleisnerChouin2022}
+ \cite{zkanUar2020}. This limit is historically derived from conventional, fractionated external-beam radiotherapy (EBRT) data, where 23 Gy represents a 5\\\\% probability of a patient developing severe, late-stage kidney damage (radiation nephropathy) within five years of treatment
+ \cite{GleisnerChouin2022}
+
+ \cite{zkanUar2020}
+ \cite{EllsGrogan2024}
+ \cite{OkamotoThieme2016}
+ \cite{RamonahengQebetu2024}.
+However, the sources emphasize that applying this 23 Gy threshold directly to internal radionuclide therapy is likely overly conservative. Because RPT delivers radiation continuously at a much lower dose rate than EBRT, healthy tissues can generally tolerate higher cumulative doses
+ \cite{zkanUar2020}
+
+ \cite{EllsGrogan2024}
+ \cite{OkamotoThieme2016}
+ \cite{RamonahengQebetu2024}
+ \cite{KabasakalAbuQbeitah2015}. Consequently, many researchers argue that for patients without pre-existing renal risk factors (such as diabetes, hypertension, or prior chemotherapy), the true biologically effective dose limit for the kidneys may safely be extended to 28 Gy, 39 Gy, or even 40 Gy
+ \cite{GleisnerChouin2022}
+
+ \cite{zkanUar2020}
+ \cite{EllsGrogan2024}
+ \cite{OkamotoThieme2016}
+ \cite{RamonahengQebetu2024}
+ \cite{StamouliNanos2023}
+ \cite{RamonahengQebetu2024}
+ \cite{BrattDrevin2016}.
+Clinical Realities of Kidney Absorbed Doses Extensive clinical dosimetry reveals that standard therapeutic regimens rarely reach the 23 Gy threshold.
+Low Per-Cycle Doses: The average kidney absorbed dose typically ranges from roughly 0.4 to 0.9 Gy per GBq of administered activity, depending on the specific radioligand utilized (e.g., 177Lu-PSMA-617 vs. 177Lu-PSMA-I&T) and individual patient physiology
+ \cite{EllsGrogan2024}
+
+ \cite{GrkovskiKrebs2025}
+ \cite{OkamotoThieme2016}
+ \cite{UijenPriv2023}
+ \cite{zkanUar2020}
+ \cite{KarimzadehSchatz2024}.
+High Cumulative Tolerance: Because these per-cycle doses are relatively low, dosimetric models indicate that patients could safely be administered a cumulative activity of 30 to 40 GBq (spanning 5 to 8 treatment cycles) before reaching the 23 Gy or 28 Gy limits
+ \cite{OkamotoThieme2016}
+
+ \cite{KabasakalAbuQbeitah2015}
+ \cite{OkamotoThieme2016}
+ \cite{KabasakalAbuQbeitah2015}
+ \cite{KabasakalAbuQbeitah2015}.
+In one cohort study observing patients over four treatment cycles, the median cumulative absorbed dose to the kidneys was approximately 14.6 Gy, remaining well below the toxicity threshold and resulting in no observed nephrotoxicity
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+ \cite{KarimzadehSchatz2024}.
+The Role of Personalized Dosimetry Despite the apparent safety margin, the sources strongly caution against a "one-size-fits-all" approach to dosing. There is significant inter-patient variability in kidney mass, baseline renal clearance, and total tumor volume, leading to a wide variance in how much radiation a patient's kidneys actually absorb
+ \cite{BegumThieme2018}
+
+ \cite{RinscheidKletting2019}
+ \cite{RinscheidKletting2019}
+ \cite{HardiansyahKletting2020}
+ \cite{DewarajaMirando2022}.
+To safely navigate the balance between target tumors and the kidney as a risk organ, patient-specific dosimetry—increasingly performed using efficient Single Time-Point (STP) SPECT/CT imaging—is essential
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+
+ \cite{GrkovskiKrebs2025}
+ \cite{DewarajaMirando2022}
+ \cite{DewarajaMirando2022}
+ \cite{RinscheidKletting2019}. By quantifying the precise radiation dose absorbed by the kidneys after the first cycle, clinicians can dynamically adapt subsequent treatments. This ensures that patients with slow renal clearance do not suffer irreversible kidney failure, while explicitly identifying patients with fast clearance who can safely tolerate additional therapy cycles or higher administered activities to maximize the lethal dose delivered to the tumor
+ \cite{DewarajaMirando2022}
+
+ \cite{GleisnerChouin2022}
+ \cite{DewarajaMirando2022}
+ \cite{GleisnerChouin2022}
+ \cite{PetersPriv2021}
+ \cite{DelkerFendler2015}.
+Discuss what these sources say about Exposure-Response Thresholds, in the larger context of Pharmacokinetic (PK) Modelling.
+
+In targeted radiopharmaceutical therapy (TRT), the core objective is to maximize the absorbed radiation dose (exposure) delivered to tumor lesions to ensure a therapeutic response, while strictly keeping the exposure to healthy organs-at-risk (OARs) below levels that would cause severe toxicity
+ \cite{PetersHofferber2021}
+
+ \cite{BegumThieme2018}
+ \cite{RamonahengQebetu2024}.
+Because fixed, empirical dosing regimens (a "one-size-fits-all" approach) fail to account for the vast interpatient variations in drug absorption and clearance, Pharmacokinetic (PK) modelling is heavily utilized to individualize treatments
+ \cite{BegumThieme2018}
+ \cite{SiebingaPriv2023}. By mathematically simulating a patient's specific radiotracer biodistribution using methods like Physiologically Based Pharmacokinetic (PBPK) or population PK models, clinicians can predict whether a planned administered activity will surpass safety thresholds in normal organs or successfully reach efficacy thresholds in tumors
+ \cite{PetersHofferber2021}
+
+ \cite{BegumThieme2018}
+ \cite{SiebingaPriv2023}.
+Exposure Thresholds for Organs at Risk (Toxicity) Historically, radiation tolerance thresholds for internal dosimetry have been extrapolated from external beam radiotherapy (EBRT) data
+ \cite{OkamotoThieme2016}
+
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{GleisnerChouin2022}.
+Kidneys: The kidneys are frequently the primary dose-limiting organ due to their role in excreting radiopharmaceuticals. The conventional maximum absorbed dose limit is typically set at 23 Gy or 28 Gy (with 28 Gy representing a 50\\\\% probability of developing severe late kidney damage within 5 years)
+ \cite{HardiansyahYousefzadehNowshahr2024}
+
+ \cite{GleisnerChouin2022}
+ \cite{OkamotoThieme2016}
+ \cite{NautiyalJha2022}. However, because TRT delivers radiation at a lower dose rate than EBRT, allowing healthy cells time to repair, models suggest patients without baseline renal risk factors might safely tolerate a Biologically Effective Dose (BED) up to 40 Gy
+ \cite{GleisnerChouin2022}
+
+ \cite{OkamotoThieme2016}
+ \cite{RamonahengQebetu2024}. Using PBPK models, researchers can design individualized treatments that maximize tumor dose while capping the kidney BED at fractionated limits, such as 5 Gy per cycle for a planned multi-cycle treatment
+ \cite{BegumThieme2018}
+ \cite{BegumThieme2018}.
+Salivary and Lacrimal Glands: Particularly in PSMA-targeted therapies, these glands show high physiological uptake
+ \cite{NautiyalJha2022}. PK modeling relies on threshold guidelines of approximately 20 to 25 Gy for salivary glands (where 25 Gy corresponds to a <25\\\\% probability of long-term damage like xerostomia) and around 40 Gy for the lacrimal glands
+ \cite{NautiyalJha2022}
+ \cite{RamonahengQebetu2024}.
+Bone Marrow: The maximum permissible absorbed dose to the bone marrow is generally recognized as 2 Gy to prevent severe, dose-limiting hematological toxicity
+ \cite{NautiyalJha2022}
+
+ \cite{RamonahengQebetu2024}
+ \cite{KabasakalAbuQbeitah2015}.
+Exposure-Response Thresholds for Tumors (Efficacy) PK models and voxel-based dosimetry clearly demonstrate a positive dose-response relationship: higher absorbed doses in tumors correlate with significantly better clinical outcomes, such as a greater probability of a ≥50\\\\% decline in Prostate-Specific Antigen (PSA) levels and longer progression-free survival
+ \cite{GrkovskiKrebs2025}
+
+ \cite{GrkovskiKrebs2025}
+ \cite{PetersHofferber2021}.
+However, establishing a universal tumor exposure threshold is highly complex. The dose required to elicit a response is heavily modulated by a tumor's effective radiosensitivity, which depends on factors like receptor expression density, genetic mutations, hypoxia, and overall tumor volume
+ \cite{GrkovskiKrebs2025}
+ \cite{GrkovskiKrebs2025}.
+To bridge this gap, advanced population Pharmacokinetic/Pharmacodynamic (PKPD) models have been developed. By linking estimated individual radioligand tumor concentrations directly to PSA dynamics over time, these models can identify specific tumor Area Under the Curve (AUC) thresholds (e.g., 709.5 to 1188 MBq·h/mL) that predict a successful clinical response
+ \cite{SiebingaVeen2024}
+
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}. This allows clinicians to use PK modeling to identify patients early on for whom a standard dosage is likely to fail because it will not reach the required efficacy threshold
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}.
+Clinical Flexibility and Limitations While PK models rigorously track these exposure thresholds, clinical realities sometimes require flexibility. Applying EBRT toxicity thresholds directly to internal therapies can be overly conservative due to the continuous, low-dose-rate irradiation characteristic of TRT
+ \cite{GleisnerChouin2022}
+ \cite{RamonahengQebetu2024}. Furthermore, because many patients receiving TRT have advanced, treatment-refractory disease with very short life expectancies, mildly exceeding established critical organ dose limits may be deemed clinically acceptable if the therapy provides significant palliative benefits or tumor control
+ \cite{PetersPriv2021}
+
+ \cite{zkanUar2020}
+ \cite{zkanUar2020}.
+Discuss what these sources say about Bone Marrow (Dose Limit 2 Gy), in the larger context of Target and Risk Organs.
+
+In the context of targeted radioligand therapies such as 177Lu-PSMA and 177Lu-DOTATATE, the bone marrow is recognised as a critical dose-limiting organ at risk (OAR)
+ \cite{GleisnerChouin2022}
+ \cite{GleisnerChouin2022}. Systemic administration of these radiopharmaceuticals exposes the blood elements and haematopoietic stem cells to radiation, which can lead to severe, albeit often transient, haematological toxicities such as thrombocytopenia, neutropenia, and lymphopenia
+ \cite{GleisnerChouin2022}
+
+ \cite{BlakkisrudPeterson2024}
+ \cite{BlakkisrudPeterson2024}. In patients with advanced metastatic castration-resistant prostate cancer (mCRPC), the incidence of these grade III-IV bone marrow toxicities is a major clinical concern
+ \cite{GrobPriv2024}.
+The 2 Gy Dose Limit and its Limitations The threshold for severe haematologic toxicity is generally considered to be a cumulative absorbed dose of 2 Gy to the bone marrow
+ \cite{BlakkisrudPeterson2024}
+ \cite{GleisnerChouin2022}. However, the sources advise caution when strictly adhering to this 2 Gy limit for modern radioligand therapies
+ \cite{BlakkisrudPeterson2024}. This historical threshold was originally derived using blood as a surrogate organ for red marrow during the treatment of differentiated thyroid cancer with 131I-NaI
+ \cite{BlakkisrudPeterson2024}. Because modern therapies like 177Lu-DOTATATE and 177Lu-PSMA involve fractionated treatment cycles and deliver radiation at significantly different, low dose rates, cellular repair mechanisms may allow patients to safely tolerate doses approaching or exceeding 2 Gy without developing clinically relevant grade 3 or higher toxicities
+ \cite{BlakkisrudPeterson2024}
+ \cite{GleisnerChouin2022}.
+Actual Absorbed Doses in Clinical Practice In routine clinical practice, the average absorbed doses delivered to the bone marrow from 177Lu-PSMA therapy are substantially below the 2 Gy tolerance limit
+ \cite{NautiyalJha2022}
+ \cite{DelkerFendler2015}. Median absorbed doses are frequently reported in the range of 0.012 to 0.044 Gy/GBq
+ \cite{DelkerFendler2015}
+
+ \cite{PetersPriv2021}
+ \cite{SarnelliBelli2019}. Therefore, even when accumulating the dose over five or six standard therapy cycles (typically 6 to 7.4 GBq each), the total absorbed dose to the bone marrow usually remains well below 2 Gy
+ \cite{NautiyalJha2022}.
+Dosimetry Challenges: Blood-Based vs. Image-Based Methods Calculating the exact absorbed radiation dose to the bone marrow is notoriously challenging and the methodology remains unstandardised
+ \cite{BlakkisrudPeterson2024}
+
+ \cite{VallotBrillouet2024}
+ \cite{VallotBrillouet2024}. The sources highlight a significant discrepancy between the two primary measurement techniques:
+Blood-Based Dosimetry: Historically, this method has been the gold standard. It assumes that the radiopharmaceutical does not specifically bind to red marrow cells, meaning the activity concentration in the marrow is assumed to be directly proportional or equal to the activity measured in the blood
+ \cite{GleisnerChouin2022}
+
+ \cite{VallotBrillouet2024}
+ \cite{GrobPriv2024}.
+Image-Based Dosimetry: This newer approach uses post-treatment SPECT/CT imaging to measure activity directly in segmented regions of the lumbar and thoracic vertebrae
+ \cite{VallotBrillouet2024}
+ \cite{GrobPriv2024}.
+Studies comparing the two methods reveal that the blood-based method often significantly underestimates the true bone marrow absorbed dose—sometimes by a factor of three or four—compared to image-based dosimetry
+ \cite{VallotBrillouet2024}
+ \cite{VallotBrillouet2024}. The higher doses detected by imaging suggest there may be specific binding of 177Lu-PSMA to bone marrow cells (or somatostatin-receptor expression on haematopoietic stem cells in the case of 177Lu-DOTATATE) that the blood-based surrogate method fails to capture
+ \cite{VallotBrillouet2024}
+ \cite{GrobPriv2024}.
+The Impact of Bone Metastases and Prior Treatments While average bone marrow doses remain low, the risk of toxicity is highly patient-dependent and heavily influenced by the extent of the patient's disease
+ \cite{GleisnerChouin2022}. Patients with high-volume skeletal metastases can receive significantly higher marrow doses due to the "cross-fire" radiation effect from adjacent highly avid bone lesions
+ \cite{NautiyalJha2022}
+ \cite{GleisnerChouin2022}. In these instances, traditional blood-based dosimetry models severely underestimate the absolute dose delivered to the marrow space
+ \cite{NautiyalJha2022}
+ \cite{KabasakalAbuQbeitah2015}.
+Furthermore, because many end-stage prostate cancer patients have already undergone extensive myelotoxic chemotherapy or external beam radiotherapy, their bone marrow reserves are often inherently compromised
+ \cite{GleisnerChouin2022}
+ \cite{NautiyalJha2022}. This heavily pre-treated status significantly increases their risk of developing severe haematotoxicity, even when the radiation dose to the bone marrow remains strictly below the 2 Gy limit
+ \cite{NautiyalJha2022}
+ \cite{KabasakalAbuQbeitah2015}.
+Discuss what these sources say about Salivary and Lacrimal Glands, in the larger context of Target and Risk Organs.
+
+In targeted radioligand therapy with 177Lu-PSMA, salivary glands and lacrimal glands are considered major organs at risk (OARs) due to their natural physiological expression of the prostate-specific membrane antigen (PSMA)
+ \cite{NautiyalJha2022}
+
+ \cite{GleisnerChouin2022}
+ \cite{GleisnerChouin2022}. While the therapy is designed to seek out and destroy prostate cancer cells, the unintended irradiation of these healthy glands poses the primary dose-limiting bottleneck for treatment
+ \cite{NautiyalJha2022}.
+Here is how the sources characterize these specific glands within the broader dynamic of target versus risk organs:
+Salivary Glands (Parotid and Submandibular)
+Mechanism and Toxicity: Radiotracer accumulation in the salivary glands is driven by focal PSMA expression as well as non-specific uptake mechanisms
+ \cite{GleisnerChouin2022}. This exposure leads to xerostomia (dry mouth), which is one of the most frequently documented side effects of the therapy
+ \cite{GleisnerChouin2022}
+ \cite{SarnelliBelli2019}. While severe xerostomia is rarely reported with 177Lu-PSMA-617, it becomes a severe, dose-limiting toxicity when patients are treated with highly potent alpha-emitters like 225Ac-PSMA
+ \cite{SarnelliBelli2019}
+ \cite{GleisnerChouin2022}.
+Saturable Uptake: Advanced population pharmacokinetic (PK) modeling reveals a unique characteristic of the salivary glands: their radioligand uptake is saturable, meaning they possess a maximum binding capacity (B 
+MAX
+​
+ ) for the drug
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023}. Because of this saturation point, simulations demonstrate that administering a higher therapeutic activity (e.g., increasing a dose from 3 to 6 GBq) actually reduces the cumulative absorbed radiation dose per unit of administered activity in the salivary glands
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023}. This suggests that safely escalating the radioactive dose to destroy tumors might not linearly increase salivary toxicity.
+Protective Strategies: To proactively mitigate salivary damage, clinical protocols explore targeted organ protectors. These include external cooling with ice packs to cause vasoconstriction and reduce local blood delivery
+ \cite{SarnelliBelli2019}
+ \cite{PaganelliSarnelli2020}, as well as the oral administration of folic polyglutamate tablets
+ \cite{SarnelliBelli2019}
+ \cite{PaganelliSarnelli2020}. These plant-based folates compete directly with the 177Lu-PSMA radioligand for the active enzymatic binding sites in the glands, effectively acting as a highly specific OAR shield
+ \cite{PaganelliSarnelli2020}
+ \cite{PaganelliSarnelli2020}.
+Lacrimal Glands
+The Highest Absorbed Dose: Dosimetry studies consistently show that the lacrimal (tear-producing) glands receive the highest absolute absorbed radiation dose per administered gigabecquerel among all OARs
+ \cite{NautiyalJha2022}
+ \cite{GleisnerChouin2022}. Meta-analyses have reported pooled average doses as high as 11.03 Gy/GBq for 177Lu-PSMA-617 and 19.23 Gy/GBq for 177Lu-PSMA-I&T
+ \cite{EllsGrogan2024}.
+The Clinical Discrepancy: Despite these alarmingly high dosimetric estimates, clinically significant xerophthalmia (dry eyes) is practically never reported by patients undergoing standard 177Lu-PSMA therapy
+ \cite{GleisnerChouin2022}
+ \cite{GleisnerChouin2022}. Researchers hypothesize that other accessory glands in the conjunctiva (such as Krause’s or Wolfring glands), which also produce tears but have low PSMA expression, survive the radiation and compensate for the lacrimal gland damage
+ \cite{PaganelliSarnelli2020}.
+Dosimetry Challenges: The sources note that absorbed dose estimates for lacrimal glands must be interpreted with caution. Because the glands have an incredibly small mass (often estimated at 1.4 grams or less), they are highly susceptible to Partial Volume Effects (PVE) and blurring during SPECT/CT imaging, making accurate mass estimation and dose quantification exceptionally difficult
+ \cite{GleisnerChouin2022}
+
+ \cite{GleisnerChouin2022}
+ \cite{GleisnerChouin2022}.
+The Therapeutic Target-to-Risk Ratio The ultimate goal of radiopharmaceutical therapy is to maximize the dose to target tumor lesions while sparing these risk organs
+ \cite{RamonahengQebetu2024}. Fortunately, because PSMA expression is massively upregulated in prostate carcinoma cells, tumor lesions successfully absorb 3 to 6 times more radiation dose than the salivary and lacrimal glands
+ \cite{NautiyalJha2022}
+ \cite{NautiyalJha2022}.
+This highly favorable target-to-risk ratio allows clinicians to deliver massive, tumoricidal radiation doses while keeping the cumulative absorbed doses to the salivary and lacrimal glands below their respective toxicity thresholds (derived from external-beam radiotherapy) over standard treatment cycles
+ \cite{NautiyalJha2022}
+ \cite{NautiyalJha2022}. Current estimates suggest the maximum tolerance limit is approximately 20 to 35 Gy for the salivary glands and roughly 40 Gy for the lacrimal glands
+ \cite{GleisnerChouin2022}
+
+ \cite{NautiyalJha2022}
+ \cite{KarimzadehSchatz2024}.
+Discuss what these sources say about Tumour Lesions, in the larger context of Target and Risk Organs.
+
+In targeted radiopharmaceutical therapy (TRT), the patient's anatomy is broadly categorized into two domains: target organs (the tumour lesions) and risk organs (healthy organs at risk, or OARs, such as the kidneys, salivary glands, liver, and bone marrow)
+ \cite{FuertesGarca2021}
+
+ \cite{FuertesGarca2021}
+ \cite{FuertesGarca2021}. The fundamental objective of TRT is to deliver a maximum, highly localized radiation-absorbed dose to the target tumour lesions in order to induce cell death, while simultaneously restricting the absorbed dose in the risk organs below established toxicity thresholds
+ \cite{TranGiaSalasRamirez2019}
+
+ \cite{PetersHofferber2021}
+ \cite{RamonahengQebetu2024}
+ \cite{RamonahengQebetu2024}
+ \cite{zkanUar2020}.
+Favorable Target-to-Risk Dose Ratios Because theranostic agents—such as 177Lu-PSMA-617 and 177Lu-DOTATATE—are designed with a high affinity for specific receptors overexpressed by cancer cells, tumour lesions actively accumulate the radiopharmaceutical at a much higher concentration than normal tissues
+ \cite{GleisnerChouin2022}
+
+ \cite{GleisnerChouin2022}
+ \cite{SarnelliBelli2019}
+ \cite{zkanUar2020}. Consequently, tumour lesions routinely receive absorbed doses that are significantly higher—often 3 to 6 times higher—than the doses delivered to critical organs at risk
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+
+ \cite{NautiyalJha2022}
+ \cite{NautiyalJha2022}. This favorable therapeutic index ensures that the radiation is effectively targeting the disease while sparing healthy tissues
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+
+ \cite{DelkerFendler2015}
+ \cite{DelkerFendler2015}.
+High Inter- and Intra-Patient Variability Despite this effective targeting, the absorbed dose delivered to tumour lesions exhibits massive inter-patient and intra-patient variability
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+
+ \cite{FinocchiaroBerenato2020}
+ \cite{HippelinenTenhunen2017}
+ \cite{DuongSarno2025}
+ \cite{GoetzLang2020}. The sources highlight several critical factors influencing the dosimetric profile of tumour lesions in relation to the wider organ context:
+Tumour Site and Composition: The absorbed dose can vary significantly depending on the anatomical location of the metastasis. Multiple studies have observed distinct dosimetric differences between lymph node metastases, bone metastases, and visceral (e.g., liver or lung) soft-tissue lesions
+ \cite{OkamotoThieme2016}
+
+ \cite{NautiyalJha2022}
+ \cite{PetersPriv2021}
+ \cite{DelkerFendler2015}. For example, some clinical analyses of 177Lu-PSMA found that lymph node lesions consistently absorbed significantly higher radiation doses and responded better to therapy than bone lesions
+ \cite{PetersPriv2021}
+
+ \cite{PetersPriv2021}
+ \cite{KarimzadehSchatz2024}
+ \cite{KarimzadehSchatz2024}.
+The Tumour Sink Effect: The total volume of all tumour lesions combined (the total tumour burden) significantly impacts the pharmacokinetics of the radioligand across the entire body. In patients with a large tumour burden, the massive number of binding sites acts as a "sink," drawing the radiopharmaceutical away from healthy risk organs
+ \cite{BegumThieme2018}
+ \cite{PetersPriv2021}. While this protects the OARs, dispersing the injected activity across a vast tumour volume can inadvertently reduce the specific activity concentration—and thus the absorbed dose—within individual tumour lesions, risking underdosing of the target
+ \cite{BegumThieme2018}.
+Cycle-Dependent Uptake Decline: Tracking dosimetry across multiple treatment cycles reveals a clear, gradual decrease in the absorbed dose delivered to tumour lesions
+ \cite{OkamotoThieme2016}
+
+ \cite{KarimzadehSchatz2024}
+ \cite{OkamotoThieme2016}. For instance, one study found that the mean absorbed dose to tumours dropped from 3.86 mGy/MBq in the first cycle down to 2.01 mGy/MBq by the fourth cycle
+ \cite{KarimzadehSchatz2024}
+ \cite{KarimzadehSchatz2024}. This decline is typically attributed to successful therapy reducing the tumour burden and receptor expression over time
+ \cite{KarimzadehSchatz2024}.
+Clinical Implications and the Need for Personalized Dosimetry Because the efficacy of TRT is heavily dependent on the area under the curve (AUC) of uptake intensity and radiopharmaceutical residence time within the target lesions, accurately monitoring tumour dosimetry is pivotal
+ \cite{PetersPriv2021}
+
+ \cite{StraubKupferschlger2023}
+ \cite{PetersPriv2021}. Studies confirm a strong dose-response relationship: patients whose tumour lesions receive higher absorbed doses generally exhibit significantly better clinical outcomes, such as a greater decline in prostate-specific antigen (PSA) levels and prolonged progression-free survival
+ \cite{PetersPriv2021}
+
+ \cite{PetersPriv2021}
+ \cite{GrkovskiKrebs2025}
+ \cite{GrkovskiKrebs2025}.
+However, because of the extreme variability in how different patients and individual lesions absorb radiation, relying on a standard, fixed-activity "one-size-fits-all" dosing regimen is suboptimal
+ \cite{DuongSarno2025}
+
+ \cite{RamonahengQebetu2024}
+ \cite{DuongSarno2025}. A fixed dose may fail to eradicate radioresistant tumors in one patient while unnecessarily risking critical organ toxicity in another
+ \cite{DuongSarno2025}.
+To overcome this, the field is shifting toward personalized, voxel-based dosimetry. Traditional organ-level calculations often oversimplify tumours as isolated, unit-density tissue spheres, which fails to account for heterogeneous radiotracer uptake within the lesion and ignores the "cross-dose" radiation that a highly active tumour might scatter into adjacent healthy organs
+ \cite{BroschLenzKurkowska2024}
+
+ \cite{BroschLenzKurkowska2024}
+ \cite{BroschLenzKurkowska2024}
+ \cite{ReschFouladgar2023}
+ \cite{DieudonnHobbs2010}
+ \cite{KostDewaraja2015}. Voxel-level evaluation explicitly maps the non-uniform energy deposition across the true patient-specific geometry, enabling clinicians to accurately quantify the dose to the target lesions and adjust subsequent administered activities to maximize tumour destruction without breaching the safety limits of the risk organs
+ \cite{BaileyMarquis2022}
+
+ \cite{KostDewaraja2015}
+ \cite{StabinMadsen2019}.
+Discuss what these sources say about PSA Dynamics, in the larger context of Treatment Monitoring.
+
+In the treatment monitoring of metastatic castration-resistant prostate cancer (mCRPC) undergoing 177Lu-PSMA radioligand therapy, prostate-specific antigen (PSA) dynamics serve as a primary clinical marker for evaluating therapeutic response and disease progression
+ \cite{StraubKupferschlger2023}
+ \cite{GrkovskiKrebs2025}. A positive treatment response is typically defined as a PSA decrease of 50\\\\% or more, whereas disease progression is marked by two consecutive increases in PSA levels totalling at least 25\\\\% above the nadir
+ \cite{StraubKupferschlger2023}
+
+ \cite{StraubKupferschlger2023}
+ \cite{StraubKupferschlger2023}. Despite the general efficacy of the therapy, achieving a significant PSA response is not guaranteed; for instance, the phase 3 VISION trial demonstrated that only 46\\\\% of patients achieved a PSA response
+ \cite{GrkovskiKrebs2025}.
+The Absorbed Dose-PSA Response Relationship Monitoring PSA dynamics reveals a clear exposure-response relationship between the absorbed dose (AD) delivered to tumour lesions and the resulting biochemical response
+ \cite{GrkovskiKrebs2025}
+ \cite{GrkovskiKrebs2025}. Clinical studies demonstrate a moderate correlation between the mean lesion AD and the percentage change in PSA after the first treatment cycle
+ \cite{GrkovskiKrebs2025}
+ \cite{GrkovskiKrebs2025}. Specifically, patients receiving a higher mean AD (greater than 7.5 Gy) exhibit a significantly better PSA response—with a median PSA drop of 70\\\\% compared to a 25\\\\% increase in patients receiving less than 7.5 Gy
+ \cite{GrkovskiKrebs2025}
+ \cite{GrkovskiKrebs2025}. This improved PSA response directly translates to a longer biochemical progression-free survival (bPFS)
+ \cite{GrkovskiKrebs2025}
+ \cite{GrkovskiKrebs2025}. Furthermore, pre-therapeutic PSA doubling time moderately correlates with PSA response, and combining PSA doubling time with AD estimates provides a stronger overall predictor for biochemical response
+ \cite{GrkovskiKrebs2025}
+ \cite{GrkovskiKrebs2025}.
+PKPD Modelling of PSA Dynamics To better understand and predict these outcomes, researchers have developed population Pharmacokinetic/Pharmacodynamic (PKPD) models that specifically quantify biochemical PSA dynamics over the course of treatment
+ \cite{SiebingaVeen2024}. In these models, underlying tumour growth is defined by an exponential PSA growth rate, while the therapy-induced PSA decrease is linked to estimated tumour radioligand concentrations
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}.
+Crucially, PKPD modelling reveals that PSA dynamics are governed by both a direct and a delayed drug effect
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}. The direct effect of the radiation on PSA levels is often limited for the majority of patients; instead, the delayed effect significantly drives the overall treatment response
+ \cite{SiebingaVeen2024}. This delayed decline in PSA can continue even after the treatment is completed and the radioactivity has been eliminated from the tumours
+ \cite{SiebingaVeen2024}.
+The sources propose several biological explanations for this delayed PSA response:
+Tumour Microenvironment & Bystander Effects: The delay may be caused by radiation-induced changes to the tumour microenvironment (such as alterations in vascularisation) or a radiation-induced bystander response, where non-irradiated cells show damage resulting from interactions with the immune system
+ \cite{SiebingaVeen2024}.
+The "PSA-Flare" Phenomenon: PSA levels may not drop immediately after the start of treatment due to the initial release of PSA from dying, responding tumour cells, which temporarily masks the therapeutic effect
+ \cite{SiebingaVeen2024}.
+Impact on Dosing Regimens By mathematically simulating PSA dynamics, PKPD models can evaluate the efficacy of different clinical dosing regimens
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}. For example, simulations comparing a standard '4 x 6' regimen (four cycles with a six-week interval) to a '2 x 2' regimen (two cycles with a two-week interval, repeated after twelve weeks) showed similar overall stable disease response rates
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}. However, the '2 x 2' scheme induced a more prominent decrease in PSA immediately following the second cycle
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}. Ultimately, modelling individual PSA dynamics helps clinicians identify population response rates, predict individual treatment outcomes, and identify patients in whom radioligand therapy is likely to fail so that treatments can be personalised
+ \cite{SiebingaVeen2024}.
+Discuss what these sources say about Theranostic Pairing (68Ga/177Lu), in the larger context of Treatment Monitoring.
+
+The theranostic pairing of 68Ga and 177Lu—particularly when utilizing prostate-specific membrane antigen (PSMA) ligands like PSMA-11, PSMA-617, and PSMA-I&T—is a foundational concept in personalized radiopharmaceutical therapy (RPT) for advanced prostate cancer. This pairing integrates diagnostic imaging (68Ga) to identify and quantify specific biological targets with a therapeutic counterpart (177Lu) designed to deliver localized, cytotoxic radiation to those exact targets
+ \cite{DuongSarno2025}
+ \cite{DuongSarno2025}.
+Within the larger context of treatment monitoring, the sources highlight how this theranostic pair is utilized from initial patient selection through predictive dosimetry and toxicity management:
+Patient Selection and Pre-Therapeutic Prediction Before initiating 177Lu-PSMA therapy, patients must undergo baseline imaging, such as a 68Ga-PSMA-11 PET/CT scan, to visually confirm adequate PSMA expression in their tumor lesions
+ \cite{KennedyLugassi2020}
+
+ \cite{StraubKupferschlger2023}
+ \cite{GrkovskiKrebs2025}. Beyond merely qualifying a patient for treatment, the diagnostic scan serves as a powerful predictive monitoring tool. Studies demonstrate that the pre-therapeutic Standardized Uptake Value (SUV) derived from the 68Ga-PSMA PET scan strongly correlates with the actual absorbed radiation dose delivered to both the tumor lesions and the dose-limiting organs at risk (OARs) during subsequent 177Lu-PSMA therapy
+ \cite{OkamotoThieme2016}
+
+ \cite{WangZang2019}
+ \cite{WangZang2019}. Consequently, a high pre-therapeutic PET SUV can serve as a simple, reliable surrogate indicator for a high therapeutic absorbed dose
+ \cite{WangZang2019}.
+Dosimetry Estimation and Toxicity Management The shared pharmacokinetic properties of these "theranostic twins" enable clinicians to qualitatively and quantitatively assess expected post-therapy dose distributions before the treatment begins
+ \cite{OkamotoThieme2016}
+ \cite{XueGafita2022}. To predict the therapeutic absorbed dose, the observed diagnostic 68Ga uptake values can be mathematically projected to predicted 177Lu uptake values by correcting for the stark differences in their physical half-lives (68Ga has a short half-life of 68 minutes, whereas 177Lu has a half-life of 6.7 days)
+ \cite{XueGafita2022}
+ \cite{PetersHofferber2021}.
+This pre-treatment dosimetry prediction is crucial for monitoring patient safety. Because many patients receiving 177Lu-PSMA are heavily pre-treated and may have compromised organ function, predicting absorbed doses based on a single 68Ga-PSMA PET scan provides physicians with a vital tool to safely manage, adjust, or refrain from additional treatment cycles if there is a significant predicted risk of organ toxicity (such as in the kidneys or salivary glands)
+ \cite{PetersHofferber2021}
+ \cite{PetersHofferber2021}. By utilizing this indirect theranostic approach, clinicians can shift away from a rigid "one-size-fits-all" fixed activity regimen toward highly personalized, dosimetry-driven dosing
+ \cite{RamonahengQebetu2024}
+ \cite{RamonahengQebetu2024}.
+Challenges and Advanced Modeling While the theranostic pairing is highly effective, predicting multi-cycle therapy outcomes from a single diagnostic scan presents challenges. A pre-therapy 68Ga-PSMA PET scan is typically a single-time-point measurement taken about one hour after injection, whereas post-therapy 177Lu dosimetry involves integrating radiation exposure continuously over several days
+ \cite{XueGafita2022}. Furthermore, therapeutic tracers are often administered at much higher activities than imaging tracers, and the specific peptides used (e.g., diagnostic 68Ga-PSMA-11 versus therapeutic 177Lu-PSMA-617) may not be perfectly identical, which can introduce variations in intratumoral residence times
+ \cite{XueGafita2022}
+ \cite{WangZang2019}.
+To bridge this gap and reduce uncertainties, researchers are developing machine learning (ML) models that integrate pre-therapeutic 68Ga-PSMA PET uptake data with patient-specific clinical information
+ \cite{XueGafita2022}
+ \cite{XueGafita2022}. These models learn quantitative principles and multi-organ relationships from training data to more accurately forecast 177Lu-PSMA absorbed doses, reducing the likelihood of underestimating or overestimating the true therapeutic biodistribution
+ \cite{XueGafita2022}.
+Discuss what these sources say about SPECT/CT Imaging, in the larger context of Treatment Monitoring.
+
+SPECT/CT (Single-Photon Emission Computed Tomography combined with Computed Tomography) is the cornerstone of modern treatment monitoring and personalized dosimetry in targeted radiopharmaceutical therapy (RPT). By replacing traditional 2D planar imaging and generic, stylized phantoms, hybrid SPECT/CT provides a highly accurate, patient-specific 3D map of both anatomical tissue density (via CT) and the spatiotemporal distribution of the radiotracer (via SPECT)
+ \cite{GtzLang2021}
+
+ \cite{FuertesGarca2021}
+ \cite{DewarajaMirando2022}.
+In the context of treatment monitoring, the sources highlight several critical roles, technological requirements, and clinical strategies regarding SPECT/CT imaging:
+1. Absolute Quantification and Essential Corrections Unlike diagnostic imaging, SPECT/CT for treatment monitoring must provide absolute quantitative data (in units like Bq/mL or standardized uptake value, SUV) to calculate the absorbed radiation dose
+ \cite{KennedyLugassi2020}
+
+ \cite{BaileyMarquis2022}
+ \cite{GleisnerChouin2022}. To achieve this, the imaging system requires a camera-specific calibration factor derived from phantom measurements
+ \cite{FuertesGarca2021}
+ \cite{GleisnerChouin2022}. Furthermore, quantitative accuracy depends heavily on iterative reconstruction algorithms (such as OSEM) that incorporate physical corrections for photon attenuation (using the CT map), scatter, and collimator-detector response (resolution recovery)
+ \cite{GtzSchmidkonz2019}
+
+ \cite{GleisnerChouin2022}
+ \cite{RamonahengQebetu2024}.
+A major challenge in SPECT/CT monitoring is the Partial Volume Effect (PVE). Because SPECT has limited spatial resolution, the imaging process can blur distinct, discrete absorbed dose values into a continuous distribution—a phenomenon described as "What You See Is Not What You Get"
+ \cite{TranGiaSalasRamirez2019}
+ \cite{TranGiaSalasRamirez2019}. This blurring severely underestimates the radiotracer concentration in small tumors or sub-organ structures, making Partial Volume Correction (PVC) techniques essential for accurate tumor dosimetry
+ \cite{TranGiaSalasRamirez2019}
+
+ \cite{FuertesGarca2021}
+ \cite{DewarajaMirando2022}
+ \cite{RamonahengQebetu2024}.
+2. Time-Sampling Strategies: MTP, STP, and Hybrid Approaches To monitor how long the radiopharmaceutical stays in the body, clinicians must generate a Time-Activity Curve (TAC) by measuring the activity at various times post-injection. The sources outline several SPECT/CT sampling strategies:
+Multiple-Time-Point (MTP) Imaging: The reference gold standard involves acquiring 3 to 5 SPECT/CT scans over several days (e.g., 4h, 24h, 48h, 72h, and 168h)
+ \cite{PetersHofferber2021}
+
+ \cite{GleisnerChouin2022}
+ \cite{PetersPriv2021}. While highly accurate, this poses a massive logistical burden on nuclear medicine departments and patients
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{BroschLenzDelker2023}.
+Single-Time-Point (STP) Dosimetry: To ease clinical implementation, STP methods rely on a single SPECT/CT scan—often recommended at 48 to 72 hours post-injection—combined with population-based pharmacokinetic data or assumed effective half-lives
+ \cite{DewarajaMirando2022}
+
+ \cite{DewarajaMirando2022}
+ \cite{GrkovskiKrebs2025}
+ \cite{BroschLenzDelker2023}. Studies show STP at these times can accurately estimate kidney and tumor doses within a 20\\\\% margin of error compared to MTP
+ \cite{BroschLenzDelker2023}
+
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{HardiansyahYousefzadehNowshahr2024}.
+Two-Time-Point (TTP) and Hybrid Dosimetry: TTP methods using SPECT/CT scans at specific intervals (e.g., 20–60h and 40–200h) significantly reduce TIA estimation errors compared to STP methods
+ \cite{ChenLu2023}
+ \cite{ChenLu2023}. Alternatively, a hybrid approach uses multiple, fast 2D planar images to establish the shape of the washout curve, which is then anchored and scaled by a single, highly accurate 3D SPECT/CT scan (usually at 24 or 48 hours)
+ \cite{KlettingSchimmel2015}
+
+ \cite{FuertesGarca2021}
+ \cite{RinscheidKletting2019}
+ \cite{GleisnerChouin2022}.
+3. Tracking Kinetics as a Prognosticator SPECT/CT is uniquely positioned to monitor the dynamic behavior of the treatment. Dual-time-point post-therapy SPECT/CT scans can explicitly describe the uptake and washout kinetics of lesions
+ \cite{StraubKupferschlger2023}. The clearance rate of the radiopharmaceutical (like 177Lu-PSMA-617) from metastases serves as a strong prognostic marker; a rapid drop in activity between scans signals a shorter residence time and a lower absorbed dose, which strongly correlates with reduced treatment response and shorter progression-free survival
+ \cite{StraubKupferschlger2023}
+ \cite{StraubKupferschlger2023}.
+4. Technological Enhancements for Clinical Feasibility To make routine SPECT/CT monitoring more viable, several technological advancements are being leveraged:
+Solid-State CZT Detectors: New digital SPECT/CT cameras utilizing Cadmium-Zinc-Telluride (CZT) detectors offer superior spatial and energy resolution compared to traditional sodium-iodide crystals, yielding in vivo quantifications that match in vitro samples to within 20\\\\%
+ \cite{KennedyLugassi2020}
+
+ \cite{KennedyLugassi2020}
+ \cite{KennedyLugassi2020}.
+Fast Acquisition Protocols: Fast SPECT acquisitions (e.g., 5 seconds per frame) have been validated to perform whole-body scans in a fraction of the time, dramatically reducing patient discomfort
+ \cite{ChuamsaamarkkeeCharoenphun2025}
+ \cite{ChuamsaamarkkeeCharoenphun2025}.
+Artificial Intelligence: Deep learning Convolutional Neural Networks (CNNs) are increasingly being used to automatically segment organs (like the kidneys and liver) on the CT portion of the SPECT/CT scan, eliminating a major bottleneck in the dosimetric workflow
+ \cite{DewarajaMirando2022}
+ \cite{DewarajaMirando2022}.
+Ultimately, by utilizing SPECT/CT imaging to monitor the exact absorbed dose delivered to tumors and critical organs at risk, clinicians can move away from generic, "one-size-fits-all" fixed-activity protocols toward highly personalized radiopharmaceutical therapy that maximizes tumor destruction while ensuring patient safety
+ \cite{BaileyMarquis2022}
+
+ \cite{DuongSarno2025}
+ \cite{BroschLenzDelker2023}.
+Analize all variables that may be needed to create universal differential equation to get a dosemap from CT and SPECT
+
+To create a universal differential equation (or more accurately, an integro-differential model) that maps CT and SPECT data to a 3D absorbed dose map, you must bridge the time-dependent radiotracer activity (functional data from SPECT) with the patient-specific radiation transport through heterogeneous matter (anatomical data from CT).
+Based on the sources, the foundational rate equation for energy dose D 
+E
+​
+  delivered to a target voxel r 
+T
+​
+  from a radioactive source voxel r 
+S
+​
+  is expressed as:  
+dt
+dD 
+E
+​
+ (r 
+T
+​
+ ,t)
+​
+ = 
+D
+˙
+  
+E
+​
+ (r 
+T
+​
+ ,t)=A(r 
+S
+​
+ ,t)×K(r 
+T
+​
+ ←r 
+S
+​
+ ,t)
+ \cite{GtzLang2021}.
+To fully define and solve this equation at the voxel level across the entire body, the following variables must be extracted and analyzed from the imaging modalities and fundamental physics:
+1. Variables Derived from SPECT (The Source Term)
+SPECT imaging provides the spatio-temporal distribution of the radioactive source. To define A(r 
+S
+​
+ ,t) (the absolute activity at source location r 
+S
+​
+  at time t), the following variables are needed:
+C(v,t): The measured count rate in a specific voxel or volume at a specific time t
+ \cite{GleisnerChouin2022}.
+Q 
+sp
+​
+ : The system calibration factor (e.g., in cps/MBq), which converts the raw camera counts into absolute radioactivity
+ \cite{GleisnerChouin2022}.
+R(v) or RC: The recovery coefficient, a volume-dependent variable used to correct for the Partial Volume Effect (PVE) caused by the limited spatial resolution of the SPECT camera
+ \cite{GleisnerChouin2022}.
+t: Time post-injection
+ \cite{GtzLang2021}.
+T 
+1/2,p
+​
+ , T 
+1/2,b
+​
+ , and T 
+1/2,eff
+​
+ : The physical, biological, and effective half-lives of the radiopharmaceutical. These variables define the exponential decay and biological clearance rates needed to fit a time-activity curve (TAC) for each voxel
+ \cite{DuongSarno2025}
+ \cite{DuongSarno2025}. Integrating this curve over time yields the Time-Integrated Activity ( 
+A
+~
+ ), which is the total number of nuclear disintegrations that occurred in that voxel
+ \cite{FuertesGarca2021}
+ \cite{GleisnerChouin2022}.
+2. Variables Derived from CT (The Medium/Anatomy Term)
+CT imaging provides the physical properties of the transport medium, which dictate how radiation is scattered and absorbed.
+HU(x,y,z): The Hounsfield Unit value for each spatial coordinate, directly extracted from the CT scan
+ \cite{GtzSchmidkonz2019}.
+ρ(r): The spatially varying mass density of the tissue (e.g., g/cm 
+3
+ ). This is derived from the HU values using a bi-linear CT-to-density calibration curve
+ \cite{GtzSchmidkonz2019}
+
+ \cite{GtzSchmidkonz2019}
+ \cite{BaileyMarquis2022}.
+Z 
+eff
+​
+ : The effective atomic number (or tissue composition class, like bone, lung, or soft tissue). This is derived from the mass density and is crucial for determining the interaction cross-sections of the tissue, particularly for photoelectric absorption and Compton scattering
+ \cite{GtzLang2021}
+
+ \cite{SalasRamirezLassmann2022}
+ \cite{SalasRamirezLassmann2022}
+ \cite{GtzSchmidkonz2019}.
+m(r 
+T
+​
+ ): The mass of the target voxel, calculated by multiplying the voxel's volume by its mass density ρ
+ \cite{GleisnerChouin2022}
+ \cite{GtzLang2021}.
+3. Variables for Radiation Transport (The Energy Transfer Kernel)
+To map the activity to actual deposited dose, variables defining the radiation physics are required to create the dose kernel K(r 
+T
+​
+ ←r 
+S
+​
+ ) or S-value S(r 
+T
+​
+ ←r 
+S
+​
+ ):
+E 
+i
+​
+  and Y 
+i
+​
+ : The mean energy and yield (probability) of the i-th emitted particle (e.g., beta electrons, gamma photons) per nuclear transition of the specific radioisotope
+ \cite{GleisnerChouin2022}
+ \cite{ChatachotShiratori2021}.
+ϕ(r 
+T
+​
+ ←r 
+S
+​
+ ,E 
+i
+​
+ ): The absorbed fraction, representing the exact fraction of energy E 
+i
+​
+  emitted in the source voxel that is absorbed in the target voxel
+ \cite{GleisnerChouin2022}
+
+ \cite{ChatachotShiratori2021}
+ \cite{KotroumpelouKyriakou2024}.
+dE/dR: The energy-loss rate or stopping power. For charged particles like electrons, this variable dictates the continuous slowing down of the particle over its residual range in the specific medium
+ \cite{KotroumpelouKyriakou2024}.
+μ 
+en
+​
+ /ρ: The mass-energy absorption coefficient. For photon transport, this variable dictates how much energy is transferred from the photon to the tissue at the target location
+ \cite{MartinovOpara2022}
+ \cite{StabinMadsen2019}.
+The Universal Equation
+When combining these variables, the total absorbed dose rate  
+D
+˙
+  to a target voxel r 
+T
+​
+  from all surrounding source voxels r 
+S
+​
+  is calculated as a convolution or summation:  
+D
+˙
+ (r 
+T
+​
+ ,t)=∑ 
+r 
+S
+​
+ 
+​
+ A(r 
+S
+​
+ ,t)S(r 
+T
+​
+ ←r 
+S
+​
+ ,t)
+ \cite{GleisnerChouin2022}.
+To make this equation "universal" and highly accurate across heterogeneous human anatomy, simple static kernels are insufficient. Instead, the ultimate mathematical formulation used by advanced deterministic solvers is the Linear Boltzmann Transport Equation (LBTE)
+ \cite{MikellKappadath2016}
+ \cite{MikellKappadath2016}. The LBTE directly utilizes the CT-derived density ρ and tissue composition to solve for the energy- and angular-dependent particle flux Ψ( 
+r
+
+ ,E, 
+Ω
+^
+ )
+ \cite{MikellKappadath2016}. By discretizing space, angle, and energy, the LBTE calculates exact dose deposition in heterogeneous media (like bone-to-lung interfaces) without the statistical noise of Monte Carlo simulations, providing a complete and personalized 3D dose map
+ \cite{MikellKappadath2016}
+ \cite{BaileyMarquis2022}.
+what are physical, biological, and effective half-lives in Lutetium PSMA
+
+In the context of targeted radioligand therapy using Lutetium-177 (177Lu) PSMA, the physical, biological, and effective half-lives describe the different rates at which the radioactive drug diminishes within the patient's body.
+Physical Half-Life The physical half-life is a fixed property of the radioisotope itself, representing the time it takes for half of the radioactive atoms to undergo radioactive decay, completely independent of biological processes. For 177Lu, the physical half-life is approximately 6.64 to 6.7 days (roughly 160 hours)
+ \cite{FuertesGarca2021}
+
+ \cite{EllsGrogan2024}
+ \cite{KennedyLugassi2020}
+ \cite{PistoneAuditore2022}. This is considered highly convenient for clinical use, as it is long enough to manage delivery and allow the radioligand to accumulate in tumors, but short enough to spare healthy organs from excessive, prolonged radiation
+ \cite{RamonahengQebetu2024}.
+Biological Half-Life The biological half-life refers to the time it takes for the patient's body to naturally clear or excrete half of the administered pharmaceutical compound, assuming the substance is not radioactive. Because 177Lu-PSMA has complex pharmacokinetics, different organs eliminate the drug at different rates. For example, pharmacokinetic modeling of the kidneys shows that the biological clearance of 177Lu-PSMA often features a fast initial washout phase with a biological half-life of around 11.5 hours, followed by a slower secondary elimination phase with a biological half-life of roughly 76.4 hours
+ \cite{HardiansyahYousefzadehNowshahr2024}. Another simulation study noted a median biological half-life in the kidneys of 50 hours starting from 24 hours post-injection
+ \cite{RinscheidKletting2019}.
+Effective Half-Life The effective half-life is the most critical metric for clinical dosimetry. It represents the actual, observed rate at which radioactivity declines in a specific organ or tumor
+ \cite{StraubKupferschlger2023}. It is the mathematical combination of both the physical decay of the 177Lu and the biological clearance of the PSMA molecule. Because these two depletion processes happen simultaneously, the effective half-life is always shorter than both the physical and biological half-lives.
+Because the radioligand targets and binds to specific tissues differently, the effective half-life varies significantly between normal organs at risk and the targeted tumor lesions:
+Organs at Risk: Normal organs typically exhibit faster radiotracer washout. Clinical studies report median effective half-lives of roughly 28 to 39 hours for the kidneys
+ \cite{PetersHofferber2021}
+
+ \cite{PetersPriv2021}
+ \cite{KarimzadehSchatz2024}, 32.5 to 42 hours for the salivary glands (parotid and submandibular)
+ \cite{PetersPriv2021}
+
+ \cite{KarimzadehSchatz2024}
+ \cite{KarimzadehSchatz2024}, and 19 to 25 hours for the liver
+ \cite{PetersPriv2021}
+ \cite{SarnelliBelli2019}.
+Tumor Lesions: Because the therapy is designed to bind strongly to the PSMA receptors overexpressed on prostate cancer cells, tumors demonstrate much longer tracer retention. The effective half-life in tumor lesions (both bone and soft tissue) is generally much longer, typically ranging from 50 to 72 hours
+ \cite{PetersHofferber2021}
+
+ \cite{KarimzadehSchatz2024}
+ \cite{KarimzadehSchatz2024}. This prolonged effective half-life in tumors ensures that a higher, lethal radiation dose is delivered to the cancer cells while the radioactivity clears more rapidly from healthy tissues.
+what is physical, biological, and effective half-lives in relation to HU in CT
+
+Physical, biological, and effective half-lives describe the temporal behavior of a radiopharmaceutical as it is absorbed and eliminated by the body:
+Physical half-life (T 
+1/2,phys
+​
+ ): The inherent, constant time it takes for half of a specific radioisotope's atoms to undergo physical radioactive decay (for example, approximately 6.7 days for 177Lu)
+ \cite{GtzLang2021}
+
+ \cite{FuertesGarca2021}
+ \cite{DuongSarno2025}.
+Biological half-life (T 
+1/2,biol
+​
+ ): The time it takes for the human body to naturally excrete or eliminate half of the administered substance through physiological processes like metabolism or renal clearance
+ \cite{DuongSarno2025}
+ \cite{BrattDrevin2016}.
+Effective half-life (T 
+1/2,eff
+​
+ ): The actual, observed rate at which radioactivity declines within a specific organ or tumor
+ \cite{DuongSarno2025}
+ \cite{BrattDrevin2016}. Because the radiopharmaceutical is simultaneously decaying physically and being flushed out biologically, the effective half-life combines both rates and is mathematically defined as: T 
+1/2,eff
+​
+ =(T 
+1/2,phys
+​
+ ×T 
+1/2,biol
+​
+ )/(T 
+1/2,phys
+​
+ +T 
+1/2,biol
+​
+ )
+ \cite{GtzLang2021}
+
+ \cite{DuongSarno2025}
+ \cite{BrattDrevin2016}.
+Relationship to Hounsfield Units (HU) in CT: There is no direct mathematical or physiological relationship between a radiopharmaceutical's half-lives and Hounsfield Units (HU). Instead, they represent two distinctly separate but equally critical components needed to compute a personalized absorbed dose map in targeted radiopharmaceutical therapy
+ \cite{GtzLang2021}
+
+ \cite{GtzLang2021}
+ \cite{ReschFouladgar2023}.
+Half-lives govern the "Radiation Source" (Functional Data): The effective half-life dictates the temporal distribution of the radiation
+ \cite{GtzLang2021}
+ \cite{GtzLang2021}. By tracking the radiotracer over time using sequential SPECT or PET imaging, clinicians use the effective half-life to fit a time-activity curve (TAC)
+ \cite{SantoroPitalot2021}
+ \cite{HippelinenTenhunen2017}. Integrating this curve yields the Time-Integrated Activity (TIA), which represents the total number of radioactive disintegrations that occurred within a given tissue
+ \cite{DuongSarno2025}
+
+ \cite{GtzLang2021}
+ \cite{GtzLang2021}.
+HU governs the "Transport Medium" (Anatomical Data): Hounsfield Units measure X-ray attenuation in a CT scan and are strongly correlated with electron density
+ \cite{GtzSchmidkonz2019}
+ \cite{StabinMadsen2019}. In dosimetry, calibration curves are used to convert a patient's local HU values directly into a highly detailed 3D mass density map (in g/cm³) and to classify specific tissue compositions (e.g., air, lung, soft tissue, and cortical bone)
+ \cite{GtzLang2021}
+
+ \cite{ReschFouladgar2023}
+ \cite{GtzSchmidkonz2019}
+ \cite{StabinMadsen2019}
+ \cite{GtzSchmidkonz2019}.
+How they interact in Dosimetry: While independent of one another, both variables must be combined to calculate the final absorbed radiation dose
+ \cite{GtzLang2021}
+ \cite{ReschFouladgar2023}. The number of localized radiation decays (driven by the effective half-life from SPECT) is multiplied by an energy transfer kernel or S-value (which is scaled or simulated based on the tissue mass density and composition derived from the CT HU values)
+ \cite{GtzLang2021}
+
+ \cite{ReschFouladgar2023}
+ \cite{ReschFouladgar2023}.
+what is mass-energy absorption coefficient for LU psma
+
+The mass-energy absorption coefficient (μ 
+en
+​
+ /ρ) is not a single specific value assigned to the radiopharmaceutical 177Lu-PSMA itself, but rather a tissue-specific and energy-dependent physical parameter used to calculate how much energy from the photon emissions of 177Lu is absorbed by surrounding biological matter
+ \cite{MartinovOpara2022}
+ \cite{StabinMadsen2019}.
+The sources highlight how this coefficient is applied within the larger context of 177Lu-PSMA dosimetry:
+Tissue Dependence: The amount of deposited energy in any given patient voxel depends directly on the photon energy fluence multiplied by the specific mass-energy absorption coefficient of that local medium (e.g., bone, lung, or soft tissue)
+ \cite{StabinMadsen2019}. Because different tissues have varying atomic compositions and densities, they possess different coefficients and absorb 177Lu's photon energy at different rates
+ \cite{StabinMadsen2019}.
+Role in Dose Calculations: In advanced Monte Carlo dosimetry simulations—specifically those using track-length (TL) estimators to increase computational efficiency—this coefficient is essential for converting a photon's path into an absorbed dose
+ \cite{MartinovOpara2022}
+ \cite{MartinovOpara2022}. The dose (D 
+e
+​
+ ) deposited by a photon traveling through a specific scoring volume (V) is calculated using the total track length (t), the photon's energy (E), and the medium's appropriate mass-energy absorption coefficient (μ 
+en
+​
+ /ρ) via the equation: D 
+e
+​
+ =(t⋅E⋅μ 
+en
+​
+ /ρ)/V
+ \cite{MartinovOpara2022}.
+Data Sources: Rather than calculating a single coefficient for the 177Lu-PSMA drug, dosimetry models rely on established physical databases—such as the standard tables by Hubbell and Seltzer—to retrieve the exact mass-energy absorption coefficients for the specific tissue compositions and the specific photon energies (primarily 113 keV and 208 keV) emitted during the decay of 177Lu
+ \cite{StabinMadsen2019}.
+what is
+Uptake Rate Constant for lutetium psma
+
+The uptake rate constants (k 
+in
+​
+ ) for 177Lu-PSMA vary depending on the specific radioligand used (e.g., 177Lu-PSMA-617 versus 177Lu-PSMA-I&T), the pharmacokinetic (PK) model applied, and the target tissue.
+Tumor Uptake Rate Constants
+For 177Lu-PSMA-617, a six-compartment population PK model estimated the baseline tumor uptake rate constant (k 
+15
+​
+ ) to be 0.000248 h 
+−1
+ 
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023}.
+For 177Lu-PSMA-I&T, a five-compartment population PK model estimated the baseline tumor uptake rate constant (k 
+14
+​
+ ) to be 0.00967 h 
+−1
+ 
+ \cite{SiebingaVeen2024}.
+Clinical Variability: The sources emphasize that the tumor uptake rate constant is highly variable between patients and treatment cycles. PK models indicate it is structurally affected by total tumor volume; for instance, a two-fold increase in tumor volume results in a 1.63-fold to 2.11-fold increase in the tumor uptake rate constant
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaPriv2023}. Additionally, the tumor uptake rate constant demonstrates a significant cycle-dependent decline as therapy progresses, dropping to 73\\\\%, 50\\\\%, and 44\\\\% of its initial value during treatment cycles 2, 3, and 4–7, respectively
+ \cite{SiebingaVeen2024}
+
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}.
+Normal Organ Uptake Rate Constants Population PK models also define specific uptake rate constants for healthy organs at risk:
+Salivary Glands: Estimated at 0.0238 h 
+−1
+  for PSMA-617
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023} and 0.0105 h 
+−1
+  for PSMA-I&T
+ \cite{SiebingaVeen2024}.
+Kidneys: Estimated at 0.00867 h 
+−1
+  for PSMA-617
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023} and 0.0321 h 
+−1
+  for PSMA-I&T
+ \cite{SiebingaVeen2024}. Another biokinetic model specifically analyzing 177Lu-PSMA-617 in the kidneys identified a biological uptake rate (l 
+3
+​
+ ) of 0.0719 h 
+−1
+ , which corresponds to an uptake half-life of 9.63 hours
+ \cite{HardiansyahYousefzadehNowshahr2024}.
+Liver: Estimated at 0.0238 h 
+−1
+  for PSMA-617
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023}.
+Remaining Tissues: Estimated at 0.275 h 
+−1
+  for PSMA-I&T
+ \cite{SiebingaVeen2024}.
+what is
+Physical Decay Constant for lutetium psma
+
+The physical decay constant (λ 
+phys
+​
+ ) for Lutetium-177 (177Lu) is 4.34×10 
+−3
+  h 
+−1
+  (expressed in the sources as 4.34E−3 h⁻¹)
+ \cite{ReschFouladgar2023}
+ \cite{ReschFouladgar2023}.
+This constant is an inherent physical property of the radioisotope itself and is mathematically defined as the natural logarithm of 2 divided by the isotope's physical half-life (λ 
+phys
+​
+ =ln(2)/half-life)
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{HardiansyahYousefzadehNowshahr2024}. The physical half-life of 177Lu used to derive this constant is approximately 6.6443 to 6.647 days
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{FuertesGarca2021}.
+what is
+Elimination / Washout Rate Constant for lutetium psma
+
+The elimination and washout rate constants for Lutetium-177 PSMA vary depending on whether they describe the systemic excretion from the blood or the specific washout from targeted tissues. Population pharmacokinetic (PK) models additionally show slight differences depending on the specific radioligand used (177Lu-PSMA-617 versus 177Lu-PSMA-I&T).
+Systemic Excretion Rate Constant (k 
+10
+​
+ ) 177Lu-PSMA is primarily eliminated from the central blood compartment via the renal system.
+For 177Lu-PSMA-617, the systemic renal excretion rate constant is estimated at 0.288h 
+−1
+ 
+ \cite{SiebingaPriv2023}
+
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaVeen2024}.
+For 177Lu-PSMA-I&T, the systemic excretion rate constant is slightly lower, estimated at 0.253h 
+−1
+ 
+ \cite{SiebingaVeen2024}
+ \cite{SiebingaVeen2024}.
+Tissue-Specific Washout Rate Constants (k 
+out
+​
+ ) The rate at which the radioligand washes out from specific tissues and returns to the central blood compartment demonstrates the targeted nature of the therapy. Because tumors actively retain the radioligand, their washout rate is notably lower than that of healthy organs
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023}.
+Tumors: 0.00902h 
+−1
+  for PSMA-617
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023} and 0.0247h 
+−1
+  for PSMA-I&T
+ \cite{SiebingaVeen2024}.
+Salivary Glands: 0.0307h 
+−1
+  for PSMA-617
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023} and 0.0270h 
+−1
+  for PSMA-I&T
+ \cite{SiebingaVeen2024}.
+Kidneys: 0.0141h 
+−1
+  for PSMA-617
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023} and 0.0135h 
+−1
+  for PSMA-I&T
+ \cite{SiebingaVeen2024}.
+Liver: 0.0283h 
+−1
+  for PSMA-617
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023} and 0.0150h 
+−1
+  for PSMA-I&T
+ \cite{SiebingaVeen2024}.
+Biphasic Kidney Clearance Rates (λ) When evaluating the kidneys specifically, advanced biokinetic modeling shows that the radioligand clearance from renal tissue often occurs in two distinct phases
+ \cite{HardiansyahYousefzadehNowshahr2024}. A study analyzing 177Lu-PSMA-617 identified two specific biological clearance rate constants for the kidneys
+ \cite{HardiansyahYousefzadehNowshahr2024}:
+Fast biologic clearance rate (λ 
+1
+​
+ ): 6.03×10 
+−2
+ h 
+−1
+  (which corresponds to an 11.5-hour half-life).
+Slow biologic clearance rate (λ 
+2
+​
+ ): 9.07×10 
+−3
+ h 
+−1
+  (which corresponds to a 76.4-hour half-life).
+what is
+Effective Half-life for lutetium psma
+
+As discussed previously, the effective half-life (T 
+1/2,eff
+​
+ ) of 177Lu-PSMA represents the actual observed rate at which radioactivity diminishes within a specific tissue, combining both the physical decay of the Lutetium-177 isotope (about 6.7 days) and the biological clearance of the PSMA molecule from the body.
+Because the radioligand binds to different tissues with varying affinities, the effective half-life is highly tissue-specific. The sources provide the following ranges and averages for 177Lu-PSMA therapies (such as 177Lu-PSMA-617 and 177Lu-PSMA-I&T):
+Tumor Lesions (Target Tissues) The therapy is designed to bind strongly to the overexpressed PSMA receptors on prostate cancer cells, resulting in prolonged retention.
+The median effective half-life for tumor lesions generally ranges from 54 to 75 hours
+ \cite{ChenLu2023}
+
+ \cite{KarimzadehSchatz2024}
+ \cite{KarimzadehSchatz2024}.
+Specific studies report medians such as 62 hours
+ \cite{PetersPriv2021} or 72 hours for the main clearance phase
+ \cite{PetersHofferber2021}.
+There is massive variability between individual lesions; some can clear the tracer relatively quickly, while others show extreme retention times (e.g., up to 417 hours in one observed case)
+ \cite{PetersPriv2021}.
+Importantly, the effective half-life within tumors generally remains consistent across multiple treatment cycles, even as the overall absorbed dose decreases due to shrinking tumor volumes
+ \cite{KarimzadehSchatz2024}
+ \cite{KarimzadehSchatz2024}.
+Healthy Organs at Risk (OARs) Healthy organs wash out the radiopharmaceutical much faster than tumor lesions, which helps protect them from excessive radiation damage.
+Kidneys: The kidneys generally show a median effective half-life of roughly 28 to 40 hours when measured using standard mono-exponential fits
+ \cite{PetersPriv2021}
+
+ \cite{SarnelliBelli2019}
+ \cite{KarimzadehSchatz2024}. However, because the kidneys actively excrete the drug, their clearance is often bi-phasic; they exhibit an early, fast excretion phase (e.g., median half-life of 28 hours) followed by a slower secondary washout phase (e.g., median 49 to 50 hours)
+ \cite{ChenLu2023}
+ \cite{PetersHofferber2021}.
+Salivary Glands: The parotid and submandibular glands generally exhibit median effective half-lives of approximately 32 to 42 hours
+ \cite{PetersPriv2021}
+
+ \cite{SarnelliBelli2019}
+ \cite{KarimzadehSchatz2024}.
+Liver: The liver clears the radiotracer relatively quickly, with median effective half-lives reported between 19 and 25 hours
+ \cite{PetersPriv2021}
+
+ \cite{SarnelliBelli2019}
+ \cite{PetersHofferber2021}.
+Bone/Red Marrow: Clearance from the bone marrow is quite rapid, with a reported median effective half-life of around 8 hours
+ \cite{SarnelliBelli2019}.
+Whole Body: The total body residence time varies significantly depending on the patient's tumor burden, but average effective half-lives are typically reported around 38 to 46 hours
+ \cite{SarnelliBelli2019}
+ \cite{MahmoudiPirayesh2021}.
+The sources strongly emphasize that because there is significant inter- and intra-patient variability in these clearance rates, determining patient-specific effective half-lives using sequential SPECT imaging is essential for calculating accurate Time-Integrated Activity (TIA) and individualizing therapy dosages safely
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{MahmoudiPirayesh2021}.
+what is
+Arterial Input Function (AIF) for lu psma
+
+In the pharmacokinetic modeling of radioligand therapy, the Arterial Input Function (AIF), denoted as C 
+a
+​
+ (t), represents the concentration of the radiotracer in the arterial blood over time, typically expressed in Bq/mL
+ \cite{DuongSarno2025}.
+The AIF is a fundamental mathematical component used to calculate patient-specific voxel-based dosimetry. According to pharmacokinetic theory, the time-activity curve (TAC) of any specific tissue is defined as the convolution of the AIF with the tissue's flow-scaled impulse residue function
+ \cite{DuongSarno2025}. Ultimately, to calculate the total Time-Integrated Activity (TIA) of a tissue voxel, the Area Under the Curve (AUC) of the AIF is multiplied by the Logan Distribution Volume (LDV) of that tissue
+ \cite{DuongSarno2025}
+ \cite{DuongSarno2025}.
+Regarding its clinical measurement and application, the sources highlight the following characteristics:
+Derivation from Imaging: Image-derived AIFs can be obtained non-invasively by sampling and averaging time-activity curves from either the left or right common iliac artery across multiple contiguous axial slices during a dynamic PET/CT scan
+ \cite{DuongSarno2025}.
+No Partial Volume Correction Required: Because the mean diameter of the common iliac artery (approximately 10 mm) substantially exceeds the spatial resolution of a standard PET/CT scanner (approximately 5 mm), resolution-related quantification errors are minimized. Therefore, partial volume correction does not need to be applied to these image-derived AIFs
+ \cite{DuongSarno2025}.
+Extrapolation: Because it is impractical to continuously measure a patient's blood activity out to infinity, researchers calculate the total AUC of the AIF by fitting the image-derived arterial curves and then using population data to extrapolate the rest of the curve
+ \cite{DuongSarno2025}.
+Typical Values: In one study evaluating patient-specific TRT dosimetry, the mean (± standard deviation) AUC of the arterial curves was reported to be 1.43±0.36×10 
+8
+  Bq·s/mL
+ \cite{DuongSarno2025}.
+what is
+Time-Integrated Activity (TIA) fo LU psma
+
+Time-Integrated Activity (TIA), often referred to as cumulated activity or residence time, represents the total number of radioactive decays (nuclear disintegrations) that occur within a specific source region—such as a tumor lesion, an organ, or a microscopic voxel—over a defined dose-integration period
+ \cite{FuertesGarca2021}
+
+ \cite{GtzSchmidkonz2019}
+ \cite{GleisnerChouin2022}. In targeted radiopharmaceutical therapy, this period is typically extrapolated to infinity to account for the entire lifespan of the drug in the body
+ \cite{GleisnerChouin2022}.
+Mathematically, TIA is defined as the area under the time-activity curve (TAC)
+ \cite{FuertesGarca2021}
+
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{RamonahengQebetu2024}. The TAC tracks the patient-specific bio-kinetics of 177Lu-PSMA, capturing how rapidly the radioligand is absorbed into tissues, how long it is retained, and how quickly it is biologically excreted and physically decays
+ \cite{RamonahengQebetu2024}
+ \cite{RamonahengQebetu2024}.
+Role in Dosimetry Within the standard Medical Internal Radiation Dose (MIRD) formalism and voxel-based dosimetry, TIA serves as the foundational "source" component for calculating the absorbed radiation dose
+ \cite{GtzLang2021}
+ \cite{GtzSchmidkonz2019}. To determine the total absorbed dose delivered to a target region, the estimated TIA is multiplied by a corresponding S-value or Dose Kernel
+ \cite{GtzLang2021}
+
+ \cite{FuertesGarca2021}
+ \cite{GustafssonLjungberg2023}
+ \cite{ChatachotShiratori2021}. While the S-value accounts for the physical transport of energy through the patient's anatomy, the TIA provides the absolute measure of how much radioactive energy was released at the source
+ \cite{FuertesGarca2021}
+
+ \cite{ChatachotShiratori2021}
+ \cite{HardiansyahYousefzadehNowshahr2024}.
+Calculation Methods for 177Lu-PSMA Because measuring continuous radioactivity in a patient is impossible, clinicians utilize various methods to sample the activity and estimate the TIA:
+Multiple-Time-Point (MTP) Imaging: The gold standard approach involves acquiring sequential SPECT/CT or planar scans over several days (e.g., at 4, 24, 48, 72, and 168 hours post-injection)
+ \cite{SiebingaPriv2023}
+ \cite{GleisnerChouin2022}. The activity measured at these discrete points is used to plot the TAC. The area under the curve is then calculated either via numerical methods (like trapezoidal integration) or by analytically fitting the data to mathematical models, such as mono-exponential or bi-exponential functions
+ \cite{FuertesGarca2021}
+
+ \cite{GleisnerChouin2022}
+ \cite{FuertesGarca2021}
+ \cite{HardiansyahYousefzadehNowshahr2024}
+ \cite{HippelinenTenhunen2017}.
+Single-Time-Point (STP) Approximations: To reduce the imaging burden on patients, simplified methods can approximate the TIA using just one SPECT/CT scan—often acquired at 48 or 72 hours post-injection
+ \cite{DewarajaMirando2022}
+ \cite{BroschLenzDelker2023}. These methods rely on established population-based effective half-lives or specific mathematical formulas (such as the Hänscheid or Madsen methods) to extrapolate the full TAC from a single data point
+ \cite{HardiansyahYousefzadehNowshahr2024}
+
+ \cite{DewarajaMirando2022}
+ \cite{ChenLu2023}.
+Predictive Modeling: Advanced pharmacokinetic techniques, such as Logan graphical analysis, are being developed to predict a patient's therapeutic 177Lu-PSMA TIA before treatment even begins. This is achieved by analyzing the distribution volume of a diagnostic analog (like 18F-DCFPyL) during a pre-therapeutic dynamic PET/CT scan
+ \cite{DuongSarno2025}
+
+ \cite{DuongSarno2025}
+ \cite{DuongSarno2025}.
+Clinical Challenges The accuracy of the TIA calculation is heavily dependent on the chosen imaging schedule
+ \cite{RinscheidKletting2019}. If the timing of the scans fails to adequately capture the early uptake peak or the slow, late-phase retention of the radiotracer, the mathematical integration will be skewed
+ \cite{GleisnerChouin2022}
+
+ \cite{GleisnerChouin2022}
+ \cite{GleisnerChouin2022}. For instance, omitting late-time-point scans can lead to significant overestimation or underestimation of the TIA, thereby compromising the safety and efficacy evaluations of the 177Lu-PSMA therapy
+ \cite{GleisnerChouin2022}
+ \cite{GleisnerChouin2022}.
+what is Maximum Binding Capacity for LU psma
+
+The Maximum Binding Capacity (B 
+MAX
+​
+ ) represents the maximum limit of radioligand uptake in a specific tissue (reflecting the available PSMA receptor expression), after which the uptake becomes saturable
+ \cite{SiebingaPriv2023}.
+In population pharmacokinetic (PK) models evaluating 177Lu-PSMA therapies, B 
+MAX
+​
+  has been successfully estimated specifically for the salivary glands
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaVeen2024}. For other compartments such as the kidneys, liver, and tumors, models could not identify a B 
+MAX
+​
+  limit at the specific activities currently used in clinical settings, implying that saturable binding is not detectable for those tissues
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaVeen2024}.
+The estimated B 
+MAX
+​
+  values for the salivary glands vary depending on the specific radioligand:
+For 177Lu-PSMA-617: The estimated maximum binding capacity is 40.4 MBq
+ \cite{SiebingaPriv2023}
+
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023}. This parameter exhibits significant interindividual variability (approximately 59.3\\\\%) among patients
+ \cite{SiebingaPriv2023}
+ \cite{SiebingaPriv2023}.
+For 177Lu-PSMA-I&T: A separate PK model estimated the maximum binding capacity in the salivary glands to be 134 MBq
+ \cite{SiebingaVeen2024}.
+what is Mean Energy per Decay for LU psma
+
+The mean energy per decay for Lutetium-177 (177Lu) is categorized by the specific type of radiation emitted:
+Beta Particles: The mean kinetic energy of the emitted β 
+−
+  particles is approximately 134 keV (often cited specifically as 133.64 keV) per decay
+ \cite{FuertesGarca2021}
+
+ \cite{EllsGrogan2024}
+ \cite{PistoneAuditore2022}.
+Total Electron Emissions: When accounting for all electron emissions—which includes both β 
+−
+  particles and internal conversion/Auger electrons—the mean kinetic energy is approximately 147 keV per decay (with specific nuclear data sets reporting values between 147.2 and 147.8 keV)
+ \cite{GleisnerChouin2022}
+ \cite{GleisnerChouin2022}.
+Photon Emissions: The mean energy emitted per decay for photon radiation (gamma rays and X-rays) is approximately 35.1 keV
+ \cite{GleisnerChouin2022}.
+Total Energy Deposition (in Joules): When converted to absolute energy, the mean energy deposition per decay for the beta component alone is 2.15×10 
+−14
+  Joules
+ \cite{BrattDrevin2016}
+ \cite{BrattDrevin2016}. When including the additional energy deposited by the gamma radiation component (which adds roughly 10\\\\%), the total mean energy deposited is approximately 2.36×10 
+−14
+  Joules per decay
+ \cite{BrattDrevin2016}.
+what is Lea-Catcheside Factor / Repair for lu psma
+
+The Lea-Catcheside factor (G) is a unitless mathematical factor used within the linear-quadratic (LQ) radiobiological model to calculate the Biologically Effective Dose (BED) and cell survival fractions during targeted radiopharmaceutical therapy
+ \cite{DuongSarno2025}
+ \cite{DuongSarno2025}.
+Because treatments like 177Lu-PSMA deliver radiation continuously at a low dose rate rather than in brief, high-dose bursts, tissues have time to repair sublethal DNA damage while the irradiation is still ongoing. The Lea-Catcheside factor explicitly accounts for this by modeling the interaction between the rate of radiation-induced tissue damage and the rate of cellular repair
+ \cite{DuongSarno2025}
+ \cite{GleisnerChouin2022}.
+How it is Calculated The factor relies heavily on the repair rate constant (μ) of the specific tissue, which assumes that cellular repair occurs at a mono-exponentially decreasing rate
+ \cite{GleisnerChouin2022}. It is calculated analytically based on the biokinetic clearance function of the radiopharmaceutical
+ \cite{KlettingSchimmel2015}.
+If the 177Lu-PSMA clears from a tissue at a simple, mono-exponential rate, the Lea-Catcheside factor is expressed as: G= 
+μ+λ 
+eff
+​
+ 
+λ 
+eff
+​
+ 
+​
+  (where λ 
+eff
+​
+  is the effective clearance rate of the source region and μ is the tissue's repair rate)
+ \cite{GleisnerChouin2022}
+ \cite{ReschFouladgar2023}.
+More complex analytical formulas are utilized if the tissue exhibits bi-exponential radiotracer clearance or when factoring in exact treatment times and cellular repopulation limits
+ \cite{DuongSarno2025}
+ \cite{ReschFouladgar2023}.
+Specific Repair Rates in 177Lu-PSMA Dosimetry To utilize the Lea-Catcheside factor in clinical dosimetry models, researchers must input specific repair half-lives (T 
+rep
+​
+  or T 
+μ
+​
+ ), which represent the time it takes for the tissue to repair half of its sublethal radiation damage:
+Tumor Lesions: The repair half-life for prostate cancer tumors is generally estimated to be 1.5 to 1.9 hours
+ \cite{ReschFouladgar2023}
+
+ \cite{BegumThieme2018}
+ \cite{DuongSarno2025}. A 1.5-hour repair half-life corresponds to an exponential repair rate (μ) of roughly 11.09 days 
+−1
+ 
+ \cite{DuongSarno2025}.
+Kidneys (Organ at Risk): Healthy renal tissue repairs damage more slowly than the targeted tumors, with a typical repair half-life estimated at 2.8 hours
+ \cite{ReschFouladgar2023}.
+what is Dose Voxel Kernel for lu psma
+
+A Dose Voxel Kernel (DVK), also commonly referred to as a Voxel S-Value (VSV), is a 3D mathematical matrix that represents the mean absorbed radiation dose delivered to a target voxel per nuclear disintegration (unit activity) that occurs in a source voxel
+ \cite{GtzSchmidkonz2019}
+
+ \cite{GleisnerChouin2022}
+ \cite{StabinMadsen2019}. It is essentially a discretized version of a continuous Dose Point Kernel (DPK) mapped onto a specific 3D grid
+ \cite{GtzSchmidkonz2019}
+
+ \cite{GtzLang2021}
+ \cite{GtzSchmidkonz2019}.
+In the context of 177Lu-PSMA targeted radioligand therapy, DVKs act as the computational engine for patient-specific dosimetry. They are used to transform a patient's Time-Integrated Activity (TIA) map—the spatial distribution of radioactive decays derived from sequential SPECT/CT images—into a highly detailed 3D absorbed dose distribution
+ \cite{GtzSchmidkonz2019}
+
+ \cite{GtzLang2021}
+ \cite{GtzLang2021}
+ \cite{DieudonnHobbs2010}. This is achieved by convolving the TIA map with the DVK, an operation typically executed rapidly using Fast Fourier Transform (FFT) or Fast Hartley Transform algorithms
+ \cite{DieudonnHobbs2012}
+
+ \cite{DewarajaMirando2022}
+ \cite{DieudonnHobbs2010}.
+Characteristics of 177Lu Kernels Because 177Lu decays by emitting both beta particles (electrons) and gamma photons, a 177Lu DVK must account for the distinct energy deposition patterns of both radiation types
+ \cite{GtzSchmidkonz2019}
+ \cite{DieudonnHobbs2010}:
+Beta Electrons: These particles have a very short average range in tissue (less than 3 mm, with a maximum range of approximately 1.7 mm in soft tissue)
+ \cite{GtzSchmidkonz2019}
+ \cite{PistoneAuditore2022}. Consequently, the vast majority of the radiation energy (roughly 70\\\\% or more) is deposited directly in the central source voxel where the decay occurred
+ \cite{GtzLang2021}
+ \cite{TranGiaSalasRamirez2019}.
+Gamma Photons: 177Lu also emits photons (primarily at 113 keV and 208 keV) which have a much longer, effectively infinite range
+ \cite{GtzSchmidkonz2019}
+ \cite{TranGiaSalasRamirez2019}. While their overall dose contribution is much smaller than the beta emissions, they are responsible for the "cross-dose" delivered to surrounding peripheral voxels
+ \cite{GtzSchmidkonz2019}
+ \cite{TranGiaSalasRamirez2019}.
+Generation and Resampling DVKs are inherently specific to a given radioisotope, voxel size, and tissue composition
+ \cite{FernndezHnscheid2013}.
+They are initially generated using highly computationally intensive Monte Carlo (MC) radiation transport simulations (such as GEANT4, MCNP, or EGSnrc) simulating millions of particle histories within a standardized medium, most commonly water or soft tissue
+ \cite{GtzLang2021}
+
+ \cite{GtzSchmidkonz2019}
+ \cite{GtzLang2021}
+ \cite{GtzSchmidkonz2019}.
+Because clinical SPECT and PET images are acquired at varying spatial resolutions (e.g., 3 mm to 6 mm voxel dimensions), base DVKs are usually simulated at very fine spatial resolutions (e.g., 0.5 mm for electrons and 1.0 mm for photons)
+ \cite{DieudonnHobbs2010}
+
+ \cite{DieudonnHobbs2010}
+ \cite{FernndezHnscheid2013}
+ \cite{FernndezHnscheid2013}. These high-resolution kernels are then analytically resampled, interpolated, and scaled to perfectly match the arbitrary voxel dimensions of a specific patient's clinical imaging data
+ \cite{DieudonnHobbs2010}
+
+ \cite{FernndezHnscheid2013}
+ \cite{FernndezHnscheid2013}
+ \cite{DieudonnHobbs2010}.
+Addressing Tissue Heterogeneity The fundamental limitation of standard DVK convolution is that it assumes the patient's body is an infinite, perfectly homogeneous soft-tissue medium, which completely neglects the varying physical densities of bone, lung tissue, and air cavities
+ \cite{GtzLang2021}
+
+ \cite{DieudonnHobbs2012}
+ \cite{GtzLang2021}
+ \cite{GtzSchmidkonz2019}. To overcome this and accurately apply DVKs to 177Lu-PSMA patients, several correction strategies are utilized:
+Voxel-by-Voxel Density Scaling: The most common correction method involves scaling the standard soft-tissue DVK by the ratio of the reference density to the patient's actual local tissue mass density, which is derived voxel-by-voxel from the co-registered CT scan Hounsfield Units
+ \cite{GtzSchmidkonz2019}
+
+ \cite{GtzSchmidkonz2019}
+ \cite{BaileyMarquis2022}.
+Advanced Modelling: To account for the complex paths radiation takes through differing adjacent tissues, newer algorithms have been developed. These include Collapsed-Cone Superposition (CCS), which adjusts dose-point kernels dynamically based on the specific tissue densities along the ray paths between the source and target
+ \cite{TerroPerret2025}
+ \cite{TerroPerret2025}. Additionally, Deep Neural Networks (DNNs) (such as U-Nets) are now being trained to take a patient's CT density kernel as input and instantly predict a custom, heterogeneous 177Lu DVK that matches the accuracy of full Monte Carlo simulations without the massive computational penalty
+ \cite{GtzLang2021}
+
+ \cite{GtzLang2021}
+ \cite{GtzLang2021}.
+what is Blood Circulation Rate for lu psma
+
+The blood circulation rate (λ 
+bc
+​
+ ) used in pharmacokinetic modeling for 177Lu-PSMA is mathematically defined as ln(2)/1 min
+ \cite{HardiansyahYousefzadehNowshahr2024}. This rate corresponds to a half-life of 1 minute, which accounts for the rapid initial increase of radiotracer activity within organs (such as the kidneys) driven by the natural blood circulation time in humans following injection
+ \cite{HardiansyahYousefzadehNowshahr2024}.
+
