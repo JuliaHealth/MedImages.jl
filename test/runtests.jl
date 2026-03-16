@@ -215,6 +215,11 @@ mkpath(DEBUG_DIR)
         end
     end
 
+    # Normalization Tests
+    @testset "Normalization Tests" begin
+        include("normalization_tests/test_normalization.jl")
+    end
+
     # Batched Processing Tests
     @testset "Batched Processing Tests" begin
         include("test_batched.jl")
