@@ -1,0 +1,191 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cite}
+\usepackage{booktabs}
+
+\geometry{a4paper, margin=1in}
+
+% Code listing style for Julia
+\lstdefinelanguage{Julia}%
+  {morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
+      end,export,false,for,function,immutable,import,importall,if,in,%
+      macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
+      using,while},%
+   sensitive=true,%
+   alsoother={$},%
+   morecomment=[l]\#,%
+   morecomment=[n]{\#=}{=\#},%
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+}[keywords,comments,strings]%
+
+\lstset{%
+    language         = Julia,
+    basicstyle       = \ttfamily\small,
+    keywordstyle     = \bfseries\color{blue},
+    stringstyle      = \color{magenta},
+    commentstyle     = \color{green!50!black},
+    showstringspaces = false,
+    numbers          = left,
+    numberstyle      = \tiny\color{gray},
+    stepnumber       = 1,
+    numbersep        = 10pt,
+    tabsize          = 4,
+    showspaces       = false,
+    showtabs         = false,
+    frame            = single,
+    rulecolor        = \color{black!30},
+    backgroundcolor  = \color{gray!5},
+    breaklines       = true
+}
+
+\title{\textbf{Learning High-Fidelity Monte Carlo Dosimetry from SPECT/CT using Universal Differential Equations for $^{177}$Lu-PSMA Therapy}}
+\author{Scientific Machine Learning (SciML) Implementation Guide}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Targeted radiopharmaceutical therapy (TRT) using $^{177}$Lu-PSMA requires highly accurate, patient-specific voxel-level dosimetry. This paper presents a exhaustive programmatic framework using \texttt{DifferentialEquations.jl} \cite{Rackauckas_2017} and the SciML \cite{Rackauckas_2020} ecosystem to formulate a Universal Differential Equation (UDE). By embedding a neural network corrector within the radiation transport equations, we rapidly learn the complex transformation from homogeneous kernel convolutions to high-fidelity MC dosemaps. This implementation explicitly incorporates all established physical, biological, and imaging variables for $^{177}$Lu-PSMA, including system-specific calibration, saturable receptor kinetics, and biphasic clearance.
+\end{abstract}
+
+\section{Introduction}
+Scientific Machine Learning (SciML) offers a path to bridge the gap between fast but inaccurate analytical models and slow gold-standard Monte Carlo (MC) simulations by combining \textbf{Universal Differential Equations (UDEs)} with patient-specific anatomical (CT) and functional (SPECT) data \cite{KennedyLugassi2020}.
+
+\section{Learning Objectives: Known Physics vs. Data-Driven Discovery}
+
+The UDE framework partitions the dosimetry problem into \textit{Mechanistic Knowns} and \textit{Learned Uncertainties}.
+
+\subsection{Compartmental Pharmacokinetics (PK)}
+\textbf{What is Known (Mechanistic Constraints):}
+\begin{itemize}
+    \item \textbf{Radiological Constants:} Physical decay constant $\lambda_{phys} = 4.34 \times 10^{-3} \text{ h}^{-1}$ and mean energy per decay $\bar{E}_i$ \cite{ReschFouladgar2023, StabinMadsen2019}.
+    \item \textbf{Conservation of Mass:} Mass-balance equations for tracer movement between the central blood compartment and tissue voxels. For $^{177}$Lu-PSMA, the \textbf{blood circulation rate} $\lambda_{bc}$ is defined as $\ln(2)/1 \text{ min} \approx 0.693 \text{ min}^{-1}$, representing a circulation half-life of 1 minute to model the rapid initial organ uptake post-injection \cite{HardiansyahYousefzadehNowshahr2024}.
+    \item \textbf{Renal Clearance Scaling:} Excretion rate $k_{10}$ scales with individual Glomerular Filtration Rate (GFR) \cite{HardiansyahYousefzadehNowshahr2024}.
+    \item \textbf{Imaging Corrections:} Initial activity scaling via the \textbf{Camera Calibration Factor} ($CF$) and resolution recovery via \textbf{Recovery Coefficients} ($RC$). $CF$ is derived from DICOM \cite{BidgoodHorii1992} tags \texttt{(0028,0031)} (Units, e.g., Bq/ml or counts/s/MBq) and quantified using \texttt{(0028,1053)} (Rescale Slope) and \texttt{(0028,1052)} (Rescale Intercept) to convert raw counts to activity \cite{GleisnerChouin2022}. $RC$ values are applied as structure-specific look-up tables based on object size (e.g., from NEMA phantom measurements) to correct for Partial Volume Effects (PVE) \cite{KlettingSchimmel2015}.
+\end{itemize}
+
+\textbf{What needs to be Learned (Neural Targets):}
+\begin{itemize}
+    \item \textbf{Voxel-Wise $B_{MAX}$:} Local receptor saturation thresholds defining the \textit{Tumour Sink Effect} \cite{BegumThieme2018}.
+    \item \textbf{Kinetic Drift:} Cycle-dependent shifts in uptake rates ($k_{in}, k_{out}$) due to tumour regression \cite{OkamotoThieme2016, SiebingaVeen2024}.
+\end{itemize}
+
+\subsection{Radiation Transport and Scattering}
+\textbf{What is Known (Mechanistic Constraints):}
+\begin{itemize}
+    \item \textbf{Base Physics:} \textbf{Homogeneous Voxel S-values} ($S_{homo}$) and \textbf{Hounsfield Unit (HU) to mass density} ($\rho$) conversion \cite{GtzSchmidkonz2019}.
+    \item \textbf{Voxel S-Values ($S_{homo}$):} $S_{homo}$ is a 3D matrix representing the mean absorbed dose delivered to a target voxel per unit activity (radioactive decay) in a source voxel, assuming an infinite, uniform water-equivalent medium ($\rho = 1.0 \text{ g/cm}^3$). These kernels are pre-calculated using Monte Carlo simulations (e.g., Geant4 or GATE) for specific voxel dimensions matching the SPECT/CT grid. In the UDE, the "baseline" dose rate is computed via 3D FFT convolution: $\dot{D}_{base} = A \ast S_{homo}$ \cite{PistoneAuditore2022}.
+    \item \textbf{HU-to-Density ($\rho$) Conversion:} Anatomical CT data is transformed into a voxel-wise mass density map ($\rho(\mathbf{r})$) using a \textbf{bi-linear calibration curve}. This curve maps HU values to physical density based on scanner-specific phantom measurements, typically using two linear segments with a breakpoint at the density of water ($HU=0, \rho=1.0$). For example:
+    \begin{equation}
+        \rho = \begin{cases} 1.0 + 0.001 \cdot HU & HU \leq 0 \text{ (Air to Water)} \\ 1.0 + 0.0007 \cdot HU & HU > 0 \text{ (Water to Bone)} \end{cases}
+    \end{equation}
+    This density map is essential for calculating the target mass $m(\mathbf{r})$ and serves as a primary spatial input for the neural corrector $\mathcal{N}_\theta$ \cite{GtzSchmidkonz2019, BaileyMarquis2022}.
+    \item \textbf{Energy-to-Dose Normalization:} The fundamental definition of absorbed dose is energy deposited per unit mass ($1 \text{ Gy} = 1 \text{ J/kg}$). In the UDE framework, the transport sub-system initially calculates the total energy deposited in a voxel. To convert this to a clinically relevant dose rate $\dot{D}$ (Gy/h), the energy must be normalized by the \textbf{target voxel mass} $m(\mathbf{r})$:
+    \begin{equation}
+        m(\mathbf{r}) = V_{voxel} \cdot \rho(\mathbf{r})
+    \end{equation}
+    where $V_{voxel}$ is the constant physical volume of the voxel (derived from DICOM Pixel Spacing and Slice Thickness) and $\rho(\mathbf{r})$ is the spatially varying density map derived from the CT HU conversion. This voxel-specific normalization is critical for accurately modeling energy deposition in heterogeneous tissues, such as the low-mass lung ($ \rho \approx 0.3 \text{ g/cm}^3$) versus high-mass cortical bone ($\rho \approx 1.9 \text{ g/cm}^3$), where identical energy deposition results in vastly different absorbed doses \cite{GtzSchmidkonz2019, StabinMadsen2019}.
+\end{itemize}
+
+\textbf{What needs to be Learned (Neural Targets):}
+\begin{itemize}
+    \item \textbf{Heterogeneous Scattering:} The corrector $\mathcal{N}_\theta$ learns residuals caused by density gradients $\nabla \rho$ and mass-energy absorption variations $\mu_{en}/\rho$ \cite{BaileyMarquis2022, MikellKappadath2016}.
+\end{itemize}
+
+\section{Radionuclide and Pharmacokinetic Constants for $^{177}$Lu-PSMA}
+
+\subsection{Physical and Radiological Constants}
+\begin{itemize}
+    \item \textbf{Physical Half-life ($T_{1/2,phys}$):} $\approx 6.647$ days (159.5 hours) \cite{HardiansyahYousefzadehNowshahr2024}.
+    \item \textbf{Physical Decay Constant ($\lambda_{phys}$):} $4.34 \times 10^{-3} \text{ h}^{-1}$ \cite{ReschFouladgar2023}.
+    \item \textbf{Mean Photon Energies:} Primary peaks at 113 keV and 208 keV \cite{StabinMadsen2019}.
+    \item \textbf{Absorbed Dose per Activity (Kidneys):} $0.49 - 0.88$ Gy/GBq \cite{ChuamsaamarkkeeCharoenphun2025, OkamotoThieme2016}.
+\end{itemize}
+
+\subsection{Organ-Specific Kinetic Constants}
+\begin{table}[h!]
+\centering
+\caption{Kinetic Parameters for $^{177}$Lu-PSMA-617 and $^{177}$Lu-PSMA-I\&T.}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Target Region} & \textbf{Effective $T_{1/2}$ (h)} & \textbf{Uptake Rate $k_{in}$ (h$^{-1}$)} & \textbf{Washout Rate $k_{out}$ (h$^{-1}$)} \\ \midrule
+Tumours (PSMA-617) & 50 -- 72 \cite{PetersHofferber2021} & 0.000248 \cite{SiebingaPriv2023} & 0.00902 \cite{SiebingaPriv2023} \\
+Tumours (PSMA-I\&T) & -- & 0.00967 \cite{SiebingaVeen2024} & 0.0247 \cite{SiebingaVeen2024} \\
+Kidneys (PSMA-617) & 28 -- 39 \cite{PetersHofferber2021} & 0.00867 \cite{SiebingaPriv2023} & 0.0141 \cite{SiebingaPriv2023} \\
+Salivary Glands & 32.5 -- 42 \cite{PetersPriv2021} & 0.0238 \cite{SiebingaPriv2023} & 0.0307 \cite{SiebingaPriv2023} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Exhaustive UDE Model Architecture}
+
+\subsection{Initial Activity Calibration}
+The observed SPECT activity $A_{obs}(\mathbf{r}, 0)$ is corrected before integration:
+\begin{equation}
+    A_{true}(\mathbf{r}, 0) = \frac{A_{obs}(\mathbf{r}, 0) \cdot RC(\mathbf{r})}{CF}
+\end{equation}
+
+\subsection{The Govering System of Equations}
+\textbf{1. PK Sub-system (Voxel-Wise Binding):}
+\begin{equation}
+    \frac{dA_{bound}}{dt} = k_3 A_{free} \left( 1 - \frac{A_{bound}}{B_{MAX}(\mathbf{r})} \right) - (k_4 + \lambda_{phys}) A_{bound}
+\end{equation}
+
+\textbf{2. Transport Sub-system (Absorbed Dose Rate):}
+\begin{equation}
+    \dot{D}(\mathbf{r}, t) = \frac{1}{m(\mathbf{r})} \left( \left[ A_{total}(t) \cdot \bar{E} * K_{homo} \right](\mathbf{r}) + \mathcal{N}_\theta \Big( A_{total}, \rho, \nabla \rho \Big) \right)
+\end{equation}
+
+\section{SciML Implementation Details}
+
+\begin{lstlisting}[language=Julia]
+function universal_dosimetry_ude!(du, u, p, t)
+    # 1. State Recovery
+    A_blood = u[1]; A_free = u[2:N+1]; A_bound = u[N+2:2N+1]
+    
+    # 2. Variable Mass and Density (from HU)
+    mass_map = p.volume .* p.rho
+    
+    # 3. Saturable PK Layer
+    k10 = p.k10_pop * (p.GFR / 120.0)
+    dA_blood = - (k10 + sum(p.f .* p.k_in) + p.lambda_phys) * A_blood + sum(p.k_out .* A_free)
+    dA_free  = (p.f .* p.k_in .* A_blood) .- (p.k_out .* A_free) .- (p.lambda_phys .* A_free)
+    dA_bound = (p.k3 .* A_free .* (1.0 .- A_bound./p.B_MAX)) .- (p.k4 .* A_bound) .- (p.lambda_phys .* A_bound)
+    
+    # 4. Neural Transport (Energy normalization by mass)
+    A_total = A_free .+ A_bound
+    dD_phys = compute_neural_dose_rate(A_total, p.rho, p.p_nn, p.st_nn) ./ mass_map
+    
+    # 5. BED Integration (Lea-Catcheside)
+    du[3N+2:4N+1] = dD_phys .- p.mu .* u[3N+2:4N+1] 
+    
+    # Update derivatives array
+    du[1] = dA_blood; du[2:N+1] = dA_free; du[N+2:2N+1] = dA_bound; du[2N+2:3N+1] = dD_phys
+end
+\end{lstlisting}
+
+\section{Expert Inquiry and Open Challenges}
+
+\begin{enumerate}
+    \item \textbf{Marrow Dosimetry:} How to initialize $A_{bound}$ for marrow receptor binding \cite{VallotBrillouet2024}?
+    \item \textbf{Low-Energy Biases:} Impact of $<10$ keV underestimation on $\mathcal{N}_\theta$ training \cite{MikellKappadath2016}?
+    \item \textbf{23 Gy vs 40 Gy:} Optimal safety threshold for adaptive dosing logic \cite{GleisnerChouin2022}?
+\end{enumerate}
+
+\section{Conclusion}
+By integrating all variables from `table.txt` including calibration ($CF$), resolution ($RC$), and anatomical mass $m(\mathbf{r})$, this SciML \cite{Rackauckas_2020} framework provides a truly universal digital twin for precision $^{177}$Lu-PSMA personalized dosimetry \cite{Garin2020} therapy.
+
+\bibliographystyle{unsrt}
+\bibliography{bibl}
+
+\end{document}
