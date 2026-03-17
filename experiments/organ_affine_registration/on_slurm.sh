@@ -4,10 +4,8 @@
 #SBATCH -t 48:00:00
 #SBATCH -p kisski-h100
 #SBATCH --constraint=inet
-#SBATCH -G H100:4
-#SBATCH --ntasks-per-node=4
-#SBATCH --cpus-per-task=24
-#SBATCH --mem=200G
+#SBATCH -G H100:2
+#SBATCH --ntasks-per-node=2
 #SBATCH --mail-user=jakub.mitura14@gmail.com
 #SBATCH --mail-type=all
 #SBATCH --output=/user/joanna.wybranska/u10867/.project/dir.project/MedImages.jl/experiments/organ_affine_registration/logs/tb.out

@@ -409,9 +409,6 @@ function run_training_experiment(args=ARGS)
     if rank == 0
         close(lg)
     end
-end
-
-end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     run_training_experiment()
