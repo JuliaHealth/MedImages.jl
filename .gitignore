@@ -30,3 +30,4 @@ wandb/
 checkpoint_epoch_10.jls
 checkpoint_latest.jls
 checkpoint_epoch_20.jls
+experiments/xnat_download.py
