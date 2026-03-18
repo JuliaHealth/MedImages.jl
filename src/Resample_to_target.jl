@@ -107,42 +107,38 @@ function resample_to_image(im_fixed::BatchedMedImage, im_moving::BatchedMedImage
     #    Output grid size is same for all (im_fixed property).
 
     new_size = size(im_fixed.voxel_data)[1:3]
-    n_points = prod(new_size)
-    points_to_interpolate = zeros(Float64, 3, n_points, batch_size)
-
-    # Base indices are same for all (0-based)
-    base_indices = get_base_indicies_arr(new_size) # 3 x N
-
-    # Optimized points_to_interpolate for BatchedMedImage using broadcasting
-    # Calculate origin diffs for all batch items (O_fix - O_mov)
-    od_vecs = [collect(im_fixed.origin[b] .- im_moving.origin[b]) for b in 1:batch_size]
-    od_mat = Float32.(hcat(od_vecs...)) # 3 x B
-    sp_mat = Float32.(hcat([collect(s) for s in im_fixed.spacing]...)) # 3 x B
+    # Calculate affine matrices for the entire batch
+    # M maps Target Index -> Source Index
+    # I_mov = ( (I_fix - 1)*S_fix + O_fix - O_mov ) / S_mov + 1
+    #       = I_fix * (S_fix/S_mov) + [ 1 - S_fix/S_mov + (O_fix - O_mov)/S_mov ]
     
-    # base_indices is 3 x N (CPU)
-    # Move to GPU if necessary
-    backend = try KernelAbstractions.get_backend(im_fixed.voxel_data) catch; KernelAbstractions.CPU() end
-    
-    if backend isa KernelAbstractions.GPU
-        base_indices = CuArray(Float32.(base_indices))
-        od_mat = CuArray(od_mat)
-        sp_mat = CuArray(sp_mat)
-        points_to_interpolate = (reshape(base_indices, 3, n_points, 1) .- 1.0f0) .* 
-                                reshape(sp_mat, 3, 1, batch_size) .+ 1.0f0 .+ 
-                                reshape(od_mat, 3, 1, batch_size)
-    else
-        points_to_interpolate = (reshape(Float32.(base_indices), 3, n_points, 1) .- 1.0f0) .* 
-                                reshape(sp_mat, 3, 1, batch_size) .+ 1.0f0 .+ 
-                                reshape(od_mat, 3, 1, batch_size)
+    M_batch = zeros(Float32, 4, 4, batch_size)
+    for b in 1:batch_size
+        sf = im_fixed.spacing[b]
+        sm = im_moving.spacing[b]
+        of = im_fixed.origin[b]
+        om = im_moving.origin[b]
+        
+        m11 = sf[1] / sm[1]
+        m22 = sf[2] / sm[2]
+        m33 = sf[3] / sm[3]
+        
+        m14 = 1.0f0 - m11 + (of[1] - om[1]) / sm[1]
+        m24 = 1.0f0 - m22 + (of[2] - om[2]) / sm[2]
+        m34 = 1.0f0 - m33 + (of[3] - om[3]) / sm[3]
+        
+        M_batch[1, 1, b] = m11; M_batch[2, 2, b] = m22; M_batch[3, 3, b] = m33
+        M_batch[1, 4, b] = m14; M_batch[2, 4, b] = m24; M_batch[3, 4, b] = m34
+        M_batch[4, 4, b] = 1.0f0
     end
-
-    spacing_arg = im_moving.spacing # Vector of tuples
-
-    val_ext = (value_to_extrapolate == Nothing) ? 0.0 : value_to_extrapolate
-
-    resampled_flat = interpolate_my(points_to_interpolate, im_moving.voxel_data, spacing_arg, interpolator_enum, false, Float64(val_ext), true)
-
-    new_data = reshape(resampled_flat, new_size[1], new_size[2], new_size[3], batch_size)
+    
+    device_M = is_cuda_array(im_moving.voxel_data) ? CuArray(M_batch) : M_batch
+    val_ext = (value_to_extrapolate == Nothing) ? 0.0f0 : Float32(value_to_extrapolate)
+    new_data = interpolate_fused_affine(im_moving.voxel_data, device_M, new_size, interpolator_enum)
+    
+    if eltype(im_moving.voxel_data) != Float32
+        new_data = cast_to_array_b_type(new_data, im_moving.voxel_data)
+    end
 
     return BatchedMedImage(
         voxel_data = new_data,

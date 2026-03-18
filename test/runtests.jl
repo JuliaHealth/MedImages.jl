@@ -232,6 +232,9 @@ mkpath(DEBUG_DIR)
         include("test_suv_stats_extended.jl")
     end
 
+    # SciML Experiment Tests
+    include("test_sciml_experiment.jl")
+
 end # main testset
 
 # Summary output

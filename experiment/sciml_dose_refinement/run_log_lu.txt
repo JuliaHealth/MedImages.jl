@@ -1,0 +1,189 @@
+  Activating project at `/media/jm/hddData/projects_new/MedImages.jl/experiment/sciml_dose_refinement`
+   Resolving package versions...
+    Updating `/media/jm/hddData/projects_new/MedImages.jl/experiment/sciml_dose_refinement/Project.toml`
+  [fbff095b] + MedImages v2.0.1 `/media/jm/hddData/projects_new/MedImages.jl/experiment/sciml_dose_refinement/../..`
+    Updating `/media/jm/hddData/projects_new/MedImages.jl/experiment/sciml_dose_refinement/Manifest.toml`
+  [a4c015fc] + ANSIColoredPrinters v0.0.1
+  [1520ce14] + AbstractTrees v0.4.5
+  [13072b0f] + AxisAlgorithms v1.1.0
+  [ab4f0b2a] + BFloat16s v0.6.1
+  [a74b3585] + Blosc v0.7.3
+⌅ [052768ef] + CUDA v5.9.7
+  [1af6417a] + CUDA_Runtime_Discovery v1.0.0
+  [944b1d66] + CodecZlib v0.7.8
+⌅ [3da002f7] + ColorTypes v0.11.5
+⌃ [c3611d14] + ColorVectorSpace v0.10.0
+  [5ae59095] + Colors v0.13.1
+  [8f4d0f93] + Conda v1.10.3
+  [150eb455] + CoordinateTransformations v0.6.4
+  [a8cc5b0e] + Crayons v4.1.1
+⌅ [1f15a43c] + CxxWrap v0.16.2
+  [85a47980] + Dictionaries v0.4.6
+  [43dc2714] + DocInventories v1.0.0
+  [e30172f5] + Documenter v1.17.0
+  [4710194d] + DocumenterVitepress v0.3.2
+  [5789e2e9] + FileIO v1.18.0
+  [26cc04aa] + FiniteDifferences v0.12.33
+  [53c48c17] + FixedPointNumbers v0.8.5
+  [587475ba] + Flux v0.16.9
+  [0c68f7d7] + GPUArrays v11.4.1
+  [096a3bc2] + GPUToolbox v1.0.0
+  [d7ba0133] + Git v1.5.0
+  [c8ec2601] + H5Zblosc v0.1.2
+  [f67ccb44] + HDF5 v0.17.2
+  [b5f81e59] + IOCapture v1.0.0
+  [8538b10a] + ITKIOWrapper v4.0.2
+  [c817782e] + ImageBase v0.1.7
+  [a09fc81d] + ImageCore v0.10.5
+  [02fcd773] + ImageTransformations v0.10.2
+  [313cdc1a] + Indexing v1.1.1
+⌃ [a98d9a8b] + Interpolations v0.15.1
+  [4138dd39] + JLD v0.13.5
+⌃ [682c06a0] + JSON v0.21.4
+  [8b046642] + LLVMLoopInfo v1.0.0
+  [b964fa9f] + LaTeXStrings v1.4.0
+  [0e77f7df] + LazilyInitializedFields v1.3.0
+  [d0bbae9a] + LuxCUDA v0.3.4
+  [3da0fdf6] + MPIPreferences v0.1.11
+  [dbb5928d] + MappedArrays v0.4.3
+  [d0879d2d] + MarkdownAST v0.1.3
+  [fbff095b] + MedImages v2.0.1 `/media/jm/hddData/projects_new/MedImages.jl/experiment/sciml_dose_refinement/../..`
+  [e94cdb99] + MosaicViews v0.3.4
+  [5da4648a] + NVTX v1.0.3
+  [6fe1bfb0] + OffsetArrays v1.17.0
+  [0b1bfda6] + OneHotArrays v0.2.10
+  [5432bcbf] + PaddedViews v0.5.12
+  [d96e819e] + Parameters v0.12.3
+  [69de0a69] + Parsers v2.8.3
+  [08abe8d2] + PrettyTables v3.2.3
+  [33c8b6b6] + ProgressLogging v0.1.6
+  [92933f4c] + ProgressMeter v1.11.0
+  [438e738f] + PyCall v1.96.4
+  [94ee1d12] + Quaternions v0.7.7
+  [74087812] + Random123 v1.7.1
+  [c84ed2f1] + Ratios v0.4.5
+  [2792f1a3] + RegistryInstances v0.1.0
+  [708f8203] + Richardson v1.4.2
+  [6038ab10] + Rotations v1.7.1
+  [cae243ae] + StackViews v0.1.2
+  [892a3eda] + StringManipulation v0.4.4
+  [62fd8b95] + TensorCore v0.1.1
+  [3bb67fe8] + TranscodingStreams v0.11.3
+  [3a884ed6] + UnPack v1.0.2
+  [81def892] + VersionParsing v1.3.0
+  [efce3f68] + WoodburyMatrices v1.1.0
+  [02a925ec] + cuDNN v1.4.6
+  [0b7ba130] + Blosc_jll v1.21.7+0
+  [d1e2174e] + CUDA_Compiler_jll v0.4.1+1
+  [4ee394cb] + CUDA_Driver_jll v13.1.1+0
+⌅ [76a88914] + CUDA_Runtime_jll v0.19.2+0
+  [62b44479] + CUDNN_jll v9.17.1+0
+  [2e619515] + Expat_jll v2.7.3+0
+  [020c3dae] + Git_LFS_jll v3.7.0+0
+  [f8c6e375] + Git_jll v2.53.0+0
+⌅ [0234f1f7] + HDF5_jll v1.14.3+3
+  [e33a78d0] + Hwloc_jll v2.13.0+0
+  [b6265aa4] + ITKIOWrapper_jll v3.0.1+1
+  [3324d3a8] + ITK_jll v5.3.3+0
+  [aacddb02] + JpegTurbo_jll v3.1.4+0
+  [9c1d0b0a] + JuliaNVTXCallbacks_jll v0.2.1+0
+  [88015f11] + LERC_jll v4.0.1+0
+  [94ce4f54] + Libiconv_jll v1.18.0+0
+  [89763e89] + Libtiff_jll v4.7.2+0
+  [5ced341a] + Lz4_jll v1.10.1+0
+  [7cb0a576] + MPICH_jll v5.0.0+0
+  [f1f71cc9] + MPItrampoline_jll v5.5.5+0
+  [9237b28f] + MicrosoftMPI_jll v10.1.4+3
+  [e98f9f5b] + NVTX_jll v3.2.2+0
+  [c7aee132] + NodeJS_20_jll v20.12.2+0
+⌅ [fe0851c0] + OpenMPI_jll v4.1.8+1
+  [9bd350c2] + OpenSSH_jll v10.2.1+0
+  [458c3c95] + OpenSSL_jll v3.5.5+0
+⌅ [02c8fc9c] + XML2_jll v2.13.9+0
+  [ffd25f8a] + XZ_jll v5.8.2+0
+  [a65dc6b1] + Xorg_libpciaccess_jll v0.18.1+0
+  [3161d3a3] + Zstd_jll v1.5.7+1
+  [1e29f10c] + demumble_jll v1.3.0+0
+  [477f73a3] + libaec_jll v1.1.5+0
+⌅ [3eaa8342] + libcxxwrap_julia_jll v0.13.4+0
+  [b53b4c65] + libpng_jll v1.6.55+0
+  [1a1011a3] + SharedArrays
+  [efcefdf7] + PCRE2_jll v10.42.0+1
+        Info Packages marked with ⌃ and ⌅ have new versions available. Those with ⌃ may be upgradable, but those with ⌅ are restricted by compatibility constraints from upgrading. To see why use `status --outdated -m`
+Precompiling packages...
+    497.5 ms  ✓ Rotations → RotationsRecipesBaseExt
+    361.6 ms  ✓ SymbolicIndexingInterface → SymbolicIndexingInterfacePrettyTablesExt
+    378.3 ms  ✓ SparseMatrixColorings → SparseMatrixColoringsColorsExt
+    438.7 ms  ✓ Graphs → GraphsSharedArraysExt
+    468.3 ms  ✓ DifferentiationInterface → DifferentiationInterfaceFiniteDifferencesExt
+    821.9 ms  ✓ SciMLBase → SciMLBasePyCallExt
+   1924.4 ms  ✓ SparseMatrixColorings → SparseMatrixColoringsCUDAExt
+   2126.2 ms  ✓ LinearSolve → LinearSolveCUDAExt
+  8 dependencies successfully precompiled in 4 seconds. 615 already precompiled.
+Loading 4 patients from /home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu...
+Patient 1/4: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_0__Pat116
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 587) CT=(512, 512, 299) Dose=(256, 256, 587)
+  Resampling SPECT to spacing (17.67897605895996, 17.67897605895996, 40.53733963519335)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(32, 32, 32) CT=(32, 32, 32) Dose=(32, 32, 32)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00011579988, 1.0]
+  ✓ Loaded successfully
+Patient 2/4: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_2__Pat49
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (17.67897605895996, 17.67897605895996, 29.280804097652435)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(32, 32, 32) CT=(32, 32, 32) Dose=(32, 32, 32)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00016946754, 1.0]
+  ✓ Loaded successfully
+Patient 3/4: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_3__Pat49
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 204) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (17.67897605895996, 17.67897605895996, 29.280804097652435)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(32, 32, 32) CT=(32, 32, 32) Dose=(32, 32, 32)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-0.00024464223, 1.0]
+  ✓ Loaded successfully
+Patient 4/4: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat10
+  Loading SPECT...
+  Loading CT...
+  Loading Dosemap...
+  Raw sizes: SPECT=(256, 256, 424) CT=(512, 512, 203) Dose=(256, 256, 424)
+  Resampling SPECT to spacing (17.67897605895996, 17.67897605895996, 29.280804097652435)...
+  Resampling CT to SPECT grid...
+  Resampling Dosemap to SPECT grid...
+  Resampled sizes: SPECT=(32, 32, 32) CT=(32, 32, 32) Dose=(32, 32, 32)
+  Normalized ranges: SPECT=[0.0, 1.0], CT=[0.0, 1.0], Dose=[-3.1371732e-5, 1.0]
+  ✓ Loaded successfully
+Successfully loaded 4/4 patients.
+
+=== Starting training for PINN-style CNN (REAL DATA) ===
+Epoch 1/3 - Average Loss: 6.7281526e7
+Epoch 2/3 - Average Loss: 454007.3122558594
+Epoch 3/3 - Average Loss: 2577.4400634765625
+=== Finished training for PINN-style CNN ===
+
+
+=== Starting training for FNO-style Spectral Proxy (REAL DATA) ===
+Epoch 1/3 - Average Loss: 0.45320814847946167
+Epoch 2/3 - Average Loss: 0.08093185350298882
+Epoch 3/3 - Average Loss: 0.22364675253629684
+=== Finished training for FNO-style Spectral Proxy ===
+
+
+=== Starting training for UDE Hybrid Model (REAL DATA) ===
+Epoch 1/3 - Average Loss: 0.012529909610748291
+Epoch 2/3 - Average Loss: 0.005468648276291788
+Epoch 3/3 - Average Loss: 0.0025708957109600306
+=== Finished training for UDE Hybrid Model ===
+
