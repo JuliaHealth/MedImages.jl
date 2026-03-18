@@ -1,0 +1,9 @@
+[MPIPreferences]
+__clear__ = ["preloads_env_switch"]
+_format = "1.0"
+abi = "OpenMPI"
+binary = "system"
+cclibs = []
+libmpi = "/user/joanna.wybranska/u10867/.conda/envs/julia_registration_env/bin/../lib/libmpi.so"
+mpiexec = "/user/joanna.wybranska/u10867/.conda/envs/julia_registration_env/bin/mpiexec"
+preloads = []

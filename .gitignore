@@ -13,6 +13,10 @@ test/new/
 test/*/outputs/
 test/visual_output/
 test_data/dataset_Lu/
+test_data/autoPET-III-Lite/
+experiments/suv_consistency/**/*.nii.gz
+test_data/
+experiments/organ_affine_registration/logs/
 experiments/organ_affine_registration/
 test_data/dataset_PET/
 test_data/dataset_uncorrected/
@@ -21,3 +25,8 @@ dataset_unified.h5
 checkpoint_best.jld
 test_data/debug.h5
 dataset_unified_monai.h5
+epoch_1/
+wandb/
+checkpoint_epoch_10.jls
+checkpoint_latest.jls
+checkpoint_epoch_20.jls

@@ -1,0 +1,22 @@
+┌ Warning: attempting to remove probably stale pidfile
+│   path = "/home/jm/.julia/compiled/v1.10/MedImages/Prci9_NCfdL.ji.pidfile"
+└ @ FileWatching.Pidfile ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/FileWatching/src/pidfile.jl:273
+┌ Warning: attempting to remove probably stale pidfile
+│   path = "/home/jm/.julia/compiled/v1.10/CUDA/oWw5k_NCfdL.ji.pidfile"
+└ @ FileWatching.Pidfile ~/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/share/julia/stdlib/v1.10/FileWatching/src/pidfile.jl:244
+ERROR: LoadError: ArgumentError: Package LuxCUDA not found in current path.
+- Run `import Pkg; Pkg.add("LuxCUDA")` to install the LuxCUDA package.
+Stacktrace:
+ [1] macro expansion
+   @ ./loading.jl:1842 [inlined]
+ [2] macro expansion
+   @ ./lock.jl:267 [inlined]
+ [3] __require(into::Module, mod::Symbol)
+   @ Base ./loading.jl:1823
+ [4] #invoke_in_world#3
+   @ ./essentials.jl:926 [inlined]
+ [5] invoke_in_world
+   @ ./essentials.jl:923 [inlined]
+ [6] require(into::Module, mod::Symbol)
+   @ Base ./loading.jl:1816
+in expression starting at /media/jm/hddData/projects_new/MedImages.jl/experiments/organ_affine_registration/test_fused_core.jl:7

@@ -29,64 +29,81 @@ function calculate_suv_factor(batched_image::BatchedMedImage)::Vector{Union{Floa
 end
 
 """
-Internal helper to calculate SUV factor from a metadata dictionary.
-Standard formula: SUVbw = (PixelValue * Weight[g]) / (TotalDose[Bq] * DecayCorrection)
+    calculate_suv_factor(med_image::MedImage)
+
+Calculates the SUV factor for a single image.
+Returns a Union{Float64, Nothing}.
 """
-function _calculate_suv_from_metadata(metadata::Dict)::Union{Float64, Nothing}
-    try
-        # 1. Patient Weight (kg -> g)
-        weight_kg = get(metadata, "PatientWeight", nothing)
-        if weight_kg === nothing
-            return nothing
-        end
-        weight_g = Float64(weight_kg) * 1000.0
+function calculate_suv_factor(med_image::MedImage)::Union{Float64, Nothing}
+    return _calculate_suv_from_metadata(med_image.metadata)
+end
 
-        # 2. Radiopharmaceutical Information
-        radio_seq = get(metadata, "RadiopharmaceuticalInformationSequence", nothing)
-        if radio_seq === nothing || isempty(radio_seq)
-            return nothing
-        end
-        entry = radio_seq[1]
-
-        total_dose = get(entry, "RadionuclideTotalDose", nothing)
-        half_life = get(entry, "RadionuclideHalfLife", nothing)
-        inj_time_str = get(entry, "RadiopharmaceuticalStartTime", nothing)
-
-        if total_dose === nothing || half_life === nothing || inj_time_str === nothing
-            return nothing
-        end
-
-        # 3. Scan Time
-        # Prefer AcquisitionTime, fallback to SeriesTime
-        scan_time_str = get(metadata, "AcquisitionTime", get(metadata, "SeriesTime", nothing))
-        if scan_time_str === nothing
-            return nothing
-        end
-
-        # 4. Parse Times and Calculate Delta
-        t_inj = parse_dicom_time(string(inj_time_str))
-        t_scan = parse_dicom_time(string(scan_time_str))
-
-        delta_s = Float64((t_scan - t_inj).value) / 1_000_000_000.0 # Nanoseconds to seconds
-
-        # Midnight crossover handling
-        if delta_s < 0
-            delta_s += 24.0 * 3600.0
-        end
-
-        # 5. Decay Correction
-        decay = 2.0^(-delta_s / Float64(half_life))
-        actual_dose = Float64(total_dose) * decay
-
-        if actual_dose == 0
-            return nothing
-        end
-
-        return weight_g / actual_dose
-
-    catch
+function _calculate_suv_from_metadata(meta::Dict{Any, Any})::Union{Float64, Nothing}
+    # 1. Get Patient Weight in kg
+    weight = get(meta, "PatientWeight", nothing)
+    if weight === nothing
+        println("DEBUG: Missing PatientWeight")
         return nothing
     end
+    weight_kg = parse(Float64, string(weight))
+
+    # 2. Extract Radiopharmaceutical Information
+    radio_seq_arr = get(meta, "RadiopharmaceuticalInformationSequence", nothing)
+    if radio_seq_arr === nothing || isempty(radio_seq_arr)
+        println("DEBUG: Missing RadiopharmaceuticalInformationSequence")
+        return nothing
+    end
+    # PyDicom sequences are usually arrays of dicts
+    radio_seq = radio_seq_arr[1]
+
+    inj_dose = get(radio_seq, "RadionuclideTotalDose", nothing)
+    half_life = get(radio_seq, "RadionuclideHalfLife", nothing)
+    if inj_dose === nothing || half_life === nothing
+        println("DEBUG: Missing RadionuclideTotalDose or RadionuclideHalfLife")
+        return nothing
+    end
+    
+    inj_dose = parse(Float64, string(inj_dose))
+    half_life = parse(Float64, string(half_life))
+
+    inj_time = get(radio_seq, "RadiopharmaceuticalStartTime", nothing)
+    if inj_time === nothing
+        println("DEBUG: Missing RadiopharmaceuticalStartTime")
+        return nothing
+    end
+    inj_time_str = string(inj_time)
+    
+    # 3. Determine Scan (Acquisition) Time
+    scan_time_str = get(meta, "AcquisitionTime", get(meta, "SeriesTime", nothing))
+    if scan_time_str === nothing
+        println("DEBUG: Missing AcquisitionTime and SeriesTime")
+        return nothing
+    end
+    scan_time_str = string(scan_time_str)
+
+    # 4. Parse Times and Calculate Decay
+    try
+        t_inj = parse_dicom_time(inj_time_str)
+        t_scan = parse_dicom_time(scan_time_str)
+
+        s_inj = Dates.value(t_inj) / 1.0e9
+        s_scan = Dates.value(t_scan) / 1.0e9
+
+        delta_s = s_scan - s_inj
+        if delta_s < 0
+            delta_s += 24 * 3600
+        end
+
+        decayed_dose = inj_dose * exp(-log(2) * delta_s / half_life)
+
+        if decayed_dose > 0
+            return (weight_kg * 1000.0) / decayed_dose
+        end
+    catch e
+        println("DEBUG: exception during time parsing or decay: ", e)
+        return nothing
+    end
+    return nothing
 end
 
 function parse_dicom_time(t_str::AbstractString)

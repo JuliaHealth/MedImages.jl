@@ -1,0 +1,14 @@
+================================================================================
+JobID = 12953477
+User = u10867, Account = ovgu_medicine_llm
+Partition = kisski-h100, Nodelist = ggpu244
+================================================================================
+Starting FNO Training on Slurm...
+============ Job Information ===================================================
+Submitted: 2026-03-11T08:48:12
+Started: 2026-03-11T08:48:43
+Ended: 2026-03-11T08:49:16
+Elapsed: 1 min, Limit: 1440 min, Difference: 1439 min
+CPUs: 16, Nodes: 1
+Estimated Consumption: 17.50 core-hours
+================================================================================

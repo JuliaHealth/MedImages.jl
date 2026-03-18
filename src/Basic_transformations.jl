@@ -4,10 +4,11 @@ using CoordinateTransformations, Interpolations, StaticArrays, LinearAlgebra, Ro
 using LinearAlgebra
 using ImageTransformations
 using ChainRulesCore
+using Statistics
 using ..MedImage_data_struct
 using ..MedImage_data_struct: Nearest_neighbour_en, Linear_en, B_spline_en
 using ..Load_and_save: update_voxel_data, update_voxel_and_spatial_data
-using ..Utils: interpolate_my, generate_affine_coords, is_cuda_array, interpolate_fused_affine, create_batched_medimage, unbatch_medimage
+using ..Utils: interpolate_my, generate_affine_coords, is_cuda_array, interpolate_fused_affine, extract_corners
 using KernelAbstractions
 using CUDA
 
@@ -174,6 +175,11 @@ function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Int
   return affine_transform_mi(image, affine_matrix, Interpolator; center_of_rotation=Tuple(C_idx))
 end
 
+      # Interpolate
+      # Use spacing (1,1,1) so that points are treated as indices
+      # Use median of 8 corners of the image as the extrapolation value
+      extrap_val = Float64(median(extract_corners(img)))
+      resampled_flat = interpolate_my(points_to_interpolate, img, (1.0,1.0,1.0), Interpolator, false, extrap_val, true)
 
 """
     crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::MedImage
@@ -401,7 +407,9 @@ function scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Floa
   points_to_interpolate, new_size = build_scale_points(old_size, scale_tuple)
 
   # Use our differentiable interpolation
-  resampled_flat = interpolate_my(points_to_interpolate, im.voxel_data, (1.0, 1.0, 1.0), Interpolator, false, 0.0, true)
+  # Use median of 8 corners as extrapolation value
+  extrap_val = Float64(median(extract_corners(im.voxel_data)))
+  resampled_flat = interpolate_my(points_to_interpolate, im.voxel_data, (1.0, 1.0, 1.0), Interpolator, false, extrap_val, true)
   new_data = reshape(resampled_flat, new_size)
 
   new_im = update_voxel_and_spatial_data(im, new_data, im.origin, im.spacing, im.direction)
@@ -707,7 +715,10 @@ function affine_transform_mi(image::BatchedMedImage, affine_matrix::Union{Matrix
     end
 
     # 3. Perform Fused Affine Interpolation
-    resampled_flat = interpolate_fused_affine(image.voxel_data, matrices_inv, spatial_size, Interpolator, false, 0, center_of_rotation)
+    # Use median of 8 corners (from first batch slice) as extrapolation value
+    first_slice = @view image.voxel_data[:, :, :, 1]
+    extrap_val = Float64(median(extract_corners(first_slice)))
+    resampled_flat = interpolate_fused_affine(image.voxel_data, matrices_inv, spatial_size, Interpolator, false, extrap_val, center_of_rotation)
 
     new_data = reshape(resampled_flat, spatial_size[1], spatial_size[2], spatial_size[3], batch_size)
 

@@ -1,0 +1,2436 @@
+--- Lu-177 SciML High-Resolution Quantitative Dosimetry ---
+Goal: Attenuation Correction & Scatter Refinement
+Model Type:  fno
+Data Dir:    /DATA
+Resolution:  (64, 64, 64)
+Samples:     100
+Epochs:      100
+Batch Size:  1
+Learn Rate:  0.001
+Device:      CUDADevice{Nothing, Missing}(nothing)
+Loading 100 patients from /DATA...
+Patient 1/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_0__Pat116
+Patient 2/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_2__Pat49
+Patient 3/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_3__Pat49
+Patient 4/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat10
+Patient 5/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat101
+Patient 6/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat102
+Patient 7/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat103
+Patient 8/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat104
+Patient 9/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat105
+Patient 10/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat106
+Patient 11/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat108
+Patient 12/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat109
+Patient 13/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat11
+Patient 14/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat110
+Patient 15/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat111
+Patient 16/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat112
+Patient 17/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat114
+Patient 18/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat115
+Patient 19/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat117
+Patient 20/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat118
+Patient 21/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat119
+Patient 22/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat120
+Patient 23/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat121
+Patient 24/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat122
+Patient 25/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat123
+Patient 26/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat124
+Patient 27/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat125
+Patient 28/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat127
+Patient 29/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat128
+Patient 30/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat13
+Patient 31/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat139
+Patient 32/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat14
+Patient 33/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat142
+Patient 34/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat145
+Patient 35/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat15
+Patient 36/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat16
+Patient 37/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat17
+Patient 38/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat19
+Patient 39/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat2
+Patient 40/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat20
+Patient 41/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat21
+Patient 42/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat22
+Patient 43/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat24
+Patient 44/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat25
+Patient 45/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat27
+Patient 46/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat28
+Patient 47/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat29
+Patient 48/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat3
+Patient 49/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat30
+Patient 50/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat31
+Patient 51/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat32
+Patient 52/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat33
+Patient 53/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat34
+Patient 54/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat35
+Patient 55/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat4
+Patient 56/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat44
+Patient 57/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat45
+Patient 58/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat46
+Patient 59/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat47
+Patient 60/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat48
+Patient 61/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat49
+Patient 62/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat5
+Patient 63/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat50
+Patient 64/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat51
+Patient 65/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat52
+Patient 66/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat53
+Patient 67/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat54
+Patient 68/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat55
+Patient 69/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat56
+Patient 70/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat58
+Patient 71/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat6
+Patient 72/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat60
+Patient 73/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat61
+Patient 74/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat64
+Patient 75/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat65
+Patient 76/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat67
+Patient 77/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat68
+Patient 78/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat7
+Patient 79/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat74
+Patient 80/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat75
+Patient 81/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat76
+Patient 82/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat79
+Patient 83/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat8
+Patient 84/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat82
+Patient 85/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat83
+Patient 86/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat84
+Patient 87/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat86
+Patient 88/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat87
+Patient 89/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat88
+Patient 90/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat89
+Patient 91/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat9
+Patient 92/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat90
+Patient 93/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat91
+Patient 94/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat93
+Patient 95/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat94
+Patient 96/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat96
+Patient 97/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat97
+Patient 98/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat98
+Patient 99/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_10__Pat2
+Patient 100/100: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_10__Pat25
+Successfully loaded 0/100 patients.
+
+=== Starting training for FNO-style Spectral Proxy (High-Res GPU) ===
+Using Device: CUDADevice{Nothing, Missing}(nothing)
+  Batch 5 - Current Loss: 0.00032436082
+  Batch 10 - Current Loss: 0.03107577
+  Batch 15 - Current Loss: 0.00086264056
+  Batch 20 - Current Loss: 0.007125055
+  Batch 25 - Current Loss: 0.0031069499
+  Batch 30 - Current Loss: 0.00062829733
+  Batch 35 - Current Loss: 0.001988804
+  Batch 40 - Current Loss: 4.417009e-6
+  Batch 45 - Current Loss: 0.00069722853
+  Batch 50 - Current Loss: 9.136649e-5
+  Batch 55 - Current Loss: 0.00018762668
+  Batch 60 - Current Loss: 7.0575734e-5
+  Batch 65 - Current Loss: 5.1832903e-5
+  Batch 70 - Current Loss: 3.1547268e-5
+  Batch 75 - Current Loss: 1.519191e-5
+  Batch 80 - Current Loss: 1.1759806e-5
+  Batch 85 - Current Loss: 5.564587e-6
+  Batch 90 - Current Loss: 2.5882348e-6
+  Batch 95 - Current Loss: 2.779002e-6
+  Batch 100 - Current Loss: 9.243233e-7
+Epoch 1/100 - Average Loss: 0.005673522448170161
+  Batch 5 - Current Loss: 9.094041e-7
+  Batch 10 - Current Loss: 1.0079558e-7
+  Batch 15 - Current Loss: 2.9051714e-7
+  Batch 20 - Current Loss: 8.4606285e-8
+  Batch 25 - Current Loss: 6.719338e-8
+  Batch 30 - Current Loss: 6.593481e-8
+  Batch 35 - Current Loss: 5.2124182e-8
+  Batch 40 - Current Loss: 2.615856e-9
+  Batch 45 - Current Loss: 8.231934e-8
+  Batch 50 - Current Loss: 2.6053877e-9
+  Batch 55 - Current Loss: 2.565043e-9
+  Batch 60 - Current Loss: 5.9179307e-8
+  Batch 65 - Current Loss: 6.8700636e-9
+  Batch 70 - Current Loss: 6.86065e-9
+  Batch 75 - Current Loss: 4.725123e-8
+  Batch 80 - Current Loss: 2.0690423e-9
+  Batch 85 - Current Loss: 4.7239084e-8
+  Batch 90 - Current Loss: 2.0570288e-9
+  Batch 95 - Current Loss: 2.1002707e-8
+  Batch 100 - Current Loss: 2.4706486e-9
+Epoch 2/100 - Average Loss: 1.0241437182090251e-7
+  Batch 5 - Current Loss: 2.062185e-9
+  Batch 10 - Current Loss: 2.0896216e-8
+  Batch 15 - Current Loss: 2.4642643e-9
+  Batch 20 - Current Loss: 2.067687e-9
+  Batch 25 - Current Loss: 2.0879526e-8
+  Batch 30 - Current Loss: 2.4750018e-9
+  Batch 35 - Current Loss: 4.7296588e-8
+  Batch 40 - Current Loss: 6.868057e-9
+  Batch 45 - Current Loss: 2.0652715e-8
+  Batch 50 - Current Loss: 4.729416e-8
+  Batch 55 - Current Loss: 2.0708217e-9
+  Batch 60 - Current Loss: 2.0689404e-8
+  Batch 65 - Current Loss: 2.4877131e-9
+  Batch 70 - Current Loss: 5.7930816e-8
+  Batch 75 - Current Loss: 6.862501e-9
+  Batch 80 - Current Loss: 2.0658335e-8
+  Batch 85 - Current Loss: 4.729578e-8
+  Batch 90 - Current Loss: 2.077099e-9
+  Batch 95 - Current Loss: 2.0688331e-8
+  Batch 100 - Current Loss: 2.478246e-9
+Epoch 3/100 - Average Loss: 2.173027283891571e-8
+  Batch 5 - Current Loss: 5.79214e-8
+  Batch 10 - Current Loss: 6.891076e-9
+  Batch 15 - Current Loss: 2.068699e-8
+  Batch 20 - Current Loss: 5.7946508e-8
+  Batch 25 - Current Loss: 2.0784574e-9
+  Batch 30 - Current Loss: 2.0987322e-8
+  Batch 35 - Current Loss: 4.7230177e-8
+  Batch 40 - Current Loss: 3.30452e-9
+  Batch 45 - Current Loss: 2.0890022e-8
+  Batch 50 - Current Loss: 2.064415e-8
+  Batch 55 - Current Loss: 4.7307935e-8
+  Batch 60 - Current Loss: 2.4905942e-9
+  Batch 65 - Current Loss: 2.078118e-9
+  Batch 70 - Current Loss: 2.4872486e-9
+  Batch 75 - Current Loss: 2.0828756e-9
+  Batch 80 - Current Loss: 6.865124e-9
+  Batch 85 - Current Loss: 2.0895967e-9
+  Batch 90 - Current Loss: 6.8635813e-9
+  Batch 95 - Current Loss: 2.0838107e-9
+  Batch 100 - Current Loss: 2.489014e-9
+Epoch 4/100 - Average Loss: 1.802976809628376e-8
+  Batch 5 - Current Loss: 4.7238274e-8
+  Batch 10 - Current Loss: 4.7254066e-8
+  Batch 15 - Current Loss: 6.856947e-9
+  Batch 20 - Current Loss: 2.1001627e-8
+  Batch 25 - Current Loss: 6.883811e-9
+  Batch 30 - Current Loss: 4.7277553e-8
+  Batch 35 - Current Loss: 5.7950093e-8
+  Batch 40 - Current Loss: 6.8856654e-9
+  Batch 45 - Current Loss: 2.0666102e-8
+  Batch 50 - Current Loss: 2.0712456e-9
+  Batch 55 - Current Loss: 2.0650621e-9
+  Batch 60 - Current Loss: 2.1008645e-8
+  Batch 65 - Current Loss: 2.0892177e-8
+  Batch 70 - Current Loss: 6.891076e-9
+  Batch 75 - Current Loss: 5.790078e-8
+  Batch 80 - Current Loss: 5.789809e-8
+  Batch 85 - Current Loss: 6.858335e-9
+  Batch 90 - Current Loss: 2.0897291e-8
+  Batch 95 - Current Loss: 2.099164e-8
+  Batch 100 - Current Loss: 2.0988877e-9
+Epoch 5/100 - Average Loss: 2.548299561810907e-8
+  Batch 5 - Current Loss: 5.9409263e-8
+  Batch 10 - Current Loss: 6.879175e-9
+  Batch 15 - Current Loss: 2.1028898e-8
+  Batch 20 - Current Loss: 2.0667443e-8
+  Batch 25 - Current Loss: 5.7952786e-8
+  Batch 30 - Current Loss: 4.7307935e-8
+  Batch 35 - Current Loss: 2.0970108e-9
+  Batch 40 - Current Loss: 2.0895138e-8
+  Batch 45 - Current Loss: 2.104646e-8
+  Batch 50 - Current Loss: 2.09812e-9
+  Batch 55 - Current Loss: 4.7232607e-8
+  Batch 60 - Current Loss: 5.796938e-8
+  Batch 65 - Current Loss: 6.206233e-9
+  Batch 70 - Current Loss: 2.0872259e-8
+  Batch 75 - Current Loss: 2.1016476e-8
+  Batch 80 - Current Loss: 2.05931e-9
+  Batch 85 - Current Loss: 2.0715e-9
+  Batch 90 - Current Loss: 2.5644769e-9
+  Batch 95 - Current Loss: 5.9259083e-8
+  Batch 100 - Current Loss: 2.094879e-9
+Epoch 6/100 - Average Loss: 2.548216243569712e-8
+  Batch 5 - Current Loss: 4.7267832e-8
+  Batch 10 - Current Loss: 5.928448e-8
+  Batch 15 - Current Loss: 2.5759974e-9
+  Batch 20 - Current Loss: 5.9245934e-8
+  Batch 25 - Current Loss: 5.7923643e-8
+  Batch 30 - Current Loss: 2.084406e-9
+  Batch 35 - Current Loss: 2.2526194e-8
+  Batch 40 - Current Loss: 2.1022958e-8
+  Batch 45 - Current Loss: 2.0895946e-8
+  Batch 50 - Current Loss: 5.7916022e-8
+  Batch 55 - Current Loss: 5.9256365e-8
+  Batch 60 - Current Loss: 2.0986317e-9
+  Batch 65 - Current Loss: 2.090187e-8
+  Batch 70 - Current Loss: 2.2537657e-8
+  Batch 75 - Current Loss: 6.2262044e-9
+  Batch 80 - Current Loss: 4.7248395e-8
+  Batch 85 - Current Loss: 5.8004808e-8
+  Batch 90 - Current Loss: 2.0895115e-9
+  Batch 95 - Current Loss: 2.1024848e-8
+  Batch 100 - Current Loss: 1.7563295e-9
+Epoch 7/100 - Average Loss: 2.7285671768684237e-8
+  Batch 5 - Current Loss: 2.077863e-9
+  Batch 10 - Current Loss: 2.2518647e-8
+  Batch 15 - Current Loss: 2.1026198e-8
+  Batch 20 - Current Loss: 2.0997413e-9
+  Batch 25 - Current Loss: 4.7257306e-8
+  Batch 30 - Current Loss: 2.0760806e-9
+  Batch 35 - Current Loss: 1.9522666e-8
+  Batch 40 - Current Loss: 2.1014586e-8
+  Batch 45 - Current Loss: 2.5615536e-9
+  Batch 50 - Current Loss: 4.7249205e-8
+  Batch 55 - Current Loss: 1.9841993e-8
+  Batch 60 - Current Loss: 2.2572905e-8
+  Batch 65 - Current Loss: 2.3362999e-8
+  Batch 70 - Current Loss: 2.2508027e-8
+  Batch 75 - Current Loss: 2.0607474e-9
+  Batch 80 - Current Loss: 4.728282e-8
+  Batch 85 - Current Loss: 1.9741108e-8
+  Batch 90 - Current Loss: 4.727391e-8
+  Batch 95 - Current Loss: 5.9379303e-8
+  Batch 100 - Current Loss: 2.6371438e-9
+Epoch 8/100 - Average Loss: 2.428094570960937e-8
+  Batch 5 - Current Loss: 5.9614194e-8
+  Batch 10 - Current Loss: 5.762904e-8
+  Batch 15 - Current Loss: 8.295868e-8
+  Batch 20 - Current Loss: 3.3126628e-9
+  Batch 25 - Current Loss: 5.946966e-8
+  Batch 30 - Current Loss: 5.7916917e-8
+  Batch 35 - Current Loss: 5.795906e-8
+  Batch 40 - Current Loss: 5.9400637e-8
+  Batch 45 - Current Loss: 3.3251102e-9
+  Batch 50 - Current Loss: 8.160638e-8
+  Batch 55 - Current Loss: 1.9508354e-8
+  Batch 60 - Current Loss: 1.9859838e-8
+  Batch 65 - Current Loss: 2.3338236e-8
+  Batch 70 - Current Loss: 6.205499e-9
+  Batch 75 - Current Loss: 5.791333e-8
+  Batch 80 - Current Loss: 2.6135705e-9
+  Batch 85 - Current Loss: 2.100424e-9
+  Batch 90 - Current Loss: 5.801244e-8
+  Batch 95 - Current Loss: 2.0573667e-9
+  Batch 100 - Current Loss: 1.9502892e-8
+Epoch 9/100 - Average Loss: 2.5972860151490806e-8
+  Batch 5 - Current Loss: 1.9496389e-8
+  Batch 10 - Current Loss: 6.2032983e-9
+  Batch 15 - Current Loss: 6.2151866e-9
+  Batch 20 - Current Loss: 6.214159e-9
+  Batch 25 - Current Loss: 2.0968403e-9
+  Batch 30 - Current Loss: 1.9694811e-8
+  Batch 35 - Current Loss: 2.0894264e-9
+  Batch 40 - Current Loss: 6.201245e-9
+  Batch 45 - Current Loss: 6.226646e-9
+  Batch 50 - Current Loss: 2.6252962e-9
+  Batch 55 - Current Loss: 5.8085142e-8
+  Batch 60 - Current Loss: 5.9466025e-8
+  Batch 65 - Current Loss: 2.6042466e-9
+  Batch 70 - Current Loss: 2.129634e-8
+  Batch 75 - Current Loss: 2.133523e-8
+  Batch 80 - Current Loss: 2.1333326e-8
+  Batch 85 - Current Loss: 2.2127644e-8
+  Batch 90 - Current Loss: 1.9690368e-8
+  Batch 95 - Current Loss: 2.0672635e-9
+  Batch 100 - Current Loss: 6.223413e-9
+Epoch 10/100 - Average Loss: 2.1712834099574252e-8
+  Batch 5 - Current Loss: 3.3192054e-9
+  Batch 10 - Current Loss: 6.005478e-8
+  Batch 15 - Current Loss: 5.937658e-8
+  Batch 20 - Current Loss: 4.774608e-8
+  Batch 25 - Current Loss: 1.968671e-8
+  Batch 30 - Current Loss: 2.0821955e-9
+  Batch 35 - Current Loss: 1.9819959e-8
+  Batch 40 - Current Loss: 6.2005108e-9
+  Batch 45 - Current Loss: 4.7770506e-8
+  Batch 50 - Current Loss: 6.022013e-8
+  Batch 55 - Current Loss: 5.7916022e-8
+  Batch 60 - Current Loss: 6.226058e-9
+  Batch 65 - Current Loss: 2.0611703e-9
+  Batch 70 - Current Loss: 2.040504e-9
+  Batch 75 - Current Loss: 4.903098e-8
+  Batch 80 - Current Loss: 2.069466e-9
+  Batch 85 - Current Loss: 5.79622e-8
+  Batch 90 - Current Loss: 1.9652749e-8
+  Batch 95 - Current Loss: 2.2184203e-8
+  Batch 100 - Current Loss: 5.789137e-8
+Epoch 11/100 - Average Loss: 2.6251322775561192e-8
+  Batch 5 - Current Loss: 5.862914e-8
+  Batch 10 - Current Loss: 6.021511e-8
+  Batch 15 - Current Loss: 2.0565218e-9
+  Batch 20 - Current Loss: 3.6674228e-9
+  Batch 25 - Current Loss: 2.0681952e-9
+  Batch 30 - Current Loss: 2.0530602e-9
+  Batch 35 - Current Loss: 1.9656405e-8
+  Batch 40 - Current Loss: 2.2265843e-8
+  Batch 45 - Current Loss: 5.8536273e-8
+  Batch 50 - Current Loss: 8.29973e-8
+  Batch 55 - Current Loss: 2.2028879e-9
+  Batch 60 - Current Loss: 2.2177268e-8
+  Batch 65 - Current Loss: 2.137388e-8
+  Batch 70 - Current Loss: 2.22114e-8
+  Batch 75 - Current Loss: 2.2313953e-8
+  Batch 80 - Current Loss: 5.8690045e-8
+  Batch 85 - Current Loss: 8.1631924e-8
+  Batch 90 - Current Loss: 3.66528e-9
+  Batch 95 - Current Loss: 8.150638e-8
+  Batch 100 - Current Loss: 2.2193637e-8
+Epoch 12/100 - Average Loss: 2.8380515919579353e-8
+  Batch 5 - Current Loss: 1.981183e-8
+  Batch 10 - Current Loss: 4.9006232e-8
+  Batch 15 - Current Loss: 8.30177e-8
+  Batch 20 - Current Loss: 6.3295125e-9
+  Batch 25 - Current Loss: 2.2208624e-8
+  Batch 30 - Current Loss: 1.9296422e-9
+  Batch 35 - Current Loss: 1.9192647e-9
+  Batch 40 - Current Loss: 3.6630248e-9
+  Batch 45 - Current Loss: 6.318255e-9
+  Batch 50 - Current Loss: 5.8690045e-8
+  Batch 55 - Current Loss: 5.854934e-8
+  Batch 60 - Current Loss: 6.006939e-8
+  Batch 65 - Current Loss: 5.87722e-8
+  Batch 70 - Current Loss: 6.002694e-8
+  Batch 75 - Current Loss: 6.005615e-8
+  Batch 80 - Current Loss: 6.005615e-8
+  Batch 85 - Current Loss: 6.0030594e-8
+  Batch 90 - Current Loss: 5.8768137e-8
+  Batch 95 - Current Loss: 6.001873e-8
+  Batch 100 - Current Loss: 6.0020554e-8
+Epoch 13/100 - Average Loss: 2.459001147814277e-8
+  Batch 5 - Current Loss: 6.0013704e-8
+  Batch 10 - Current Loss: 6.0007324e-8
+  Batch 15 - Current Loss: 5.876723e-8
+  Batch 20 - Current Loss: 6.003196e-8
+  Batch 25 - Current Loss: 6.004154e-8
+  Batch 30 - Current Loss: 6.003333e-8
+  Batch 35 - Current Loss: 6.00201e-8
+  Batch 40 - Current Loss: 6.00096e-8
+  Batch 45 - Current Loss: 6.0002755e-8
+  Batch 50 - Current Loss: 5.9999564e-8
+  Batch 55 - Current Loss: 5.999911e-8
+  Batch 60 - Current Loss: 6.0000474e-8
+  Batch 65 - Current Loss: 6.000321e-8
+  Batch 70 - Current Loss: 6.000641e-8
+  Batch 75 - Current Loss: 6.00096e-8
+  Batch 80 - Current Loss: 6.0012795e-8
+  Batch 85 - Current Loss: 6.001599e-8
+  Batch 90 - Current Loss: 6.002101e-8
+  Batch 95 - Current Loss: 6.002831e-8
+  Batch 100 - Current Loss: 6.0036065e-8
+Epoch 14/100 - Average Loss: 1.5220449740560582e-8
+  Batch 5 - Current Loss: 6.004337e-8
+  Batch 10 - Current Loss: 6.00493e-8
+  Batch 15 - Current Loss: 6.005387e-8
+  Batch 20 - Current Loss: 6.0057516e-8
+  Batch 25 - Current Loss: 6.0059804e-8
+  Batch 30 - Current Loss: 6.006163e-8
+  Batch 35 - Current Loss: 6.0063e-8
+  Batch 40 - Current Loss: 6.006574e-8
+  Batch 45 - Current Loss: 6.006756e-8
+  Batch 50 - Current Loss: 6.006848e-8
+  Batch 55 - Current Loss: 6.0068935e-8
+  Batch 60 - Current Loss: 6.0068935e-8
+  Batch 65 - Current Loss: 6.007396e-8
+  Batch 70 - Current Loss: 6.008172e-8
+  Batch 75 - Current Loss: 6.008948e-8
+  Batch 80 - Current Loss: 6.009678e-8
+  Batch 85 - Current Loss: 6.010272e-8
+  Batch 90 - Current Loss: 6.010728e-8
+  Batch 95 - Current Loss: 6.011048e-8
+  Batch 100 - Current Loss: 6.011277e-8
+Epoch 15/100 - Average Loss: 1.525518964928807e-8
+  Batch 5 - Current Loss: 6.0114594e-8
+  Batch 10 - Current Loss: 6.0115966e-8
+  Batch 15 - Current Loss: 6.0116875e-8
+  Batch 20 - Current Loss: 6.011779e-8
+  Batch 25 - Current Loss: 6.01187e-8
+  Batch 30 - Current Loss: 6.012007e-8
+  Batch 35 - Current Loss: 6.01219e-8
+  Batch 40 - Current Loss: 6.0123725e-8
+  Batch 45 - Current Loss: 6.01251e-8
+  Batch 50 - Current Loss: 6.012692e-8
+  Batch 55 - Current Loss: 6.012875e-8
+  Batch 60 - Current Loss: 6.013012e-8
+  Batch 65 - Current Loss: 6.0131946e-8
+  Batch 70 - Current Loss: 6.013378e-8
+  Batch 75 - Current Loss: 6.0135605e-8
+  Batch 80 - Current Loss: 6.013743e-8
+  Batch 85 - Current Loss: 6.01388e-8
+  Batch 90 - Current Loss: 6.0140174e-8
+  Batch 95 - Current Loss: 6.0142e-8
+  Batch 100 - Current Loss: 6.0143826e-8
+Epoch 16/100 - Average Loss: 1.526893947501051e-8
+  Batch 5 - Current Loss: 6.014611e-8
+  Batch 10 - Current Loss: 6.014748e-8
+  Batch 15 - Current Loss: 6.0149766e-8
+  Batch 20 - Current Loss: 6.015159e-8
+  Batch 25 - Current Loss: 6.015296e-8
+  Batch 30 - Current Loss: 6.0149304e-8
+  Batch 35 - Current Loss: 6.014337e-8
+  Batch 40 - Current Loss: 6.014337e-8
+  Batch 45 - Current Loss: 6.014657e-8
+  Batch 50 - Current Loss: 6.015159e-8
+  Batch 55 - Current Loss: 6.01525e-8
+  Batch 60 - Current Loss: 6.014565e-8
+  Batch 65 - Current Loss: 6.055867e-9
+  Batch 70 - Current Loss: 1.9533857e-8
+  Batch 75 - Current Loss: 2.0125819e-9
+  Batch 80 - Current Loss: 6.0648575e-9
+  Batch 85 - Current Loss: 2.0436461e-8
+  Batch 90 - Current Loss: 1.9322612e-9
+  Batch 95 - Current Loss: 1.9577097e-8
+  Batch 100 - Current Loss: 4.718728e-8
+Epoch 17/100 - Average Loss: 1.8027421242461373e-8
+  Batch 5 - Current Loss: 1.9495348e-8
+  Batch 10 - Current Loss: 1.6781441e-9
+  Batch 15 - Current Loss: 2.0454307e-8
+  Batch 20 - Current Loss: 1.9284967e-9
+  Batch 25 - Current Loss: 6.1273724e-8
+  Batch 30 - Current Loss: 1.6724261e-9
+  Batch 35 - Current Loss: 1.6750932e-9
+  Batch 40 - Current Loss: 4.020352e-8
+  Batch 45 - Current Loss: 2.2810559e-8
+  Batch 50 - Current Loss: 2.0484952e-8
+  Batch 55 - Current Loss: 6.1318914e-8
+  Batch 60 - Current Loss: 9.9296784e-8
+  Batch 65 - Current Loss: 2.0429804e-8
+  Batch 70 - Current Loss: 2.04599e-8
+  Batch 75 - Current Loss: 4.9078004e-8
+  Batch 80 - Current Loss: 6.800019e-8
+  Batch 85 - Current Loss: 2.2846864e-8
+  Batch 90 - Current Loss: 2.273888e-8
+  Batch 95 - Current Loss: 2.0032338e-9
+  Batch 100 - Current Loss: 2.0438591e-8
+Epoch 18/100 - Average Loss: 3.362654192318182e-8
+  Batch 5 - Current Loss: 2.2857563e-8
+  Batch 10 - Current Loss: 6.788172e-8
+  Batch 15 - Current Loss: 5.392339e-8
+  Batch 20 - Current Loss: 2.1267809e-8
+  Batch 25 - Current Loss: 9.427489e-8
+  Batch 30 - Current Loss: 1.0547244e-7
+  Batch 35 - Current Loss: 2.3114545e-8
+  Batch 40 - Current Loss: 8.28423e-8
+  Batch 45 - Current Loss: 1.962757e-9
+  Batch 50 - Current Loss: 1.9395552e-9
+  Batch 55 - Current Loss: 8.529522e-8
+  Batch 60 - Current Loss: 6.12327e-8
+  Batch 65 - Current Loss: 2.0279659e-8
+  Batch 70 - Current Loss: 6.6337575e-9
+  Batch 75 - Current Loss: 2.0437527e-8
+  Batch 80 - Current Loss: 1.9574793e-9
+  Batch 85 - Current Loss: 6.615111e-9
+  Batch 90 - Current Loss: 8.525714e-8
+  Batch 95 - Current Loss: 6.607538e-9
+  Batch 100 - Current Loss: 2.0360643e-8
+Epoch 19/100 - Average Loss: 3.5961941891038406e-8
+  Batch 5 - Current Loss: 1.9365212e-9
+  Batch 10 - Current Loss: 5.991883e-8
+  Batch 15 - Current Loss: 1.9592103e-9
+  Batch 20 - Current Loss: 1.6779913e-9
+  Batch 25 - Current Loss: 8.543453e-8
+  Batch 30 - Current Loss: 1.9462876e-9
+  Batch 35 - Current Loss: 1.9938244e-9
+  Batch 40 - Current Loss: 5.992294e-8
+  Batch 45 - Current Loss: 2.3154492e-8
+  Batch 50 - Current Loss: 6.704717e-8
+  Batch 55 - Current Loss: 2.0493486e-8
+  Batch 60 - Current Loss: 6.596944e-9
+  Batch 65 - Current Loss: 2.0420488e-8
+  Batch 70 - Current Loss: 2.2748028e-9
+  Batch 75 - Current Loss: 2.0342307e-8
+  Batch 80 - Current Loss: 6.00945e-8
+  Batch 85 - Current Loss: 1.9402115e-9
+  Batch 90 - Current Loss: 2.0335136e-8
+  Batch 95 - Current Loss: 2.3169278e-9
+  Batch 100 - Current Loss: 8.519297e-8
+Epoch 20/100 - Average Loss: 2.8394462359138116e-8
+  Batch 5 - Current Loss: 6.582126e-9
+  Batch 10 - Current Loss: 2.0418092e-8
+  Batch 15 - Current Loss: 6.588021e-9
+  Batch 20 - Current Loss: 2.1229255e-8
+  Batch 25 - Current Loss: 1.6760081e-9
+  Batch 30 - Current Loss: 6.129355e-8
+  Batch 35 - Current Loss: 2.3117094e-8
+  Batch 40 - Current Loss: 5.4442374e-8
+  Batch 45 - Current Loss: 8.806482e-9
+  Batch 50 - Current Loss: 2.0386166e-8
+  Batch 55 - Current Loss: 7.1112524e-8
+  Batch 60 - Current Loss: 2.2294566e-9
+  Batch 65 - Current Loss: 9.829798e-8
+  Batch 70 - Current Loss: 8.534582e-8
+  Batch 75 - Current Loss: 7.110706e-8
+  Batch 80 - Current Loss: 7.146861e-8
+  Batch 85 - Current Loss: 2.1681883e-8
+  Batch 90 - Current Loss: 8.547918e-8
+  Batch 95 - Current Loss: 2.1453077e-9
+  Batch 100 - Current Loss: 5.4375032e-8
+Epoch 21/100 - Average Loss: 4.557277560990336e-8
+  Batch 5 - Current Loss: 2.0372871e-8
+  Batch 10 - Current Loss: 2.2585742e-9
+  Batch 15 - Current Loss: 2.528694e-8
+  Batch 20 - Current Loss: 8.70751e-8
+  Batch 25 - Current Loss: 7.158917e-8
+  Batch 30 - Current Loss: 2.003134e-7
+  Batch 35 - Current Loss: 2.0314424e-8
+  Batch 40 - Current Loss: 9.824485e-8
+  Batch 45 - Current Loss: 8.730169e-8
+  Batch 50 - Current Loss: 6.109358e-8
+  Batch 55 - Current Loss: 6.3627494e-9
+  Batch 60 - Current Loss: 8.271797e-8
+  Batch 65 - Current Loss: 6.3324763e-9
+  Batch 70 - Current Loss: 5.715159e-8
+  Batch 75 - Current Loss: 9.840664e-8
+  Batch 80 - Current Loss: 8.871962e-8
+  Batch 85 - Current Loss: 6.943128e-8
+  Batch 90 - Current Loss: 2.075079e-7
+  Batch 95 - Current Loss: 1.9928933e-8
+  Batch 100 - Current Loss: 1.7215787e-7
+Epoch 22/100 - Average Loss: 6.116172650560969e-8
+  Batch 5 - Current Loss: 8.2363705e-8
+  Batch 10 - Current Loss: 8.236424e-8
+  Batch 15 - Current Loss: 9.867618e-8
+  Batch 20 - Current Loss: 7.8744815e-9
+  Batch 25 - Current Loss: 9.54239e-8
+  Batch 30 - Current Loss: 8.914661e-11
+  Batch 35 - Current Loss: 6.387289e-9
+  Batch 40 - Current Loss: 6.3541584e-8
+  Batch 45 - Current Loss: 1.7686065e-9
+  Batch 50 - Current Loss: 1.9858e-8
+  Batch 55 - Current Loss: 6.242112e-8
+  Batch 60 - Current Loss: 1.5864627e-8
+  Batch 65 - Current Loss: 1.991132e-8
+  Batch 70 - Current Loss: 1.7260178e-9
+  Batch 75 - Current Loss: 6.0621666e-8
+  Batch 80 - Current Loss: 2.1267809e-8
+  Batch 85 - Current Loss: 6.3238823e-9
+  Batch 90 - Current Loss: 6.230715e-8
+  Batch 95 - Current Loss: 5.643786e-9
+  Batch 100 - Current Loss: 2.1218398e-8
+Epoch 23/100 - Average Loss: 3.810048131339117e-8
+  Batch 5 - Current Loss: 1.0447426e-8
+  Batch 10 - Current Loss: 1.1519996e-9
+  Batch 15 - Current Loss: 7.886718e-9
+  Batch 20 - Current Loss: 1.7564856e-9
+  Batch 25 - Current Loss: 5.6785425e-9
+  Batch 30 - Current Loss: 5.6901985e-9
+  Batch 35 - Current Loss: 1.1653777e-9
+  Batch 40 - Current Loss: 6.057215e-8
+  Batch 45 - Current Loss: 2.0639332e-8
+  Batch 50 - Current Loss: 2.1394309e-8
+  Batch 55 - Current Loss: 2.0604292e-8
+  Batch 60 - Current Loss: 6.068727e-8
+  Batch 65 - Current Loss: 5.6882317e-9
+  Batch 70 - Current Loss: 5.6625526e-9
+  Batch 75 - Current Loss: 2.0587454e-8
+  Batch 80 - Current Loss: 1.1636615e-9
+  Batch 85 - Current Loss: 1.6135338e-8
+  Batch 90 - Current Loss: 2.0602421e-8
+  Batch 95 - Current Loss: 1.9796441e-7
+  Batch 100 - Current Loss: 2.1266182e-8
+Epoch 24/100 - Average Loss: 3.580287697826923e-8
+  Batch 5 - Current Loss: 9.6524886e-8
+  Batch 10 - Current Loss: 1.0515123e-8
+  Batch 15 - Current Loss: 2.1363803e-8
+  Batch 20 - Current Loss: 5.506795e-9
+  Batch 25 - Current Loss: 4.430946e-9
+  Batch 30 - Current Loss: 5.53198e-9
+  Batch 35 - Current Loss: 1.9734995e-13
+  Batch 40 - Current Loss: 1.2611935e-7
+  Batch 45 - Current Loss: 2.0720762e-8
+  Batch 50 - Current Loss: 1.2573415e-10
+  Batch 55 - Current Loss: 1.0667116e-9
+  Batch 60 - Current Loss: 1.9244668e-8
+  Batch 65 - Current Loss: 6.124914e-9
+  Batch 70 - Current Loss: 8.2201815e-8
+  Batch 75 - Current Loss: 2.0810411e-8
+  Batch 80 - Current Loss: 1.036629e-8
+  Batch 85 - Current Loss: 1.0194431e-7
+  Batch 90 - Current Loss: 1.9426244e-7
+  Batch 95 - Current Loss: 1.0067882e-8
+  Batch 100 - Current Loss: 1.001506e-8
+Epoch 25/100 - Average Loss: 3.690103792275759e-8
+  Batch 5 - Current Loss: 1.4805363e-8
+  Batch 10 - Current Loss: 9.948995e-13
+  Batch 15 - Current Loss: 2.4314003e-8
+  Batch 20 - Current Loss: 4.414347e-9
+  Batch 25 - Current Loss: 1.0806271e-9
+  Batch 30 - Current Loss: 7.628053e-8
+  Batch 35 - Current Loss: 2.082143e-8
+  Batch 40 - Current Loss: 9.970372e-9
+  Batch 45 - Current Loss: 1.7566668e-8
+  Batch 50 - Current Loss: 9.599127e-13
+  Batch 55 - Current Loss: 1.00477095e-7
+  Batch 60 - Current Loss: 7.6477106e-13
+  Batch 65 - Current Loss: 1.0875572e-9
+  Batch 70 - Current Loss: 5.18511e-10
+  Batch 75 - Current Loss: 1.7549887e-8
+  Batch 80 - Current Loss: 2.3612207e-8
+  Batch 85 - Current Loss: 4.4829243e-9
+  Batch 90 - Current Loss: 2.2802402e-8
+  Batch 95 - Current Loss: 1.0929879e-7
+  Batch 100 - Current Loss: 9.792167e-8
+Epoch 26/100 - Average Loss: 2.5821774949606747e-8
+  Batch 5 - Current Loss: 9.997172e-9
+  Batch 10 - Current Loss: 1.6596609e-7
+  Batch 15 - Current Loss: 7.083515e-11
+  Batch 20 - Current Loss: 7.70981e-8
+  Batch 25 - Current Loss: 1.9008964e-10
+  Batch 30 - Current Loss: 2.4121821e-8
+  Batch 35 - Current Loss: 3.0208277e-8
+  Batch 40 - Current Loss: 9.055909e-11
+  Batch 45 - Current Loss: 3.5397786e-8
+  Batch 50 - Current Loss: 2.2757422e-10
+  Batch 55 - Current Loss: 2.2788342e-10
+  Batch 60 - Current Loss: 2.3229094e-10
+  Batch 65 - Current Loss: 4.92416e-9
+  Batch 70 - Current Loss: 1.2040123e-8
+  Batch 75 - Current Loss: 2.1018906e-8
+  Batch 80 - Current Loss: 2.1597394e-11
+  Batch 85 - Current Loss: 1.024254e-9
+  Batch 90 - Current Loss: 3.4072407e-9
+  Batch 95 - Current Loss: 2.0973024e-8
+  Batch 100 - Current Loss: 4.2565107e-9
+Epoch 27/100 - Average Loss: 2.570153576592765e-8
+  Batch 5 - Current Loss: 4.2243684e-9
+  Batch 10 - Current Loss: 4.2589416e-9
+  Batch 15 - Current Loss: 2.3363343e-11
+  Batch 20 - Current Loss: 2.1026198e-8
+  Batch 25 - Current Loss: 2.4364191e-11
+  Batch 30 - Current Loss: 2.2817373e-11
+  Batch 35 - Current Loss: 2.1936307e-11
+  Batch 40 - Current Loss: 3.4117e-9
+  Batch 45 - Current Loss: 2.4290694e-11
+  Batch 50 - Current Loss: 2.1040783e-8
+  Batch 55 - Current Loss: 2.0167621e-11
+  Batch 60 - Current Loss: 4.881252e-9
+  Batch 65 - Current Loss: 4.8979234e-9
+  Batch 70 - Current Loss: 4.9007918e-9
+  Batch 75 - Current Loss: 1.970191e-11
+  Batch 80 - Current Loss: 2.115818e-11
+  Batch 85 - Current Loss: 3.5695937e-8
+  Batch 90 - Current Loss: 3.5751913e-8
+  Batch 95 - Current Loss: 2.1365985e-8
+  Batch 100 - Current Loss: 4.8944044e-9
+Epoch 28/100 - Average Loss: 6.9163678757117045e-9
+  Batch 5 - Current Loss: 4.260522e-9
+  Batch 10 - Current Loss: 4.919848e-9
+  Batch 15 - Current Loss: 4.9211546e-9
+  Batch 20 - Current Loss: 4.908619e-9
+  Batch 25 - Current Loss: 2.1236852e-8
+  Batch 30 - Current Loss: 4.3648605e-9
+  Batch 35 - Current Loss: 4.2370893e-9
+  Batch 40 - Current Loss: 2.1223556e-8
+  Batch 45 - Current Loss: 4.7137974e-9
+  Batch 50 - Current Loss: 4.2208583e-9
+  Batch 55 - Current Loss: 4.3660915e-9
+  Batch 60 - Current Loss: 2.06557e-11
+  Batch 65 - Current Loss: 2.1574229e-8
+  Batch 70 - Current Loss: 2.3174657e-11
+  Batch 75 - Current Loss: 4.2249737e-9
+  Batch 80 - Current Loss: 2.165556e-8
+  Batch 85 - Current Loss: 1.982612e-11
+  Batch 90 - Current Loss: 4.1660342e-10
+  Batch 95 - Current Loss: 3.8761723e-11
+  Batch 100 - Current Loss: 2.1589551e-8
+Epoch 29/100 - Average Loss: 7.626160311302587e-9
+  Batch 5 - Current Loss: 4.735691e-9
+  Batch 10 - Current Loss: 4.098089e-9
+  Batch 15 - Current Loss: 2.157833e-8
+  Batch 20 - Current Loss: 4.0935593e-9
+  Batch 25 - Current Loss: 4.9363236e-11
+  Batch 30 - Current Loss: 3.5227675e-8
+  Batch 35 - Current Loss: 4.0934403e-9
+  Batch 40 - Current Loss: 4.138706e-10
+  Batch 45 - Current Loss: 2.1668443e-8
+  Batch 50 - Current Loss: 4.564354e-9
+  Batch 55 - Current Loss: 4.550145e-9
+  Batch 60 - Current Loss: 4.5439905e-9
+  Batch 65 - Current Loss: 3.6546877e-9
+  Batch 70 - Current Loss: 4.1607134e-10
+  Batch 75 - Current Loss: 5.0032915e-11
+  Batch 80 - Current Loss: 9.465616e-10
+  Batch 85 - Current Loss: 4.083912e-9
+  Batch 90 - Current Loss: 3.7901732e-10
+  Batch 95 - Current Loss: 4.927167e-11
+  Batch 100 - Current Loss: 3.7677234e-10
+Epoch 30/100 - Average Loss: 5.376229133963184e-9
+  Batch 5 - Current Loss: 6.68483e-11
+  Batch 10 - Current Loss: 4.7988364e-9
+  Batch 15 - Current Loss: 6.701592e-11
+  Batch 20 - Current Loss: 3.775682e-10
+  Batch 25 - Current Loss: 4.5657385e-9
+  Batch 30 - Current Loss: 9.547741e-10
+  Batch 35 - Current Loss: 3.6490593e-9
+  Batch 40 - Current Loss: 4.5630957e-9
+  Batch 45 - Current Loss: 8.936826e-10
+  Batch 50 - Current Loss: 2.1700261e-8
+  Batch 55 - Current Loss: 5.0032915e-11
+  Batch 60 - Current Loss: 8.9719404e-10
+  Batch 65 - Current Loss: 4.7560938e-11
+  Batch 70 - Current Loss: 4.8187285e-9
+  Batch 75 - Current Loss: 5.0072453e-11
+  Batch 80 - Current Loss: 4.7921292e-11
+  Batch 85 - Current Loss: 4.8521454e-9
+  Batch 90 - Current Loss: 2.1724412e-8
+  Batch 95 - Current Loss: 4.560328e-11
+  Batch 100 - Current Loss: 4.3088035e-9
+Epoch 31/100 - Average Loss: 6.753456259327162e-9
+  Batch 5 - Current Loss: 2.1740616e-8
+  Batch 10 - Current Loss: 8.8751245e-10
+  Batch 15 - Current Loss: 6.633574e-10
+  Batch 20 - Current Loss: 9.0065644e-10
+  Batch 25 - Current Loss: 6.676821e-10
+  Batch 30 - Current Loss: 4.304525e-9
+  Batch 35 - Current Loss: 4.7265948e-11
+  Batch 40 - Current Loss: 4.636111e-11
+  Batch 45 - Current Loss: 8.9073376e-10
+  Batch 50 - Current Loss: 2.1574776e-8
+  Batch 55 - Current Loss: 4.9376322e-11
+  Batch 60 - Current Loss: 4.8714965e-9
+  Batch 65 - Current Loss: 9.0227825e-10
+  Batch 70 - Current Loss: 2.1698341e-8
+  Batch 75 - Current Loss: 4.648421e-9
+  Batch 80 - Current Loss: 4.433674e-9
+  Batch 85 - Current Loss: 4.4593844e-9
+  Batch 90 - Current Loss: 2.1541956e-8
+  Batch 95 - Current Loss: 4.8698066e-11
+  Batch 100 - Current Loss: 4.8712367e-9
+Epoch 32/100 - Average Loss: 6.309646677117587e-9
+  Batch 5 - Current Loss: 9.005447e-10
+  Batch 10 - Current Loss: 2.1790628e-8
+  Batch 15 - Current Loss: 4.664182e-9
+  Batch 20 - Current Loss: 2.1661862e-8
+  Batch 25 - Current Loss: 4.625464e-9
+  Batch 30 - Current Loss: 4.6293915e-9
+  Batch 35 - Current Loss: 9.0569446e-10
+  Batch 40 - Current Loss: 2.2251392e-8
+  Batch 45 - Current Loss: 4.4931565e-9
+  Batch 50 - Current Loss: 4.4259876e-9
+  Batch 55 - Current Loss: 2.2157856e-8
+  Batch 60 - Current Loss: 4.515283e-9
+  Batch 65 - Current Loss: 4.51666e-9
+  Batch 70 - Current Loss: 2.1956742e-8
+  Batch 75 - Current Loss: 4.2893853e-9
+  Batch 80 - Current Loss: 6.20169e-8
+  Batch 85 - Current Loss: 4.2680632e-9
+  Batch 90 - Current Loss: 1.319539e-8
+  Batch 95 - Current Loss: 1.662037e-7
+  Batch 100 - Current Loss: 2.9674545e-8
+Epoch 33/100 - Average Loss: 1.2655993631080498e-8
+  Batch 5 - Current Loss: 4.2110617e-9
+  Batch 10 - Current Loss: 3.8123082e-9
+  Batch 15 - Current Loss: 4.245459e-9
+  Batch 20 - Current Loss: 5.939383e-10
+  Batch 25 - Current Loss: 8.958329e-9
+  Batch 30 - Current Loss: 9.192016e-9
+  Batch 35 - Current Loss: 1.4229512e-8
+  Batch 40 - Current Loss: 4.3011044e-9
+  Batch 45 - Current Loss: 5.3859395e-10
+  Batch 50 - Current Loss: 3.7414125e-8
+  Batch 55 - Current Loss: 2.3443924e-8
+  Batch 60 - Current Loss: 3.908906e-8
+  Batch 65 - Current Loss: 7.119618e-9
+  Batch 70 - Current Loss: 8.987619e-9
+  Batch 75 - Current Loss: 7.864024e-8
+  Batch 80 - Current Loss: 1.3241862e-8
+  Batch 85 - Current Loss: 6.998749e-10
+  Batch 90 - Current Loss: 3.800931e-9
+  Batch 95 - Current Loss: 6.270298e-8
+  Batch 100 - Current Loss: 2.2999714e-8
+Epoch 34/100 - Average Loss: 1.7841164119403174e-8
+  Batch 5 - Current Loss: 7.0606454e-9
+  Batch 10 - Current Loss: 8.935426e-9
+  Batch 15 - Current Loss: 1.2848299e-8
+  Batch 20 - Current Loss: 7.175273e-10
+  Batch 25 - Current Loss: 8.6723134e-8
+  Batch 30 - Current Loss: 2.3390053e-8
+  Batch 35 - Current Loss: 2.260286e-8
+  Batch 40 - Current Loss: 1.2805687e-8
+  Batch 45 - Current Loss: 5.6803014e-8
+  Batch 50 - Current Loss: 1.2929926e-8
+  Batch 55 - Current Loss: 2.3396604e-8
+  Batch 60 - Current Loss: 6.7492106e-10
+  Batch 65 - Current Loss: 8.549511e-9
+  Batch 70 - Current Loss: 1.26711415e-8
+  Batch 75 - Current Loss: 8.539009e-9
+  Batch 80 - Current Loss: 6.8692635e-10
+  Batch 85 - Current Loss: 6.861942e-10
+  Batch 90 - Current Loss: 1.25857404e-8
+  Batch 95 - Current Loss: 1.2620033e-8
+  Batch 100 - Current Loss: 1.2575502e-8
+Epoch 35/100 - Average Loss: 1.834874851114332e-8
+  Batch 5 - Current Loss: 1.2516669e-8
+  Batch 10 - Current Loss: 1.298951e-8
+  Batch 15 - Current Loss: 1.2551285e-8
+  Batch 20 - Current Loss: 8.623384e-9
+  Batch 25 - Current Loss: 8.488995e-9
+  Batch 30 - Current Loss: 1.2310801e-8
+  Batch 35 - Current Loss: 8.650215e-9
+  Batch 40 - Current Loss: 8.659225e-9
+  Batch 45 - Current Loss: 8.634284e-9
+  Batch 50 - Current Loss: 2.4961878e-8
+  Batch 55 - Current Loss: 2.4485663e-8
+  Batch 60 - Current Loss: 2.4945402e-8
+  Batch 65 - Current Loss: 8.633245e-9
+  Batch 70 - Current Loss: 2.4905995e-8
+  Batch 75 - Current Loss: 2.4923343e-8
+  Batch 80 - Current Loss: 2.4492076e-8
+  Batch 85 - Current Loss: 2.3203809e-7
+  Batch 90 - Current Loss: 2.355557e-8
+  Batch 95 - Current Loss: 4.4099306e-8
+  Batch 100 - Current Loss: 1.2061183e-8
+Epoch 36/100 - Average Loss: 2.2967559762188462e-8
+  Batch 5 - Current Loss: 2.9676471e-8
+  Batch 10 - Current Loss: 1.0991546e-7
+  Batch 15 - Current Loss: 4.818952e-8
+  Batch 20 - Current Loss: 1.720489e-7
+  Batch 25 - Current Loss: 1.1376295e-8
+  Batch 30 - Current Loss: 1.0790785e-7
+  Batch 35 - Current Loss: 1.2222711e-8
+  Batch 40 - Current Loss: 1.0662675e-7
+  Batch 45 - Current Loss: 1.06872015e-7
+  Batch 50 - Current Loss: 1.3737905e-8
+  Batch 55 - Current Loss: 1.1766392e-8
+  Batch 60 - Current Loss: 9.654399e-8
+  Batch 65 - Current Loss: 1.0960814e-7
+  Batch 70 - Current Loss: 1.1223529e-9
+  Batch 75 - Current Loss: 1.1282889e-9
+  Batch 80 - Current Loss: 9.573486e-8
+  Batch 85 - Current Loss: 3.8744393e-8
+  Batch 90 - Current Loss: 6.3596534e-10
+  Batch 95 - Current Loss: 3.870411e-7
+  Batch 100 - Current Loss: 8.419975e-9
+Epoch 37/100 - Average Loss: 6.926413962361766e-8
+  Batch 5 - Current Loss: 1.2530637e-7
+  Batch 10 - Current Loss: 4.2563173e-8
+  Batch 15 - Current Loss: 6.3378295e-8
+  Batch 20 - Current Loss: 8.408185e-9
+  Batch 25 - Current Loss: 9.296424e-7
+  Batch 30 - Current Loss: 7.986779e-9
+  Batch 35 - Current Loss: 2.7819402e-8
+  Batch 40 - Current Loss: 1.6593117e-7
+  Batch 45 - Current Loss: 1.4136485e-7
+  Batch 50 - Current Loss: 1.17122866e-7
+  Batch 55 - Current Loss: 1.1690942e-7
+  Batch 60 - Current Loss: 8.170804e-8
+  Batch 65 - Current Loss: 5.259942e-8
+  Batch 70 - Current Loss: 1.2078779e-7
+  Batch 75 - Current Loss: 1.1710119e-7
+  Batch 80 - Current Loss: 1.7040183e-7
+  Batch 85 - Current Loss: 1.5076319e-7
+  Batch 90 - Current Loss: 1.5394465e-7
+  Batch 95 - Current Loss: 4.6500734e-8
+  Batch 100 - Current Loss: 2.0780584e-7
+Epoch 38/100 - Average Loss: 1.3134854894902847e-7
+  Batch 5 - Current Loss: 3.512427e-8
+  Batch 10 - Current Loss: 5.8761817e-8
+  Batch 15 - Current Loss: 3.4788904e-8
+  Batch 20 - Current Loss: 3.738747e-8
+  Batch 25 - Current Loss: 1.3043143e-7
+  Batch 30 - Current Loss: 1.5553201e-8
+  Batch 35 - Current Loss: 1.9789894e-7
+  Batch 40 - Current Loss: 7.4362546e-8
+  Batch 45 - Current Loss: 5.8216294e-8
+  Batch 50 - Current Loss: 1.3059899e-7
+  Batch 55 - Current Loss: 5.0686662e-8
+  Batch 60 - Current Loss: 1.9245235e-7
+  Batch 65 - Current Loss: 6.525359e-8
+  Batch 70 - Current Loss: 4.002371e-8
+  Batch 75 - Current Loss: 2.9988534e-8
+  Batch 80 - Current Loss: 4.6599194e-8
+  Batch 85 - Current Loss: 3.3802217e-9
+  Batch 90 - Current Loss: 3.475278e-8
+  Batch 95 - Current Loss: 3.3871561e-9
+  Batch 100 - Current Loss: 5.5032864e-8
+Epoch 39/100 - Average Loss: 6.035979493951813e-8
+  Batch 5 - Current Loss: 3.413876e-9
+  Batch 10 - Current Loss: 3.2000074e-8
+  Batch 15 - Current Loss: 5.4993544e-12
+  Batch 20 - Current Loss: 4.655618e-8
+  Batch 25 - Current Loss: 1.0894008e-9
+  Batch 30 - Current Loss: 3.1992744e-8
+  Batch 35 - Current Loss: 1.3105039e-8
+  Batch 40 - Current Loss: 2.47522e-10
+  Batch 45 - Current Loss: 1.3085642e-8
+  Batch 50 - Current Loss: 3.3875898e-9
+  Batch 55 - Current Loss: 5.30884e-12
+  Batch 60 - Current Loss: 2.2231669e-8
+  Batch 65 - Current Loss: 5.4882218e-8
+  Batch 70 - Current Loss: 2.0633982e-8
+  Batch 75 - Current Loss: 7.811461e-12
+  Batch 80 - Current Loss: 5.862193e-9
+  Batch 85 - Current Loss: 1.3072008e-8
+  Batch 90 - Current Loss: 2.3070955e-8
+  Batch 95 - Current Loss: 1.18319214e-7
+  Batch 100 - Current Loss: 6.3384062e-9
+Epoch 40/100 - Average Loss: 1.805929746472208e-8
+  Batch 5 - Current Loss: 1.3122316e-12
+  Batch 10 - Current Loss: 2.0587454e-8
+  Batch 15 - Current Loss: 2.0673063e-8
+  Batch 20 - Current Loss: 1.0673674e-8
+  Batch 25 - Current Loss: 9.722348e-8
+  Batch 30 - Current Loss: 6.413032e-8
+  Batch 35 - Current Loss: 9.3604086e-8
+  Batch 40 - Current Loss: 2.6495906e-8
+  Batch 45 - Current Loss: 6.1443175e-9
+  Batch 50 - Current Loss: 1.6782417e-12
+  Batch 55 - Current Loss: 2.3047479e-8
+  Batch 60 - Current Loss: 4.2733944e-7
+  Batch 65 - Current Loss: 3.595608e-7
+  Batch 70 - Current Loss: 3.9562622e-7
+  Batch 75 - Current Loss: 4.7206035e-7
+  Batch 80 - Current Loss: 2.4226977e-6
+  Batch 85 - Current Loss: 2.9450748e-6
+  Batch 90 - Current Loss: 1.6211709e-6
+  Batch 95 - Current Loss: 3.7175997e-8
+  Batch 100 - Current Loss: 2.4355552e-8
+Epoch 41/100 - Average Loss: 3.386813456263214e-7
+  Batch 5 - Current Loss: 2.9276412e-8
+  Batch 10 - Current Loss: 3.1821063e-8
+  Batch 15 - Current Loss: 1.247505e-7
+  Batch 20 - Current Loss: 4.695693e-8
+  Batch 25 - Current Loss: 5.6400644e-8
+  Batch 30 - Current Loss: 5.407359e-8
+  Batch 35 - Current Loss: 1.3360442e-8
+  Batch 40 - Current Loss: 4.6879872e-8
+  Batch 45 - Current Loss: 1.7486773e-8
+  Batch 50 - Current Loss: 4.685084e-8
+  Batch 55 - Current Loss: 4.475416e-8
+  Batch 60 - Current Loss: 6.149283e-9
+  Batch 65 - Current Loss: 1.3039445e-8
+  Batch 70 - Current Loss: 5.2611384e-8
+  Batch 75 - Current Loss: 2.8326124e-9
+  Batch 80 - Current Loss: 4.6179963e-8
+  Batch 85 - Current Loss: 4.916181e-8
+  Batch 90 - Current Loss: 1.8777772e-8
+  Batch 95 - Current Loss: 2.0011058e-8
+  Batch 100 - Current Loss: 7.604047e-8
+Epoch 42/100 - Average Loss: 5.0338871204758105e-8
+  Batch 5 - Current Loss: 4.653207e-8
+  Batch 10 - Current Loss: 1.3913268e-7
+  Batch 15 - Current Loss: 2.0038998e-8
+  Batch 20 - Current Loss: 1.1193663e-8
+  Batch 25 - Current Loss: 1.3977191e-7
+  Batch 30 - Current Loss: 3.796195e-8
+  Batch 35 - Current Loss: 6.2755696e-8
+  Batch 40 - Current Loss: 2.3965891e-9
+  Batch 45 - Current Loss: 3.4430397e-7
+  Batch 50 - Current Loss: 4.2382413e-7
+  Batch 55 - Current Loss: 5.5259e-7
+  Batch 60 - Current Loss: 3.9449296e-7
+  Batch 65 - Current Loss: 5.1382642e-8
+  Batch 70 - Current Loss: 2.9589577e-8
+  Batch 75 - Current Loss: 7.3166335e-9
+  Batch 80 - Current Loss: 1.2989652e-7
+  Batch 85 - Current Loss: 3.408165e-6
+  Batch 90 - Current Loss: 4.9906594e-6
+  Batch 95 - Current Loss: 6.8402227e-7
+  Batch 100 - Current Loss: 5.08579e-7
+Epoch 43/100 - Average Loss: 5.525076960744002e-7
+  Batch 5 - Current Loss: 2.3116982e-6
+  Batch 10 - Current Loss: 1.7842862e-6
+  Batch 15 - Current Loss: 6.759538e-7
+  Batch 20 - Current Loss: 1.1495509e-6
+  Batch 25 - Current Loss: 1.8798197e-8
+  Batch 30 - Current Loss: 5.6213634e-7
+  Batch 35 - Current Loss: 1.8066358e-7
+  Batch 40 - Current Loss: 1.4933892e-7
+  Batch 45 - Current Loss: 4.6242354e-7
+  Batch 50 - Current Loss: 1.971573e-8
+  Batch 55 - Current Loss: 7.398411e-8
+  Batch 60 - Current Loss: 3.0280742e-7
+  Batch 65 - Current Loss: 1.0416805e-7
+  Batch 70 - Current Loss: 1.0062331e-6
+  Batch 75 - Current Loss: 1.6019517e-6
+  Batch 80 - Current Loss: 5.2898447e-8
+  Batch 85 - Current Loss: 4.634881e-7
+  Batch 90 - Current Loss: 8.7065393e-7
+  Batch 95 - Current Loss: 3.3635132e-8
+  Batch 100 - Current Loss: 6.633439e-7
+Epoch 44/100 - Average Loss: 6.34399366670202e-7
+  Batch 5 - Current Loss: 1.1362802e-7
+  Batch 10 - Current Loss: 5.531246e-7
+  Batch 15 - Current Loss: 1.5368167e-7
+  Batch 20 - Current Loss: 1.4418146e-7
+  Batch 25 - Current Loss: 5.0699667e-10
+  Batch 30 - Current Loss: 5.212716e-10
+  Batch 35 - Current Loss: 1.6208531e-8
+  Batch 40 - Current Loss: 6.56894e-7
+  Batch 45 - Current Loss: 8.431977e-7
+  Batch 50 - Current Loss: 9.6044594e-8
+  Batch 55 - Current Loss: 2.0944528e-9
+  Batch 60 - Current Loss: 7.295204e-7
+  Batch 65 - Current Loss: 2.7222518e-7
+  Batch 70 - Current Loss: 1.0270219e-7
+  Batch 75 - Current Loss: 8.730957e-9
+  Batch 80 - Current Loss: 5.748658e-9
+  Batch 85 - Current Loss: 1.6184054e-9
+  Batch 90 - Current Loss: 8.732524e-9
+  Batch 95 - Current Loss: 8.052239e-8
+  Batch 100 - Current Loss: 4.138441e-8
+Epoch 45/100 - Average Loss: 2.0073514714103597e-7
+  Batch 5 - Current Loss: 4.144961e-8
+  Batch 10 - Current Loss: 5.613322e-9
+  Batch 15 - Current Loss: 1.4112881e-8
+  Batch 20 - Current Loss: 9.053605e-9
+  Batch 25 - Current Loss: 1.6882159e-7
+  Batch 30 - Current Loss: 2.7784984e-7
+  Batch 35 - Current Loss: 4.6021988e-8
+  Batch 40 - Current Loss: 2.7458117e-7
+  Batch 45 - Current Loss: 3.6252001e-10
+  Batch 50 - Current Loss: 1.34072025e-8
+  Batch 55 - Current Loss: 1.9878406e-9
+  Batch 60 - Current Loss: 1.9969861e-9
+  Batch 65 - Current Loss: 2.369987e-10
+  Batch 70 - Current Loss: 9.311156e-9
+  Batch 75 - Current Loss: 1.3447346e-8
+  Batch 80 - Current Loss: 1.3563371e-10
+  Batch 85 - Current Loss: 1.5052677e-7
+  Batch 90 - Current Loss: 1.5773963e-8
+  Batch 95 - Current Loss: 1.6885441e-6
+  Batch 100 - Current Loss: 2.5808237e-8
+Epoch 46/100 - Average Loss: 1.1913836516178056e-7
+  Batch 5 - Current Loss: 2.0502169e-7
+  Batch 10 - Current Loss: 8.4385924e-8
+  Batch 15 - Current Loss: 6.033446e-8
+  Batch 20 - Current Loss: 5.4038893e-9
+  Batch 25 - Current Loss: 2.2281377e-7
+  Batch 30 - Current Loss: 1.4890087e-7
+  Batch 35 - Current Loss: 2.381931e-8
+  Batch 40 - Current Loss: 5.6515265e-8
+  Batch 45 - Current Loss: 2.5560173e-8
+  Batch 50 - Current Loss: 6.4957966e-8
+  Batch 55 - Current Loss: 6.535845e-7
+  Batch 60 - Current Loss: 7.2697554e-7
+  Batch 65 - Current Loss: 1.9124393e-6
+  Batch 70 - Current Loss: 7.809049e-7
+  Batch 75 - Current Loss: 3.8959907e-8
+  Batch 80 - Current Loss: 2.80225e-7
+  Batch 85 - Current Loss: 6.942441e-8
+  Batch 90 - Current Loss: 1.1147777e-7
+  Batch 95 - Current Loss: 1.7199776e-8
+  Batch 100 - Current Loss: 1.0932281e-7
+Epoch 47/100 - Average Loss: 4.2526473843118585e-7
+  Batch 5 - Current Loss: 9.744256e-8
+  Batch 10 - Current Loss: 1.0046941e-6
+  Batch 15 - Current Loss: 3.4026323e-7
+  Batch 20 - Current Loss: 6.5321257e-7
+  Batch 25 - Current Loss: 9.913671e-7
+  Batch 30 - Current Loss: 6.933229e-7
+  Batch 35 - Current Loss: 4.9660883e-7
+  Batch 40 - Current Loss: 4.169875e-8
+  Batch 45 - Current Loss: 4.255176e-6
+  Batch 50 - Current Loss: 1.0173096e-6
+  Batch 55 - Current Loss: 1.3412614e-7
+  Batch 60 - Current Loss: 1.8187742e-6
+  Batch 65 - Current Loss: 4.6241626e-6
+  Batch 70 - Current Loss: 7.060579e-8
+  Batch 75 - Current Loss: 9.944815e-7
+  Batch 80 - Current Loss: 2.7229619e-9
+  Batch 85 - Current Loss: 7.5711495e-7
+  Batch 90 - Current Loss: 1.3836763e-8
+  Batch 95 - Current Loss: 1.210336e-8
+  Batch 100 - Current Loss: 5.776329e-7
+Epoch 48/100 - Average Loss: 1.1618300786167546e-6
+  Batch 5 - Current Loss: 7.7926785e-8
+  Batch 10 - Current Loss: 6.7651445e-7
+  Batch 15 - Current Loss: 4.339998e-8
+  Batch 20 - Current Loss: 5.3640497e-7
+  Batch 25 - Current Loss: 1.6455303e-6
+  Batch 30 - Current Loss: 7.765929e-6
+  Batch 35 - Current Loss: 2.3509308e-6
+  Batch 40 - Current Loss: 6.667285e-6
+  Batch 45 - Current Loss: 5.1027623e-6
+  Batch 50 - Current Loss: 2.0717384e-6
+  Batch 55 - Current Loss: 2.1494416e-6
+  Batch 60 - Current Loss: 3.3666809e-6
+  Batch 65 - Current Loss: 2.8303969e-6
+  Batch 70 - Current Loss: 1.2703936e-5
+  Batch 75 - Current Loss: 1.5443125e-5
+  Batch 80 - Current Loss: 1.12515025e-7
+  Batch 85 - Current Loss: 8.211052e-8
+  Batch 90 - Current Loss: 1.0754922e-6
+  Batch 95 - Current Loss: 8.431127e-8
+  Batch 100 - Current Loss: 1.391431e-7
+Epoch 49/100 - Average Loss: 2.812778819335504e-6
+  Batch 5 - Current Loss: 5.8471848e-8
+  Batch 10 - Current Loss: 1.929069e-8
+  Batch 15 - Current Loss: 1.0204589e-6
+  Batch 20 - Current Loss: 1.3992167e-6
+  Batch 25 - Current Loss: 3.348697e-6
+  Batch 30 - Current Loss: 1.8977798e-6
+  Batch 35 - Current Loss: 1.0073292e-7
+  Batch 40 - Current Loss: 2.633448e-5
+  Batch 45 - Current Loss: 1.8407758e-5
+  Batch 50 - Current Loss: 4.6739146e-6
+  Batch 55 - Current Loss: 6.3215566e-7
+  Batch 60 - Current Loss: 9.558882e-6
+  Batch 65 - Current Loss: 4.158666e-6
+  Batch 70 - Current Loss: 7.0952133e-6
+  Batch 75 - Current Loss: 2.831936e-6
+  Batch 80 - Current Loss: 7.4059517e-7
+  Batch 85 - Current Loss: 2.240993e-9
+  Batch 90 - Current Loss: 1.175805e-6
+  Batch 95 - Current Loss: 3.2129087e-6
+  Batch 100 - Current Loss: 5.223327e-7
+Epoch 50/100 - Average Loss: 3.978737317031529e-6
+  Batch 5 - Current Loss: 6.6601206e-7
+  Batch 10 - Current Loss: 1.4068585e-5
+  Batch 15 - Current Loss: 3.6785675e-6
+  Batch 20 - Current Loss: 1.244679e-6
+  Batch 25 - Current Loss: 3.4443667e-6
+  Batch 30 - Current Loss: 5.7230923e-6
+  Batch 35 - Current Loss: 2.5907136e-6
+  Batch 40 - Current Loss: 5.989425e-5
+  Batch 45 - Current Loss: 7.4148824e-7
+  Batch 50 - Current Loss: 8.598809e-6
+  Batch 55 - Current Loss: 7.5367775e-6
+  Batch 60 - Current Loss: 1.7707569e-6
+  Batch 65 - Current Loss: 7.5533336e-8
+  Batch 70 - Current Loss: 1.8010602e-6
+  Batch 75 - Current Loss: 5.2488235e-6
+  Batch 80 - Current Loss: 2.8747013e-7
+  Batch 85 - Current Loss: 5.9547693e-7
+  Batch 90 - Current Loss: 1.1350821e-6
+  Batch 95 - Current Loss: 5.5463147e-6
+  Batch 100 - Current Loss: 9.364461e-6
+Epoch 51/100 - Average Loss: 6.559806550272551e-6
+  Batch 5 - Current Loss: 1.4924822e-7
+  Batch 10 - Current Loss: 1.0111588e-5
+  Batch 15 - Current Loss: 1.2435944e-10
+  Batch 20 - Current Loss: 8.754011e-6
+  Batch 25 - Current Loss: 5.7195416e-6
+  Batch 30 - Current Loss: 1.0693657e-7
+  Batch 35 - Current Loss: 2.5430063e-7
+  Batch 40 - Current Loss: 1.7880706e-7
+  Batch 45 - Current Loss: 1.9825702e-6
+  Batch 50 - Current Loss: 1.6726013e-7
+  Batch 55 - Current Loss: 1.0073545e-6
+  Batch 60 - Current Loss: 3.984932e-6
+  Batch 65 - Current Loss: 6.9113156e-7
+  Batch 70 - Current Loss: 1.0839365e-6
+  Batch 75 - Current Loss: 2.5660238e-6
+  Batch 80 - Current Loss: 6.1001573e-9
+  Batch 85 - Current Loss: 2.4370536e-7
+  Batch 90 - Current Loss: 5.945344e-9
+  Batch 95 - Current Loss: 5.8272935e-8
+  Batch 100 - Current Loss: 1.351465e-6
+Epoch 52/100 - Average Loss: 1.8752020179527152e-6
+  Batch 5 - Current Loss: 2.5446786e-7
+  Batch 10 - Current Loss: 2.1136973e-6
+  Batch 15 - Current Loss: 2.5870513e-6
+  Batch 20 - Current Loss: 2.499582e-6
+  Batch 25 - Current Loss: 9.655035e-8
+  Batch 30 - Current Loss: 1.1209461e-5
+  Batch 35 - Current Loss: 1.1298392e-5
+  Batch 40 - Current Loss: 2.27674e-6
+  Batch 45 - Current Loss: 1.1538711e-5
+  Batch 50 - Current Loss: 3.6355882e-6
+  Batch 55 - Current Loss: 8.30455e-6
+  Batch 60 - Current Loss: 6.332135e-7
+  Batch 65 - Current Loss: 8.015187e-7
+  Batch 70 - Current Loss: 8.8600325e-7
+  Batch 75 - Current Loss: 1.3118902e-6
+  Batch 80 - Current Loss: 5.877734e-7
+  Batch 85 - Current Loss: 3.441138e-9
+  Batch 90 - Current Loss: 9.036918e-7
+  Batch 95 - Current Loss: 1.4156195e-6
+  Batch 100 - Current Loss: 5.085843e-9
+Epoch 53/100 - Average Loss: 3.716543659413318e-6
+  Batch 5 - Current Loss: 5.848895e-7
+  Batch 10 - Current Loss: 5.599251e-6
+  Batch 15 - Current Loss: 1.4613869e-7
+  Batch 20 - Current Loss: 1.3507245e-8
+  Batch 25 - Current Loss: 3.5279785e-10
+  Batch 30 - Current Loss: 2.1849234e-8
+  Batch 35 - Current Loss: 1.3286507e-7
+  Batch 40 - Current Loss: 1.7562225e-8
+  Batch 45 - Current Loss: 1.8733884e-7
+  Batch 50 - Current Loss: 1.433396e-7
+  Batch 55 - Current Loss: 2.0846527e-7
+  Batch 60 - Current Loss: 2.4012102e-6
+  Batch 65 - Current Loss: 4.663559e-6
+  Batch 70 - Current Loss: 4.273785e-6
+  Batch 75 - Current Loss: 3.8814123e-6
+  Batch 80 - Current Loss: 2.1516812e-6
+  Batch 85 - Current Loss: 8.405834e-8
+  Batch 90 - Current Loss: 5.7165125e-6
+  Batch 95 - Current Loss: 1.4435647e-6
+  Batch 100 - Current Loss: 1.05241015e-5
+Epoch 54/100 - Average Loss: 1.6362028313327005e-6
+  Batch 5 - Current Loss: 7.692933e-6
+  Batch 10 - Current Loss: 2.602179e-6
+  Batch 15 - Current Loss: 2.72758e-5
+  Batch 20 - Current Loss: 1.15008925e-5
+  Batch 25 - Current Loss: 2.572038e-5
+  Batch 30 - Current Loss: 3.2283313e-7
+  Batch 35 - Current Loss: 6.658068e-6
+  Batch 40 - Current Loss: 2.9552773e-6
+  Batch 45 - Current Loss: 2.2818173e-7
+  Batch 50 - Current Loss: 9.8535224e-8
+  Batch 55 - Current Loss: 2.485837e-7
+  Batch 60 - Current Loss: 3.9823377e-7
+  Batch 65 - Current Loss: 8.903675e-6
+  Batch 70 - Current Loss: 3.7350742e-6
+  Batch 75 - Current Loss: 1.313916e-5
+  Batch 80 - Current Loss: 1.4480439e-6
+  Batch 85 - Current Loss: 3.7598172e-6
+  Batch 90 - Current Loss: 2.864783e-7
+  Batch 95 - Current Loss: 1.6617221e-6
+  Batch 100 - Current Loss: 2.1425924e-10
+Epoch 55/100 - Average Loss: 5.857739777422461e-6
+  Batch 5 - Current Loss: 3.1590226e-8
+  Batch 10 - Current Loss: 1.3569967e-6
+  Batch 15 - Current Loss: 1.7139591e-7
+  Batch 20 - Current Loss: 6.529865e-6
+  Batch 25 - Current Loss: 3.6323606e-6
+  Batch 30 - Current Loss: 3.278465e-6
+  Batch 35 - Current Loss: 1.7185836e-5
+  Batch 40 - Current Loss: 1.1442568e-5
+  Batch 45 - Current Loss: 2.9692292e-6
+  Batch 50 - Current Loss: 5.4229495e-6
+  Batch 55 - Current Loss: 5.5850984e-7
+  Batch 60 - Current Loss: 7.962131e-6
+  Batch 65 - Current Loss: 7.028206e-7
+  Batch 70 - Current Loss: 5.5708765e-6
+  Batch 75 - Current Loss: 1.4883591e-6
+  Batch 80 - Current Loss: 2.997499e-12
+  Batch 85 - Current Loss: 1.6342433e-6
+  Batch 90 - Current Loss: 1.2924885e-6
+  Batch 95 - Current Loss: 3.9145866e-6
+  Batch 100 - Current Loss: 9.015416e-7
+Epoch 56/100 - Average Loss: 4.157063168100496e-6
+  Batch 5 - Current Loss: 5.9686334e-7
+  Batch 10 - Current Loss: 4.7185432e-7
+  Batch 15 - Current Loss: 6.984722e-7
+  Batch 20 - Current Loss: 1.9750267e-8
+  Batch 25 - Current Loss: 2.6326086e-8
+  Batch 30 - Current Loss: 4.3929631e-7
+  Batch 35 - Current Loss: 3.0625938e-6
+  Batch 40 - Current Loss: 5.688569e-7
+  Batch 45 - Current Loss: 2.568722e-6
+  Batch 50 - Current Loss: 1.29414675e-5
+  Batch 55 - Current Loss: 1.0340078e-6
+  Batch 60 - Current Loss: 1.1432546e-5
+  Batch 65 - Current Loss: 1.3621941e-5
+  Batch 70 - Current Loss: 1.6341552e-6
+  Batch 75 - Current Loss: 1.4170427e-6
+  Batch 80 - Current Loss: 2.9651735e-6
+  Batch 85 - Current Loss: 1.3904446e-7
+  Batch 90 - Current Loss: 2.0286829e-7
+  Batch 95 - Current Loss: 3.756578e-6
+  Batch 100 - Current Loss: 9.966113e-7
+Epoch 57/100 - Average Loss: 3.264228961357713e-6
+  Batch 5 - Current Loss: 6.314095e-7
+  Batch 10 - Current Loss: 2.765257e-6
+  Batch 15 - Current Loss: 6.1638975e-6
+  Batch 20 - Current Loss: 5.1434417e-6
+  Batch 25 - Current Loss: 1.2753877e-5
+  Batch 30 - Current Loss: 5.9051326e-6
+  Batch 35 - Current Loss: 2.2070021e-6
+  Batch 40 - Current Loss: 1.1160128e-6
+  Batch 45 - Current Loss: 7.0316055e-8
+  Batch 50 - Current Loss: 5.236252e-6
+  Batch 55 - Current Loss: 3.4611633e-6
+  Batch 60 - Current Loss: 4.89219e-6
+  Batch 65 - Current Loss: 1.3085834e-6
+  Batch 70 - Current Loss: 3.527556e-9
+  Batch 75 - Current Loss: 1.2734368e-5
+  Batch 80 - Current Loss: 1.2580621e-6
+  Batch 85 - Current Loss: 3.0945334e-6
+  Batch 90 - Current Loss: 1.1271936e-6
+  Batch 95 - Current Loss: 4.0052913e-7
+  Batch 100 - Current Loss: 9.316807e-8
+Epoch 58/100 - Average Loss: 3.942760630815814e-6
+  Batch 5 - Current Loss: 7.072661e-8
+  Batch 10 - Current Loss: 6.3169966e-7
+  Batch 15 - Current Loss: 4.6529306e-7
+  Batch 20 - Current Loss: 1.7388719e-7
+  Batch 25 - Current Loss: 3.0417831e-7
+  Batch 30 - Current Loss: 2.0909934e-7
+  Batch 35 - Current Loss: 2.0918792e-7
+  Batch 40 - Current Loss: 1.8467819e-6
+  Batch 45 - Current Loss: 5.9903105e-6
+  Batch 50 - Current Loss: 8.17272e-8
+  Batch 55 - Current Loss: 5.806314e-6
+  Batch 60 - Current Loss: 1.07819205e-5
+  Batch 65 - Current Loss: 8.281866e-6
+  Batch 70 - Current Loss: 8.00033e-6
+  Batch 75 - Current Loss: 5.541516e-7
+  Batch 80 - Current Loss: 6.7673695e-6
+  Batch 85 - Current Loss: 8.48856e-6
+  Batch 90 - Current Loss: 1.355062e-6
+  Batch 95 - Current Loss: 1.8084604e-5
+  Batch 100 - Current Loss: 2.6598361e-6
+Epoch 59/100 - Average Loss: 4.409659969668578e-6
+  Batch 5 - Current Loss: 2.1708247e-6
+  Batch 10 - Current Loss: 5.144815e-6
+  Batch 15 - Current Loss: 6.585936e-6
+  Batch 20 - Current Loss: 1.1346351e-5
+  Batch 25 - Current Loss: 4.076712e-6
+  Batch 30 - Current Loss: 2.8585853e-7
+  Batch 35 - Current Loss: 7.508266e-11
+  Batch 40 - Current Loss: 2.3625776e-6
+  Batch 45 - Current Loss: 3.1931904e-6
+  Batch 50 - Current Loss: 9.728216e-7
+  Batch 55 - Current Loss: 5.8993223e-8
+  Batch 60 - Current Loss: 2.1994884e-7
+  Batch 65 - Current Loss: 4.6690297e-7
+  Batch 70 - Current Loss: 2.6547534e-6
+  Batch 75 - Current Loss: 1.1343659e-7
+  Batch 80 - Current Loss: 7.261642e-7
+  Batch 85 - Current Loss: 1.7578101e-6
+  Batch 90 - Current Loss: 6.6559255e-7
+  Batch 95 - Current Loss: 3.1979972e-9
+  Batch 100 - Current Loss: 1.0708341e-8
+Epoch 60/100 - Average Loss: 3.173706811048782e-6
+  Batch 5 - Current Loss: 9.2800167e-7
+  Batch 10 - Current Loss: 7.5635858e-6
+  Batch 15 - Current Loss: 4.0768996e-6
+  Batch 20 - Current Loss: 1.5960068e-6
+  Batch 25 - Current Loss: 6.255661e-8
+  Batch 30 - Current Loss: 1.0429795e-7
+  Batch 35 - Current Loss: 5.560973e-7
+  Batch 40 - Current Loss: 9.336408e-7
+  Batch 45 - Current Loss: 1.4906263e-7
+  Batch 50 - Current Loss: 3.6790505e-7
+  Batch 55 - Current Loss: 4.262818e-6
+  Batch 60 - Current Loss: 8.150802e-6
+  Batch 65 - Current Loss: 5.262877e-6
+  Batch 70 - Current Loss: 1.1836303e-6
+  Batch 75 - Current Loss: 5.764684e-7
+  Batch 80 - Current Loss: 5.060768e-9
+  Batch 85 - Current Loss: 6.030238e-7
+  Batch 90 - Current Loss: 2.3840039e-7
+  Batch 95 - Current Loss: 1.0726236e-6
+  Batch 100 - Current Loss: 2.9247228e-6
+Epoch 61/100 - Average Loss: 2.341728741161453e-6
+  Batch 5 - Current Loss: 1.6931508e-6
+  Batch 10 - Current Loss: 7.9822534e-8
+  Batch 15 - Current Loss: 2.043509e-7
+  Batch 20 - Current Loss: 4.28484e-6
+  Batch 25 - Current Loss: 1.5758201e-7
+  Batch 30 - Current Loss: 8.549339e-9
+  Batch 35 - Current Loss: 3.6649226e-8
+  Batch 40 - Current Loss: 4.500433e-8
+  Batch 45 - Current Loss: 3.5085648e-7
+  Batch 50 - Current Loss: 6.08783e-10
+  Batch 55 - Current Loss: 7.1819904e-6
+  Batch 60 - Current Loss: 8.555899e-6
+  Batch 65 - Current Loss: 1.1892766e-6
+  Batch 70 - Current Loss: 3.9840307e-7
+  Batch 75 - Current Loss: 4.914083e-6
+  Batch 80 - Current Loss: 1.0462666e-7
+  Batch 85 - Current Loss: 1.4031694e-5
+  Batch 90 - Current Loss: 3.853592e-9
+  Batch 95 - Current Loss: 5.6938184e-6
+  Batch 100 - Current Loss: 1.4004662e-6
+Epoch 62/100 - Average Loss: 2.413836255592801e-6
+  Batch 5 - Current Loss: 1.2295533e-6
+  Batch 10 - Current Loss: 6.582912e-7
+  Batch 15 - Current Loss: 9.398932e-6
+  Batch 20 - Current Loss: 4.4718463e-6
+  Batch 25 - Current Loss: 1.6851984e-6
+  Batch 30 - Current Loss: 3.688216e-6
+  Batch 35 - Current Loss: 3.1675695e-6
+  Batch 40 - Current Loss: 7.0047093e-7
+  Batch 45 - Current Loss: 2.1395572e-7
+  Batch 50 - Current Loss: 1.4063136e-8
+  Batch 55 - Current Loss: 7.2121925e-6
+  Batch 60 - Current Loss: 2.8033835e-6
+  Batch 65 - Current Loss: 3.692677e-7
+  Batch 70 - Current Loss: 5.9449994e-6
+  Batch 75 - Current Loss: 3.1592776e-6
+  Batch 80 - Current Loss: 7.87897e-8
+  Batch 85 - Current Loss: 6.237542e-7
+  Batch 90 - Current Loss: 1.5851186e-6
+  Batch 95 - Current Loss: 2.7876004e-6
+  Batch 100 - Current Loss: 2.1659753e-6
+Epoch 63/100 - Average Loss: 2.741449118435213e-6
+  Batch 5 - Current Loss: 1.0646808e-7
+  Batch 10 - Current Loss: 8.478083e-8
+  Batch 15 - Current Loss: 7.5935163e-6
+  Batch 20 - Current Loss: 7.409328e-6
+  Batch 25 - Current Loss: 1.7394528e-5
+  Batch 30 - Current Loss: 3.1631819e-6
+  Batch 35 - Current Loss: 4.5288493e-6
+  Batch 40 - Current Loss: 4.561531e-6
+  Batch 45 - Current Loss: 1.566854e-6
+  Batch 50 - Current Loss: 4.6009836e-7
+  Batch 55 - Current Loss: 1.3637916e-7
+  Batch 60 - Current Loss: 7.627981e-7
+  Batch 65 - Current Loss: 6.215767e-6
+  Batch 70 - Current Loss: 6.523608e-7
+  Batch 75 - Current Loss: 3.8946528e-5
+  Batch 80 - Current Loss: 4.1931357e-6
+  Batch 85 - Current Loss: 1.4406725e-5
+  Batch 90 - Current Loss: 9.323631e-8
+  Batch 95 - Current Loss: 1.659418e-6
+  Batch 100 - Current Loss: 1.320151e-6
+Epoch 64/100 - Average Loss: 6.199773304982336e-6
+  Batch 5 - Current Loss: 1.5222563e-8
+  Batch 10 - Current Loss: 2.8966182e-8
+  Batch 15 - Current Loss: 1.603258e-8
+  Batch 20 - Current Loss: 7.308001e-8
+  Batch 25 - Current Loss: 1.0441393e-6
+  Batch 30 - Current Loss: 3.406893e-7
+  Batch 35 - Current Loss: 1.5370946e-6
+  Batch 40 - Current Loss: 3.6469893e-7
+  Batch 45 - Current Loss: 1.9661628e-10
+  Batch 50 - Current Loss: 6.501662e-7
+  Batch 55 - Current Loss: 6.395255e-7
+  Batch 60 - Current Loss: 5.5720903e-7
+  Batch 65 - Current Loss: 5.4807987e-7
+  Batch 70 - Current Loss: 3.2841938e-6
+  Batch 75 - Current Loss: 9.3210446e-7
+  Batch 80 - Current Loss: 3.761681e-6
+  Batch 85 - Current Loss: 4.7428944e-6
+  Batch 90 - Current Loss: 7.76682e-7
+  Batch 95 - Current Loss: 8.887559e-8
+  Batch 100 - Current Loss: 1.2127184e-6
+Epoch 65/100 - Average Loss: 1.1335135378626183e-6
+  Batch 5 - Current Loss: 1.3521343e-6
+  Batch 10 - Current Loss: 6.269653e-7
+  Batch 15 - Current Loss: 3.4913005e-6
+  Batch 20 - Current Loss: 9.677357e-7
+  Batch 25 - Current Loss: 7.670533e-6
+  Batch 30 - Current Loss: 1.6395346e-5
+  Batch 35 - Current Loss: 6.769768e-6
+  Batch 40 - Current Loss: 1.1613555e-5
+  Batch 45 - Current Loss: 3.9515305e-7
+  Batch 50 - Current Loss: 1.3863769e-6
+  Batch 55 - Current Loss: 8.484267e-6
+  Batch 60 - Current Loss: 2.5522857e-7
+  Batch 65 - Current Loss: 2.0210045e-5
+  Batch 70 - Current Loss: 4.0328136e-6
+  Batch 75 - Current Loss: 1.5741125e-7
+  Batch 80 - Current Loss: 1.8201994e-5
+  Batch 85 - Current Loss: 1.9919135e-5
+  Batch 90 - Current Loss: 6.97831e-6
+  Batch 95 - Current Loss: 0.0013079201
+  Batch 100 - Current Loss: 4.58091e-5
+Epoch 66/100 - Average Loss: 5.028808132203355e-5
+  Batch 5 - Current Loss: 0.00019694897
+  Batch 10 - Current Loss: 0.00016269332
+  Batch 15 - Current Loss: 2.934008e-5
+  Batch 20 - Current Loss: 3.8050857e-5
+  Batch 25 - Current Loss: 2.8649114e-5
+  Batch 30 - Current Loss: 4.6034497e-6
+  Batch 35 - Current Loss: 1.2650409e-5
+  Batch 40 - Current Loss: 3.9178462e-7
+  Batch 45 - Current Loss: 2.172027e-6
+  Batch 50 - Current Loss: 1.6792795e-6
+  Batch 55 - Current Loss: 4.7397293e-7
+  Batch 60 - Current Loss: 3.884308e-10
+  Batch 65 - Current Loss: 1.681373e-7
+  Batch 70 - Current Loss: 1.2749832e-7
+  Batch 75 - Current Loss: 8.044313e-8
+  Batch 80 - Current Loss: 7.951197e-9
+  Batch 85 - Current Loss: 1.1051342e-9
+  Batch 90 - Current Loss: 3.2370897e-9
+  Batch 95 - Current Loss: 3.1831626e-9
+  Batch 100 - Current Loss: 4.868377e-9
+Epoch 67/100 - Average Loss: 2.84916620465564e-5
+  Batch 5 - Current Loss: 4.7824633e-9
+  Batch 10 - Current Loss: 4.8648685e-9
+  Batch 15 - Current Loss: 3.5042522e-9
+  Batch 20 - Current Loss: 3.9243517e-8
+  Batch 25 - Current Loss: 2.8982353e-8
+  Batch 30 - Current Loss: 3.9443023e-8
+  Batch 35 - Current Loss: 6.773604e-9
+  Batch 40 - Current Loss: 6.5323515e-9
+  Batch 45 - Current Loss: 1.3266419e-9
+  Batch 50 - Current Loss: 5.098071e-9
+  Batch 55 - Current Loss: 3.2879015e-8
+  Batch 60 - Current Loss: 5.064081e-9
+  Batch 65 - Current Loss: 6.5501284e-9
+  Batch 70 - Current Loss: 1.3311912e-9
+  Batch 75 - Current Loss: 3.914948e-8
+  Batch 80 - Current Loss: 3.64139e-8
+  Batch 85 - Current Loss: 3.1743692e-8
+  Batch 90 - Current Loss: 4.88737e-9
+  Batch 95 - Current Loss: 8.932872e-8
+  Batch 100 - Current Loss: 1.8785437e-7
+Epoch 68/100 - Average Loss: 2.0712002701817057e-8
+  Batch 5 - Current Loss: 6.710134e-9
+  Batch 10 - Current Loss: 3.8898904e-8
+  Batch 15 - Current Loss: 2.9031522e-8
+  Batch 20 - Current Loss: 2.904803e-8
+  Batch 25 - Current Loss: 4.2086445e-9
+  Batch 30 - Current Loss: 1.2658216e-9
+  Batch 35 - Current Loss: 7.4318365e-8
+  Batch 40 - Current Loss: 5.973523e-8
+  Batch 45 - Current Loss: 3.1287044e-8
+  Batch 50 - Current Loss: 2.8491675e-8
+  Batch 55 - Current Loss: 8.0712786e-10
+  Batch 60 - Current Loss: 1.3278634e-9
+  Batch 65 - Current Loss: 4.037739e-9
+  Batch 70 - Current Loss: 1.3222357e-9
+  Batch 75 - Current Loss: 1.8596733e-8
+  Batch 80 - Current Loss: 6.1020856e-8
+  Batch 85 - Current Loss: 4.035846e-9
+  Batch 90 - Current Loss: 4.8761198e-8
+  Batch 95 - Current Loss: 2.4707095e-8
+  Batch 100 - Current Loss: 4.0782004e-9
+Epoch 69/100 - Average Loss: 2.5098438319604012e-8
+  Batch 5 - Current Loss: 1.2151131e-9
+  Batch 10 - Current Loss: 6.015022e-8
+  Batch 15 - Current Loss: 3.210779e-8
+  Batch 20 - Current Loss: 1.203105e-7
+  Batch 25 - Current Loss: 3.2247115e-8
+  Batch 30 - Current Loss: 6.125805e-8
+  Batch 35 - Current Loss: 5.8297218e-8
+  Activating project at `~/MedImages.jl/experiment/sciml_dose_refinement`
+┌ Warning: CHOLMOD version incompatibility
+│ 
+│ Julia was compiled with CHOLMOD version 4.0.4. It is
+│ currently linked with version 5.3.1.
+│ This might cause Julia to terminate when working with
+│ sparse matrix factorizations, e.g. solving systems of
+│ equations with \.
+│ 
+│ It is recommended that you use Julia with the same major
+│ version of CHOLMOD as the one used during the build, or
+│ download the generic binaries from www.julialang.org,
+│ which ship with the correct versions of all dependencies.
+└ @ SparseArrays.CHOLMOD ~/miniforge/envs/sciml_env/share/julia/stdlib/v1.10/SparseArrays/src/solvers/cholmod.jl:206
+┌ Warning: You are using a non-official build of Julia. This may cause issues with CUDA.jl.
+│ Please consider using an official build from https://julialang.org/downloads/.
+└ @ CUDA ~/miniforge/envs/sciml_env/share/julia/packages/CUDA/FJf6p/src/initialization.jl:170
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_0__Pat116
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_2__Pat49
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_3__Pat49
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat10
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat101
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat102
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat103
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat104
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat105
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat106
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat108
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat109
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat11
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat110
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat111
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat112
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat114
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat115
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat117
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat118
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat119
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat120
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat121
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat122
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat123
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat124
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat125
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat127
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat128
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat13
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat139
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat14
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat142
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat145
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat15
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat16
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat17
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat19
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat2
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat20
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat21
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat22
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat24
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat25
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat27
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat28
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat29
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat3
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat30
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat31
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat32
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat33
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat34
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat35
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat4
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat44
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat45
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat46
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat47
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat48
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat49
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat5
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat50
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat51
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat52
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat53
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat54
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat55
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat56
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat58
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat6
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat60
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat61
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat64
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat65
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat67
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat68
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat7
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat74
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat75
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat76
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat79
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat8
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat82
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat83
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat84
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat86
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat87
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat88
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat89
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat9
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat90
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat91
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat93
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat94
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat96
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat97
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat98
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_10__Pat2
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /DATA/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_10__Pat25
+└ @ Main ~/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Lux layers are stateless and hence don't participate in device transfers. Apply this function on the parameters and states generated using `LuxCore.setup`.
+└ @ MLDataDevicesExt ~/miniforge/envs/sciml_env/share/julia/packages/LuxCore/kQC9S/ext/MLDataDevicesExt.jl:10
+  Batch 40 - Current Loss: 1.0928463e-9
+  Batch 45 - Current Loss: 1.2323148e-9
+  Batch 50 - Current Loss: 1.3355441e-9
+  Batch 55 - Current Loss: 1.4560443e-9
+  Batch 60 - Current Loss: 3.178552e-8
+  Batch 65 - Current Loss: 1.2228584e-7
+  Batch 70 - Current Loss: 1.1743606e-9
+  Batch 75 - Current Loss: 5.7240236e-8
+  Batch 80 - Current Loss: 6.1103705e-8
+  Batch 85 - Current Loss: 3.190751e-8
+  Batch 90 - Current Loss: 2.7758968e-9
+  Batch 95 - Current Loss: 1.5912994e-8
+  Batch 100 - Current Loss: 1.7736928e-8
+Epoch 70/100 - Average Loss: 2.963211536178255e-8
+  Batch 5 - Current Loss: 3.1212957e-10
+  Batch 10 - Current Loss: 2.2293648e-8
+  Batch 15 - Current Loss: 3.0628645e-8
+  Batch 20 - Current Loss: 6.1304156e-8
+  Batch 25 - Current Loss: 6.7205946e-8
+  Batch 30 - Current Loss: 5.1361535e-8
+  Batch 35 - Current Loss: 2.0157827e-8
+  Batch 40 - Current Loss: 7.6871736e-8
+  Batch 45 - Current Loss: 2.3041244e-9
+  Batch 50 - Current Loss: 5.0364697e-8
+  Batch 55 - Current Loss: 8.333372e-9
+  Batch 60 - Current Loss: 7.7429455e-8
+  Batch 65 - Current Loss: 1.3335029e-11
+  Batch 70 - Current Loss: 5.061456e-8
+  Batch 75 - Current Loss: 2.5233058e-8
+  Batch 80 - Current Loss: 1.3909309e-7
+  Batch 85 - Current Loss: 2.9717802e-9
+  Batch 90 - Current Loss: 5.7153346e-7
+  Batch 95 - Current Loss: 1.3518626e-9
+  Batch 100 - Current Loss: 4.8209966e-8
+Epoch 71/100 - Average Loss: 7.646596384593661e-8
+  Batch 5 - Current Loss: 5.314861e-7
+  Batch 10 - Current Loss: 1.7597189e-7
+  Batch 15 - Current Loss: 4.7542795e-8
+  Batch 20 - Current Loss: 5.5976614e-7
+  Batch 25 - Current Loss: 7.6466875e-8
+  Batch 30 - Current Loss: 1.51592e-8
+  Batch 35 - Current Loss: 7.7487e-8
+  Batch 40 - Current Loss: 8.6284e-9
+  Batch 45 - Current Loss: 7.656837e-8
+  Batch 50 - Current Loss: 6.6311756e-8
+  Batch 55 - Current Loss: 7.729786e-8
+  Batch 60 - Current Loss: 4.4027754e-8
+  Batch 65 - Current Loss: 6.429221e-8
+  Batch 70 - Current Loss: 1.8612486e-8
+  Batch 75 - Current Loss: 1.2144585e-8
+  Batch 80 - Current Loss: 5.7080364e-8
+  Batch 85 - Current Loss: 1.67899e-8
+  Batch 90 - Current Loss: 5.9375676e-8
+  Batch 95 - Current Loss: 2.1557542e-8
+  Batch 100 - Current Loss: 9.474157e-8
+Epoch 72/100 - Average Loss: 8.428030800103348e-8
+  Batch 5 - Current Loss: 5.252853e-8
+  Batch 10 - Current Loss: 1.2274866e-8
+  Batch 15 - Current Loss: 4.6760196e-9
+  Batch 20 - Current Loss: 2.3323926e-7
+  Batch 25 - Current Loss: 8.297703e-9
+  Batch 30 - Current Loss: 8.927152e-9
+  Batch 35 - Current Loss: 5.3709066e-8
+  Batch 40 - Current Loss: 3.431388e-8
+  Batch 45 - Current Loss: 8.7377465e-9
+  Batch 50 - Current Loss: 8.309755e-9
+  Batch 55 - Current Loss: 6.477343e-8
+  Batch 60 - Current Loss: 4.85176e-8
+  Batch 65 - Current Loss: 1.01271596e-7
+  Batch 70 - Current Loss: 1.36982e-8
+  Batch 75 - Current Loss: 1.784127e-8
+  Batch 80 - Current Loss: 9.4663044e-8
+  Batch 85 - Current Loss: 1.7882842e-8
+  Batch 90 - Current Loss: 9.476852e-8
+  Batch 95 - Current Loss: 2.7253142e-7
+  Batch 100 - Current Loss: 1.2009095e-7
+Epoch 73/100 - Average Loss: 7.838858382160086e-8
+  Batch 5 - Current Loss: 1.3117582e-7
+  Batch 10 - Current Loss: 1.358529e-8
+  Batch 15 - Current Loss: 4.8497084e-10
+  Batch 20 - Current Loss: 1.1905201e-8
+  Batch 25 - Current Loss: 1.3171066e-7
+  Batch 30 - Current Loss: 3.5767414e-8
+  Batch 35 - Current Loss: 7.074742e-8
+  Batch 40 - Current Loss: 1.7275585e-8
+  Batch 45 - Current Loss: 6.302429e-8
+  Batch 50 - Current Loss: 1.1530985e-8
+  Batch 55 - Current Loss: 1.6914184e-8
+  Batch 60 - Current Loss: 6.0675795e-8
+  Batch 65 - Current Loss: 1.70966e-8
+  Batch 70 - Current Loss: 1.7283666e-8
+  Batch 75 - Current Loss: 3.6000639e-10
+  Batch 80 - Current Loss: 2.1058824e-7
+  Batch 85 - Current Loss: 1.03805874e-7
+  Batch 90 - Current Loss: 1.6555055e-7
+  Batch 95 - Current Loss: 2.517045e-7
+  Batch 100 - Current Loss: 8.276726e-8
+Epoch 74/100 - Average Loss: 5.333788336483493e-8
+  Batch 5 - Current Loss: 1.3460271e-7
+  Batch 10 - Current Loss: 5.6633116e-8
+  Batch 15 - Current Loss: 6.996827e-8
+  Batch 20 - Current Loss: 1.8454255e-8
+  Batch 25 - Current Loss: 1.5029201e-7
+  Batch 30 - Current Loss: 3.0241085e-7
+  Batch 35 - Current Loss: 1.642722e-7
+  Batch 40 - Current Loss: 6.3140305e-8
+  Batch 45 - Current Loss: 7.8479964e-8
+  Batch 50 - Current Loss: 1.26663195e-8
+  Batch 55 - Current Loss: 5.4132046e-9
+  Batch 60 - Current Loss: 5.352937e-9
+  Batch 65 - Current Loss: 4.959558e-8
+  Batch 70 - Current Loss: 8.029475e-8
+  Batch 75 - Current Loss: 8.152658e-8
+  Batch 80 - Current Loss: 1.3282909e-7
+  Batch 85 - Current Loss: 9.589227e-10
+  Batch 90 - Current Loss: 1.000548e-7
+  Batch 95 - Current Loss: 4.7727303e-7
+  Batch 100 - Current Loss: 1.3064545e-7
+Epoch 75/100 - Average Loss: 1.6918180708203056e-7
+  Batch 5 - Current Loss: 3.667964e-7
+  Batch 10 - Current Loss: 5.4237756e-7
+  Batch 15 - Current Loss: 1.8861886e-7
+  Batch 20 - Current Loss: 1.2538419e-7
+  Batch 25 - Current Loss: 6.190424e-8
+  Batch 30 - Current Loss: 3.4412633e-8
+  Batch 35 - Current Loss: 1.0778735e-9
+  Batch 40 - Current Loss: 9.819873e-8
+  Batch 45 - Current Loss: 3.1094274e-8
+  Batch 50 - Current Loss: 3.357026e-8
+  Batch 55 - Current Loss: 7.566752e-8
+  Batch 60 - Current Loss: 8.367589e-8
+  Batch 65 - Current Loss: 1.7674864e-7
+  Batch 70 - Current Loss: 4.006907e-9
+  Batch 75 - Current Loss: 5.761658e-9
+  Batch 80 - Current Loss: 6.8784445e-8
+  Batch 85 - Current Loss: 2.1613671e-7
+  Batch 90 - Current Loss: 6.948479e-8
+  Batch 95 - Current Loss: 2.855051e-7
+  Batch 100 - Current Loss: 1.6407672e-7
+Epoch 76/100 - Average Loss: 1.1672990102525038e-7
+  Batch 5 - Current Loss: 1.3875132e-8
+  Batch 10 - Current Loss: 6.84819e-8
+  Batch 15 - Current Loss: 9.2561294e-8
+  Batch 20 - Current Loss: 6.2190053e-9
+  Batch 25 - Current Loss: 7.8088345e-9
+  Batch 30 - Current Loss: 8.51957e-9
+  Batch 35 - Current Loss: 6.861266e-9
+  Batch 40 - Current Loss: 1.1394783e-7
+  Batch 45 - Current Loss: 3.1699977e-7
+  Batch 50 - Current Loss: 9.61501e-9
+  Batch 55 - Current Loss: 1.7437545e-8
+  Batch 60 - Current Loss: 5.2809803e-8
+  Batch 65 - Current Loss: 3.649183e-7
+  Batch 70 - Current Loss: 7.937847e-8
+  Batch 75 - Current Loss: 3.5788905e-10
+  Batch 80 - Current Loss: 1.02908835e-7
+  Batch 85 - Current Loss: 2.5733416e-7
+  Batch 90 - Current Loss: 5.603697e-9
+  Batch 95 - Current Loss: 9.843818e-8
+  Batch 100 - Current Loss: 3.175233e-7
+Epoch 77/100 - Average Loss: 1.17991574126175e-7
+  Batch 5 - Current Loss: 1.08436895e-8
+  Batch 10 - Current Loss: 5.429731e-8
+  Batch 15 - Current Loss: 7.52296e-9
+  Batch 20 - Current Loss: 9.698551e-10
+  Batch 25 - Current Loss: 2.2080565e-8
+  Batch 30 - Current Loss: 2.204239e-8
+  Batch 35 - Current Loss: 7.247523e-7
+  Batch 40 - Current Loss: 1.0595439e-6
+  Batch 45 - Current Loss: 5.6739113e-11
+  Batch 50 - Current Loss: 8.8621016e-7
+  Batch 55 - Current Loss: 3.7873814e-8
+  Batch 60 - Current Loss: 5.9185197e-8
+  Batch 65 - Current Loss: 1.1310036e-6
+  Batch 70 - Current Loss: 2.3984603e-10
+  Batch 75 - Current Loss: 9.751583e-8
+  Batch 80 - Current Loss: 2.7834314e-8
+  Batch 85 - Current Loss: 4.043399e-7
+  Batch 90 - Current Loss: 2.1324206e-7
+  Batch 95 - Current Loss: 1.9130885e-8
+  Batch 100 - Current Loss: 8.850227e-8
+Epoch 78/100 - Average Loss: 3.5229168765416907e-7
+  Batch 5 - Current Loss: 3.546377e-7
+  Batch 10 - Current Loss: 1.5976497e-8
+  Batch 15 - Current Loss: 1.956985e-9
+  Batch 20 - Current Loss: 2.6923297e-8
+  Batch 25 - Current Loss: 2.9190426e-8
+  Batch 30 - Current Loss: 1.0641043e-6
+  Batch 35 - Current Loss: 4.808377e-7
+  Batch 40 - Current Loss: 3.0258914e-7
+  Batch 45 - Current Loss: 1.0195071e-6
+  Batch 50 - Current Loss: 2.318829e-7
+  Batch 55 - Current Loss: 1.2180561e-7
+  Batch 60 - Current Loss: 8.2741525e-7
+  Batch 65 - Current Loss: 5.8839476e-7
+  Batch 70 - Current Loss: 2.5007833e-7
+  Batch 75 - Current Loss: 2.1412547e-9
+  Batch 80 - Current Loss: 5.7282546e-7
+  Batch 85 - Current Loss: 7.424542e-7
+  Batch 90 - Current Loss: 1.2354816e-7
+  Batch 95 - Current Loss: 6.188285e-7
+  Batch 100 - Current Loss: 1.9368847e-6
+Epoch 79/100 - Average Loss: 3.3043344323718804e-7
+  Batch 5 - Current Loss: 2.039324e-6
+  Batch 10 - Current Loss: 1.14047815e-7
+  Batch 15 - Current Loss: 9.866305e-9
+  Batch 20 - Current Loss: 1.2823081e-6
+  Batch 25 - Current Loss: 4.0830074e-7
+  Batch 30 - Current Loss: 4.175721e-9
+  Batch 35 - Current Loss: 1.864595e-7
+  Batch 40 - Current Loss: 6.55928e-8
+  Batch 45 - Current Loss: 8.457104e-9
+  Batch 50 - Current Loss: 2.8335942e-8
+  Batch 55 - Current Loss: 2.8512426e-8
+  Batch 60 - Current Loss: 1.0681357e-7
+  Batch 65 - Current Loss: 1.7114769e-7
+  Batch 70 - Current Loss: 2.8133754e-12
+  Batch 75 - Current Loss: 1.4359994e-9
+  Batch 80 - Current Loss: 9.53949e-7
+  Batch 85 - Current Loss: 8.820734e-7
+  Batch 90 - Current Loss: 2.1890662e-6
+  Batch 95 - Current Loss: 1.2859365e-6
+  Batch 100 - Current Loss: 3.6522035e-12
+Epoch 80/100 - Average Loss: 4.74523818451986e-7
+  Batch 5 - Current Loss: 5.8268892e-8
+  Batch 10 - Current Loss: 1.8359042e-7
+  Batch 15 - Current Loss: 2.1605099e-7
+  Batch 20 - Current Loss: 7.617605e-9
+  Batch 25 - Current Loss: 2.278171e-7
+  Batch 30 - Current Loss: 1.2488531e-6
+  Batch 35 - Current Loss: 9.5185976e-7
+  Batch 40 - Current Loss: 2.8839665e-7
+  Batch 45 - Current Loss: 4.8475346e-8
+  Batch 50 - Current Loss: 5.3344923e-8
+  Batch 55 - Current Loss: 4.5636398e-8
+  Batch 60 - Current Loss: 4.6501942e-8
+  Batch 65 - Current Loss: 2.5225958e-8
+  Batch 70 - Current Loss: 1.4073078e-8
+  Batch 75 - Current Loss: 1.9389975e-7
+  Batch 80 - Current Loss: 3.91703e-7
+  Batch 85 - Current Loss: 1.2300993e-7
+  Batch 90 - Current Loss: 3.3023796e-6
+  Batch 95 - Current Loss: 1.2601752e-6
+  Batch 100 - Current Loss: 4.041541e-6
+Epoch 81/100 - Average Loss: 6.393820442716566e-7
+  Batch 5 - Current Loss: 7.0649403e-6
+  Batch 10 - Current Loss: 5.662465e-6
+  Batch 15 - Current Loss: 5.0908407e-6
+  Batch 20 - Current Loss: 4.767529e-8
+  Batch 25 - Current Loss: 1.7331745e-6
+  Batch 30 - Current Loss: 3.3198144e-6
+  Batch 35 - Current Loss: 3.7610018e-6
+  Batch 40 - Current Loss: 2.7308658e-6
+  Batch 45 - Current Loss: 1.8792222e-6
+  Batch 50 - Current Loss: 1.6090202e-6
+  Batch 55 - Current Loss: 1.5372146e-6
+  Batch 60 - Current Loss: 4.9833716e-6
+  Batch 65 - Current Loss: 9.087523e-7
+  Batch 70 - Current Loss: 1.1261754e-6
+  Batch 75 - Current Loss: 1.4264513e-7
+  Batch 80 - Current Loss: 1.861532e-7
+  Batch 85 - Current Loss: 5.521498e-7
+  Batch 90 - Current Loss: 1.455412e-6
+  Batch 95 - Current Loss: 8.432883e-7
+  Batch 100 - Current Loss: 1.6212917e-7
+Epoch 82/100 - Average Loss: 2.0279356557434403e-6
+  Batch 5 - Current Loss: 4.7797053e-6
+  Batch 10 - Current Loss: 1.8540815e-7
+  Batch 15 - Current Loss: 2.8930783e-6
+  Batch 20 - Current Loss: 9.2799446e-8
+  Batch 25 - Current Loss: 1.2888279e-7
+  Batch 30 - Current Loss: 2.3125635e-7
+  Batch 35 - Current Loss: 1.8144584e-7
+  Batch 40 - Current Loss: 8.975455e-8
+  Batch 45 - Current Loss: 4.5187755e-7
+  Batch 50 - Current Loss: 1.3648802e-6
+  Batch 55 - Current Loss: 9.710606e-7
+  Batch 60 - Current Loss: 2.1068704e-6
+  Batch 65 - Current Loss: 7.519687e-6
+  Batch 70 - Current Loss: 1.7630222e-6
+  Batch 75 - Current Loss: 4.534341e-6
+  Batch 80 - Current Loss: 1.2276764e-6
+  Batch 85 - Current Loss: 4.5371694e-6
+  Batch 90 - Current Loss: 5.143496e-7
+  Batch 95 - Current Loss: 5.746783e-6
+  Batch 100 - Current Loss: 2.5180917e-9
+Epoch 83/100 - Average Loss: 2.073607805954114e-6
+  Batch 5 - Current Loss: 1.7170991e-7
+  Batch 10 - Current Loss: 7.304689e-11
+  Batch 15 - Current Loss: 7.5727695e-7
+  Batch 20 - Current Loss: 2.8717861e-10
+  Batch 25 - Current Loss: 1.5085504e-7
+  Batch 30 - Current Loss: 1.1600154e-6
+  Batch 35 - Current Loss: 9.3295705e-7
+  Batch 40 - Current Loss: 3.185011e-6
+  Batch 45 - Current Loss: 4.6861805e-6
+  Batch 50 - Current Loss: 1.5811696e-6
+  Batch 55 - Current Loss: 1.4916945e-6
+  Batch 60 - Current Loss: 1.1375123e-6
+  Batch 65 - Current Loss: 9.419309e-7
+  Batch 70 - Current Loss: 6.1097046e-7
+  Batch 75 - Current Loss: 2.4281422e-7
+  Batch 80 - Current Loss: 6.0974855e-8
+  Batch 85 - Current Loss: 1.09352385e-8
+  Batch 90 - Current Loss: 6.093254e-8
+  Batch 95 - Current Loss: 2.0395282e-7
+  Batch 100 - Current Loss: 6.76267e-8
+Epoch 84/100 - Average Loss: 1.0496413965564722e-6
+  Batch 5 - Current Loss: 3.0546944e-6
+  Batch 10 - Current Loss: 1.73288e-6
+  Batch 15 - Current Loss: 4.3758877e-8
+  Batch 20 - Current Loss: 7.222751e-10
+  Batch 25 - Current Loss: 1.752148e-7
+  Batch 30 - Current Loss: 6.5320813e-7
+  Batch 35 - Current Loss: 1.351082e-7
+  Batch 40 - Current Loss: 1.2329295e-7
+  Batch 45 - Current Loss: 4.994863e-7
+  Batch 50 - Current Loss: 1.5567839e-8
+  Batch 55 - Current Loss: 3.7194245e-6
+  Batch 60 - Current Loss: 3.068954e-6
+  Batch 65 - Current Loss: 1.5269941e-6
+  Batch 70 - Current Loss: 9.967061e-7
+  Batch 75 - Current Loss: 1.4977255e-7
+  Batch 80 - Current Loss: 1.8702455e-7
+  Batch 85 - Current Loss: 3.528674e-7
+  Batch 90 - Current Loss: 2.4845477e-8
+  Batch 95 - Current Loss: 9.235938e-6
+  Batch 100 - Current Loss: 9.758931e-6
+Epoch 85/100 - Average Loss: 1.6879002063838189e-6
+  Batch 5 - Current Loss: 4.262118e-6
+  Batch 10 - Current Loss: 1.462864e-6
+  Batch 15 - Current Loss: 8.357635e-6
+  Batch 20 - Current Loss: 3.277752e-7
+  Batch 25 - Current Loss: 4.595603e-7
+  Batch 30 - Current Loss: 6.0648426e-7
+  Batch 35 - Current Loss: 6.731753e-8
+  Batch 40 - Current Loss: 5.683409e-8
+  Batch 45 - Current Loss: 8.339907e-6
+  Batch 50 - Current Loss: 3.2720868e-6
+  Batch 55 - Current Loss: 2.216953e-6
+  Batch 60 - Current Loss: 1.1570629e-9
+  Batch 65 - Current Loss: 7.934321e-6
+  Batch 70 - Current Loss: 4.8043453e-6
+  Batch 75 - Current Loss: 3.6017314e-11
+  Batch 80 - Current Loss: 7.227602e-6
+  Batch 85 - Current Loss: 7.0595e-6
+  Batch 90 - Current Loss: 2.6698551e-6
+  Batch 95 - Current Loss: 3.092863e-8
+  Batch 100 - Current Loss: 2.3367127e-6
+Epoch 86/100 - Average Loss: 3.0638578310950016e-6
+  Batch 5 - Current Loss: 6.4685725e-7
+  Batch 10 - Current Loss: 6.708914e-9
+  Batch 15 - Current Loss: 1.2391325e-8
+  Batch 20 - Current Loss: 2.5755628e-7
+  Batch 25 - Current Loss: 3.0167485e-7
+  Batch 30 - Current Loss: 1.7642067e-7
+  Batch 35 - Current Loss: 1.9971816e-8
+  Batch 40 - Current Loss: 9.88389e-9
+  Batch 45 - Current Loss: 1.1413278e-8
+  Batch 50 - Current Loss: 1.2000834e-7
+  Batch 55 - Current Loss: 5.156055e-8
+  Batch 60 - Current Loss: 1.9667689e-6
+  Batch 65 - Current Loss: 4.6759364e-8
+  Batch 70 - Current Loss: 1.8561848e-6
+  Batch 75 - Current Loss: 6.1900283e-7
+  Batch 80 - Current Loss: 3.936057e-8
+  Batch 85 - Current Loss: 3.7379542e-7
+  Batch 90 - Current Loss: 2.1909846e-6
+  Batch 95 - Current Loss: 1.8082267e-6
+  Batch 100 - Current Loss: 1.4242581e-6
+Epoch 87/100 - Average Loss: 6.782882508675567e-7
+  Batch 5 - Current Loss: 9.097625e-6
+  Batch 10 - Current Loss: 1.707565e-7
+  Batch 15 - Current Loss: 7.688728e-6
+  Batch 20 - Current Loss: 2.249931e-6
+  Batch 25 - Current Loss: 2.1426254e-7
+  Batch 30 - Current Loss: 1.5259997e-7
+  Batch 35 - Current Loss: 4.387286e-9
+  Batch 40 - Current Loss: 5.9349805e-8
+  Batch 45 - Current Loss: 4.8460173e-8
+  Batch 50 - Current Loss: 1.7022656e-9
+  Batch 55 - Current Loss: 3.6780925e-8
+  Batch 60 - Current Loss: 1.4744393e-7
+  Batch 65 - Current Loss: 6.5671536e-8
+  Batch 70 - Current Loss: 2.3524706e-8
+  Batch 75 - Current Loss: 4.5179153e-8
+  Batch 80 - Current Loss: 2.528899e-7
+  Batch 85 - Current Loss: 2.3744912e-8
+  Batch 90 - Current Loss: 2.3217174e-8
+  Batch 95 - Current Loss: 2.332657e-8
+  Batch 100 - Current Loss: 1.991868e-8
+Epoch 88/100 - Average Loss: 9.464379456174901e-7
+  Batch 5 - Current Loss: 6.2647956e-8
+  Batch 10 - Current Loss: 1.6420502e-7
+  Batch 15 - Current Loss: 1.6057218e-7
+  Batch 20 - Current Loss: 9.3730694e-7
+  Batch 25 - Current Loss: 4.319592e-6
+  Batch 30 - Current Loss: 2.00744e-6
+  Batch 35 - Current Loss: 1.5430675e-6
+  Batch 40 - Current Loss: 9.715031e-8
+  Batch 45 - Current Loss: 1.42281795e-8
+  Batch 50 - Current Loss: 4.1455298e-10
+  Batch 55 - Current Loss: 1.1678827e-6
+  Batch 60 - Current Loss: 2.9770144e-6
+  Batch 65 - Current Loss: 6.5944636e-7
+  Batch 70 - Current Loss: 3.8248197e-7
+  Batch 75 - Current Loss: 1.9297417e-8
+  Batch 80 - Current Loss: 5.5460646e-6
+  Batch 85 - Current Loss: 4.79537e-5
+  Batch 90 - Current Loss: 2.8662964e-8
+  Batch 95 - Current Loss: 4.007694e-6
+  Batch 100 - Current Loss: 2.4372284e-7
+Epoch 89/100 - Average Loss: 4.1539694636599185e-6
+  Batch 5 - Current Loss: 2.5874317e-6
+  Batch 10 - Current Loss: 1.1890716e-6
+  Batch 15 - Current Loss: 5.275906e-7
+  Batch 20 - Current Loss: 3.3790308e-9
+  Batch 25 - Current Loss: 2.4478976e-7
+  Batch 30 - Current Loss: 1.2602213e-7
+  Batch 35 - Current Loss: 3.570388e-9
+  Batch 40 - Current Loss: 3.431802e-8
+  Batch 45 - Current Loss: 1.1473053e-8
+  Batch 50 - Current Loss: 2.9904086e-8
+  Batch 55 - Current Loss: 4.6365074e-8
+  Batch 60 - Current Loss: 2.6949284e-8
+  Batch 65 - Current Loss: 8.034279e-8
+  Batch 70 - Current Loss: 6.412749e-8
+  Batch 75 - Current Loss: 1.6497883e-7
+  Batch 80 - Current Loss: 2.7721984e-7
+  Batch 85 - Current Loss: 1.1609436e-7
+  Batch 90 - Current Loss: 1.0636758e-8
+  Batch 95 - Current Loss: 1.58243e-8
+  Batch 100 - Current Loss: 2.0813118e-7
+Epoch 90/100 - Average Loss: 2.3535482053069212e-7
+  Batch 5 - Current Loss: 3.1662236e-7
+  Batch 10 - Current Loss: 5.701768e-7
+  Batch 15 - Current Loss: 1.6532381e-6
+  Batch 20 - Current Loss: 7.938877e-7
+  Batch 25 - Current Loss: 1.1600552e-7
+  Batch 30 - Current Loss: 6.524597e-8
+  Batch 35 - Current Loss: 1.2720585e-9
+  Batch 40 - Current Loss: 7.171781e-8
+  Batch 45 - Current Loss: 8.113791e-9
+  Batch 50 - Current Loss: 2.297712e-8
+  Batch 55 - Current Loss: 6.282461e-7
+  Batch 60 - Current Loss: 1.4381885e-11
+  Batch 65 - Current Loss: 1.9158635e-7
+  Batch 70 - Current Loss: 2.1893584e-8
+  Batch 75 - Current Loss: 2.3319699e-7
+  Batch 80 - Current Loss: 1.1366632e-7
+  Batch 85 - Current Loss: 5.5556404e-7
+  Batch 90 - Current Loss: 4.710908e-7
+  Batch 95 - Current Loss: 4.8716134e-7
+  Batch 100 - Current Loss: 8.31906e-8
+Epoch 91/100 - Average Loss: 2.60436245176493e-7
+  Batch 5 - Current Loss: 1.7340035e-8
+  Batch 10 - Current Loss: 1.9134347e-7
+  Batch 15 - Current Loss: 6.039762e-8
+  Batch 20 - Current Loss: 1.5462275e-8
+  Batch 25 - Current Loss: 7.118009e-10
+  Batch 30 - Current Loss: 2.0732807e-9
+  Batch 35 - Current Loss: 2.5879442e-6
+  Batch 40 - Current Loss: 7.903133e-6
+  Batch 45 - Current Loss: 2.1105606e-7
+  Batch 50 - Current Loss: 4.633728e-6
+  Batch 55 - Current Loss: 1.1728458e-6
+  Batch 60 - Current Loss: 2.5643622e-8
+  Batch 65 - Current Loss: 1.8988618e-7
+  Batch 70 - Current Loss: 1.0724094e-6
+  Batch 75 - Current Loss: 6.3373835e-7
+  Batch 80 - Current Loss: 5.737802e-8
+  Batch 85 - Current Loss: 1.4643647e-6
+  Batch 90 - Current Loss: 1.985657e-7
+  Batch 95 - Current Loss: 1.4259524e-8
+  Batch 100 - Current Loss: 8.290732e-7
+Epoch 92/100 - Average Loss: 1.097893442448261e-6
+  Batch 5 - Current Loss: 1.0323285e-8
+  Batch 10 - Current Loss: 1.1354954e-7
+  Batch 15 - Current Loss: 1.9233948e-6
+  Batch 20 - Current Loss: 3.939807e-7
+  Batch 25 - Current Loss: 1.2813594e-5
+  Batch 30 - Current Loss: 7.092266e-6
+  Batch 35 - Current Loss: 1.8745217e-6
+  Batch 40 - Current Loss: 3.286017e-6
+  Batch 45 - Current Loss: 8.2195675e-6
+  Batch 50 - Current Loss: 2.225278e-6
+  Batch 55 - Current Loss: 5.1388884e-7
+  Batch 60 - Current Loss: 6.848678e-8
+  Batch 65 - Current Loss: 8.893166e-7
+  Batch 70 - Current Loss: 2.6782322e-7
+  Batch 75 - Current Loss: 2.4203673e-6
+  Batch 80 - Current Loss: 1.0000414e-7
+  Batch 85 - Current Loss: 2.3429893e-6
+  Batch 90 - Current Loss: 7.4659755e-7
+  Batch 95 - Current Loss: 1.3485294e-7
+  Batch 100 - Current Loss: 1.1799147e-8
+Epoch 93/100 - Average Loss: 2.176370233228919e-6
+  Batch 5 - Current Loss: 1.8997139e-7
+  Batch 10 - Current Loss: 2.221862e-8
+  Batch 15 - Current Loss: 2.813571e-7
+  Batch 20 - Current Loss: 2.122274e-6
+  Batch 25 - Current Loss: 5.276609e-7
+  Batch 30 - Current Loss: 3.568429e-6
+  Batch 35 - Current Loss: 1.8876692e-7
+  Batch 40 - Current Loss: 1.6963128e-6
+  Batch 45 - Current Loss: 1.7875569e-6
+  Batch 50 - Current Loss: 7.4086284e-7
+  Batch 55 - Current Loss: 1.2024983e-6
+  Batch 60 - Current Loss: 1.387331e-6
+  Batch 65 - Current Loss: 3.3457104e-7
+  Batch 70 - Current Loss: 7.5539145e-7
+  Batch 75 - Current Loss: 7.3717365e-7
+  Batch 80 - Current Loss: 3.030217e-7
+  Batch 85 - Current Loss: 3.4958668e-7
+  Batch 90 - Current Loss: 3.9887226e-7
+  Batch 95 - Current Loss: 2.6874786e-6
+  Batch 100 - Current Loss: 1.590368e-7
+Epoch 94/100 - Average Loss: 1.05616043455381e-6
+  Batch 5 - Current Loss: 5.2374958e-6
+  Batch 10 - Current Loss: 4.3727982e-6
+  Batch 15 - Current Loss: 7.9240635e-7
+  Batch 20 - Current Loss: 3.6556216e-8
+  Batch 25 - Current Loss: 2.5742686e-6
+  Batch 30 - Current Loss: 3.1204172e-6
+  Batch 35 - Current Loss: 4.4211316e-7
+  Batch 40 - Current Loss: 1.7253315e-8
+  Batch 45 - Current Loss: 4.2741254e-7
+  Batch 50 - Current Loss: 1.5565423e-6
+  Batch 55 - Current Loss: 1.2065124e-7
+  Batch 60 - Current Loss: 1.3229475e-6
+  Batch 65 - Current Loss: 2.885913e-8
+  Batch 70 - Current Loss: 1.4170184e-5
+  Batch 75 - Current Loss: 5.039693e-6
+  Batch 80 - Current Loss: 7.821512e-6
+  Batch 85 - Current Loss: 8.415342e-6
+  Batch 90 - Current Loss: 1.7286287e-6
+  Batch 95 - Current Loss: 7.8254516e-7
+  Batch 100 - Current Loss: 4.6498818e-7
+Epoch 95/100 - Average Loss: 3.1330241354310397e-6
+  Batch 5 - Current Loss: 3.2018326e-7
+  Batch 10 - Current Loss: 5.1441347e-8
+  Batch 15 - Current Loss: 1.1079478e-6
+  Batch 20 - Current Loss: 2.6179503e-6
+  Batch 25 - Current Loss: 5.075613e-6
+  Batch 30 - Current Loss: 3.3029212e-6
+  Batch 35 - Current Loss: 1.7017804e-6
+  Batch 40 - Current Loss: 6.157148e-8
+  Batch 45 - Current Loss: 1.2436527e-9
+  Batch 50 - Current Loss: 8.916983e-7
+  Batch 55 - Current Loss: 2.5093361e-6
+  Batch 60 - Current Loss: 9.338766e-8
+  Batch 65 - Current Loss: 2.061587e-6
+  Batch 70 - Current Loss: 2.0493699e-6
+  Batch 75 - Current Loss: 2.561744e-6
+  Batch 80 - Current Loss: 7.043565e-7
+  Batch 85 - Current Loss: 1.1428964e-6
+  Batch 90 - Current Loss: 8.8936577e-7
+  Batch 95 - Current Loss: 8.4546153e-10
+  Batch 100 - Current Loss: 9.5042844e-7
+Epoch 96/100 - Average Loss: 1.0274563497775225e-6
+  Batch 5 - Current Loss: 1.9359311e-7
+  Batch 10 - Current Loss: 1.426702e-6
+  Batch 15 - Current Loss: 3.0231254e-7
+  Batch 20 - Current Loss: 2.4768905e-8
+  Batch 25 - Current Loss: 9.563104e-6
+  Batch 30 - Current Loss: 1.989156e-6
+  Batch 35 - Current Loss: 6.9953745e-7
+  Batch 40 - Current Loss: 3.624639e-7
+  Batch 45 - Current Loss: 1.9866532e-7
+  Batch 50 - Current Loss: 1.1790825e-7
+  Batch 55 - Current Loss: 4.2110372e-7
+  Batch 60 - Current Loss: 1.5188265e-9
+  Batch 65 - Current Loss: 7.593983e-8
+  Batch 70 - Current Loss: 3.0777798e-8
+  Batch 75 - Current Loss: 1.4346023e-7
+  Batch 80 - Current Loss: 9.8340614e-8
+  Batch 85 - Current Loss: 5.0597475e-7
+  Batch 90 - Current Loss: 1.8927052e-6
+  Batch 95 - Current Loss: 3.000954e-6
+  Batch 100 - Current Loss: 2.7800918e-6
+Epoch 97/100 - Average Loss: 9.656445175628986e-7
+  Batch 5 - Current Loss: 8.1422695e-6
+  Batch 10 - Current Loss: 2.3171967e-9
+  Batch 15 - Current Loss: 5.3813715e-6
+  Batch 20 - Current Loss: 1.6444077e-6
+  Batch 25 - Current Loss: 7.196644e-8
+  Batch 30 - Current Loss: 2.1699438e-10
+  Batch 35 - Current Loss: 2.9086772e-8
+  Batch 40 - Current Loss: 1.9799511e-8
+  Batch 45 - Current Loss: 2.7220574e-8
+  Batch 50 - Current Loss: 1.1524359e-7
+  Batch 55 - Current Loss: 1.8117934e-9
+  Batch 60 - Current Loss: 5.803087e-7
+  Batch 65 - Current Loss: 2.2734246e-6
+  Batch 70 - Current Loss: 7.812653e-7
+  Batch 75 - Current Loss: 6.55438e-7
+  Batch 80 - Current Loss: 6.034173e-7
+  Batch 85 - Current Loss: 7.722824e-9
+  Batch 90 - Current Loss: 5.8855335e-7
+  Batch 95 - Current Loss: 2.3880867e-8
+  Batch 100 - Current Loss: 6.608719e-7
+Epoch 98/100 - Average Loss: 1.4709716373696724e-6
+  Batch 5 - Current Loss: 1.5920255e-6
+  Batch 10 - Current Loss: 2.09245e-7
+  Batch 15 - Current Loss: 1.4507483e-8
+  Batch 20 - Current Loss: 1.623109e-6
+  Batch 25 - Current Loss: 7.424269e-7
+  Batch 30 - Current Loss: 3.703426e-7
+  Batch 35 - Current Loss: 4.560479e-7
+  Batch 40 - Current Loss: 3.2530374e-7
+  Batch 45 - Current Loss: 1.1371925e-8
+  Batch 50 - Current Loss: 2.2794808e-8
+  Batch 55 - Current Loss: 6.9852047e-7
+  Batch 60 - Current Loss: 7.7935346e-7
+  Batch 65 - Current Loss: 2.2997906e-6
+  Batch 70 - Current Loss: 4.9222745e-6
+  Batch 75 - Current Loss: 1.7439241e-7
+  Batch 80 - Current Loss: 6.8465816e-8
+  Batch 85 - Current Loss: 1.2785122e-6
+  Batch 90 - Current Loss: 2.2324612e-6
+  Batch 95 - Current Loss: 9.764809e-7
+  Batch 100 - Current Loss: 2.4831724e-7
+Epoch 99/100 - Average Loss: 9.447639131650309e-7
+  Batch 5 - Current Loss: 1.526902e-7
+  Batch 10 - Current Loss: 1.843179e-6
+  Batch 15 - Current Loss: 5.8054854e-7
+  Batch 20 - Current Loss: 7.6908225e-7
+  Batch 25 - Current Loss: 5.291381e-7
+  Batch 30 - Current Loss: 1.9844329e-6
+  Batch 35 - Current Loss: 1.3331456e-6
+  Batch 40 - Current Loss: 8.7719593e-7
+  Batch 45 - Current Loss: 8.261028e-6
+  Batch 50 - Current Loss: 2.6563046e-6
+  Batch 55 - Current Loss: 4.782931e-6
+  Batch 60 - Current Loss: 3.2538554e-9
+  Batch 65 - Current Loss: 9.409333e-7
+  Batch 70 - Current Loss: 7.4791296e-7
+  Batch 75 - Current Loss: 7.900553e-7
+  Batch 80 - Current Loss: 8.402482e-7
+  Batch 85 - Current Loss: 5.027236e-8
+  Batch 90 - Current Loss: 4.487482e-8
+  Batch 95 - Current Loss: 7.692897e-9
+  Batch 100 - Current Loss: 4.0818887e-7
+Epoch 100/100 - Average Loss: 1.28091574770825e-6
+=== Finished training for FNO-style Spectral Proxy ===
+

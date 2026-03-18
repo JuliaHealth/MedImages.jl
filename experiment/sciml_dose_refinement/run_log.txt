@@ -1,0 +1,31 @@
+  Activating project at `/app/experiments/sciml_dose_refinement`
+Precompiling packages...
+┌ Warning: attempting to remove probably stale pidfile
+│   path = "/home/jules/.julia/compiled/v1.12/BoundaryValueDiffEqFIRK/ughQx_KBaz6.ji.pidfile"
+└ @ FileWatching.Pidfile ~/.julia/juliaup/julia-1.12.5+0.x64.linux.gnu/share/julia/stdlib/v1.12/FileWatching/src/pidfile.jl:247
+┌ Warning: attempting to remove probably stale pidfile
+│   path = "/home/jules/.julia/compiled/v1.12/BoundaryValueDiffEqMIRK/6bkfK_KBaz6.ji.pidfile"
+└ @ FileWatching.Pidfile ~/.julia/juliaup/julia-1.12.5+0.x64.linux.gnu/share/julia/stdlib/v1.12/FileWatching/src/pidfile.jl:247
+┌ Warning: attempting to remove probably stale pidfile
+│   path = "/home/jules/.julia/compiled/v1.12/SciMLSensitivity/bIrP1_KBaz6.ji.pidfile"
+└ @ FileWatching.Pidfile ~/.julia/juliaup/julia-1.12.5+0.x64.linux.gnu/share/julia/stdlib/v1.12/FileWatching/src/pidfile.jl:247
+┌ Warning: attempting to remove probably stale pidfile
+│   path = "/home/jules/.julia/compiled/v1.12/BoundaryValueDiffEqShooting/q74Uy_KBaz6.ji.pidfile"
+└ @ FileWatching.Pidfile ~/.julia/juliaup/julia-1.12.5+0.x64.linux.gnu/share/julia/stdlib/v1.12/FileWatching/src/pidfile.jl:247
+┌ Warning: attempting to remove probably stale pidfile
+│   path = "/home/jules/.julia/compiled/v1.12/OrdinaryDiffEqBDF/DafTP_KBaz6.ji.pidfile"
+└ @ FileWatching.Pidfile ~/.julia/juliaup/julia-1.12.5+0.x64.linux.gnu/share/julia/stdlib/v1.12/FileWatching/src/pidfile.jl:247
+  22080.6 ms  ✓ SciMLSensitivity
+  27838.9 ms  ✓ OrdinaryDiffEqBDF
+  59106.8 ms  ✓ OrdinaryDiffEqDefault
+   8115.8 ms  ✓ OrdinaryDiffEq
+  11166.5 ms  ✓ DelayDiffEq
+ 203127.2 ms  ✓ BoundaryValueDiffEqMIRK
+ 204824.5 ms  ✓ BoundaryValueDiffEqShooting
+ 276335.3 ms  ✓ BoundaryValueDiffEqFIRK
+  12429.7 ms  ✓ BoundaryValueDiffEq
+  16349.5 ms  ✓ DifferentialEquations
+  10 dependencies successfully precompiled in 308 seconds. 493 already precompiled.
+Generating dummy 5D tensor data (W, H, D, C, N) for 16 samples...
+Batch input size: (16, 16, 16, 3, 4)
+Batch target size: (16, 16, 16, 1, 4)
