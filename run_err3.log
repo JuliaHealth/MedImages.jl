@@ -1,0 +1,20 @@
+  Activating project at `~/project_ssd/MedImages.jl`
+┌ Warning: Slow fallback implementation invoked for conv!  You probably don't want this; check your datatypes.
+│   yT = Float64
+│   T1 = Float64
+│   T2 = Float32
+└ @ NNlib ~/.julia/packages/NNlib/srXYX/src/conv.jl:192
+┌ Warning: Slow fallback implementation invoked for ∇conv_data!  You probably don't want this; check your datatypes.
+│   yT = Float64
+│   T1 = Float64
+│   T2 = Float32
+└ @ NNlib ~/.julia/packages/NNlib/srXYX/src/conv.jl:243
+Processing patient: test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat10
+Building Optimization Problem via Optimization.jl and Zygote...
+Loss: 4.948469468306765
+Loss: 12.143147838434814
+Loss: 1.6061684545208412
+Loss: 3.328066985450449
+Loss: 5.0980274838075355
+Loss: 1.6061684545208412
+Finished native Lux network training loops. Final Loss: 1.6061684545208412

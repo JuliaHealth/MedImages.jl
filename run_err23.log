@@ -1,0 +1,106 @@
+
+[1853122] signal (2): Interrupt
+in expression starting at /home/jm/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:10
+_ZN15LiveDebugValues16InstrRefBasedLDV27produceMLocTransferFunctionERN4llvm15MachineFunctionERNS1_15SmallVectorImplINS1_13SmallDenseMapINS_6LocIdxENS_10ValueIDNumELj4ENS1_12DenseMapInfoIS6_vEENS1_6detail12DenseMapPairIS6_S7_EEEEEEj at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN15LiveDebugValues16InstrRefBasedLDV12ExtendRangesERN4llvm15MachineFunctionEPNS1_20MachineDominatorTreeEPNS1_16TargetPassConfigEjj.part.1399 at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm19MachineFunctionPass13runOnFunctionERNS_8FunctionE.part.68 at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm13FPPassManager13runOnFunctionERNS_8FunctionE at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm13FPPassManager11runOnModuleERNS_6ModuleE at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm6legacy15PassManagerImpl3runERNS_6ModuleE at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm3orc14SimpleCompilerclERNS_6ModuleE at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+operator() at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jitlayers.cpp:1311
+_ZN4llvm3orc14IRCompileLayer4emitESt10unique_ptrINS0_29MaterializationResponsibilityESt14default_deleteIS3_EENS0_16ThreadSafeModuleE at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm3orc16IRTransformLayer4emitESt10unique_ptrINS0_29MaterializationResponsibilityESt14default_deleteIS3_EENS0_16ThreadSafeModuleE at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+emit at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jitlayers.cpp:724
+_ZN4llvm3orc31BasicIRLayerMaterializationUnit11materializeESt10unique_ptrINS0_29MaterializationResponsibilityESt14default_deleteIS3_EE at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm3orc19MaterializationTask3runEv at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm6detail18UniqueFunctionBaseIvJSt10unique_ptrINS_3orc4TaskESt14default_deleteIS4_EEEE8CallImplIPFvS7_EEEvPvRS7_ at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm3orc16ExecutionSession22dispatchOutstandingMUsEv at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm3orc16ExecutionSession17OL_completeLookupESt10unique_ptrINS0_21InProgressLookupStateESt14default_deleteIS3_EESt10shared_ptrINS0_23AsynchronousSymbolQueryEESt8functionIFvRKNS_8DenseMapIPNS0_8JITDylibENS_8DenseSetINS0_15SymbolStringPtrENS_12DenseMapInfoISF_vEEEENSG_ISD_vEENS_6detail12DenseMapPairISD_SI_EEEEEE at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm3orc25InProgressFullLookupState8completeESt10unique_ptrINS0_21InProgressLookupStateESt14default_deleteIS3_EE at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm3orc16ExecutionSession19OL_applyQueryPhase1ESt10unique_ptrINS0_21InProgressLookupStateESt14default_deleteIS3_EENS_5ErrorE at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm3orc16ExecutionSession6lookupENS0_10LookupKindERKSt6vectorISt4pairIPNS0_8JITDylibENS0_19JITDylibLookupFlagsEESaIS8_EENS0_15SymbolLookupSetENS0_11SymbolStateENS_15unique_functionIFvNS_8ExpectedINS_8DenseMapINS0_15SymbolStringPtrENS_18JITEvaluatedSymbolENS_12DenseMapInfoISI_vEENS_6detail12DenseMapPairISI_SJ_EEEEEEEEESt8functionIFvRKNSH_IS6_NS_8DenseSetISI_SL_EENSK_IS6_vEENSN_IS6_SV_EEEEEE at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+_ZN4llvm3orc16ExecutionSession6lookupERKSt6vectorISt4pairIPNS0_8JITDylibENS0_19JITDylibLookupFlagsEESaIS7_EENS0_15SymbolLookupSetENS0_10LookupKindENS0_11SymbolStateESt8functionIFvRKNS_8DenseMapIS5_NS_8DenseSetINS0_15SymbolStringPtrENS_12DenseMapInfoISI_vEEEENSJ_IS5_vEENS_6detail12DenseMapPairIS5_SL_EEEEEE at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libLLVM-15jl.so (unknown line)
+addModule at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jitlayers.cpp:1604
+jl_add_to_ee at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jitlayers.cpp:2015
+jl_add_to_ee at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jitlayers.cpp:1994
+_jl_compile_codeinst at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jitlayers.cpp:276
+jl_generate_fptr_impl at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jitlayers.cpp:528
+jl_compile_method_internal at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2481 [inlined]
+jl_compile_method_internal at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2368
+gen_cfun_wrapper at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/codegen.cpp:6054
+emit_cfunction at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/codegen.cpp:6692 [inlined]
+emit_expr at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/codegen.cpp:5530
+emit_ssaval_assign at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/codegen.cpp:5101
+emit_stmtpos at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/codegen.cpp:5335 [inlined]
+emit_function at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/codegen.cpp:8384
+jl_emit_code at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/codegen.cpp:8719
+jl_emit_codeinst at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/codegen.cpp:8793
+jl_compile_workqueue at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/codegen.cpp:8917
+_jl_compile_codeinst at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jitlayers.cpp:226
+jl_generate_fptr_impl at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jitlayers.cpp:528
+jl_compile_method_internal at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2481 [inlined]
+jl_compile_method_internal at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2368
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2887 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+jl_module_run_initializer at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/toplevel.c:76
+run_module_init at ./loading.jl:1193
+register_restored_modules at ./loading.jl:1181
+_include_from_serialized at ./loading.jl:1126
+_tryrequire_from_serialized at ./loading.jl:1551
+_require_search_from_serialized at ./loading.jl:1644
+_require at ./loading.jl:2008
+__require_prelocked at ./loading.jl:1882
+jfptr___require_prelocked_81108.1 at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/lib/julia/sys.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+jl_f__call_in_world at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/builtins.c:831
+#invoke_in_world#3 at ./essentials.jl:926 [inlined]
+invoke_in_world at ./essentials.jl:923 [inlined]
+_require_prelocked at ./loading.jl:1873
+macro expansion at ./loading.jl:1860 [inlined]
+macro expansion at ./lock.jl:267 [inlined]
+__require at ./loading.jl:1823
+jfptr___require_81071.1 at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/lib/julia/sys.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+jl_f__call_in_world at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/builtins.c:831
+#invoke_in_world#3 at ./essentials.jl:926 [inlined]
+invoke_in_world at ./essentials.jl:923 [inlined]
+require at ./loading.jl:1816
+jfptr_require_81068.1 at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/lib/julia/sys.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+call_require at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/toplevel.c:481 [inlined]
+eval_import_path at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/toplevel.c:518
+jl_toplevel_eval_flex at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/toplevel.c:752
+jl_toplevel_eval_flex at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/toplevel.c:877
+ijl_toplevel_eval_in at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/toplevel.c:985
+eval at ./boot.jl:385 [inlined]
+include_string at ./loading.jl:2146
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+_include at ./loading.jl:2206
+include at ./Base.jl:495
+jfptr_include_46653.1 at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/lib/julia/sys.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+exec_options at ./client.jl:323
+_start at ./client.jl:557
+jfptr__start_83114.1 at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/lib/julia/sys.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+true_main at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jlapi.c:582
+jl_repl_entrypoint at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jlapi.c:731
+main at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/cli/loader_exe.c:58
+unknown function (ip: 0x7fd6b522a574)
+__libc_start_main at /lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+unknown function (ip: 0x4010b8)
+unknown function (ip: (nil))
+Allocations: 31720946 (Pool: 31635097; Big: 85849); GC: 40
+  Activating project at `~/project_ssd/MedImages.jl`
