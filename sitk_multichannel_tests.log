@@ -1,3 +1,0 @@
-[ Info: Max difference between MedImages and SimpleITK: 5.9604645e-8
-Test Summary:                                  | Pass  Total  Time
-SimpleITK Multichannel Resampling Verification |    6      6  3.7s
