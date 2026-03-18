@@ -5,6 +5,7 @@ using Test
 using MedImages
 using MedImages.Utils
 using Random
+using Statistics
 
 # Import test infrastructure (conditionally include if not already defined)
 if !isdefined(@__MODULE__, :TestHelpers)
@@ -40,6 +41,10 @@ using .TestConfig
                                                             new_dims, MedImages.Linear_en)
 
                     # 2. Slow Interpolations.jl (Reference)
+                    # Use the same median corner extrapolation value as resample_kernel_launch
+                    corners = Utils.extract_corners(data)
+                    extrap_val = Statistics.median(corners)
+
                     indices = Utils.get_base_indicies_arr(new_dims)
                     points = similar(indices, Float64)
                     for i in 1:size(indices, 2)
@@ -49,7 +54,7 @@ using .TestConfig
                     end
 
                     res_slow_flat = Utils.interpolate_my(points, data, old_spacing,
-                                                          MedImages.Linear_en, true, 0.0, false)
+                                                          MedImages.Linear_en, true, extrap_val, false)
                     res_slow = reshape(res_slow_flat, new_dims)
                     res_slow = Float32.(res_slow)
 
@@ -73,6 +78,9 @@ using .TestConfig
                                      for (sz, osp, nsp) in zip(size_src, old_spacing, new_spacing))
 
                     # Calculate points
+                    corners = Utils.extract_corners(data)
+                    extrap_val = Statistics.median(corners)
+
                     indices = Utils.get_base_indicies_arr(new_dims)
                     points = similar(indices, Float64)
                     for i in 1:size(indices, 2)
@@ -83,13 +91,13 @@ using .TestConfig
 
                     # Reference (slow)
                     res_slow_flat = Utils.interpolate_my(points, data, old_spacing,
-                                                          MedImages.Linear_en, true, 0.0, false)
+                                                          MedImages.Linear_en, true, extrap_val, false)
                     res_slow = reshape(res_slow_flat, new_dims)
                     res_slow = Float32.(res_slow)
 
                     # Generic fast kernel
                     res_generic_fast_flat = Utils.interpolate_my(points, data, old_spacing,
-                                                                  MedImages.Linear_en, true, 0.0, true)
+                                                                  MedImages.Linear_en, true, extrap_val, true)
                     res_generic_fast = reshape(res_generic_fast_flat, new_dims)
                     res_generic_fast = Float32.(res_generic_fast)
 

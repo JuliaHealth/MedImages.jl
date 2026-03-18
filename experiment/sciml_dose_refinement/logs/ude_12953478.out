@@ -1,0 +1,14 @@
+================================================================================
+JobID = 12953478
+User = u10867, Account = ovgu_medicine_llm
+Partition = kisski-h100, Nodelist = ggpu244
+================================================================================
+Starting UDE Training on Slurm...
+============ Job Information ===================================================
+Submitted: 2026-03-11T08:48:13
+Started: 2026-03-11T08:50:18
+Ended: 2026-03-11T08:56:25
+Elapsed: 7 min, Limit: 1440 min, Difference: 1433 min
+CPUs: 16, Nodes: 1
+Estimated Consumption: 122.50 core-hours
+================================================================================

@@ -17,10 +17,26 @@ end
 
 
 
+function resample_to_spacing(im::MedImage, new_spacing::Tuple{Float64,Float64,Float64}, interpolator_enum::Interpolator_enum, use_cuda=false)::MedImage
+    old_spacing = im.spacing
+    old_size = size(im.voxel_data)
 
 
-#  te force solution get all direction combinetions put it in sitk and try all possible ways to permute and reverse axis to get the same result as sitk then save the result in json or sth and use; do the same with the origin
-#     Additionally in similar manner save all directions in a form of a vector and associate it with 3 letter codes
+    # Julia array dims map as: dim1 -> X, dim2 -> Y, dim3 -> Z
+    # Spacing is already in (x,y,z) order, so no reversal needed
+    # Use optimized kernel resampling
+    new_voxel_data = resample_kernel_launch(im.voxel_data, old_spacing, new_spacing, new_size, interpolator_enum)
+
+    new_im = Load_and_save.update_voxel_and_spatial_data(im, new_voxel_data, im.origin, new_spacing, im.direction)
+
+    return new_im
+end#resample_to_spacing
+
+function resample_to_spacing(im::BatchedMedImage, new_spacing::Union{Tuple{Float64,Float64,Float64}, Vector{Tuple{Float64,Float64,Float64}}}, interpolator_enum::Interpolator_enum)::BatchedMedImage
+    batch_size = size(im.voxel_data, 4)
+    old_size = size(im.voxel_data)[1:3]
+
+    # Logic for handling shared vs unique spacing
 
 
 """
@@ -29,13 +45,92 @@ end
 
 Change the orientation of a `MedImage` to a target orientation (e.g., "RAS", "LPS").
 
-This function permutes and/or reverses the image axes to match the desired `goal_orientation`.
-It updates both the voxel data and the spatial metadata (origin, spacing, direction)
-consistently.
+    # If consistent, we can proceed.
+    # We need to adapt `resample_kernel_launch` to handle batches.
+    # Currently `resample_kernel_launch` takes (image_data, old_spacing, new_spacing, new_dims, ...)
+    # It assumes shared spacing?
+    # Let's check `Utils.jl`.
 
-# Arguments
-- `im::MedImage`: The input image to reorient.
-- `goal_orientation`: Target orientation as an `Orientation_code` enum or a string.
+    # `resample_kernel_launch` in Utils calls `trilinear_resample_enzyme_kernel!` or similar.
+    # The kernels take `old_spacing`, `new_spacing`.
+    # They are marked `@Const` in simple version, or as arrays in the 4D/Enzyme version?
+    # Wait, I added `interpolate_kernel_4d` but did I update `resample_kernel_launch`?
+    # No, I updated `interpolate_pure`.
+    # `resample_to_spacing` uses `resample_kernel_launch`, which is a specialized resampling kernel (inverse mapping).
+    # `interpolate_my` is forward/arbitrary point interpolation.
+
+    # `resample_kernel_launch` is optimized for grid-to-grid resampling.
+    # I need to update `resample_kernel_launch` in `Utils.jl` to support batched arrays and vector spacings!
+
+    # For now, I will use `interpolate_my` approach which supports batching via my previous work,
+    # OR I should update `resample_kernel_launch`.
+    # Updating `resample_kernel_launch` is better for performance (specialized grid kernel).
+    # But `interpolate_my` is more generic.
+
+    # Let's stick to `resample_kernel_launch` if I update it, or fallback to `resample_to_image` logic?
+    # Actually `resample_to_spacing` is a subset of `resample_to_image` where new grid is aligned.
+
+    # If I use `resample_kernel_launch`, I need to modify it in `Utils.jl`.
+    # Let's assume for this step I will rely on `Utils.resample_kernel_launch` and update it if needed,
+    # OR implement loop here.
+
+    # To avoid modifying `Utils.jl` extensively again in this step (risk),
+    # I can implement the batch loop here calling single `resample_kernel_launch`?
+    # No, that's slow on GPU.
+
+    # I should use `interpolate_my` which I ALREADY updated to support batches!
+    # Calculate affine matrices for the entire batch
+    # M maps Target Index -> Source Index
+    # rx = (ix - 1) * nsp / osp + 1 = ix * (nsp/osp) + (1 - nsp/osp)
+    
+    M_batch = zeros(Float32, 4, 4, batch_size)
+    for b in 1:batch_size
+        nsp = target_spacings[b]
+        osp = im.spacing[b]
+        
+        m11 = nsp[1] / osp[1]
+        m22 = nsp[2] / osp[2]
+        m33 = nsp[3] / osp[3]
+        
+        M_batch[1, 1, b] = m11; M_batch[2, 2, b] = m22; M_batch[3, 3, b] = m33
+        M_batch[1, 4, b] = 1.0f0 - m11
+        M_batch[2, 4, b] = 1.0f0 - m22
+        M_batch[3, 4, b] = 1.0f0 - m33
+        M_batch[4, 4, b] = 1.0f0
+    end
+    
+    device_M = is_cuda_array(im.voxel_data) ? CuArray(M_batch) : M_batch
+    
+    # Call the fused kernel
+    new_data = interpolate_fused_affine(im.voxel_data, device_M, first_new_size, interpolator_enum)
+    
+    # Cast back to original type if needed
+    if eltype(im.voxel_data) != Float32
+        new_data = cast_to_array_b_type(new_data, im.voxel_data)
+    end
+
+    return BatchedMedImage(
+        voxel_data = new_data,
+        origin = im.origin,
+        spacing = target_spacings,
+        direction = im.direction,
+        image_type = im.image_type,
+        image_subtype = im.image_subtype,
+        patient_id = im.patient_id,
+        current_device = im.current_device,
+        date_of_saving = im.date_of_saving,
+        acquistion_time = im.acquistion_time,
+        study_uid = im.study_uid,
+        patient_uid = im.patient_uid,
+        series_uid = im.series_uid,
+        study_description = im.study_description,
+        legacy_file_name = im.legacy_file_name,
+        display_data = im.display_data,
+        clinical_data = im.clinical_data,
+        is_contrast_administered = im.is_contrast_administered,
+        metadata = im.metadata
+    )
+end
 
 # Returns
 - `MedImage`: A new image object with the requested orientation.

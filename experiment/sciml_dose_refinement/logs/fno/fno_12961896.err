@@ -1,0 +1,385 @@
+   Resolving package versions...
+  No Changes to `/mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/Project.toml`
+  No Changes to `/mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/Manifest.toml`
+┌ Warning: Circular dependency detected. Precompilation will be skipped for:
+│   OrdinaryDiffEqExplicitRK [9286f039-9fbf-40e8-bf65-aa933bdc4db0]
+│   BracketingNonlinearSolve [70df07ce-3d50-431d-a3e7-ca6ddb60ac1e]
+│   ArrayInterfaceTrackerExt [eb0c05c4-6780-5852-a67e-5d31d2970b9a]
+│   NonlinearSolveBaseBandedMatricesExt [f3d6eb4f-59b9-5696-a638-eddf66c7554e]
+│   RecursiveArrayToolsStatisticsExt [50282732-812c-594b-adfe-8a041f888e43]
+│   NonlinearSolveFirstOrder [5959db7a-ea39-4486-b5fe-2dd0bf03d60d]
+│   PreallocationTools [d236fae5-4411-538c-8e31-a6e3d9e00b46]
+│   LinearSolveForwardDiffExt [bae460b6-3243-5590-8f88-309b73c7dfe7]
+│   LinearSolveKernelAbstractionsExt [385e4588-a1a0-5c1d-98fa-d45bf6f8ecf9]
+│   SparseConnectivityTracerNaNMathExt [1196811c-ab8c-56f5-92ba-b57bfe034832]
+│   NonlinearSolveBaseSparseMatrixColoringsExt [e3ecd195-ca82-5397-9546-f380c1e34951]
+│   ChainRulesCoreExt [8ccf546c-b5ad-5491-b9b6-b62e2a4db961]
+│   DifferentiationInterfaceReverseDiffExt [42de5545-25ae-52f4-80ae-53d50af9133a]
+│   GPUArraysSparseArraysExt [555d850b-e4ac-5d9d-bfa0-17bb432b4efb]
+│   OrdinaryDiffEqCore [bbf590c4-e513-4bbe-9b18-05decba2e5d8]
+│   ChainRules [082447d4-558c-5d27-93f4-14fc19e9eca2]
+│   SpecialFunctionsExt [1285c0f1-ff9f-5867-b66e-0f359bcf09ba]
+│   SciMLOperatorsStaticArraysCoreExt [a2df0a61-553a-563b-aed7-0ce21874eb58]
+│   DiffEqBaseChainRulesCoreExt [b00db79b-61e3-50fb-b26f-2d35b2d9e4ed]
+│   Sundials [c3572dad-4567-51f8-b174-8c6c989267f4]
+│   FastPowerTrackerExt [18c65b70-2546-5492-ac4c-dad4ac5611e8]
+│   ComponentArraysExt [71eeaaa2-a698-5b09-840f-ecf38409e9a6]
+│   NonlinearSolve [8913a72c-1f9b-4ce2-8d82-65094dcecaec]
+│   NonlinearSolveQuasiNewtonForwardDiffExt [7edab7de-1038-5e4f-97a7-6bfc75d44324]
+│   OrdinaryDiffEq [1dea7af3-3e70-54e6-95c3-0bf5283fa5ed]
+│   ArrayInterfaceReverseDiffExt [f04d60fc-fd76-50a2-b20a-e66ecc355e8f]
+│   OrdinaryDiffEqCoreEnzymeCoreExt [ca1c724a-f4aa-55ef-b8e4-2f05449449ac]
+│   StaticArrayInterface [0d7ed370-da01-4f52-bd93-41d350b8b718]
+│   RecursiveArrayToolsFastBroadcastExt [42296aa8-c874-5f57-b5c1-8d6f5ebd5400]
+│   SciMLBase [0bca4576-84f4-4d90-8ffe-ffa030f20462]
+│   ComponentArrays [b0b7db55-cfe3-40fc-9ded-d10e2dbeff66]
+│   GPUArrays [0c68f7d7-f131-5f86-a1c3-88cf8149b2d7]
+│   ComponentArraysRecursiveArrayToolsExt [eb027ef3-389c-5561-b3ad-95c7d3310487]
+│   SciMLBasePythonCallExt [2797fd30-2078-5027-980c-4c2c8a19c528]
+│   OrdinaryDiffEqDifferentiationSparseArraysExt [9bf9f624-072b-5e2a-ad4d-3f284075db8d]
+│   DiffEqBaseCUDAExt [78064ecb-8a7e-51fd-a998-f0197ddca326]
+│   FluxCUDAcuDNNExt [a1ab010e-6f71-51d6-acc8-fb8bfa4c0f92]
+│   NonlinearSolveBaseForwardDiffExt [63d416d0-6995-5965-81e0-55251226d976]
+│   KernelAbstractions [63c18a36-062a-441e-b654-da1e3ab1ce7c]
+│   EnzymeExt [581baccc-15ba-5e95-98da-6f157893efaf]
+│   ZygoteExt [3f48baa7-5843-56cc-8004-b8b725de387b]
+│   OrdinaryDiffEqPDIRK [5dd0a6cf-3d4b-4314-aa06-06d4e299bc89]
+│   FluxCUDAExt [dd41ee52-2073-581e-92e8-26baf003f19a]
+│   SciMLBaseDistributionsExt [9459e65e-4998-5ce3-a48a-41c39864cf81]
+│   MLUtilsExt [5e1fd73c-d1df-5b04-a844-08cc9c579aab]
+│   LineSearchLineSearchesExt [8d20b31a-8b56-511a-b573-0bef60e8c8c7]
+│   NonlinearSolveQuasiNewton [9a2c21bd-3a47-402d-9113-8faf9a0ee114]
+│   SimpleNonlinearSolveReverseDiffExt [58f75c21-254d-53c4-ab12-ca382cd58dd6]
+│   ComponentArraysTrackerExt [a97f7ea9-bdd4-56dc-b9a4-48fcd061f528]
+│   TrackerExt [04626ccc-6cff-520c-b373-a969fd68a29c]
+│   SparseMatrixColoringsCUDAExt [4e75eb78-b06e-5e0a-a341-6fea9c73d77e]
+│   cuDNNExt [7bbd2ad5-5ae6-5484-820f-8570d3a216f7]
+│   RecursiveArrayToolsStructArraysExt [07510ace-05c5-59ac-8535-cc0df8d4a157]
+│   RecursiveArrayToolsSparseArraysExt [73e54eaf-3344-511d-b088-1ac5413eca63]
+│   StrideArraysCore [7792a7ef-975c-4747-a70f-980b88e8d1da]
+│   LinearSolveFastAlmostBandedMatricesExt [f94f2e43-4c39-5f8d-ab9c-7017feb07ff4]
+│   OrdinaryDiffEqHighOrderRK [d28bc4f8-55e1-4f49-af69-84c1a99f0f58]
+│   MLDataDevicesExt [29385a29-24a8-5b0a-9a3b-dee3d043232d]
+│   CUDAExt [9e0aca61-9665-56cf-9642-d947ef6fc392]
+│   StructArraysAdaptExt [f04e5bcb-ab32-5a64-8b64-c2cc4abec66e]
+│   ArrayInterfaceCUDAExt [f78586ac-ba87-5ec7-b3a5-84bc1b258ee3]
+│   RecursiveArrayToolsKernelAbstractionsExt [a2c70ebf-ea5c-585a-934a-212dbeaca23f]
+│   RecursiveArrayToolsExt [32999b6b-3d33-5bcb-8d6d-c18e13101d60]
+│   OneHotArrays [0b1bfda6-eb8a-41d2-88d8-f5af5cad476f]
+│   Tracker [9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c]
+│   OrdinaryDiffEqLowStorageRK [b0944070-b475-4768-8dec-fb6eb410534d]
+│   OrdinaryDiffEqStabilizedRK [358294b1-0aab-51c3-aafe-ad5ab194a2ad]
+│   EnzymeExt [e313a9a4-0723-5d2b-a457-c2fc3b4602bb]
+│   PreallocationToolsForwardDiffExt [34a8f204-0c2c-5664-bafb-c14baecaa342]
+│   ArrayInterfaceReverseDiffExt [f5ac7eda-3dd3-5519-a9cf-05d3c8378848]
+│   OrdinaryDiffEqSymplecticRK [fa646aed-7ef9-47eb-84c4-9443fc8cbfa8]
+│   ForwardDiffExt [c91426f4-7861-5196-9c44-7b937c24c440]
+│   RecursiveArrayToolsTablesExt [d7e6196c-66fc-58ad-a3da-7870e8770d21]
+│   MLUtilsExt [447e3217-c189-5fc4-9e2b-3bc546fe18f7]
+│   OrdinaryDiffEqSSPRK [669c94d9-1f4b-4b64-b377-1aa079aa2388]
+│   OrdinaryDiffEqStabilizedIRK [e3e12d00-db14-5390-b879-ac3dd2ef6296]
+│   LuxCUDA [d0bbae9a-e099-4d5b-a835-1c6931763bda]
+│   FluxEnzymeExt [b638a555-8f07-5bb7-814d-c429cc18ac6b]
+│   ComponentArraysReverseDiffExt [e70cba5e-829d-5c58-b281-a7bd6bd860ad]
+│   OrdinaryDiffEqLowOrderRK [1344f307-1e59-4825-a18e-ace9aa3fa4c6]
+│   cuDNN [02a925ec-e4fe-4b08-9a7e-0d78e3d38ccd]
+│   TrackerPDMatsExt [413474bb-43f3-55e9-965b-d5648011ca3f]
+│   OrdinaryDiffEqFunctionMap [d3585ca7-f5d3-4ba6-8057-292ed1abd90f]
+│   MaybeInplace [bb5d69b7-63fc-4a16-80bd-7e42200c7bdb]
+│   CUDAExt [0d0e9cde-cfc5-56bb-a277-295c1cc0b950]
+│   OrdinaryDiffEqExponentialRK [e0540318-69ee-4070-8777-9e2de6de23de]
+│   ComponentArraysGPUArraysExt [9a6daffa-3352-5563-953a-3fb952178ca8]
+│   LinearSolveEnzymeExt [133222a9-3015-5ee0-8b28-65fc8ed13c28]
+│   ComponentArraysOptimisersExt [69ff9dc5-f245-5f9a-aa14-ed74a9cec1e3]
+│   Polyester [f517fe37-dbe3-4b94-8317-1923a5111588]
+│   NNlibEnzymeCoreExt [c8a29c40-e0ac-5e6e-8984-8da3115ac879]
+│   DifferentiationInterfaceStaticArraysExt [a583ad16-7f3e-50a1-a3ab-8640d85ec5ce]
+│   ArrayInterfaceTrackerExt [5331bc18-65ed-5114-99b1-1964e516d542]
+│   DelayDiffEq [bcd4f6db-9728-5f36-b5f7-82caef46ccdb]
+│   DifferentiationInterfaceGPUArraysCoreExt [84466896-9be0-59d9-a6c0-1e4e2a5f5925]
+│   CloseOpenIntervals [fb6a15b2-703c-40df-9091-08a04967cfa9]
+│   NNlibSpecialFunctionsExt [ca12507f-4cf6-5922-b1f9-e0da61ef4aa8]
+│   ComponentArraysExt [94ac7b7b-795a-523a-bd53-a5e5490be248]
+│   SciMLBaseMLStyleExt [54891929-e0db-55d3-b096-c0f3ec60df6b]
+│   OrdinaryDiffEqLinear [521117fe-8c41-49f8-b3b6-30780b3f0fb5]
+│   NonlinearSolveBaseTrackerExt [d9a211c1-624c-51fd-affb-3f92d00954db]
+│   DifferentiationInterfaceFiniteDiffExt [6044458a-139e-583a-bc2f-a730a9b54282]
+│   StructArraysSparseArraysExt [d5b9410b-929f-5d61-aab8-0598522fd334]
+│   DifferentialEquations [0c46a032-eb83-5123-abaf-570d42b7fbaa]
+│   NLSolversBase [d41bc354-129a-5804-8e4c-c37616107c6c]
+│   CUDAForwardDiffExt [dc5d30e2-4f8d-51b2-b0ae-3c49f878e242]
+│   Flux [587475ba-b771-5e3f-ad9e-33799f191a9c]
+│   FastBroadcast [7034ab61-46d4-4ed7-9d0f-46aef9175898]
+│   OrdinaryDiffEqDifferentiation [4302a76b-040a-498a-8c04-15b101fed76b]
+│   NonlinearSolveBaseSparseArraysExt [8494477e-8a74-521a-b11a-5a22161b1bc8]
+│   ExponentialUtilities [d4d017d3-3776-5f7e-afef-a10c40355c18]
+│   SciMLJacobianOperators [19f34311-ddf3-4b8b-af20-060888a46c0e]
+│   SciMLBaseReverseDiffExt [93996ac4-73bc-50a9-b500-81385394312c]
+│   NonlinearSolveBaseLineSearchExt [a65b7766-7c26-554a-8b8d-165d7f96f890]
+│   SimpleNonlinearSolveTrackerExt [ac004708-0488-5d74-bdd8-3e2743d441a0]
+│   OrdinaryDiffEqNonlinearSolve [127b3ac7-2247-4354-8eb6-78cf4e7c58e8]
+│   OrdinaryDiffEqCoreSparseArraysExt [16d6ab37-8c95-53ee-a83a-760f9b08d86c]
+│   CUDA [052768ef-5323-5732-b1bb-66c8b64840ba]
+│   DiffEqNoiseProcessReverseDiffExt [527f56d1-b64a-561a-bf18-c49fb85fda5d]
+│   FiniteDiffSparseArraysExt [699899dd-2948-59d9-a4f6-ce210f3f1f61]
+│   StructArraysStaticArraysExt [d1e1e8be-46cf-5459-abb8-be6c7518b661]
+│   ZygoteExt [b8d5cfce-b3cf-5145-8195-9a5ca6d51e74]
+│   NonlinearSolveBaseReverseDiffExt [f30dfbbe-04dc-561d-a411-71d8bed91639]
+│   SparseArraysExt [85068d23-b5fb-53f1-8204-05c2aba6942f]
+│   DiffEqNoiseProcess [77a26b50-5914-5dd7-bc55-306e6241c503]
+│   PreallocationToolsSparseConnectivityTracerExt [f3463b80-2822-5513-b06b-5bb94f50d0b8]
+│   RecursiveArrayToolsTrackerExt [201bfbae-74a9-54d9-992e-8e72788965ed]
+│   LayoutPointers [10f19ff3-798f-405d-979b-55457f8fc047]
+│   OrdinaryDiffEqTsit5 [b1df2697-797e-41e3-8120-5422d3b24e4a]
+│   StructArraysGPUArraysCoreExt [cbbf52aa-d660-55d4-8a5a-33845bbaa85d]
+│   OrdinaryDiffEqSDIRK [2d112036-d095-4a1e-ab9a-08536f3ecdbf]
+│   SciMLBaseZygoteExt [392c259a-06a8-538e-8884-4698e7892fb5]
+│   SciMLSensitivity [1ed8b502-d754-442c-8d5d-10ac956f44a1]
+│   RecursiveArrayToolsZygoteExt [6283b665-1224-52f5-a8f0-5953a1198cc4]
+│   ReverseDiffExt [803e744a-61ae-5ce8-9d9b-448c51268277]
+│   AtomixCUDAExt [13011619-4c7c-5ef0-948f-5fc81565cd05]
+│   SciMLBaseTrackerExt [f1baba63-ec0d-5ae7-beb2-989fd3480656]
+│   LineSearch [87fe0de2-c867-4266-b59a-2f0a94fc965b]
+│   FluxExt [0fb19202-9d0c-5029-9bb1-961b9add5c0f]
+│   RecursiveArrayToolsReverseDiffExt [c5f39a36-1949-51cd-b5fc-0f226c89d745]
+│   LinearAlgebraExt [66d79d19-2cc4-5b0b-ac7a-b340256d1ecd]
+│   ZygoteColorsExt [e68c091a-8ea5-5ca7-be4f-380657d4ad79]
+│   DifferentiationInterfaceSparseMatrixColoringsExt [47c9d817-0958-518c-b746-b505a6e8df74]
+│   NNlibCUDAExt [8a688d86-d2bc-5ad3-8ed1-384f9f2c8cc5]
+│   FastAlmostBandedMatrices [9d29842c-ecb8-4973-b1e9-a27b1157504e]
+│   EnzymeExt [6425d1ab-ad86-5f6e-82f1-f5118e0dc800]
+│   OrdinaryDiffEqBDF [6ad6398a-0878-4a85-9266-38940aa047c8]
+│   OneHotArraysExt [48215bd6-5da8-50ad-84f7-db45ab33cd27]
+│   SparseArraysExt [d59e0577-78a2-56be-b22d-01c326f52333]
+│   ChainRulesExt [f152a86e-e60b-5ef3-ac8e-cdcef9fc354e]
+│   NonlinearSolveSundialsExt [5bae49a2-05de-53bb-8739-0a4838b86c22]
+│   JumpProcessesKernelAbstractionsExt [34528d17-2bd1-5141-99d7-313f2b0f38e8]
+│   NNlibCUDACUDNNExt [ab3ce674-22af-5de9-b6c7-795b17302dcb]
+│   FluxFiniteDifferencesExt [43d9849d-736f-575e-bb0b-d32bec2d27fa]
+│   LuxLib [82251201-b29d-42c6-8e01-566dec8acb11]
+│   SciMLBaseChainRulesCoreExt [4676cac9-c8e0-5d6e-a4e0-e3351593cdf5]
+│   ArrayInterfaceChainRulesCoreExt [eb83e881-a866-5cf1-975c-edd1d5b6a108]
+│   OrdinaryDiffEqExtrapolation [becaefa8-8ca2-5cf9-886d-c06f3d2bd2c4]
+│   DifferentiationInterfaceTrackerExt [5d45cd70-030a-50f9-801c-65d027cb0d7a]
+│   DiffEqBaseTrackerExt [1ba67e42-7aa7-5162-ac9b-c09642cdebbf]
+│   OrdinaryDiffEqVerner [79d7bb75-1356-48c1-b8c0-6832512096c2]
+│   OneHotArraysExt [843a9d76-88bf-51f8-b7e4-e34d0b11c080]
+│   FiniteDiff [6a86dc24-6348-571c-b903-95158fe2bd41]
+│   NonlinearSolveBaseLinearSolveExt [3d4538b4-647b-544e-b0c2-b52d0495c932]
+│   NonlinearSolveBaseChainRulesCoreExt [883047d3-6f96-5731-8a11-3844a23c77e3]
+│   ArrayInterfaceStaticArraysCoreExt [48797bb2-d098-51e0-906f-70266c2e01ac]
+│   ChainRulesCoreExt [eae2faf6-b232-58cb-a410-7764fda2830c]
+│   LinearSolveBandedMatricesExt [9522afde-9e86-5396-abc8-24b7312356fe]
+│   SimpleNonlinearSolveChainRulesCoreExt [073a8d7d-86ee-5d75-9348-f9bf6155b014]
+│   OrdinaryDiffEqNordsieck [c9986a66-5c92-4813-8696-a7ec84c806c8]
+│   NNlib [872c559c-99b0-510c-b3b7-b6c96a88d5cd]
+│   DiffEqCallbacks [459566f4-90b8-5000-8ac3-15dfb0a30def]
+│   BoundaryValueDiffEqFIRK [85d9eb09-370e-4000-bb32-543851f73618]
+│   OrdinaryDiffEqPRK [5b33eab2-c0f1-4480-b2c3-94bc1e80bda1]
+│   OrdinaryDiffEqDefault [50262376-6c5a-4cf5-baba-aaf4f84d72d7]
+│   BoundaryValueDiffEqShooting [ed55bfe0-3725-4db6-871e-a1dc9f42a757]
+│   TrackerExt [7e63994b-2d53-5fe7-87ec-6a14d0fc8980]
+│   DiffEqBaseEnzymeExt [f08752e2-9bef-53a6-94a4-9c20ca55f0a4]
+│   CUDAExt [8d20f71a-eaa5-5402-8cb1-1e6062ff668e]
+│   DifferentiationInterfaceChainRulesCoreExt [9dc9f1db-29b2-5863-acb4-b3b6c4880d6a]
+│   StructArraysLinearAlgebraExt [084ded39-0575-5459-ba0f-7a4568fdaad8]
+│   OrdinaryDiffEqFIRK [5960d6e9-dd7a-4743-88e7-cf307b64f125]
+│   BoundaryValueDiffEqMIRKN [9255f1d6-53bf-473e-b6bd-23f1ff009da4]
+│   Lux [b2108857-7c20-44ae-9111-449ecde12c47]
+│   ComponentArraysZygoteExt [3acbf79e-e1c1-58d9-9a19-e1c5cc2c64d6]
+│   DiffEqBaseReverseDiffExt [58a0a981-ddd9-5446-b230-82741bf17c47]
+│   StaticArrayInterfaceStaticArraysExt [06b0261c-7a9b-5753-9bdf-fd6840237b4a]
+│   DifferentiationInterfaceSparseConnectivityTracerExt [d59d10b7-1dae-5777-89c3-d355480b0221]
+│   ExponentialUtilitiesStaticArraysExt [7d52e85c-72bb-51a3-82f3-f6aed919620f]
+│   NNlibFFTWExt [96386cae-6b62-59ad-b532-a94eae05753e]
+│   GPUArraysExt [d46355a1-b099-5f8f-b471-85d4a6fc4f8d]
+│   GPUArraysExt [027ed672-b986-5df3-8c0f-72687092ffd9]
+│   NonlinearSolveBaseEnzymeExt [28304e1e-b02f-5f0f-8e31-08d922976a0f]
+│   TrackerExt [132e7989-7a00-52a0-8ad9-913e221536b6]
+│   SciMLBasePyCallExt [d083c4ab-32a5-5342-b289-e118b48fb79d]
+│   BoundaryValueDiffEqMIRK [1a22d4ce-7765-49ea-b6f2-13c8438986a6]
+│   DifferentiationInterfaceFiniteDifferencesExt [5a431001-f1e7-53e1-89a6-d41ea5e6406a]
+│   DiffEqBaseForwardDiffExt [1fe0b789-d9ca-5274-abe4-f8a8503e5a20]
+│   SparseConnectivityTracerNNlibExt [ccb82920-7ef2-52c3-b603-0dfb2f0ec831]
+│   OrdinaryDiffEqRKN [af6ede74-add8-4cfd-b1df-9a4dbb109d7a]
+│   BracketingNonlinearSolveForwardDiffExt [bb716554-e89b-5af4-bfb6-0f88eb8bb218]
+│   StaticArrayInterfaceOffsetArraysExt [a8fab69c-de6f-5f74-aba3-bef19c2d033f]
+│   ComponentArraysKernelAbstractionsExt [822c09ce-5cab-5e86-b03b-60b2f7596a18]
+│   EnzymeCoreExt [c3ed20f3-746d-5a71-99a7-df1cca8c2b90]
+│   NonlinearSolveSpectralMethods [26075421-4e9a-44e1-8bd1-420ed7ad02b2]
+│   NNlibForwardDiffExt [e8958739-db86-5f80-9e4c-f7c96aa15038]
+│   SciMLOperators [c0aeaf25-5076-4817-a8d5-81caf7dfa961]
+│   BracketingNonlinearSolveChainRulesCoreExt [a94cdb29-925e-502b-9a53-14a43dce85ea]
+│   LinearSolveSparseArraysExt [acf9803d-64eb-5f69-b965-a71e3e6e1ed4]
+│   FluxExt [efdd9d81-d575-5575-aba4-25aacf97df01]
+│   SymbolicIndexingInterfacePrettyTablesExt [876762bf-968e-5ca7-ba95-0cf65a4f10ea]
+│   SciMLBaseDifferentiationInterfaceExt [61c4812a-2cb6-58ab-bd42-a7cbe32d188a]
+│   FiniteDiffBandedMatricesExt [73d9490b-8748-553f-aba9-cf4754de47d8]
+│   RecursiveArrayTools [731186ca-8d62-57ce-b412-fbd966d074cd]
+│   SimpleNonlinearSolve [727e6d20-b764-4bd8-a329-72de5adea6c7]
+│   OrdinaryDiffEqRosenbrock [43230ef6-c299-4910-a778-202eb28ce4ce]
+│   MaybeInplaceSparseArraysExt [9c97de4a-2903-5b9c-add6-4b1aaffe4ab8]
+│   NonlinearSolveBase [be0214bd-f91f-a760-ac4e-3421ce2b2da0]
+│   LineSearches [d3d80556-e9d4-5f37-9878-2ab0fcc64255]
+│   OrdinaryDiffEqIMEXMultistep [9f002381-b378-40b7-97a6-27a27c83f129]
+│   BoundaryValueDiffEqAscher [7227322d-7511-4e07-9247-ad6ff830280e]
+│   cuDNNExt [7e055bff-62fb-5a05-a830-c2878efb2173]
+│   BoundaryValueDiffEqCore [56b672f2-a5fe-4263-ab2d-da677488eb3a]
+│   SparseConnectivityTracerLogExpFunctionsExt [d814ad88-ab24-57e0-b8f0-09133e37aa20]
+│   OrdinaryDiffEqFeagin [101fe9f7-ebb6-4678-b671-3a81e7194747]
+│   SciMLStructures [53ae85a6-f571-4167-b2af-e1d143709226]
+│   ComponentArraysSciMLBaseExt [4f110ecc-9415-5188-843d-6e96dffda943]
+│   NonlinearSolveSpectralMethodsForwardDiffExt [18fca43e-4a0b-515d-9822-068bb149f8e9]
+│   LinearSolve [7ed4a6bd-45f5-4d41-b270-4a48e9bafcae]
+│   ChainRulesCoreExt [961e4994-6beb-54af-ba9d-95fe34ee2dbb]
+│   OrdinaryDiffEqQPRK [04162be5-8125-4266-98ed-640baecc6514]
+│   StochasticDiffEq [789caeaf-c7a9-5a7d-9973-96adeb23e2a0]
+│   JumpProcesses [ccbc3e58-028d-4f4c-8cd5-9ae44345cda5]
+│   MedImages [fbff095b-7891-4fc4-b5e5-3cd99b9dd225]
+│   SymbolicIndexingInterface [2efcf032-c050-4f8e-a9bb-153293bab1f5]
+│   SciMLBaseForwardDiffExt [53f9bee7-1433-5cb3-b0ab-2dd3fda1e9bd]
+│   DifferentiationInterfaceZygoteExt [bbc9ae08-70e9-50a1-83a4-36e0af391677]
+│   SteadyStateDiffEq [9672c7b4-1e72-59bd-8a11-6ac3964bc41f]
+│   RecursiveArrayToolsForwardDiffExt [14203109-85fb-5f77-af23-1cb7d9032242]
+│   DifferentiationInterfaceEnzymeExt [55327dd7-aa92-56e5-a3d3-d077748ab7c0]
+│   SciMLBaseEnzymeExt [1f50db0a-af91-59e4-a072-6fe0735aace0]
+│   SciMLOperatorsSparseArraysExt [9985400b-97ec-5583-b534-4f70b643bcf7]
+│   ArrayInterfaceChainRulesExt [8673388c-2cec-59d7-825e-32163c06c3e1]
+│   ReverseDiffExt [9149b93c-f759-5a67-8f95-7a4df534e306]
+│   OrdinaryDiffEqAdamsBashforthMoulton [89bda076-bce5-4f1c-845f-551c83cdda9a]
+│   BoundaryValueDiffEq [764a87c0-6b3e-53db-9096-fe964310641d]
+│   ZygoteTrackerExt [2203d700-20ca-554d-9228-defc17349bb5]
+│   DiffEqCallbacksFunctorsExt [36e898d0-60c9-5513-9761-e0325b60db4c]
+│   DiffEqBaseSparseArraysExt [4131c53f-b1d6-5635-a7a3-57f6f930b644]
+│   DiffEqBase [2b5f629d-d688-5b77-993f-72d75c75574e]
+│   NeuralOperators [ea5c82af-86e5-48da-8ee1-382d6ad7af4b]
+│   LinearSolveCUDAExt [e24d4dde-ed20-5ee7-b465-f1dd73f9b6ba]
+│   DifferentiationInterfaceSparseArraysExt [b08b8115-38b0-5317-86de-b806e26a31fc]
+│   Zygote [e88e6eb3-aa80-5325-afca-941959d7151f]
+│   FiniteDiffStaticArraysExt [75e56524-3a34-51de-85ea-03aa6eac4b64]
+│   PreallocationToolsReverseDiffExt [723d033e-e474-5c37-8984-530550ab56d4]
+│   MLUtils [f1d291b0-491e-4a28-83b9-f70985020b54]
+└ @ Pkg.API /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/Pkg/src/API.jl:1239
+  Activating project at `/mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement`
+   Resolving package versions...
+  No Changes to `/mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/Project.toml`
+  No Changes to `/mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/Manifest.toml`
+┌ Warning: CHOLMOD version incompatibility
+│ 
+│ Julia was compiled with CHOLMOD version 4.0.4. It is
+│ currently linked with version 5.3.1.
+│ This might cause Julia to terminate when working with
+│ sparse matrix factorizations, e.g. solving systems of
+│ equations with \.
+│ 
+│ It is recommended that you use Julia with the same major
+│ version of CHOLMOD as the one used during the build, or
+│ download the generic binaries from www.julialang.org,
+│ which ship with the correct versions of all dependencies.
+└ @ SparseArrays.CHOLMOD /mnt/vast-kisski/home/joanna.wybranska/u10867/.conda/envs/julia_registration_env/share/julia/stdlib/v1.10/SparseArrays/src/solvers/cholmod.jl:206
+┌ Warning: You are using a non-official build of Julia. This may cause issues with CUDA.jl.
+│ Please consider using an official build from https://julialang.org/downloads/.
+└ @ CUDA ~/.julia/packages/CUDA/FJf6p/src/initialization.jl:170
+┌ Warning: Missing files in /user/joanna.wybranska/u10867/.project/dir.project/ollama_data/dataset_Lu/home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat25
+└ @ Main /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /user/joanna.wybranska/u10867/.project/dir.project/ollama_data/dataset_Lu/home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat27
+└ @ Main /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /user/joanna.wybranska/u10867/.project/dir.project/ollama_data/dataset_Lu/home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat28
+└ @ Main /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /user/joanna.wybranska/u10867/.project/dir.project/ollama_data/dataset_Lu/home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat29
+└ @ Main /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /user/joanna.wybranska/u10867/.project/dir.project/ollama_data/dataset_Lu/home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat65
+└ @ Main /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Missing files in /user/joanna.wybranska/u10867/.project/dir.project/ollama_data/dataset_Lu/home/jm/project_ssd/MedImages.jl/test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_10__Pat2
+└ @ Main /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/lu_loader.jl:12
+┌ Warning: Lux layers are stateless and hence don't participate in device transfers. Apply this function on the parameters and states generated using `LuxCore.setup`.
+└ @ MLDataDevicesExt ~/.julia/packages/LuxCore/kQC9S/ext/MLDataDevicesExt.jl:10
+ERROR: LoadError: CUDNNError: CUDNN_STATUS_NOT_SUPPORTED (code 3000)
+Stacktrace:
+  [1] throw_api_error(res::cuDNN.cudnnStatus_t)
+    @ cuDNN ~/.conda/envs/julia_registration_env/share/julia/packages/cuDNN/vKsqU/src/libcudnn.jl:15
+  [2] check
+    @ ~/.conda/envs/julia_registration_env/share/julia/packages/cuDNN/vKsqU/src/libcudnn.jl:26 [inlined]
+  [3] cudnnSetTensorNdDescriptorEx(tensorDesc::Ptr{cuDNN.cudnnTensorStruct}, format::cuDNN.cudnnTensorFormat_t, dataType::cuDNN.cudnnDataType_t, nbDims::Int32, dimA::Vector{Int32})
+    @ cuDNN ~/.julia/packages/GPUToolbox/JLBB1/src/ccalls.jl:33
+  [4] cuDNN.cudnnTensorDescriptor(::cuDNN.cudnnTensorFormat_t, ::Vararg{Any})
+    @ cuDNN ~/.conda/envs/julia_registration_env/share/julia/packages/cuDNN/vKsqU/src/descriptors.jl:40
+  [5] #cudnnTensorDescriptor#528
+    @ ~/.conda/envs/julia_registration_env/share/julia/packages/cuDNN/vKsqU/src/tensor.jl:9 [inlined]
+  [6] cudnnConvolutionForward!
+    @ ~/.conda/envs/julia_registration_env/share/julia/packages/cuDNN/vKsqU/src/convolution.jl:53 [inlined]
+  [7] conv_bias_act!(y::CuArray{Float32, 5, CUDA.DeviceMemory}, x::CuArray{Float32, 5, CUDA.DeviceMemory}, w::CuArray{Float32, 5, CUDA.DeviceMemory}, cdims::DenseConvDims{3, 3, 3, 6, 3}, bias::CuArray{Float32, 5, CUDA.DeviceMemory}, σ::typeof(relu); z::CuArray{Float32, 5, CUDA.DeviceMemory}, alpha::Int64, beta::Int64, algo::Int64)
+    @ NNlibCUDACUDNNExt ~/.julia/packages/NNlib/srXYX/ext/NNlibCUDACUDNNExt/conv.jl:131
+  [8] conv_bias_act!
+    @ ~/.julia/packages/NNlib/srXYX/ext/NNlibCUDACUDNNExt/conv.jl:119 [inlined]
+  [9] #conv_bias_act#404
+    @ ~/.julia/packages/NNlib/srXYX/src/conv_bias_act.jl:4 [inlined]
+ [10] conv_bias_act
+    @ ~/.julia/packages/NNlib/srXYX/src/conv_bias_act.jl:1 [inlined]
+ [11] conv_bias_act
+    @ ~/.conda/envs/julia_registration_env/share/julia/packages/LuxLib/ZJ3gh/src/impl/conv.jl:163 [inlined]
+ [12] conv_bias_act
+    @ ~/.conda/envs/julia_registration_env/share/julia/packages/LuxLib/ZJ3gh/src/impl/conv.jl:141 [inlined]
+ [13] rrule(cfg::Zygote.ZygoteRuleConfig{Zygote.Context{false}}, ::typeof(LuxLib.Impl.fused_conv), opmode::LuxLib.GPUBroadcastOp{CUDADevice}, act::typeof(relu), weight::CuArray{Float32, 5, CUDA.DeviceMemory}, x::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}, cdims::DenseConvDims{3, 3, 3, 6, 3})
+    @ LuxLib.Impl ~/.conda/envs/julia_registration_env/share/julia/packages/LuxLib/ZJ3gh/src/impl/conv.jl:218
+ [14] chain_rrule
+    @ ~/.julia/packages/Zygote/55SqB/src/compiler/chainrules.jl:234 [inlined]
+ [15] macro expansion
+    @ ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0 [inlined]
+ [16] _pullback
+    @ ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:81 [inlined]
+ [17] fused_conv
+    @ ~/.conda/envs/julia_registration_env/share/julia/packages/LuxLib/ZJ3gh/src/impl/conv.jl:177 [inlined]
+ [18] fused_conv_bias_activation
+    @ ~/.conda/envs/julia_registration_env/share/julia/packages/LuxLib/ZJ3gh/src/api/conv.jl:37 [inlined]
+ [19] ##c::Convinternal#340
+    @ ~/.conda/envs/julia_registration_env/share/julia/packages/Lux/GCC0y/src/layers/conv.jl:259 [inlined]
+ [20] Conv
+    @ ~/.julia/packages/ReactantCore/SEqVX/src/ReactantCore.jl:286 [inlined]
+ [21] _pullback(::Zygote.Context{false}, ::Conv{typeof(relu), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, ::CuArray{Float32, 5, CUDA.DeviceMemory}, ::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, ::@NamedTuple{})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [22] apply
+    @ ~/.julia/packages/LuxCore/kQC9S/src/LuxCore.jl:155 [inlined]
+ [23] applychain
+    @ ~/.conda/envs/julia_registration_env/share/julia/packages/Lux/GCC0y/src/layers/containers.jl:0 [inlined]
+ [24] Chain
+    @ ~/.conda/envs/julia_registration_env/share/julia/packages/Lux/GCC0y/src/layers/containers.jl:575 [inlined]
+ [25] apply
+    @ ~/.julia/packages/LuxCore/kQC9S/src/LuxCore.jl:155 [inlined]
+ [26] _pullback(::Zygote.Context{false}, ::typeof(LuxCore.apply), ::Chain{@NamedTuple{layer_1::Conv{typeof(relu), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}}, Nothing}, ::CuArray{Float32, 5, CUDA.DeviceMemory}, ::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}}, ::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [27] applychain
+    @ ~/.conda/envs/julia_registration_env/share/julia/packages/Lux/GCC0y/src/layers/containers.jl:0 [inlined]
+ [28] _pullback(::Zygote.Context{false}, ::typeof(Lux.applychain), ::@NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Chain{@NamedTuple{layer_1::OperatorKernel{Parallel{NeuralOperators.Fix1{typeof(NeuralOperators.add_act), typeof(relu)}, @NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.False, Static.False}, layer_2::Chain{@NamedTuple{stabilizer::WrappedFunction{Base.Broadcast.BroadcastFunction{typeof(identity)}}, conv_layer::OperatorConv{FourierTransform{ComplexF32, Tuple{Int64, Int64, Int64}}, typeof(glorot_uniform)}}, Nothing}}, Nothing}}}, Nothing}, layer_3::Chain{@NamedTuple{layer_1::Conv{typeof(relu), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}}, Nothing}}, ::CuArray{Float32, 5, CUDA.DeviceMemory}, ::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{weight::CuArray{ComplexF32, 3, CUDA.DeviceMemory}}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}}}, ::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [29] Chain
+    @ ~/.conda/envs/julia_registration_env/share/julia/packages/Lux/GCC0y/src/layers/containers.jl:575 [inlined]
+ [30] _pullback(::Zygote.Context{false}, ::Chain{@NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Chain{@NamedTuple{layer_1::OperatorKernel{Parallel{NeuralOperators.Fix1{typeof(NeuralOperators.add_act), typeof(relu)}, @NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.False, Static.False}, layer_2::Chain{@NamedTuple{stabilizer::WrappedFunction{Base.Broadcast.BroadcastFunction{typeof(identity)}}, conv_layer::OperatorConv{FourierTransform{ComplexF32, Tuple{Int64, Int64, Int64}}, typeof(glorot_uniform)}}, Nothing}}, Nothing}}}, Nothing}, layer_3::Chain{@NamedTuple{layer_1::Conv{typeof(relu), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}}, Nothing}}, Nothing}, ::CuArray{Float32, 5, CUDA.DeviceMemory}, ::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{weight::CuArray{ComplexF32, 3, CUDA.DeviceMemory}}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}}}, ::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [31] apply
+    @ ~/.julia/packages/LuxCore/kQC9S/src/LuxCore.jl:155 [inlined]
+ [32] _pullback(::Zygote.Context{false}, ::typeof(LuxCore.apply), ::Chain{@NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Chain{@NamedTuple{layer_1::OperatorKernel{Parallel{NeuralOperators.Fix1{typeof(NeuralOperators.add_act), typeof(relu)}, @NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.False, Static.False}, layer_2::Chain{@NamedTuple{stabilizer::WrappedFunction{Base.Broadcast.BroadcastFunction{typeof(identity)}}, conv_layer::OperatorConv{FourierTransform{ComplexF32, Tuple{Int64, Int64, Int64}}, typeof(glorot_uniform)}}, Nothing}}, Nothing}}}, Nothing}, layer_3::Chain{@NamedTuple{layer_1::Conv{typeof(relu), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}}, Nothing}}, Nothing}, ::CuArray{Float32, 5, CUDA.DeviceMemory}, ::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{weight::CuArray{ComplexF32, 3, CUDA.DeviceMemory}}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}}}, ::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [33] AbstractLuxWrapperLayer
+    @ ~/.julia/packages/LuxCore/kQC9S/src/LuxCore.jl:269 [inlined]
+ [34] _pullback(::Zygote.Context{false}, ::FourierNeuralOperator{Chain{@NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Chain{@NamedTuple{layer_1::OperatorKernel{Parallel{NeuralOperators.Fix1{typeof(NeuralOperators.add_act), typeof(relu)}, @NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.False, Static.False}, layer_2::Chain{@NamedTuple{stabilizer::WrappedFunction{Base.Broadcast.BroadcastFunction{typeof(identity)}}, conv_layer::OperatorConv{FourierTransform{ComplexF32, Tuple{Int64, Int64, Int64}}, typeof(glorot_uniform)}}, Nothing}}, Nothing}}}, Nothing}, layer_3::Chain{@NamedTuple{layer_1::Conv{typeof(relu), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}}, Nothing}}, Nothing}}, ::CuArray{Float32, 5, CUDA.DeviceMemory}, ::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{weight::CuArray{ComplexF32, 3, CUDA.DeviceMemory}}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}}}, ::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [35] fno_loss
+    @ /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/run_experiment_lu.jl:69 [inlined]
+ [36] _pullback(::Zygote.Context{false}, ::typeof(fno_loss), ::FourierNeuralOperator{Chain{@NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Chain{@NamedTuple{layer_1::OperatorKernel{Parallel{NeuralOperators.Fix1{typeof(NeuralOperators.add_act), typeof(relu)}, @NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.False, Static.False}, layer_2::Chain{@NamedTuple{stabilizer::WrappedFunction{Base.Broadcast.BroadcastFunction{typeof(identity)}}, conv_layer::OperatorConv{FourierTransform{ComplexF32, Tuple{Int64, Int64, Int64}}, typeof(glorot_uniform)}}, Nothing}}, Nothing}}}, Nothing}, layer_3::Chain{@NamedTuple{layer_1::Conv{typeof(relu), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}}, Nothing}}, Nothing}}, ::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{weight::CuArray{ComplexF32, 3, CUDA.DeviceMemory}}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}}}, ::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{}}}, ::CuArray{Float32, 5, CUDA.DeviceMemory}, ::CuArray{Float32, 5, CUDA.DeviceMemory})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [37] #16
+    @ /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/run_experiment_lu.jl:135 [inlined]
+ [38] _pullback(ctx::Zygote.Context{false}, f::var"#16#17"{typeof(fno_loss), FourierNeuralOperator{Chain{@NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Chain{@NamedTuple{layer_1::OperatorKernel{Parallel{NeuralOperators.Fix1{typeof(NeuralOperators.add_act), typeof(relu)}, @NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.False, Static.False}, layer_2::Chain{@NamedTuple{stabilizer::WrappedFunction{Base.Broadcast.BroadcastFunction{typeof(identity)}}, conv_layer::OperatorConv{FourierTransform{ComplexF32, Tuple{Int64, Int64, Int64}}, typeof(glorot_uniform)}}, Nothing}}, Nothing}}}, Nothing}, layer_3::Chain{@NamedTuple{layer_1::Conv{typeof(relu), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}}, Nothing}}, Nothing}}, CuArray{Float32, 5, CUDA.DeviceMemory}, CuArray{Float32, 5, CUDA.DeviceMemory}}, args::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{weight::CuArray{ComplexF32, 3, CUDA.DeviceMemory}}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [39] pullback(f::Function, cx::Zygote.Context{false}, args::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{weight::CuArray{ComplexF32, 3, CUDA.DeviceMemory}}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:96
+ [40] pullback(f::Function, args::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}}, layer_2::@NamedTuple{stabilizer::@NamedTuple{}, conv_layer::@NamedTuple{weight::CuArray{ComplexF32, 3, CUDA.DeviceMemory}}}}}, layer_3::@NamedTuple{layer_1::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}, layer_2::@NamedTuple{weight::CuArray{Float32, 5, CUDA.DeviceMemory}, bias::CuArray{Float32, 1, CUDA.DeviceMemory}}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:94
+ [41] train_model!(model_name::String, model::FourierNeuralOperator{Chain{@NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Chain{@NamedTuple{layer_1::OperatorKernel{Parallel{NeuralOperators.Fix1{typeof(NeuralOperators.add_act), typeof(relu)}, @NamedTuple{layer_1::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.False, Static.False}, layer_2::Chain{@NamedTuple{stabilizer::WrappedFunction{Base.Broadcast.BroadcastFunction{typeof(identity)}}, conv_layer::OperatorConv{FourierTransform{ComplexF32, Tuple{Int64, Int64, Int64}}, typeof(glorot_uniform)}}, Nothing}}, Nothing}}}, Nothing}, layer_3::Chain{@NamedTuple{layer_1::Conv{typeof(relu), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}, layer_2::Conv{typeof(identity), Int64, Int64, Tuple{Int64, Int64, Int64}, Tuple{Int64, Int64, Int64}, NTuple{6, Int64}, Tuple{Int64, Int64, Int64}, Int64, Nothing, Nothing, Static.True, Static.False}}, Nothing}}, Nothing}}, loss_func::typeof(fno_loss), loader::DataLoader{BatchView{Tuple{Array{Float32, 5}, Array{Float32, 5}}, ObsView{Tuple{Array{Float32, 5}, Array{Float32, 5}}, Vector{Int64}}, Val{nothing}}, Bool, :serial, Val{nothing}, Tuple{Array{Float32, 5}, Array{Float32, 5}}, TaskLocalRNG}; epochs::Int64, lr::Float64)
+    @ Main /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/run_experiment_lu.jl:135
+ [42] run_selected_experiment()
+    @ Main /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/run_experiment_lu.jl:192
+ [43] top-level scope
+    @ /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/run_experiment_lu.jl:201
+in expression starting at /mnt/vast-kisski/projects/ovgu_medicine_llm/MedImages.jl/experiment/sciml_dose_refinement/run_experiment_lu.jl:201
