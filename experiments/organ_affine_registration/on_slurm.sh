@@ -4,8 +4,8 @@
 #SBATCH -t 48:00:00
 #SBATCH -p kisski-h100
 #SBATCH --constraint=inet
-#SBATCH -G H100:2
-#SBATCH --ntasks-per-node=2
+#SBATCH -G H100:4
+#SBATCH --ntasks-per-node=4
 #SBATCH --mail-user=jakub.mitura14@gmail.com
 #SBATCH --mail-type=all
 #SBATCH --output=/user/joanna.wybranska/u10867/.project/dir.project/MedImages.jl/experiments/organ_affine_registration/logs/tb.out
@@ -67,14 +67,19 @@ cd "$REPO_ROOT"
 export JULIA_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 echo "Sequential Pre-initialization (Phase 1: Build & Instantiate)..."
+# Force-remove any conflicting PyCall preferences before building
+rm -f ~/.julia/environments/v1.10/LocalPreferences.toml
+rm -f ~/.julia/prefs/PyCall*
+
 # Run directly on the first node to handle build and instantiation safely
-julia --project=. -e '
+# We enforce PYTHONCOERCE to ensure it binds strongly to the conda env
+PYTHONCOERCE=1 julia --project=. -e "
     using Pkg; 
-    ENV["PYTHON"]=ENV["PYTHON"]; 
-    Pkg.build("PyCall"); 
+    ENV[\"PYTHON\"]=\"$PYTHON\"; 
+    Pkg.build(\"PyCall\"); 
     Pkg.instantiate(); 
-    println("Phase 1: Instantiation complete")
-'
+    println(\"Phase 1: Instantiation complete\")
+"
 
 # Configure MPI.jl to use the system OpenMPI loaded via module
 OMPI_LIB_DIR=$(dirname $(which mpiexec))/../lib
@@ -99,6 +104,7 @@ if [ -d "$COMPILED_DIR" ]; then
     rm -rf "$COMPILED_DIR"/v1.10/JLD*
     rm -rf "$COMPILED_DIR"/v1.10/MedImages*
     rm -rf "$COMPILED_DIR"/v1.10/OpenMPI*
+    rm -rf "$COMPILED_DIR"/v1.10/Wandb*
 fi
 
 echo "Sequential Pre-initialization (Phase 2: Full Precompile after MPI config)..."

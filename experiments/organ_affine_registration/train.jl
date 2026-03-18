@@ -14,7 +14,7 @@ using Serialization
 using Wandb
 using Accessors
 using HDF5
-using Functors: fmap
+using Lux: fmap
 
 # Ensure local imports
 if !@isdefined(Preprocessing)
@@ -520,6 +520,7 @@ function run_training_experiment()
     if rank == 0
         close(lg)
     end
+end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     run_training_experiment()
