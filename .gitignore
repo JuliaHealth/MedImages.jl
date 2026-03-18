@@ -17,6 +17,7 @@ test_data/autoPET-III-Lite/
 experiments/suv_consistency/**/*.nii.gz
 test_data/
 experiments/organ_affine_registration/logs/
+experiments/organ_affine_registration/
 test_data/dataset_PET/
 test_data/dataset_uncorrected/
 test_data/combined.nii.gz

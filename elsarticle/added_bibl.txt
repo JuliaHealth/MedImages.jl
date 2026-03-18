@@ -1,0 +1,34 @@
+Enzyme.jl -> \cite{Moses_2020}
+Zygote.jl -> \cite{Innes_2019}
+DifferentialEquations.jl -> \cite{Rackauckas_2017}
+SciML -> \cite{Rackauckas_2020}
+Lux.jl -> \cite{Atkinson_2024}
+KernelAbstractions.jl -> \cite{Montoison_2025}
+PyTorch -> \cite{Paszke_2019}
+DICOM -> \cite{BidgoodHorii1992}
+NIfTI -> \cite{CoxAshburner2004}
+BIDS -> \cite{GorgolewskiAuer2016}
+HDF5 -> \cite{FolkHeber2011}
+Personalized Dosimetry -> \cite{Garin2020}
+
+Hemodynamic Assessment	
+Chronic thromboembolic pulmonary hypertension (CTEPH) is hemodynamically confirmed by a mean pulmonary arterial pressure (mPAP) > 20 mmHg and a pulmonary vascular resistance (PVR) > 2 Wood units.
+-> \cite{Kramer_2026}
+
+V/Q SPECT Screening	
+V/Q scintigraphy is the recommended initial screening test for CTEPH, identifying mismatched wedge-shaped perfusion defects with 90–100% sensitivity.
+-> \cite{Seiffert2020}
+
+TotalSegmentator	
+An AI-based nnU-Net framework capable of robustly segmenting 104 anatomical structures in CT scans with a mean Dice score of 0.943.
+-> \cite{Wasserthal2023}
+
+Flux.jl library	
+A flexible machine learning stack for Julia that supports differentiable programming and GPU-accelerated custom kernels.
+-> \cite{Innes_2018}
+
+PyRadiomics platform	An open-source platform used to extract a large panel of engineered features (radiomics) from medical images to decode phenotypes.
+-> \cite{vanGriethuysen_2017}
+
+SimpleITK library	
+-> \cite{Lowekamp_2013}

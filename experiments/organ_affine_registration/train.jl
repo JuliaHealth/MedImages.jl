@@ -5,7 +5,7 @@ const rank = MPI.Comm_rank(comm)
 const world_size = MPI.Comm_size(comm)
 
 using Lux, Random, Optimisers, Zygote, Statistics
-using KernelAbstractions
+using KernelAbstractions, LuxCUDA, HDF5
 using MedImages
 using MedImages.MedImage_data_struct
 using Printf
@@ -16,14 +16,7 @@ using Accessors
 using HDF5
 using Functors: fmap
 
-# Optional: Distributed Utils
-# We check if we are running in distributed mode
-const DISTRIBUTED_MODE = MPI.Initialized() ? true : false
-
-# If distributed, we might want to use CUDA if available on local rank
-# For now, we stick to CPU or basic GPU detection.
-
-# Ensure local imports work relative to this file
+# Ensure local imports
 if !@isdefined(Preprocessing)
     include(joinpath(@__DIR__, "src", "preprocessing.jl"))
 end
@@ -38,9 +31,14 @@ if !@isdefined(RegistrationUtils)
     include(joinpath(@__DIR__, "src", "utils.jl"))
 end
 
+if !@isdefined(RegistrationUtils)
+    include("src/utils.jl")
+end
+
 using .Preprocessing
 using .RegistrationModel
 using .FusedLoss
+using .RegistrationUtils
 
 # --- Distributed Helper (AllReduce) ---
 function allreduce_recursive!!(backend, grads)
@@ -191,22 +189,131 @@ function visualize_validation(epoch, model, ps, st, valid_train, f, device, ka_b
     end
 end
 
-# --- Overfit Experiment ---
-function run_training_experiment(args=ARGS)
-    # Initialize MPI if needed
-    if !MPI.Initialized()
-        MPI.Init()
+function visualize_validation(epoch, model, ps, st, valid_train, f, device, ka_backend, rank, dataset_path, num_organs)
+    if rank != 0 return end
+    
+    println("--- Running Visualization for Epoch $epoch ---")
+    output_dir = "epoch_$epoch"
+    mkpath(output_dir)
+    
+    # Use first patient in train as Atlas Reference
+    ref_pat = valid_train[1]
+    ref_gold = read(f[ref_pat]["gold"]) # (X,Y,Z,N)
+    sx, sy, sz, _ = size(ref_gold)
+    
+    # Prepare Atlas Channels on Device
+    atlas_channels = KernelAbstractions.allocate(ka_backend, Float32, sx, sy, sz, 1, num_organs)
+    for i in 1:num_organs
+        ch = reshape(ref_gold[:,:,:,i], sx, sy, sz, 1, 1)
+        # copyto! expects same size or specific subarray
+        copyto!(view(atlas_channels, :, :, :, 1, i), ref_gold[:,:,:,i])
     end
-    comm = MPI.COMM_WORLD
-    rank = MPI.Comm_rank(comm)
-    world_size = MPI.Comm_size(comm)
+    
+    # Select 2 validation subjects
+    val_list = read(f["val_list"])
+    valid_val = [p for p in val_list if p in keys(f)]
+    if isempty(valid_val) return end
+    
+    targets = valid_val[1:min(2, length(valid_val))]
+    labels = [1, 2, 3, 6] # Organs matching SELECTED_ORGANS
+    
+    for pat_id in targets
+        # Load patient data (full resolution for inference visualization)
+        pat_grp = f[pat_id]
+        spect = read(pat_grp["spect"])
+        atlas = read(pat_grp["atlas"])
+        
+        # Prepare Input
+        x_raw = cat(reshape(atlas, size(atlas)..., 1), 
+                     reshape(spect, size(spect)..., 1), dims=4)
+        x_raw = reshape(x_raw, size(x_raw)..., 1) |> device
+        
+        # Predict Parameters
+        params_pred, _ = model(x_raw, ps, st)
+        ap_cpu = Array(reshape(params_pred, 15, num_organs))
+        
+        # Invert and Warp
+        warped_sum = zeros(Float32, sx, sy, sz)
+        warped_channels = KernelAbstractions.zeros(ka_backend, Float32, sx, sy, sz, 1, num_organs)
+        
+        # We need T^-1 (Patient -> Atlas)
+        inv_matrices = zeros(Float32, 3, 4, num_organs)
+        for i in 1:num_organs
+            # Get center from metadata if possible, else middle
+            cx_v, cy_v, cz_v = ap_cpu[13, i], ap_cpu[14, i], ap_cpu[15, i]
+            M = params_to_matrix(ap_cpu[:, i], [cx_v, cy_v, cz_v])
+            M_inv = inv(M)
+            inv_matrices[:, :, i] .= Float32.(M_inv[1:3, :])
+        end
+        
+        # Move to GPU
+        inv_matrices_gpu = KernelAbstractions.allocate(ka_backend, Float32, size(inv_matrices))
+        copyto!(inv_matrices_gpu, inv_matrices)
+        
+        # Dummy centers for the warp kernel since we already shifted back in Matrix
+        dummy_centers_gpu = KernelAbstractions.zeros(ka_backend, Float32, 3, num_organs)
+        
+        # Launch Warp
+        warp_kernel = FusedLoss.gpu_batch_affine_warp_kernel!(ka_backend, (8, 8, 8))
+        warp_kernel(warped_channels, atlas_channels, inv_matrices_gpu, dummy_centers_gpu, ndrange=size(warped_channels))
+        KernelAbstractions.synchronize(ka_backend)
+        
+        # Fuse labels
+        warped_cpu = Array(warped_channels)
+        final_seg = zeros(Float32, sx, sy, sz)
+        for i in 1:num_organs
+            final_seg .+= warped_cpu[:,:,:,1,i] .* Float32(labels[i])
+        end
+        
+        # Save NIfTI
+        pat_dir = joinpath(output_dir, pat_id)
+        mkpath(pat_dir)
+        
+        # Metadata from attributes
+        spacing = Tuple(read(HDF5.attributes(pat_grp)["spacing"]))
+        origin = Tuple(read(HDF5.attributes(pat_grp)["origin"]))
+        direction = Tuple(read(HDF5.attributes(pat_grp)["direction"]))
+        
+        mi = MedImage(
+            voxel_data=final_seg, 
+            origin=origin, 
+            spacing=spacing, 
+            direction=direction,
+            image_type=MedImage_data_struct.CT_type,
+            image_subtype=MedImage_data_struct.CT_subtype,
+            patient_id=pat_id
+        )
+        MedImages.Load_and_save.create_nii_from_medimage(mi, joinpath(pat_dir, "registered_atlas_seg.nii.gz"))
+        
+        # Copy original files
+        src_pat_path = joinpath(dataset_path, pat_id)
+        cp(joinpath(src_pat_path, "SPECT_DATA", "CT.nii.gz"), joinpath(pat_dir, "CT.nii.gz"), force=true)
+        cp(joinpath(src_pat_path, "Atlas", "Atlas_Registered.nii.gz"), joinpath(pat_dir, "Atlas_Registered.nii.gz"), force=true)
+        cp(joinpath(src_pat_path, "TOTAL_SEGMENTOR_OUTPUT", "segmentation.nii.gz"), joinpath(pat_dir, "segmentation.nii.gz"), force=true)
+        cp(joinpath(src_pat_path, "SPECT_DATA", "SPECT_Recon_WholeBody.nii.gz"), joinpath(pat_dir, "SPECT_Recon_WholeBody.nii.gz"), force=true)
+        
+        println("Saved visualization for $pat_id")
+    end
+end
+
+# --- Augmentation ---
+# Moved to src/utils.jl
+
+function run_training_experiment()
+    # Initialize Distributed Backend
+    Lux.DistributedUtils.initialize(Lux.MPIBackend)
+    backend = Lux.DistributedUtils.get_distributed_backend(Lux.MPIBackend)
+    device = Lux.DistributedUtils.get_device(backend)
+    if device === nothing device = Lux.gpu_device() end
+    rank = Lux.DistributedUtils.local_rank(backend)
+    world_size = Lux.DistributedUtils.total_workers(backend)
 
     rng = Random.default_rng()
     Random.seed!(rng, 1234 + rank)
 
     if rank == 0
-        println("--- Starting Organ Affine Registration Training ---")
-        println("MPI World Size: $world_size")
+        println("--- Starting Real Data Organ Affine Registration ---")
+        println("Distributed Backend: MPI | World Size: $world_size")
     end
 
     # Initialize WandB
@@ -244,6 +351,10 @@ function run_training_experiment(args=ARGS)
     model = MultiScaleCNN(2, num_organs)
     
     ps, st = Lux.setup(rng, model)
+    ps = ps |> device
+    st = st |> device
+    ps = Lux.DistributedUtils.synchronize!!(backend, ps)
+    st = Lux.DistributedUtils.synchronize!!(backend, st)
 
     opt = Optimisers.Adam(0.0001)
     opt_state = Optimisers.setup(opt, ps)
