@@ -1,0 +1,99 @@
+  Activating project at `~/project_ssd/MedImages.jl`
+ERROR: LoadError: Scalar indexing is disallowed.
+Invocation of getindex resulted in scalar indexing of a GPU array.
+This is typically caused by calling an iterating implementation of a method.
+Such implementations *do not* execute on the GPU, but very slowly on the CPU,
+and therefore should be avoided.
+
+If you want to allow scalar iteration, use `allowscalar` or `@allowscalar`
+to enable scalar iteration globally or for the operations in question.
+Stacktrace:
+  [1] error(s::String)
+    @ Base ./error.jl:35
+  [2] errorscalar(op::String)
+    @ GPUArraysCore ~/.julia/packages/GPUArraysCore/aNaXo/src/GPUArraysCore.jl:151
+  [3] _assertscalar(op::String, behavior::GPUArraysCore.ScalarIndexing)
+    @ GPUArraysCore ~/.julia/packages/GPUArraysCore/aNaXo/src/GPUArraysCore.jl:124
+  [4] assertscalar(op::String)
+    @ GPUArraysCore ~/.julia/packages/GPUArraysCore/aNaXo/src/GPUArraysCore.jl:112
+  [5] getindex
+    @ ~/.julia/packages/GPUArrays/3a5jB/src/host/indexing.jl:50 [inlined]
+  [6] iterate
+    @ ./abstractarray.jl:1216 [inlined]
+  [7] iterate
+    @ ./abstractarray.jl:1214 [inlined]
+  [8] _zip_iterate_some
+    @ ./iterators.jl:428 [inlined]
+  [9] _zip_iterate_some
+    @ ./iterators.jl:430 [inlined]
+ [10] _zip_iterate_all
+    @ ./iterators.jl:420 [inlined]
+ [11] iterate
+    @ ./iterators.jl:410 [inlined]
+ [12] _append!(a::Vector{Float32}, ::Base.HasShape{3}, iter::CuArray{Float32, 3, CUDA.DeviceMemory})
+    @ Base ./array.jl:1197
+ [13] append!
+    @ ./array.jl:1187 [inlined]
+ [14] make_idx(data::Vector{Float32}, x::CuArray{Float32, 3, CUDA.DeviceMemory}, last_val::Int64)
+    @ ComponentArrays ~/.julia/packages/ComponentArrays/wtXLb/src/componentarray.jl:253
+ [15] #28
+    @ ~/.julia/packages/ComponentArrays/wtXLb/src/componentarray.jl:221 [inlined]
+ [16] (::ComponentArrays.var"#28#29"{Vector{Float32}, Base.RefValue{Int64}})(::Pair{Symbol, DenseArray{Float32}})
+    @ ComponentArrays ./none:0
+ [17] iterate
+    @ ./generator.jl:47 [inlined]
+ [18] merge(a::@NamedTuple{}, itr::Base.Generator{@Kwargs{A_blood::Vector{Float32}, A_free::CuArray{Float32, 3, CUDA.DeviceMemory}, A_bound::CuArray{Float32, 3, CUDA.DeviceMemory}, BED::Array{Float32, 3}}, ComponentArrays.var"#28#29"{Vector{Float32}, Base.RefValue{Int64}}})
+    @ Base ./namedtuple.jl:370
+ [19] make_idx(data::Vector{Float32}, nt::@NamedTuple{A_blood::Vector{Float32}, A_free::CuArray{Float32, 3, CUDA.DeviceMemory}, A_bound::CuArray{Float32, 3, CUDA.DeviceMemory}, BED::Array{Float32, 3}}, last_val::Int64)
+    @ ComponentArrays ~/.julia/packages/ComponentArrays/wtXLb/src/componentarray.jl:218
+ [20] make_carray_args
+    @ ~/.julia/packages/ComponentArrays/wtXLb/src/componentarray.jl:210 [inlined]
+ [21] make_carray_args
+    @ ~/.julia/packages/ComponentArrays/wtXLb/src/componentarray.jl:203 [inlined]
+ [22] ComponentArray(nt::@NamedTuple{A_blood::Vector{Float32}, A_free::CuArray{Float32, 3, CUDA.DeviceMemory}, A_bound::CuArray{Float32, 3, CUDA.DeviceMemory}, BED::Array{Float32, 3}})
+    @ ComponentArrays ~/.julia/packages/ComponentArrays/wtXLb/src/componentarray.jl:97
+ [23] rrule
+    @ ~/.julia/packages/ComponentArrays/wtXLb/src/compat/chainrulescore.jl:73 [inlined]
+ [24] rrule
+    @ ~/.julia/packages/ChainRulesCore/Vsbj9/src/rules.jl:138 [inlined]
+ [25] chain_rrule
+    @ ~/.julia/packages/Zygote/55SqB/src/compiler/chainrules.jl:234 [inlined]
+ [26] macro expansion
+    @ ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0 [inlined]
+ [27] _pullback(ctx::Zygote.Context{false}, f::Type{ComponentArray}, args::@NamedTuple{A_blood::Vector{Float32}, A_free::CuArray{Float32, 3, CUDA.DeviceMemory}, A_bound::CuArray{Float32, 3, CUDA.DeviceMemory}, BED::Array{Float32, 3}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:81
+ [28] #ComponentArray#21
+    @ ~/.julia/packages/ComponentArrays/wtXLb/src/componentarray.jl:101 [inlined]
+ [29] _pullback(::Zygote.Context{false}, ::ComponentArrays.var"##ComponentArray#21", ::@Kwargs{A_blood::Vector{Float32}, A_free::CuArray{Float32, 3, CUDA.DeviceMemory}, A_bound::CuArray{Float32, 3, CUDA.DeviceMemory}, BED::Array{Float32, 3}}, ::Type{ComponentArray})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [30] ComponentArray
+    @ ~/.julia/packages/ComponentArrays/wtXLb/src/componentarray.jl:101 [inlined]
+ [31] _pullback(::Zygote.Context{false}, ::typeof(Core.kwcall), ::@NamedTuple{A_blood::Vector{Float32}, A_free::CuArray{Float32, 3, CUDA.DeviceMemory}, A_bound::CuArray{Float32, 3, CUDA.DeviceMemory}, BED::Array{Float32, 3}}, ::Type{ComponentArray})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [32] predict_dosemap
+    @ ~/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:137 [inlined]
+ [33] _pullback(::Zygote.Context{false}, ::typeof(predict_dosemap), ::@NamedTuple{vol_map::CuArray{Float32, 3, CUDA.DeviceMemory}, ρ_map::CuArray{Float32, 3, CUDA.DeviceMemory}, ∇ρ_map::CuArray{Float32, 3, CUDA.DeviceMemory}, A0_obs::CuArray{Float32, 3, CUDA.DeviceMemory}, target_dosemap::CuArray{Float32, 3, CUDA.DeviceMemory}, st::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{}, layer_3::@NamedTuple{}}, layer_2::@NamedTuple{}, layer_3::@NamedTuple{}}}, ::ComponentVector{Float32, CuArray{Float32, 1, CUDA.DeviceMemory}, Tuple{Axis{(layer_1 = ViewAxis(1:336, Axis(layer_1 = ViewAxis(1:112, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_2 = ViewAxis(113:224, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_3 = ViewAxis(225:336, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))))), layer_2 = ViewAxis(337:1208, Axis(weight = ViewAxis(1:864, ShapedAxis((3, 3, 3, 4, 8))), bias = ViewAxis(865:872, Shaped1DAxis((8,))))), layer_3 = ViewAxis(1209:1425, Axis(weight = ViewAxis(1:216, ShapedAxis((3, 3, 3, 8, 1))), bias = ViewAxis(217:217, Shaped1DAxis((1,))))))}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [34] loss_function
+    @ ~/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:187 [inlined]
+ [35] _pullback(::Zygote.Context{false}, ::typeof(loss_function), ::@NamedTuple{vol_map::CuArray{Float32, 3, CUDA.DeviceMemory}, ρ_map::CuArray{Float32, 3, CUDA.DeviceMemory}, ∇ρ_map::CuArray{Float32, 3, CUDA.DeviceMemory}, A0_obs::CuArray{Float32, 3, CUDA.DeviceMemory}, target_dosemap::CuArray{Float32, 3, CUDA.DeviceMemory}, st::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{}, layer_3::@NamedTuple{}}, layer_2::@NamedTuple{}, layer_3::@NamedTuple{}}}, ::ComponentVector{Float32, CuArray{Float32, 1, CUDA.DeviceMemory}, Tuple{Axis{(layer_1 = ViewAxis(1:336, Axis(layer_1 = ViewAxis(1:112, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_2 = ViewAxis(113:224, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_3 = ViewAxis(225:336, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))))), layer_2 = ViewAxis(337:1208, Axis(weight = ViewAxis(1:864, ShapedAxis((3, 3, 3, 4, 8))), bias = ViewAxis(865:872, Shaped1DAxis((8,))))), layer_3 = ViewAxis(1209:1425, Axis(weight = ViewAxis(1:216, ShapedAxis((3, 3, 3, 8, 1))), bias = ViewAxis(217:217, Shaped1DAxis((1,))))))}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [36] #3
+    @ ~/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:249 [inlined]
+ [37] _pullback(ctx::Zygote.Context{false}, f::var"#3#4"{@NamedTuple{vol_map::CuArray{Float32, 3, CUDA.DeviceMemory}, ρ_map::CuArray{Float32, 3, CUDA.DeviceMemory}, ∇ρ_map::CuArray{Float32, 3, CUDA.DeviceMemory}, A0_obs::CuArray{Float32, 3, CUDA.DeviceMemory}, target_dosemap::CuArray{Float32, 3, CUDA.DeviceMemory}, st::@NamedTuple{layer_1::@NamedTuple{layer_1::@NamedTuple{}, layer_2::@NamedTuple{}, layer_3::@NamedTuple{}}, layer_2::@NamedTuple{}, layer_3::@NamedTuple{}}}}, args::ComponentVector{Float32, CuArray{Float32, 1, CUDA.DeviceMemory}, Tuple{Axis{(layer_1 = ViewAxis(1:336, Axis(layer_1 = ViewAxis(1:112, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_2 = ViewAxis(113:224, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_3 = ViewAxis(225:336, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))))), layer_2 = ViewAxis(337:1208, Axis(weight = ViewAxis(1:864, ShapedAxis((3, 3, 3, 4, 8))), bias = ViewAxis(865:872, Shaped1DAxis((8,))))), layer_3 = ViewAxis(1209:1425, Axis(weight = ViewAxis(1:216, ShapedAxis((3, 3, 3, 8, 1))), bias = ViewAxis(217:217, Shaped1DAxis((1,))))))}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+ [38] pullback(f::Function, cx::Zygote.Context{false}, args::ComponentVector{Float32, CuArray{Float32, 1, CUDA.DeviceMemory}, Tuple{Axis{(layer_1 = ViewAxis(1:336, Axis(layer_1 = ViewAxis(1:112, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_2 = ViewAxis(113:224, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_3 = ViewAxis(225:336, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))))), layer_2 = ViewAxis(337:1208, Axis(weight = ViewAxis(1:864, ShapedAxis((3, 3, 3, 4, 8))), bias = ViewAxis(865:872, Shaped1DAxis((8,))))), layer_3 = ViewAxis(1209:1425, Axis(weight = ViewAxis(1:216, ShapedAxis((3, 3, 3, 8, 1))), bias = ViewAxis(217:217, Shaped1DAxis((1,))))))}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:96
+ [39] pullback
+    @ ~/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:94 [inlined]
+ [40] withgradient(f::Function, args::ComponentVector{Float32, CuArray{Float32, 1, CUDA.DeviceMemory}, Tuple{Axis{(layer_1 = ViewAxis(1:336, Axis(layer_1 = ViewAxis(1:112, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_2 = ViewAxis(113:224, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_3 = ViewAxis(225:336, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))))), layer_2 = ViewAxis(337:1208, Axis(weight = ViewAxis(1:864, ShapedAxis((3, 3, 3, 4, 8))), bias = ViewAxis(865:872, Shaped1DAxis((8,))))), layer_3 = ViewAxis(1209:1425, Axis(weight = ViewAxis(1:216, ShapedAxis((3, 3, 3, 8, 1))), bias = ViewAxis(217:217, Shaped1DAxis((1,))))))}}})
+    @ Zygote ~/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:211
+ [41] train_on_dataset(dataset_dir::String, epochs::Int64)
+    @ Main ~/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:249
+ [42] top-level scope
+    @ ~/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:271
+in expression starting at /home/jm/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:270
+Initializing dataset training over: test_data/dataset_Lu
+Using device: CUDADevice{Nothing, Missing}(nothing)
+=== Epoch 1 ===
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_0__Pat116
