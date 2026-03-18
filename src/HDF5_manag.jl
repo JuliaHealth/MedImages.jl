@@ -5,8 +5,24 @@ using UUIDs
 using .MedImage_data_struct: MedImage
 
 """
-saving a MedImage object to a HDF5 file into a group with the given name
-we use Json to encode the display_data, clinical_data and metadata fields dictionaries to strings so it can be saved as attribute
+    save_med_image(f::HDF5.File, group_name::String, image::MedImage)
+
+Save a `MedImage` object to an HDF5 group.
+
+Voxel data is stored as a dataset, while all metadata fields are stored as attributes.
+Dictionaries (display_data, clinical_data, metadata) are serialized to JSON strings
+for attribute compatibility.
+
+# Arguments
+- `f::HDF5.File`: Open HDF5 file handle.
+- `group_name::String`: Name of the group (e.g., patient or study ID).
+- `image::MedImage`: The image object to save.
+
+# Returns
+- `String`: The unique dataset name (UUID) generated for this image.
+
+# Notes
+- HDF5 is recommended for its speed and efficient handling of large multidimensional arrays.
 """
 function save_med_image(f::HDF5.File, group_name::String, image::MedImage)
     if group_name in keys(f)
@@ -46,8 +62,20 @@ function save_med_image(f::HDF5.File, group_name::String, image::MedImage)
 end
 
 """
-loading a MedImage object from a HDF5 file from a group with the given name
-we use Json to encode the display_data, clinical_data and metadata fields dictionaries to strings so it can be saved as attribute
+    load_med_image(f::HDF5.File, group_name::String, dataset_name::String)
+
+Load a `MedImage` object from an HDF5 group and dataset.
+
+Deserializes internal dictionaries from JSON and restores all spatial metadata
+into a standard `MedImage` struct.
+
+# Arguments
+- `f::HDF5.File`: Open HDF5 file handle.
+- `group_name::String`: Group name where the image is stored.
+- `dataset_name::String`: The unique dataset name (UUID).
+
+# Returns
+- `MedImage`: The reconstructed image object.
 """
 function load_med_image(f::HDF5.File, group_name::String, dataset_name::String)
     g = f[group_name]

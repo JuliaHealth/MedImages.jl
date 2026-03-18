@@ -9,18 +9,12 @@ export ORIENTATION_RPI, ORIENTATION_LPI, ORIENTATION_RAI, ORIENTATION_LAI
 export ORIENTATION_RPS, ORIENTATION_LPS, ORIENTATION_RAS, ORIENTATION_LAS
 
 """
-
     @enum Image_type
 
-
 Defines the type of medical image. Possible values are:
-
 - `MRI_type`: Magnetic Resonance Imaging
-
 - `PET_type`: Positron Emission Tomography
-
 - `CT_type`: Computed Tomography
-
 """
 @enum Image_type begin
     MRI_type
@@ -28,55 +22,34 @@ Defines the type of medical image. Possible values are:
     CT_type
 end
 
-
-
 """
-
     @enum current_device_enum
 
-
 Specifies the current device used for processing. Possible values are:
-
 - `CPU_current_device`: Central Processing Unit
-
 - `CUDA_current_device`: NVIDIA CUDA-enabled GPU
-
 - `AMD_current_device`: AMD GPU
-
 - `ONEAPI_current_device`: Intel oneAPI-enabled device
-
 """
 @enum current_device_enum begin
     CPU_current_device
     CUDA_current_device
     AMD_current_device
     ONEAPI_current_device
-
 end
-
 
 """
     @enum Image_subtype
 
-
 Defines the subtype of medical image. Possible values include:
-
 - `CT_subtype`: CT scan subtype
-
 - `ADC_subtype`: Apparent Diffusion Coefficient
-
 - `DWI_subtype`: Diffusion Weighted Imaging
-
 - `T1_subtype`: T1-weighted MRI
-
 - `T2_subtype`: T2-weighted MRI
-
 - `FLAIR_subtype`: Fluid-attenuated inversion recovery
-
 - `FDG_subtype`: Fluorodeoxyglucose PET
-
 - `PSMA_subtype`: Prostate-Specific Membrane Antigen PET
-
 """
 @enum Image_subtype begin
     CT_subtype
@@ -89,79 +62,55 @@ Defines the subtype of medical image. Possible values include:
     PSMA_subtype
 end
 
-
-# following struct can be expanded with all the relevant meta data mentioned within the readme.md of MedImage.jl
-#struct for now, will switch to MetaArrays when it has GPU support
-
 """
+    struct MedImage
 
-    mutable struct MedImage
-
-
-A standardized structure for storing medical image data and metadata.
-
+A standardized, immutable structure for storing medical image data and metadata.
+Being immutable, fields cannot be modified directly. Use accessor functions like
+`update_voxel_data` or `update_voxel_and_spatial_data` from `Load_and_save.jl` 
+or the `@set` macro from `Accessors.jl` to create updated copies.
 
 # Fields
-
 - `voxel_data`: Multidimensional array representing the image data.
-
-- `origin`: Tuple of 3 Float64 values indicating the origin of the image.
-
-- `spacing`: Tuple of 3 Float64 values indicating the spacing between voxels.
-
-- `direction`: 9-element tuple of Float64 values for orientation cosines.
-
-- `image_type`: Enum `Image_type` indicating the type of image.
-
-- `image_subtype`: Enum `Image_subtype` indicating the subtype of image.
-
+- `origin`: Tuple of 3 Float64 values indicating the origin of the image in physical space (mm).
+- `spacing`: Tuple of 3 Float64 values indicating the spacing between voxels (mm).
+- `direction`: 9-element tuple of Float64 values representing the direction cosine matrix.
+- `image_type`: Enum `Image_type` indicating the broad category (MRI, PET, CT).
+- `image_subtype`: Enum `Image_subtype` indicating the specific imaging sequence or subtype.
 - `date_of_saving`: DateTime when the image was saved.
-
 - `acquistion_time`: DateTime when the image was acquired.
-
 - `patient_id`: String identifier for the patient.
-
-- `current_device`: Enum `current_device_enum` indicating the processing device.
-
-- `study_uid`: Unique identifier for the study.
-
-- `patient_uid`: Unique identifier for the patient.
-
-- `series_uid`: Unique identifier for the series.
-
-- `study_description`: Description of the study.
-
-- `legacy_file_name`: Original file name.
-
-- `display_data`: Dictionary for color values (e.g., RGB or grayscale).
-
-- `clinical_data`: Dictionary with clinical data (e.g., age, gender).
-
-- `is_contrast_administered`: Boolean indicating if contrast was used.
-
-- `metadata`: Dictionary for additional metadata.
-
+- `current_device`: Enum `current_device_enum` indicating the device (CPU/GPU) where data resides.
+- `study_uid`: Unique identifier for the study (UUID).
+- `patient_uid`: Unique identifier for the patient (UUID).
+- `series_uid`: Unique identifier for the series (UUID).
+- `study_description`: Human-readable description of the study.
+- `legacy_file_name`: Original name of the source file.
+- `display_data`: Dictionary for color-related metadata (RGB, grayscale bounds).
+- `clinical_data`: Dictionary containing clinical info (age, gender, etc.).
+- `is_contrast_administered`: Boolean flag for contrast usage.
+- `metadata`: Dictionary for any additional raw metadata from source formats (DICOM, NIfTI).
 """
-@with_kw mutable struct MedImage
-    voxel_data #mutlidimensional array (512,512,3)
+@with_kw struct MedImage
+    voxel_data 
     origin::Tuple{Float64,Float64,Float64}
-    spacing::Tuple{Float64,Float64,Float64}#spacing between the voxels
-    direction::NTuple{9,Float64} #direction cosines for orientation
-    image_type::Image_type#enum defining the type of the image
-    image_subtype::Image_subtype #enum defining the subtype of the image
+    spacing::Tuple{Float64,Float64,Float64}
+    direction::NTuple{9,Float64}
+    image_type::Image_type
+    image_subtype::Image_subtype
     date_of_saving::DateTime = Dates.today()
     acquistion_time::DateTime = Dates.now()
-    patient_id::String #the id of the patient in the data file
-    current_device::current_device_enum = CPU_current_device# CPU or GPU , preferrably GPU
-    study_uid::String = string(UUIDs.uuid4())#unique identifier for the study
-    patient_uid::String = string(UUIDs.uuid4())#unique identifier for the patient
-    series_uid::String = string(UUIDs.uuid4())#unique identifier for the series
+    patient_id::String
+    current_device::current_device_enum = CPU_current_device
+    study_uid::String = string(UUIDs.uuid4())
+    patient_uid::String = string(UUIDs.uuid4())
+    series_uid::String = string(UUIDs.uuid4())
     study_description::String = " "
-    legacy_file_name::String = " "#original file name
-    display_data::Dict{Any,Any} = Dict() #color values for the data such as RGB or gray
-    clinical_data::Dict{Any,Any} = Dict()#dictionary with age , gender data of the patient
-    is_contrast_administered::Bool = false #bool, any substance for visibility enhancement given during imaging procedure?
-    metadata::Dict{Any,Any} = Dict() #dictionary for any other relevant metadata from individual data file
+    legacy_file_name::String = " "
+    display_data::Dict{Any,Any} = Dict()
+    clinical_data::Dict{Any,Any} = Dict()
+    is_contrast_administered::Bool = false
+    metadata::Dict{Any,Any} = Dict()
 end
 
 
@@ -199,60 +148,29 @@ end
 # end
 
 """
-
     @enum Interpolator_enum
 
-
 Defines basic interpolators for image processing. Possible values are:
-
-- `Nearest_neighbour_en`: Nearest neighbor interpolation
-
-- `Linear_en`: Linear interpolation
-
-- `B_spline_en`: B-spline interpolation
-
+- `Nearest_neighbour_en`: Nearest neighbor interpolation. Fastest, best for discrete labels.
+- `Linear_en`: Linear (trilinear) interpolation. Balanced speed and quality for continuous images.
+- `B_spline_en`: B-spline interpolation. Highest quality/resolution, but slower.
 """
 @enum Interpolator_enum Nearest_neighbour_en Linear_en B_spline_en
 
 """
-
     @enum Mode_mi
 
-
 Indicates the mode of operation for modifying image data. Possible values are:
-
-- `pixel_array_mode`: Modify pixel array only
-
-- `spat_metadata_mode`: Modify spatial metadata only
-
-- `all_mode`: Modify both pixel array and spatial metadata
-
+- `pixel_array_mode`: Modify pixel array only.
+- `spat_metadata_mode`: Modify spatial metadata only.
+- `all_mode`: Modify both pixel array and spatial metadata.
 """
 @enum Mode_mi pixel_array_mode = 0 spat_metadata_mode = 2 all_mode = 3
 
-
-################## orientation
 """
-
     @enum CoordinateTerms
 
-
-Defines coordinate terms based on ITK spatial orientation. Possible values are:
-
-- `ITK_COORDINATE_UNKNOWN`: Unknown coordinate
-
-- `ITK_COORDINATE_Right`: Right
-
-- `ITK_COORDINATE_Left`: Left
-
-- `ITK_COORDINATE_Posterior`: Posterior
-
-- `ITK_COORDINATE_Anterior`: Anterior
-
-- `ITK_COORDINATE_Inferior`: Inferior
-
-- `ITK_COORDINATE_Superior`: Superior
-
+Defines coordinate terms based on ITK spatial orientation conventions.
 """
 @enum CoordinateTerms begin
     ITK_COORDINATE_UNKNOWN = 0
@@ -264,23 +182,10 @@ Defines coordinate terms based on ITK spatial orientation. Possible values are:
     ITK_COORDINATE_Superior = 9
 end
 
-
-
-
-
 """
-
     @enum CoordinateMajornessTerms
 
-
-Defines the majorness of coordinates. Possible values are:
-
-- `PrimaryMinor`: Primary minor coordinate
-
-- `SecondaryMinor`: Secondary minor coordinate
-
-- `TertiaryMinor`: Tertiary minor coordinate
-
+Defines the majorness (precedence) of coordinates in orientation codes.
 """
 @enum CoordinateMajornessTerms begin
     PrimaryMinor = 0
@@ -292,28 +197,10 @@ end
 
 
 """
-
     @enum Orientation_code
 
-
-Defines orientation codes for medical images. Possible values include:
-
-- `ORIENTATION_RPI`: Right-Posterior-Inferior
-
-- `ORIENTATION_LPI`: Left-Posterior-Inferior
-
-- `ORIENTATION_RAI`: Right-Anterior-Inferior
-
-- `ORIENTATION_LAI`: Left-Anterior-Inferior
-
-- `ORIENTATION_RPS`: Right-Posterior-Superior
-
-- `ORIENTATION_LPS`: Left-Posterior-Superior
-
-- `ORIENTATION_RAS`: Right-Anterior-Superior
-
-- `ORIENTATION_LAS`: Left-Anterior-Superior
-
+Defines 3D orientation codes (e.g., RAS, LPS) for medical images based on ITK conventions.
+These codes describe the direction of the image axes relative to the patient's anatomy.
 """
 @enum Orientation_code begin
     # ORIENTATION_RIP
