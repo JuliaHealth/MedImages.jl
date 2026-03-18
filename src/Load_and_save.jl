@@ -71,6 +71,45 @@ Determines the study type for an image based on its metadata using SimpleITK
 #   return MedImage_data_struct.CT_type
 # end
 
+"""
+    create_nii_from_medimage(med_image, file_path, extension=".nii.gz")
+
+Save a MedImage object to a NIfTI file.
+
+This function exports a MedImage struct to the standard NIfTI file format,
+preserving all spatial metadata (origin, spacing, direction) in the NIfTI header.
+
+# Arguments
+- `med_image::MedImage`: MedImage object to save
+- `file_path::String`: Destination file path
+- `extension::String=".nii.gz"`: File extension (default: .nii.gz for compressed NIfTI)
+
+# Returns
+- Nothing: Saves file to disk
+
+# Examples
+```julia
+# Create a MedImage
+img = MedImage(rand(10, 10, 10), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0), (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0))
+
+# Save as NIfTI file
+create_nii_from_medimage(img, "output_image")
+
+# Saves as "output_image.nii.gz" (compressed)
+# Can be loaded by other NIfTI readers (ITK-SNAP, Slicer, etc.)
+
+# Save with different extension
+create_nii_from_medimage(img, "output_image", ".nii")
+# Saves as "output_image.nii" (uncompressed)
+```
+
+# Notes
+- Uses ITKIOWrapper.jl for NIfTI I/O operations
+- Preserves all spatial metadata in NIfTI header fields
+- Default compression (.nii.gz) reduces file size significantly
+- Resulting files are compatible with standard medical imaging software
+- Useful for sharing results or intermediate processing steps
+"""
 function create_nii_from_medimage(med_image::MedImage, file_path::String, extension::String=".nii.gz")
   # Ensure path has extension if not already present
   full_path = endswith(file_path, extension) ? file_path : file_path * extension
@@ -91,103 +130,98 @@ function create_nii_from_medimage(med_image::MedImage, file_path::String, extens
   ITKIOWrapper.save_image(vd, meta, full_path, false)
 end
 
+"""
+    update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
+
+Update the voxel data of a `MedImage` while preserving all other metadata.
+
+This function creates a new `MedImage` with updated `voxel_data` using the `@set` macro
+from `Accessors.jl`. It is the preferred way to "modify" the immutable `MedImage` struct.
+
+# Arguments
+- `old_image::MedImage`: Original image object.
+- `new_voxel_data::AbstractArray`: New array for the `voxel_data` field.
+
+# Returns
+- `MedImage`: A new image object with updated data.
+"""
 function update_voxel_data(old_image::MedImage, new_voxel_data::AbstractArray)
-
-  return MedImage(
-    new_voxel_data,
-    old_image.origin,
-    old_image.spacing,
-    old_image.direction,
-    instances(Image_type)[Int(old_image.image_type)+1],#  Int(image.image_type),
-    instances(Image_subtype)[Int(old_image.image_subtype)+1],#  Int(image.image_subtype),
-    # old_image.voxel_datatype,
-    old_image.date_of_saving,
-    old_image.acquistion_time,
-    old_image.patient_id,
-    instances(current_device_enum)[Int(old_image.current_device)+1], #Int(image.current_device),
-    old_image.study_uid,
-    old_image.patient_uid,
-    old_image.series_uid,
-    old_image.study_description,
-    old_image.legacy_file_name,
-    old_image.display_data,
-    old_image.clinical_data,
-    old_image.is_contrast_administered,
-    old_image.metadata)
-
+  return @set old_image.voxel_data = new_voxel_data
 end
 
 function update_voxel_data(old_image::BatchedMedImage, new_voxel_data::AbstractArray)
-  # For BatchedMedImage, we assume new_voxel_data is 4D
-  # We construct a new BatchedMedImage copying metadata
-  # Note: This is constructor based, so it should be differentiable if BatchedMedImage constructor is differentiable (which is struct construction).
-
-  return BatchedMedImage(
-      voxel_data = new_voxel_data,
-      origin = old_image.origin,
-      spacing = old_image.spacing,
-      direction = old_image.direction,
-      image_type = old_image.image_type,
-      image_subtype = old_image.image_subtype,
-      date_of_saving = old_image.date_of_saving,
-      acquistion_time = old_image.acquistion_time,
-      patient_id = old_image.patient_id,
-      current_device = old_image.current_device,
-      study_uid = old_image.study_uid,
-      patient_uid = old_image.patient_uid,
-      series_uid = old_image.series_uid,
-      study_description = old_image.study_description,
-      legacy_file_name = old_image.legacy_file_name,
-      display_data = old_image.display_data,
-      clinical_data = old_image.clinical_data,
-      is_contrast_administered = old_image.is_contrast_administered,
-      metadata = old_image.metadata
-  )
+  return @set old_image.voxel_data = new_voxel_data
 end
 
-function update_voxel_and_spatial_data(old_image, new_voxel_data::AbstractArray, new_origin, new_spacing, new_direction)
+"""
+    update_voxel_and_spatial_data(old_image, new_voxel_data::AbstractArray, new_origin, new_spacing, new_direction=nothing)
 
-  return MedImage(
-    new_voxel_data,
-    Utils.ensure_tuple(new_origin),
-    Utils.ensure_tuple(new_spacing),
-    Utils.ensure_tuple(new_direction),
-    # old_image.spatial_metadata,
-    instances(Image_type)[Int(old_image.image_type)+1],#  Int(image.image_type),
-    instances(Image_subtype)[Int(old_image.image_subtype)+1],#  Int(image.image_subtype),
-    # old_image.voxel_datatype,
-    old_image.date_of_saving,
-    old_image.acquistion_time,
-    old_image.patient_id,
-    instances(current_device_enum)[Int(old_image.current_device)+1], #Int(image.current_device),
-    old_image.study_uid,
-    old_image.patient_uid,
-    old_image.series_uid,
-    old_image.study_description,
-    old_image.legacy_file_name,
-    old_image.display_data,
-    old_image.clinical_data,
-    old_image.is_contrast_administered,
-    old_image.metadata)
+Update both voxel data and spatial metadata (origin, spacing, direction) of a `MedImage`.
 
+This function uses the `@set` macro to create a new `MedImage` with multiple fields
+updated. If `new_direction` is not provided, the original direction is kept.
+
+# Arguments
+- `old_image`: The image object to update.
+- `new_voxel_data`: Target voxel data array.
+- `new_origin`: Target origin tuple/vector.
+- `new_spacing`: Target spacing tuple/vector.
+- `new_direction`: (Optional) Target direction matrix.
+
+# Returns
+- `MedImage`: A new image object with updated data and spatial metadata.
+"""
+function update_voxel_and_spatial_data(old_image, new_voxel_data::AbstractArray, new_origin, new_spacing, new_direction=nothing)
+    res = @set old_image.voxel_data = new_voxel_data
+    res = @set res.origin = Utils.ensure_tuple(new_origin)
+    res = @set res.spacing = Utils.ensure_tuple(new_spacing)
+    if !isnothing(new_direction)
+        res = @set res.direction = Utils.ensure_tuple(new_direction)
+    end
+    return res
 end
 
-# function update_voxel_and_spatial_data(old_image, new_voxel_data::AbstractArray, new_origin, new_spacing, new_direction)
 
-#   res = @set old_image.voxel_data = new_voxel_data
-#   res = @set res.origin = Utils.ensure_tuple(new_origin)
-#   res = @set res.spacing = Utils.ensure_tuple(new_spacing)
-#   res = @set res.direction = Utils.ensure_tuple(new_direction)
-#   # voxel_data=new_voxel_data
-#   # origin=new_origin
-#   # spacing=new_spacing
-#   # direction=new_direction
+"""
+    load_image(path, type)
 
-#   # return @pack! old_image = voxel_data, origin, spacing, direction
-#   return res
-# end
+Load a medical image from file (DICOM or NIfTI format) into a MedImage struct.
 
+This function supports both DICOM and NIfTI formats, converting them into the unified
+MedImage struct representation. Both formats load into the same structure, making
+downstream processing format-agnostic.
 
+# Arguments
+- `path::String`: Path to the image file or DICOM directory
+- `type::String`: Image type identifier ("dicom" or "nifti")
+
+# Returns
+- `MedImage`: Loaded medical image in standard MedImage format
+
+# Examples
+```julia
+# Load a NIfTI file
+julia> nifti_img = load_image("brain.nii.gz", "nifti")
+MedImage(...)
+
+# Load a DICOM series from directory
+julia> dicom_img = load_image("/path/to/dicom/series/", "dicom")
+MedImage(...)
+
+# Both return the same MedImage struct format
+julia> typeof(nifti_img) == typeof(dicom_img)
+true
+```
+
+# Notes
+- **Format unification**: Both DICOM and NIfTI load into identical MedImage structs
+- **Orientation**: By default, ITKIOWrapper loads images in LPS orientation
+- **Modality inference**: The automatic modality inference has been sunsetted;
+  users must explicitly specify image type downstream
+- **Standardization**: Setting all files to a standard orientation (e.g., RAS) at
+  the beginning is recommended for consistency across datasets
+- **Metadata**: DICOM metadata is extracted and stored in the `metadata` field
+"""
 function load_image(path::String, type::String)::MedImage
   # ITKIOWrapper I/O defaults to LPS orientation for any given image
   # The section for inferring modality has now been sunsetted, with user having to explicitly pass the modality downstream

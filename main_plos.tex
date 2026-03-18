@@ -102,8 +102,7 @@ ct = load_image("patient_1/ct.nii")
 # Create a batched tensor to process simultaneously
 batch = create_batched_medimage([pet, ct])
 
-# Rotate both volumes by 45 degrees around Z-axis (GPU supported)
-rotated_batch = rotate_mi(batch, 45.0)
+A critical design decision: ITK (C++) is used \textit{only} for I/O robustness (NIfTI \cite{CoxAshburner2004}, DICOM \cite{BidgoodHorii1992} parsing), while \textit{all} transformations are native Julia. This ensures: (1) \textbf{Differentiability}—operations integrate with Zygote.jl \cite{Innes_2019}/Enzyme.jl \cite{Moses_2020}; (2) \textbf{Composability}—seamless integration with Lux.jl \cite{Atkinson_2024} and DifferentialEquations.jl \cite{Rackauckas_2017}; (3) \textbf{Transparency}—users can inspect and extend algorithms without C++ recompilation.
 
 # Extract SUV statistics for the PET scan using an ROI mask
 suv_stats = calculate_suv_statistics(rotated_batch[1], roi_mask)
@@ -113,12 +112,12 @@ println("Mean SUV: ", suv_stats.mean_suv)
 \subsection*{Functionalities and I/O Robustness}
 MedImages.jl provides a comprehensive set of functionalities optimized for 3D medical image processing:
 \begin{itemize}
-    \item \textbf{Robust I/O:} Loading of various medical image formats (NIfTI, DICOM) using \texttt{ITKIOWrapper}.
+    \item \textbf{Robust I/O:} Loading of various medical image formats (NIfTI \cite{CoxAshburner2004}, DICOM \cite{BidgoodHorii1992}) using \texttt{ITKIOWrapper}.
     \item \textbf{Native Julia Transformations:} Functions to modify spatial properties of 3D volumes (\texttt{rotate\_mi}, \texttt{translate\_mi}, \texttt{scale\_mi}, \texttt{resample\_to\_spacing}, \texttt{crop\_mi}, \texttt{pad\_mi}).
     \item \textbf{Resample to Target:} Resamples a moving image to match the spatial geometry of a reference image.
-    \item \textbf{GPU Acceleration:} All transformations transparently support GPU execution via KernelAbstractions.jl.
-    \item \textbf{HDF5 Support:} Fast loading and saving of 3D images using HDF5, speeding up I/O for intermediate processing and reducing the "loading penalty" common in deep learning pipelines.
-    \item \textbf{Autodifferentiation:} All spatial transformations have well-defined gradients via Zygote.jl and Enzyme.jl.
+    \item \textbf{GPU Acceleration:} All transformations transparently support GPU execution via KernelAbstractions.jl \cite{Montoison_2025}.
+    \item \textbf{HDF5 Support:} Fast loading and saving of 3D images using HDF5 \cite{FolkHeber2011}, speeding up I/O for intermediate processing and reducing the "loading penalty" common in deep learning pipelines.
+    \item \textbf{Autodifferentiation:} All spatial transformations have well-defined gradients via Zygote.jl \cite{Innes_2019} and Enzyme.jl \cite{Moses_2020}.
     \item \textbf{Orientation Management:} Robust tools to handle and convert between neuroimaging coordinate systems.
 \end{itemize}
 
@@ -198,26 +197,7 @@ The dosimetry refinement pipeline evaluated three models for predicting high-acc
     \item \textbf{UDE Performance:} The Universal Differential Equation model achieved steady convergence with an MSE of $4.14 \times 10^{-4}$, successfully isolating the known mechanistic physics from the neural residual.
 \end{itemize}
 
-<<<<<<< HEAD
 \subsection*{Metadata Management -- SUV Precision and Spatial Integrity}
-=======
-\textbf{Proof-of-Concept: Learned Inverse Rotation via Spatial Transformer.} To validate end-to-end differentiability, we implemented a neural-network-based spatial transformer that learns to predict and invert unknown 3D rotations applied to volumetric data. The pipeline operates as follows:
-
-\begin{enumerate}
-    \item \textbf{Synthetic Data Generation:} A primitive volumetric pattern (a central bar along the Z-axis in a $32^3$ grid) is rotated by random Euler angles $(\alpha_x, \alpha_y, \alpha_z) \in [-45^\circ, 45^\circ]$ using MedImages.jl's \texttt{affine\_transform\_mi} to produce the input batch $X$. The target batch $Y$ is the original, unrotated volume.
-    \item \textbf{Architecture:} A Lux.jl 3D CNN consisting of two convolutional layers (\texttt{Conv(5$^3$, 1$\to$8)} $\to$ \texttt{MaxPool(2$^3$)} $\to$ \texttt{Conv(3$^3$, 8$\to$16)} $\to$ \texttt{MaxPool(2$^3$)}) followed by a fully-connected head (\texttt{Dense(8192$\to$64)} $\to$ \texttt{Dense(64$\to$3)}) predicts three Euler angles per batch item.
-    \item \textbf{Differentiable Geometric Pipeline:} The predicted angles are converted to Rodrigues rotation matrices via \texttt{Rodrigues\_rotation\_matrix}, composed into a $4\times4$ affine matrix, and used to generate a differentiable sampling grid. MedImages.jl's native \texttt{interpolate\_pure} function then resamples the rotated input at the computed grid coordinates using trilinear interpolation.
-    \item \textbf{Training:} The MSE loss between the de-rotated output and the original target $Y$ is minimized using Zygote.jl backpropagation and the Adam optimizer. Crucially, gradients flow from the loss \emph{through} the trilinear interpolation kernel and the matrix construction back into the CNN weights---a capability unavailable in frameworks that rely on non-differentiable C++ resampling backends.
-\end{enumerate}
-
-Over 20 training iterations, the spatial transformer consistently reduced reconstruction error by over 65%, demonstrating that MedImages.jl's spatial operations are fully composable with modern deep learning optimizers and that ``learned preprocessing'' pipelines are feasible within the Julia ecosystem.
-
-\paragraph{High-End Use Case: Differentiable Rendering and 2D/3D Registration.} 
-The limits of MedImages.jl's differentiability are further demonstrated in the context of Projective Spatial Transformers (ProST). In clinical scenarios like robotic surgery or radiotherapy, a 3D volume (CT) must often be registered with 2D projections (X-rays). This requires a differentiable renderer that implements the Beer-Lambert law of attenuation through coordinate sampling. By leveraging MedImages.jl's native Julia kernels, researchers can implement these projection models such that the gradient flows from the 2D image similarity loss, through the renderer, back to the 3D pose parameters. This level of integration is traditionally difficult in Python-based frameworks, which often rely on non-differentiable OpenGL backends or opaque C++ ray-casters.
-
-\subsubsection*{Differentiability Verification}
-To rigorously validate that automatic differentiation produces correct gradients through every spatial operation, we implemented a comprehensive test suite covering all core transformations. For each operation---\texttt{resample\_to\_image}, \texttt{rotate\_mi}, \texttt{scale\_mi}, \texttt{translate\_mi}, \texttt{crop\_mi}, \texttt{pad\_mi}, \texttt{resample\_to\_spacing}, and \texttt{change\_orientation}---we defined a scalar loss function $\mathcal{L}(\mathbf{x}) = \sum f(\mathbf{x})$, where $f$ is the spatial transformation applied to input voxel data $\mathbf{x}$, and verified that Zygote.jl returns non-trivial, structurally correct gradients.
-
 Specifically, for identity-preserving operations such as \texttt{translate\_mi} (integer-voxel shifts) and \texttt{pad\_mi} (zero-padding), we verified that $\nabla_{\mathbf{x}} \mathcal{L} = \mathbf{1}$, confirming that the gradient propagates without corruption. For spatially selective operations like \texttt{crop\_mi}, we verified that the gradient is $1$ inside the cropped region and $0$ outside. For interpolation-based transforms (\texttt{rotate\_mi}, \texttt{resample\_to\_image}, \texttt{resample\_to\_spacing}), we verified gradient existence and non-triviality. Batched operations were separately tested to confirm that gradients flow correctly through the 4D data path, including through the \texttt{create\_batched\_medimage} constructor. Additionally, for the fused affine interpolation kernel, we validated CPU/GPU gradient consistency to within $10^{-4}$, ensuring that the CUDA kernel produces numerically equivalent gradients to the CPU reference implementation. This systematic verification across 7 test files establishes a foundation of trust for deploying MedImages.jl in gradient-based optimization pipelines.
 
 \subsubsection*{Organ-Specific Affine Registration with Fused GPU Loss}
@@ -250,7 +230,7 @@ To further explore the utility of the Julia SciML ecosystem, we implemented a do
 These implementations demonstrate that MedImages.jl allows researchers to transition from blind data-fitting to \textit{Scientific Machine Learning} (SciML)---embedding structural mechanistic priors natively into the architecture. In this paradigm, SciML effectively acts as an "in-the-loop physics expert" \cite{Berman_2024}. Rather than relying solely on a neural network to infer complex spatial distributions from massive data, the physical priors (e.g., the differential equations governing photon scattering and attenuation) strictly bound the network's predictions. The model is forced to learn only the residual error that the physics equations cannot perfectly resolve, ensuring that the outputs remain anchored to biological and physical reality even when generalizing to unseen patient anatomies. Beyond nuclear medicine, the differentiability of MedImages.jl kernels enables the native implementation of MRI-specific physics models, such as bias field correction and motion-induced ghosting simulation. In frameworks like TorchIO, these operations often rely on non-differentiable CPU-bound backends. In Julia, these artifacts can be modeled as differentiable layers, allowing the network to learn robustness to physical acquisition noise in a fully end-to-end manner.
 
 \subsection*{Challenge 4: Metadata Management -- SUV Precision and Spatial Integrity}
->>>>>>> 62101fc (up)
+
 We verified the quantitative accuracy of MedImages.jl by comparing its Standardized Uptake Value (SUV) calculations against the gold standard SimpleITK. Due to Julia's high-precision handling of temporal and clinical metadata, MedImages.jl achieves identical results for SUVbw (Body Weight) calculations, matching SimpleITK's output up to $10^{-14}$ in double precision. This ensures that the massive speedups achieved through GPU acceleration do not compromise clinical validity.
 
 \begin{figure}[!h]
@@ -383,7 +363,7 @@ MedImages.jl is open-source and available at \url{https://github.com/JuliaHealth
 Future work will focus on:
 \begin{enumerate}
     \item Integrating with advanced reconstruction frameworks (KomaMRI.jl \cite{CastilloPassiCoronado2023}, GIRFReco.jl \cite{JaffrayWu2024}) for end-to-end physics-informed learning.
-    \item Implementing differentiable registration algorithms leveraging Zygote.jl.
+    \item Implementing differentiable registration algorithms leveraging Zygote.jl \cite{Innes_2019}.
     \item Expanding support for standardized formats like DICOM-SEG via Highdicom \cite{BridgeGorman2022} integration.
     \item Developing architectural foundations for clinical-grade AI agents (e.g., VoxelPrompt) capable of multi-modal "Medical Superintelligence" benchmarks where absolute metadata integrity is a prerequisite for safe automated diagnostics.
 \end{enumerate}

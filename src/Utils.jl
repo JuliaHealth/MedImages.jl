@@ -21,6 +21,7 @@ export is_cuda_array, extract_corners
 export create_batched_medimage, unbatch_medimage
 export interpolate_fused_affine
 export generate_affine_coords
+export one_hot_encode, calculate_barycenter, calculate_max_radius, extract_points_from_mask
 
 import ..MedImage_data_struct: MedImage, BatchedMedImage, Interpolator_enum, Mode_mi, Orientation_code, Nearest_neighbour_en, Linear_en, B_spline_en
 
@@ -51,8 +52,53 @@ function extract_corners(arr::AbstractArray{T,3}) where T
 end
 
 """
-return array of cartesian indices for given dimensions in a form of array
-Optimized: uses vectorized broadcasting instead of scalar loops
+    get_base_indicies_arr(dims)
+
+
+Return an array of Cartesian indices for given dimensions as a 3×N matrix where N = prod(dims).
+
+Return an array of Cartesian indices for given dimensions as a 3xN matrix where N = prod(dims).
+
+
+This function generates all possible index combinations for a 3D array with dimensions `dims`.
+The result is a matrix where each column represents an (i, j, k) coordinate. Useful for
+vectorized operations that require coordinate grids.
+
+# Arguments
+- `dims::Tuple{Int,Int,Int}`: A 3-tuple of dimensions (x, y, z).
+
+# Returns
+
+- `Matrix{Int32}`: A 3×N matrix where each column is an (i, j, k) coordinate.
+
+- `Matrix{Int32}`: A 3xN matrix where each column is an (i, j, k) coordinate.
+
+
+# Examples
+```julia
+julia> get_base_indicies_arr((2, 2, 2))
+
+3×8 Matrix{Int32}:
+
+3x8 Matrix{Int32}:
+
+ 1  2  1  2  1  2  1  2
+ 1  1  2  2  1  1  2  2
+ 1  1  1  1  2  2  2  2
+
+julia> get_base_indicies_arr((3, 2, 1))
+
+3×6 Matrix{Int32}:
+
+3x6 Matrix{Int32}:
+
+ 1  2  3  1  2  3
+ 1  1  1  2  2  2
+ 1  1  1  1  1  1
+```
+
+# Performance
+Optimized using vectorized broadcasting instead of triple-nested loops, making it much faster for large arrays.
 """
 function get_base_indicies_arr(dims)
     n_points = prod(dims)
@@ -79,7 +125,43 @@ ChainRulesCore.@non_differentiable get_base_indicies_arr(::Any)
 ChainRulesCore.@non_differentiable extract_corners(::Any)
 
 """
-cast array a to the value type of array b
+    cast_to_array_b_type(a, b)
+
+Cast array `a` to the element type of array `b`, handling integer conversions safely.
+
+This function converts array `a` to have the same element type as array `b`. When converting
+from floating-point types to integer types, it applies rounding (`round.`) to prevent
+the `InexactError` that would occur with direct truncation-based casting.
+
+# Arguments
+- `a::AbstractArray`: The source array to convert.
+- `b::AbstractArray`: The target array whose element type should be matched.
+
+# Returns
+- `Array{eltype(b)}`: Array `a` converted to the element type of `b`.
+
+# Examples
+```julia
+julia> a = Float32[1.2, 2.7, 3.5]
+julia> b = Int32[0, 0, 0]
+julia> cast_to_array_b_type(a, b)
+3-element Vector{Int32}:
+ 1
+ 3
+ 4
+
+julia> a = Float64[1.5, 2.5, 3.5]
+julia> b = Float32[0.0, 0.0, 0.0]
+julia> cast_to_array_b_type(a, b)
+3-element Vector{Float32}:
+ 1.5
+ 2.5
+ 3.5
+```
+
+# Notes
+- If element types are already identical, the original array `a` is returned.
+- This is vital for preparing arrays for kernels or library calls that require specific bit-depths.
 """
 function cast_to_array_b_type(a, b)
     # Check if array a and b have the same type
@@ -98,8 +180,36 @@ function cast_to_array_b_type(a, b)
 end
 
 """
-interpolate the point in the given space
-keep_begining_same - will keep unmodified first layer of each axis - usefull when changing spacing
+    interpolate_point(point, itp, keep_begining_same=false, extrapolate_value=0)
+
+Interpolate a point in 3D space using an interpolation object.
+
+This function evaluates an interpolation object `itp` at the given `point` coordinates.
+By convention, all negative indices are cast to the `extrapolate_value`.
+
+# Arguments
+- `point::Tuple{Real,Real,Real}`: The (i, j, k) coordinates to interpolate.
+- `itp::AbstractInterpolation`: The interpolation object (e.g., from Interpolations.jl).
+- `keep_begining_same::Bool=false`: If true, indices less than 1 are clamped to 1.
+- `extrapolate_value::Real=0`: Value returned for points outside the defined range (especially negative indices).
+
+# Returns
+- The interpolated value at the specified point.
+
+# Examples
+```julia
+using Interpolations
+data = rand(10, 10, 10)
+itp = interpolate(data, BSpline(Linear()))
+
+# Interpolate within bounds
+julia> interpolate_point((5.5, 5.5, 5.5), itp)
+0.523...
+
+# Negative indices return extrapolation value
+julia> interpolate_point((-1.0, 2.0, 3.0), itp)
+0.0
+```
 """
 function interpolate_point(point, itp, keep_begining_same=false, extrapolate_value=0)
 
@@ -183,7 +293,7 @@ end
     I = @index(Global)
     n_points = size(out_res, 1)
     idx_point = (I - 1) % n_points + 1
-    idx_batch = (I - 1) ÷ n_points + 1
+    idx_batch = div(I - 1, n_points) + 1
 
     px = points_to_interpolate[1, idx_point, 1 + (idx_batch - 1) * points_batch_stride]
     py = points_to_interpolate[2, idx_point, 1 + (idx_batch - 1) * points_batch_stride]
@@ -302,12 +412,12 @@ end
     
     n_spatial = output_size[1] * output_size[2] * output_size[3]
     idx_spatial = (I - 1) % n_spatial + 1
-    idx_batch = (I - 1) ÷ n_spatial + 1
+    idx_batch = div(I - 1, n_spatial) + 1
     
     stride_z = output_size[1] * output_size[2]
-    iz = (idx_spatial - 1) ÷ stride_z + 1
+    iz = div(idx_spatial - 1, stride_z) + 1
     rem_z = (idx_spatial - 1) % stride_z
-    iy = rem_z ÷ output_size[1] + 1
+    iy = div(rem_z, output_size[1]) + 1
     ix = rem_z % output_size[1] + 1
     
     out_res[I] = fused_affine_point_logic(source_arr, affine_matrices, source_arr_shape, output_size, center_shift, keep_begining_same, extrapolate_value[1], is_nearest_neighbour, ix, iy, iz, idx_batch)
@@ -652,13 +762,38 @@ function ChainRulesCore.rrule(::typeof(interpolate_fused_affine), input_array, a
 end
 
 """
-input_array - array we will use to find interpolated val
-input_array_spacing - spacing associated with array from which we will perform interpolation
-Interpolator_enum - enum value defining the type of interpolation
-keep_begining_same - will keep unmodified first layer of each axis - usefull when changing spacing
-extrapolate_value - value to use for extrapolation
 
-IMPORTANT!!! - by convention if index to interpolate is less than 0 we will use extrapolate_value (we work only on positive indicies here)
+    interpolate_my(points_to_interpolate, input_array, input_array_spacing, interpolator_enum, keep_begining_same, extrapolate_value=0, use_fast=true)
+
+
+Interpolate multiple points from a 3D/4D medical image array with support for different interpolators.
+
+This function handles non-isovolumetric voxels (different spacing in x, y, z) and
+provides both high-level Interpolations.jl wrappers and fast GPU-ready kernels.
+
+# Arguments
+
+- `points_to_interpolate::Matrix{Real}`: 3×N matrix of physical coordinates.
+
+- `points_to_interpolate::Matrix{Real}`: 3xN matrix of physical coordinates.
+
+- `input_array::AbstractArray`: Voxel data (3D or 4D batch).
+- `input_array_spacing`: Tuple or Vector of tuples representing voxel spacing (mm).
+- `interpolator_enum::Interpolator_enum`: Choice of interpolation method:
+  - `Nearest_neighbour_en`: Preserves discrete values (labels).
+  - `Linear_en`: Fast and smooth (trilinear).
+  - `B_spline_en`: High resolution cubic spline.
+- `keep_begining_same::Bool`: If true, clamps coordinates to at least 1.0.
+- `extrapolate_value::Real=0`: Value for points outside the source image.
+- `use_fast::Bool=true`: Use optimized KernelAbstractions kernels (recommended for GPU).
+
+# Returns
+- `AbstractArray`: Interpolated values.
+
+# Notes
+- **Non-isovolumetric Spacing**: Correctly maps physical points to index space using `input_array_spacing`.
+- **Extrapolation**: Negative indices are always cast to `extrapolate_value`.
+- **Interpolators**: Nearest neighbor is recommended for segmentation masks; Linear/B-spline for grayscale images.
 """
 function interpolate_my(points_to_interpolate, input_array, input_array_spacing, interpolator_enum, keep_begining_same, extrapolate_value=0, use_fast=true)
 
@@ -712,12 +847,68 @@ end#interpolate_my
 
 
 
+"""
+    TransformIndexToPhysicalPoint_julia(index, origin, spacing)
+
+Transform voxel indices to physical coordinates in millimeters.
+
+This function converts voxel indices (i, j, k) to physical coordinates in the patient's
+coordinate system, accounting for image origin and voxel spacing. Note that this
+simplified version assumes a default identity direction matrix.
+
+# Arguments
+- `index::Tuple{Int,Int,Int}`: Voxel indices (1-based indexing).
+- `origin::Tuple{Float64,Float64,Float64}`: Image origin in physical space (mm).
+- `spacing::Tuple{Float64,Float64,Float64}`: Voxel spacing in (x, y, z) directions (mm).
+
+# Returns
+- `Tuple{Float64,Float64,Float64}`: Physical coordinates in millimeters.
+
+# Examples
+```julia
+# Origin at (0,0,0), unit spacing
+julia> TransformIndexToPhysicalPoint_julia((1, 1, 1), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0))
+(1.0, 1.0, 1.0)
+
+# Non-zero origin shifts the result
+julia> TransformIndexToPhysicalPoint_julia((1, 1, 1), (10.0, 20.0, 30.0), (1.0, 1.0, 1.0))
+(11.0, 21.0, 31.0)
+```
+
+# Notes
+- Formula: `physical = origin + (index * spacing)`
+- This function is a fundamental building block for spatial image analysis.
+"""
 function TransformIndexToPhysicalPoint_julia(index::Tuple{Int,Int,Int}, origin::Tuple{Float64,Float64,Float64}, spacing::Tuple{Float64,Float64,Float64})
 
     # return origin .+ ((collect(index) .- 1) .* collect(spacing))
     return collect(collect(origin) .+ ((collect(index)) .* collect(spacing)))
 end
 
+"""
+    ensure_tuple(arr)
+
+Convert an array or list to a tuple.
+
+This utility function ensures that input is a tuple, converting from arrays or lists if necessary.
+It is primarily used because the `MedImage` struct requires tuples for spatial fields
+(spacing, origin, direction).
+
+# Arguments
+- `arr`: Input to convert (Tuple, AbstractArray, or other iterable).
+
+# Returns
+- `Tuple`: The input converted to a tuple.
+
+# Examples
+```julia
+julia> ensure_tuple([1.0, 2.0, 3.0])
+(1.0, 2.0, 3.0)
+
+julia> ensure_tuple((1.0, 2.0, 3.0))
+(1.0, 2.0, 3.0)
+```
+"""
 function ensure_tuple(arr)
     if isa(arr, Tuple)
         return arr
@@ -733,9 +924,9 @@ end
 
     # Map linear index to x,y,z (1-based)
     stride_z = new_dims[1] * new_dims[2]
-    iz = (i - 1) ÷ stride_z + 1
+    iz = div(i - 1, stride_z) + 1
     rem_z = (i - 1) % stride_z
-    iy = rem_z ÷ new_dims[1] + 1
+    iy = div(rem_z, new_dims[1]) + 1
     ix = rem_z % new_dims[1] + 1
 
     # Map to source index space
@@ -779,9 +970,9 @@ end
 @kernel function nearest_resample_kernel(output, @Const(image_data), @Const(old_spacing), @Const(new_spacing), @Const(new_dims))
     i = @index(Global, Linear)
 
-    iz = (i - 1) ÷ (new_dims[1] * new_dims[2]) + 1
+    iz = div(i - 1, new_dims[1] * new_dims[2]) + 1
     rem_z = (i - 1) % (new_dims[1] * new_dims[2])
-    iy = rem_z ÷ new_dims[1] + 1
+    iy = div(rem_z, new_dims[1]) + 1
     ix = rem_z % new_dims[1] + 1
 
     real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing[1]) / Float32(old_spacing[1])) + 1.0f0
@@ -817,9 +1008,9 @@ end
 
     # Map linear index to x,y,z (1-based)
     stride_z = ndx * ndy
-    iz = (i - 1) ÷ stride_z + 1
+    iz = div(i - 1, stride_z) + 1
     rem_z = (i - 1) % stride_z
-    iy = rem_z ÷ ndx + 1
+    iy = div(rem_z, ndx) + 1
     ix = rem_z % ndx + 1
 
     # Map to source index space using array indexing
@@ -1001,9 +1192,9 @@ end
     ndx = Int(new_dims_arr[1])
     ndy = Int(new_dims_arr[2])
 
-    iz = (i - 1) ÷ (ndx * ndy) + 1
+    iz = div(i - 1, ndx * ndy) + 1
     rem_z = (i - 1) % (ndx * ndy)
-    iy = rem_z ÷ ndx + 1
+    iy = div(rem_z, ndx) + 1
     ix = rem_z % ndx + 1
 
     real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing_arr[1]) / Float32(old_spacing_arr[1])) + 1.0f0
@@ -1074,9 +1265,9 @@ function trilinear_resample_cpu_loop!(output, image_data, old_spacing, new_spaci
     sx, sy, sz = size(image_data)
 
     @inbounds for i in 1:n_points
-        iz = (i - 1) ÷ stride_z + 1
+        iz = div(i - 1, stride_z) + 1
         rem_z = (i - 1) % stride_z
-        iy = rem_z ÷ new_dims[1] + 1
+        iy = div(rem_z, new_dims[1]) + 1
         ix = rem_z % new_dims[1] + 1
 
         real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing[1]) / Float32(old_spacing[1])) + 1.0f0
@@ -1119,9 +1310,9 @@ function nearest_resample_cpu_loop!(output, image_data, old_spacing, new_spacing
     sx, sy, sz = size(image_data)
 
     @inbounds for i in 1:n_points
-        iz = (i - 1) ÷ stride_z + 1
+        iz = div(i - 1, stride_z) + 1
         rem_z = (i - 1) % stride_z
-        iy = rem_z ÷ new_dims[1] + 1
+        iy = div(rem_z, new_dims[1]) + 1
         ix = rem_z % new_dims[1] + 1
 
         real_x = (Float32(ix) - 1.0f0) * (Float32(new_spacing[1]) / Float32(old_spacing[1])) + 1.0f0
@@ -1183,7 +1374,7 @@ end
     # Map linear index to spatial index and batch index
     # We iterate over (N_points * BatchSize)
     idx_spatial = (i - 1) % n_spatial + 1
-    idx_batch = (i - 1) ÷ n_spatial + 1
+    idx_batch = div(i - 1, n_spatial) + 1
 
     # Convert spatial index to 3D coords (x,y,z)
     sx = spatial_size[1]
@@ -1191,9 +1382,9 @@ end
     # sz = spatial_size[3]
     stride_z = sx * sy
 
-    iz = (idx_spatial - 1) ÷ stride_z + 1
+    iz = div(idx_spatial - 1, stride_z) + 1
     rem_z = (idx_spatial - 1) % stride_z
-    iy = rem_z ÷ sx + 1
+    iy = div(rem_z, sx) + 1
     ix = rem_z % sx + 1
 
     # Center shift
@@ -1259,11 +1450,11 @@ function generate_affine_coords_cpu_loop!(points_out, affine_matrices, spatial_s
 
     for i in 1:(n_spatial * batch_size)
         idx_spatial = (i - 1) % n_spatial + 1
-        idx_batch = (i - 1) ÷ n_spatial + 1
+        idx_batch = div(i - 1, n_spatial) + 1
 
-        iz = (idx_spatial - 1) ÷ stride_z + 1
+        iz = div(idx_spatial - 1, stride_z) + 1
         rem_z = (idx_spatial - 1) % stride_z
-        iy = rem_z ÷ sx + 1
+        iy = div(rem_z, sx) + 1
         ix = rem_z % sx + 1
 
         px = Float32(ix) - center_shift[1]
@@ -1673,6 +1864,161 @@ function ChainRulesCore.rrule(::typeof(resample_kernel_launch), image_data, old_
         return NoTangent(), d_image_out, NoTangent(), NoTangent(), NoTangent(), NoTangent()
     end
     return output, resample_pullback
+end
+
+
+
+"""
+    one_hot_encode(arr::AbstractArray{T, N}, num_classes::Int) where {T, N}
+
+Converts an integer-labeled array into a one-hot encoded Float32 array.
+The new dimension is added at N+1.
+"""
+function one_hot_encode(arr::AbstractArray{T, N}, num_classes::Int) where {T, N}
+    backend = get_backend(arr)
+    out_dims = (size(arr)..., num_classes)
+    out = KernelAbstractions.zeros(backend, Float32, out_dims...)
+    
+    for c in 1:num_classes
+        # Select the c-th channel in the last dimension
+        out_channel = selectdim(out, N + 1, c)
+        out_channel .= Float32.(arr .== T(c))
+    end
+    return out
+end
+
+"""
+    calculate_barycenter(mask::AbstractArray{T, N}) where {T, N}
+
+Calculates the barycenter (centroid) of non-zero voxels in a mask.
+If N=4, it calculates a barycenter for each channel/batch in the 4th dimension.
+Returns a Tuple or Vector of Tuples.
+"""
+function calculate_barycenter(mask::AbstractArray{T, N}) where {T, N}
+    backend = get_backend(mask)
+    dims = size(mask)
+    
+    if N == 3
+        # Ensure we work on GPU if possible
+        mask_f32 = Float32.(mask)
+        n = sum(mask_f32)
+        if n == 0
+            return (0.0f0, 0.0f0, 0.0f0)
+        end
+        
+        # Optimized GPU path using grids
+        x_grid = KernelAbstractions.allocate(backend, Float32, dims[1])
+        y_grid = KernelAbstractions.allocate(backend, Float32, dims[2])
+        z_grid = KernelAbstractions.allocate(backend, Float32, dims[3])
+        
+        # Fill grids
+        x_arr = Float32.(collect(1:dims[1]))
+        y_arr = Float32.(collect(1:dims[2]))
+        z_arr = Float32.(collect(1:dims[3]))
+        
+        if backend isa KernelAbstractions.GPU
+            copyto!(x_grid, x_arr)
+            copyto!(y_grid, y_arr)
+            copyto!(z_grid, z_arr)
+        else
+            x_grid .= x_arr
+            y_grid .= y_arr
+            z_grid .= z_arr
+        end
+        
+        sum_x = sum(mask_f32 .* reshape(x_grid, :, 1, 1))
+        sum_y = sum(mask_f32 .* reshape(y_grid, 1, :, 1))
+        sum_z = sum(mask_f32 .* reshape(z_grid, 1, 1, :))
+        
+        return (Float32(sum_x/n), Float32(sum_y/n), Float32(sum_z/n))
+        
+    elseif N == 4
+        # Multichannel support
+        num_channels = dims[4]
+        barycenters = Vector{Tuple{Float32, Float32, Float32}}(undef, num_channels)
+        for c in 1:num_channels
+            barycenters[c] = calculate_barycenter(selectdim(mask, 4, c))
+        end
+        return barycenters
+    else
+        error("calculate_barycenter only supports 3D or 4D arrays")
+    end
+end
+
+"""
+    calculate_max_radius(mask::AbstractArray{T, 3}, barycenter::Tuple{Float32, Float32, Float32})
+
+Calculates the maximum distance from the barycenter to any non-zero voxel in the mask.
+"""
+function calculate_max_radius(mask::AbstractArray{T, 3}, barycenter::Tuple{Float32, Float32, Float32}) where {T}
+    backend = get_backend(mask)
+    dims = size(mask)
+    
+    x_grid = KernelAbstractions.allocate(backend, Float32, dims[1])
+    y_grid = KernelAbstractions.allocate(backend, Float32, dims[2])
+    z_grid = KernelAbstractions.allocate(backend, Float32, dims[3])
+    
+    x_arr = Float32.(collect(1:dims[1]))
+    y_arr = Float32.(collect(1:dims[2]))
+    z_arr = Float32.(collect(1:dims[3]))
+    
+    if backend isa KernelAbstractions.GPU
+        copyto!(x_grid, x_arr)
+        copyto!(y_grid, y_arr)
+        copyto!(z_grid, z_arr)
+    else
+        x_grid .= x_arr
+        y_grid .= y_arr
+        z_grid .= z_arr
+    end
+    
+    # Square distance volume: filter by mask
+    mask_bool = (mask .> 0)
+    dist_sq_vol = (((reshape(x_grid, :, 1, 1) .- barycenter[1]).^2) .+ 
+                   ((reshape(y_grid, 1, :, 1) .- barycenter[2]).^2) .+ 
+                   ((reshape(z_grid, 1, 1, :) .- barycenter[3]).^2)) .* Float32.(mask_bool)
+    
+    return sqrt(maximum(dist_sq_vol))
+end
+
+"""
+    extract_points_from_mask(mask::AbstractArray{T, 3}, max_points::Int)
+
+Extracts a deterministic subset of coordinates for non-zero voxels in a mask.
+Pads with (-1.0, -1.0, -1.0) if fewer than max_points are found.
+"""
+function extract_points_from_mask(mask::AbstractArray{T, 3}, max_points::Int) where {T}
+    # findall always returns indices on CPU for CuArrays (scalar indexing warning)
+    # but for small masks it's okay. For large ones we should use GPU kernels
+    # to find non-zero indices.
+    indices = findall(mask .> 0)
+    n_points = length(indices)
+    
+    points_tensor = fill(-1.0f0, (3, max_points))
+    
+    if n_points == 0
+        return points_tensor
+    end
+    
+    # Deterministic sampling using fixed stride
+    if n_points > max_points
+        if max_points == 1
+            subset = [indices[1]]
+        else
+            sel_indices = round.(Int, range(1, stop=n_points, length=max_points))
+            subset = indices[sel_indices]
+        end
+    else
+        subset = indices
+    end
+    
+    for (p_idx, idx) in enumerate(subset)
+        points_tensor[1, p_idx] = Float32(idx[1])
+        points_tensor[2, p_idx] = Float32(idx[2])
+        points_tensor[3, p_idx] = Float32(idx[3])
+    end
+    
+    return points_tensor
 end
 
 end#Utils

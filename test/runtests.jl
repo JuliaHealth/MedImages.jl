@@ -135,6 +135,10 @@ mkpath(DEBUG_DIR)
         end
     end
 
+    @testset "Non-Isovolumetric Rotation Tests" begin
+        include("test_rotation_non_iso.jl")
+    end
+
     # Basic Transformations Tests - require test data and PyCall
     if isfile(TEST_NIFTI_FILE) && PYCALL_AVAILABLE
         @testset "Basic Transformations Tests" begin
@@ -143,6 +147,7 @@ mkpath(DEBUG_DIR)
             include("basic_transformations_tests/test_pad_mi.jl")
             include("basic_transformations_tests/test_translate_mi.jl")
             include("basic_transformations_tests/test_scale_mi.jl")
+            include("basic_transformations_tests/test_affine_transform_mi.jl")
         end
     else
         @testset "Basic Transformations Tests" begin
@@ -155,6 +160,7 @@ mkpath(DEBUG_DIR)
         @testset "Spatial Metadata Change Tests" begin
             include("spatial_metadata_change_tests/test_resample_to_spacing.jl")
             include("spatial_metadata_change_tests/test_change_orientation.jl")
+            include("integrated_spatial_tests.jl")
         end
     else
         @testset "Spatial Metadata Change Tests" begin
@@ -207,6 +213,11 @@ mkpath(DEBUG_DIR)
             @warn "Zygote not available or failed to load: $e"
             @test_skip "Zygote required for differentiability tests"
         end
+    end
+
+    # Normalization Tests
+    @testset "Normalization Tests" begin
+        include("normalization_tests/test_normalization.jl")
     end
 
     # Batched Processing Tests

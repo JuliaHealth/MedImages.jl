@@ -4,7 +4,7 @@ using CUDA
 using ChainRulesCore
 
 using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Load_and_save
-export change_orientation, resample_to_spacing
+export change_orientation
 """
 given a MedImage object and desired spacing (spacing) return the MedImage object with the new spacing
 """
@@ -21,9 +21,6 @@ function resample_to_spacing(im::MedImage, new_spacing::Tuple{Float64,Float64,Fl
     old_spacing = im.spacing
     old_size = size(im.voxel_data)
 
-    # Calculate new size based on the ratio of physical extent to new spacing
-    # Formula: new_size = ceil(old_size * old_spacing / new_spacing)
-    new_size = Tuple{Int,Int,Int}(ceil.((old_size .* old_spacing) ./ new_spacing))
 
     # Julia array dims map as: dim1 -> X, dim2 -> Y, dim3 -> Z
     # Spacing is already in (x,y,z) order, so no reversal needed
@@ -41,27 +38,12 @@ function resample_to_spacing(im::BatchedMedImage, new_spacing::Union{Tuple{Float
 
     # Logic for handling shared vs unique spacing
 
-    target_spacings = []
-    if new_spacing isa Vector
-        if length(new_spacing) != batch_size
-            error("New spacing vector length must match batch size")
-        end
-        target_spacings = new_spacing
-    else
-        target_spacings = [new_spacing for _ in 1:batch_size]
-    end
 
-    # Must enforce consistent output size
-    # Calculate expected new size for first item
-    first_new_size = Tuple{Int,Int,Int}(ceil.((old_size .* im.spacing[1]) ./ target_spacings[1]))
+"""
+    change_orientation(im::MedImage, goal_orientation::Orientation_code)::MedImage
+    change_orientation(im::MedImage, goal_orientation::String)::MedImage
 
-    # Verify all match
-    for b in 2:batch_size
-        sz = Tuple{Int,Int,Int}(ceil.((old_size .* im.spacing[b]) ./ target_spacings[b]))
-        if sz != first_new_size
-            error("Batched resampling to spacing requires consistent output voxel dimensions. Item 1 size: $first_new_size, Item $b size: $sz")
-        end
-    end
+Change the orientation of a `MedImage` to a target orientation (e.g., "RAS", "LPS").
 
     # If consistent, we can proceed.
     # We need to adapt `resample_kernel_launch` to handle batches.
@@ -150,18 +132,31 @@ function resample_to_spacing(im::BatchedMedImage, new_spacing::Union{Tuple{Float
     )
 end
 
+# Returns
+- `MedImage`: A new image object with the requested orientation.
 
-#  te force solution get all direction combinetions put it in sitk and try all possible ways to permute and reverse axis to get the same result as sitk then save the result in json or sth and use; do the same with the origin
-#     Additionally in similar manner save all directions in a form of a vector and associate it with 3 letter codes
+# Examples
+```julia
+# Change to Right-Anterior-Superior (RAS)
+julia> new_im = change_orientation(im, "RAS")
 
+# Change using enum
+julia> new_im = change_orientation(im, ORIENTATION_LPS)
+```
 
-"""
-given a MedImage object and desired orientation encoded as 3 letter string (like RAS or LPS) return the MedImage object with the new orientation
+# Notes
+- **Permutation**: If the target orientation requires swapping axes (e.g., sagittal to axial), the `voxel_data` is permuted.
+- **Reversal**: If an axis direction needs to be flipped (e.g., Left to Right), the data along that dimension is reversed.
+- **Metadata**: Origin, spacing, and direction are automatically adjusted to remain physically accurate.
 """
 function change_orientation(im::MedImage, new_orientation::Orientation_code)::MedImage
     old_orientation = Orientation_dicts.number_to_enum_orientation_dict[im.direction]
     reorient_operation = Orientation_dicts.orientation_pair_to_operation_dict[(old_orientation, new_orientation)]
     return change_orientation_main(im, new_orientation, reorient_operation)
+end#change_orientation
+
+function change_orientation(im::MedImage, new_orientation::String)::MedImage
+    return change_orientation(im, Orientation_dicts.string_to_orientation_enum[new_orientation])
 end#change_orientation
 
 # Custom rrule for change_orientation that handles dictionary lookups properly

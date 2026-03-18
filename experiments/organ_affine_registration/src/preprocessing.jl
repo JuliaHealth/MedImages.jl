@@ -4,6 +4,7 @@ using MedImages
 using MedImages.MedImage_data_struct
 using Statistics
 using LinearAlgebra
+using CUDA, KernelAbstractions, LuxCUDA
 
 export preprocess_organ_data, OrganMetadata
 
@@ -36,8 +37,13 @@ function preprocess_organ_data(atlas_mask::MedImage, gold_standard_mask::MedImag
     # 1. Identify unique organs (integers > 0)
     # We assume atlas and gold standard have matching organ IDs
     atlas_data = atlas_mask.voxel_data
-    organ_ids = sort(unique(filter(x -> x > 0, atlas_data)))
+    organ_ids = sort(unique(filter(x -> x > 0, Array(atlas_data)))) # Ensure unique on CPU for simplicity
     num_organs = length(organ_ids)
+
+    # Check if we are on GPU
+    data_on_gpu = hasmethod(parent, (typeof(atlas_data),)) && parent(atlas_data) isa CuArray || atlas_data isa CuArray
+    # Or more simply:
+    data_on_gpu = (KernelAbstractions.get_backend(atlas_data) isa LuxCUDA.CUDABackend)
 
     if num_organs == 0
         error("No organs found in atlas mask")
@@ -51,50 +57,55 @@ function preprocess_organ_data(atlas_mask::MedImage, gold_standard_mask::MedImag
 
     # 3. Process each organ in Atlas
     for (i, oid) in enumerate(organ_ids)
-        # Extract indices (CartesianIndex)
-        indices = findall(x -> x == oid, atlas_data)
-
-        if isempty(indices)
-            # Should not happen based on unique check, but safety first
-            organ_meta_list[i] = OrganMetadata(oid, (0f0,0f0,0f0), 0f0)
-            continue
-        end
-
-        # Convert to Float32 tuples (1-based index)
-        points_float = [Float32.((idx[1], idx[2], idx[3])) for idx in indices]
-
-        # Compute Barycenter (Atlas) - used for initialization logic if needed,
-        # but here we focus on processing points.
-        # Actually, the prompt says "calculate Gold Standard Barycenters and Max Radii".
-        # But we also need points from Atlas.
-
-        # Deterministic Downsampling
-        n_points = length(points_float)
-        if n_points > max_points
-            # Stride based selection
-            # We want exactly max_points? Or at most?
-            # Prompt: "fill those with -1" -> implies fixed size buffer.
-            # "select every k-th point"
-            step = n_points / max_points
-            selected_indices = [Int(ceil(j * step)) for j in 1:max_points]
-            # Clamp to be safe
-            selected_indices = clamp.(selected_indices, 1, n_points)
-            # Ensure unique if possible? With ceil, might repeat last one.
-            # Better: range(1, n_points, length=max_points)
-            selected_indices = round.(Int, range(1, stop=n_points, length=max_points))
-
-            subset = points_float[selected_indices]
+        # Process on GPU if data is there
+        if data_on_gpu
+            mask = (atlas_data .== Int32(oid))
+            indices_gpu = findall(mask)
+            n_points = length(indices_gpu)
+            
+            if n_points == 0
+                organ_meta_list[i] = OrganMetadata(Int(oid), (0f0,0f0,0f0), 0f0)
+                continue
+            end
+            
+            # Deterministic Downsampling on CPU (once we have indices)
+            # Fetch only the indices we need to avoid massive CPU transfer if many points
+            if n_points > max_points
+                sel_indices = round.(Int, range(1, stop=n_points, length=max_points))
+                # Indexing into CuArray with indices is allowed
+                subset_indices = Array(indices_gpu[sel_indices])
+            else
+                subset_indices = Array(indices_gpu)
+            end
+            
+            # Fill Tensor
+            for (p_idx, idx) in enumerate(subset_indices)
+                points_tensor[1, p_idx, i] = Float32(idx[1])
+                points_tensor[2, p_idx, i] = Float32(idx[2])
+                points_tensor[3, p_idx, i] = Float32(idx[3])
+            end
         else
-            subset = points_float
+            # CPU Path
+            indices = findall(x -> x == oid, atlas_data)
+            if isempty(indices)
+                organ_meta_list[i] = OrganMetadata(Int(oid), (0f0,0f0,0f0), 0f0)
+                continue
+            end
+            
+            n_points = length(indices)
+            if n_points > max_points
+                sel_indices = round.(Int, range(1, stop=n_points, length=max_points))
+                subset = indices[sel_indices]
+            else
+                subset = indices
+            end
+            
+            for (p_idx, idx) in enumerate(subset)
+                points_tensor[1, p_idx, i] = Float32(idx[1])
+                points_tensor[2, p_idx, i] = Float32(idx[2])
+                points_tensor[3, p_idx, i] = Float32(idx[3])
+            end
         end
-
-        # Fill Tensor
-        for (p_idx, p) in enumerate(subset)
-            points_tensor[1, p_idx, i] = p[1]
-            points_tensor[2, p_idx, i] = p[2]
-            points_tensor[3, p_idx, i] = p[3]
-        end
-        # Remaining are already -1.0f0
     end
 
     # 4. Process Gold Standard for Metadata
@@ -107,43 +118,58 @@ function preprocess_organ_data(atlas_mask::MedImage, gold_standard_mask::MedImag
 
     for (i, oid) in enumerate(organ_ids)
         # Create one-hot channel
-        # We can optimize this by iterating volume once if needed, but per-organ is clear
-        indices = findall(x -> x == oid, gold_data)
-
-        if isempty(indices)
-             # Warning: Gold standard missing organ present in Atlas?
-             # Set metadata to 0
-             organ_meta_list[i] = OrganMetadata(oid, (0f0,0f0,0f0), 0f0)
-             continue
-        end
-
-        # Fill One-Hot
-        for idx in indices
-            gold_onehot[idx, i] = 1.0f0
-        end
-
-        # Compute Barycenter
-        coords = [Float32.((idx[1], idx[2], idx[3])) for idx in indices]
-        # Tuple mean is not standard in Statistics for simple divide
-        # Calculate manually
-        sum_x = sum(c[1] for c in coords)
-        sum_y = sum(c[2] for c in coords)
-        sum_z = sum(c[3] for c in coords)
-        n = length(coords)
-        center = (sum_x/n, sum_y/n, sum_z/n)
-
-        # Compute Max Radius
-        # Max distance from center to any voxel in the organ
-        max_dist_sq = 0.0f0
-        for p in coords
-            d2 = sum((p .- center).^2)
-            if d2 > max_dist_sq
-                max_dist_sq = d2
+        # On GPU, use broadcasting for performance
+        if data_on_gpu
+            gold_onehot[:, :, :, i] .= Float32.(gold_data .== Int32(oid))
+            
+            mask = (gold_data .== Int32(oid))
+            n = sum(mask)
+            if n > 0
+                sx, sy, sz = size(gold_data)
+                # Use grids for barycenter
+                x_grid = CuArray(Float32.(collect(1:sx)))
+                y_grid = CuArray(Float32.(collect(1:sy)))
+                z_grid = CuArray(Float32.(collect(1:sz)))
+                
+                sum_x = sum(Float32.(mask) .* reshape(x_grid, :, 1, 1))
+                sum_y = sum(Float32.(mask) .* reshape(y_grid, 1, :, 1))
+                sum_z = sum(Float32.(mask) .* reshape(z_grid, 1, 1, :))
+                
+                center = (sum_x/n, sum_y/n, sum_z/n)
+                
+                # Max Radius
+                # Broadcasted distance calculation
+                # (x-cx)^2 + (y-cy)^2 + (z-cz)^2
+                dist_sq_vol = (((reshape(x_grid, :, 1, 1) .- center[1]).^2) .+ 
+                               ((reshape(y_grid, 1, :, 1) .- center[2]).^2) .+ 
+                               ((reshape(z_grid, 1, 1, :) .- center[3]).^2)) .* Float32.(mask)
+                max_radius = sqrt(maximum(dist_sq_vol))
+                
+                organ_meta_list[i] = OrganMetadata(Int(oid), center, Float32(max_radius))
+            else
+                organ_meta_list[i] = OrganMetadata(Int(oid), (0f0,0f0,0f0), 1.0f0)
             end
+        else
+            # CPU path (Original)
+            indices = findall(x -> x == oid, gold_data)
+            if isempty(indices)
+                 organ_meta_list[i] = OrganMetadata(Int(oid), (0f0,0f0,0f0), 0f0)
+                 continue
+            end
+            for idx in indices
+                gold_onehot[idx, i] = 1.0f0
+            end
+            coords = [Float32.((idx[1], idx[2], idx[3])) for idx in indices]
+            sum_x = sum(c[1] for c in coords); sum_y = sum(c[2] for c in coords); sum_z = sum(c[3] for c in coords)
+            n = length(coords)
+            center = (sum_x/n, sum_y/n, sum_z/n)
+            max_dist_sq = 0.0f0
+            for p in coords
+                d2 = sum((p .- center).^2)
+                if d2 > max_dist_sq; max_dist_sq = d2; end
+            end
+            organ_meta_list[i] = OrganMetadata(Int(oid), center, sqrt(max_dist_sq))
         end
-        max_radius = sqrt(max_dist_sq)
-
-        organ_meta_list[i] = OrganMetadata(oid, center, max_radius)
     end
 
     return points_tensor, organ_meta_list, gold_onehot

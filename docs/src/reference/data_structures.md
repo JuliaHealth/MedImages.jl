@@ -9,7 +9,7 @@ This page provides detailed documentation for all data structures and types in M
 The `MedImage` struct is the central data structure in MedImages.jl. It encapsulates both voxel data and comprehensive metadata for medical images.
 
 ```julia
-@with_kw mutable struct MedImage
+@with_kw struct MedImage
     voxel_data                                   # Multidimensional array
     origin::Tuple{Float64,Float64,Float64}       # Physical origin (x,y,z)
     spacing::Tuple{Float64,Float64,Float64}      # Voxel spacing (x,y,z)
@@ -31,6 +31,9 @@ The `MedImage` struct is the central data structure in MedImages.jl. It encapsul
     metadata::Dict{Any,Any} = Dict()             # Additional metadata
 end
 ```
+
+> [!IMPORTANT]
+> `MedImage` is an **immutable** struct. To "modify" it, you must create a new instance with the desired changes, preferably using the `@set` macro from `Accessors.jl`.
 
 ---
 
@@ -224,9 +227,9 @@ A dictionary for storing visualization-related parameters such as color maps, wi
 
 **Example:**
 ```julia
-image.display_data["window_center"] = 40
-image.display_data["window_width"] = 400
-image.display_data["colormap"] = "gray"
+image = @set image.display_data["window_center"] = 40
+image = @set image.display_data["window_width"] = 400
+image = @set image.display_data["colormap"] = "gray"
 ```
 
 #### `clinical_data`
@@ -237,10 +240,10 @@ A dictionary for storing patient clinical information.
 
 **Example:**
 ```julia
-image.clinical_data["age"] = 65
-image.clinical_data["sex"] = "M"
-image.clinical_data["weight_kg"] = 75.0
-image.clinical_data["diagnosis"] = "Normal"
+image = @set image.clinical_data["age"] = 65
+image = @set image.clinical_data["sex"] = "M"
+image = @set image.clinical_data["weight_kg"] = 75.0
+image = @set image.clinical_data["diagnosis"] = "Normal"
 ```
 
 #### `metadata`
@@ -251,9 +254,9 @@ A dictionary for storing any additional metadata not covered by other fields.
 
 **Example:**
 ```julia
-image.metadata["source_format"] = "DICOM"
-image.metadata["reconstruction_kernel"] = "B30f"
-image.metadata["slice_thickness"] = 1.0
+image = @set image.metadata["source_format"] = "DICOM"
+image = @set image.metadata["reconstruction_kernel"] = "B30f"
+image = @set image.metadata["slice_thickness"] = 1.0
 ```
 
 #### `is_contrast_administered`
@@ -280,9 +283,11 @@ end
 
 **Usage:**
 ```julia
-image.image_type = CT_type
+# Create a new version with modified type
+using Accessors
+new_image = @set image.image_type = CT_type
 
-if image.image_type == CT_type
+if new_image.image_type == CT_type
     println("Processing CT scan")
 end
 ```

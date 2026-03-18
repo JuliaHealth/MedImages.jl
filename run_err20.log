@@ -1,0 +1,50 @@
+  Activating project at `~/project_ssd/MedImages.jl`
+ERROR: LoadError: Out of GPU memory
+Stacktrace:
+  [1] throw_api_error(res::CUDA.cudaError_enum)
+    @ CUDA ~/.julia/packages/CUDA/724Sm/lib/cudadrv/libcuda.jl:28
+  [2] check
+    @ ~/.julia/packages/CUDA/724Sm/lib/cudadrv/libcuda.jl:37 [inlined]
+  [3] cuDevicePrimaryCtxRetain
+    @ ~/.julia/packages/GPUToolbox/JLBB1/src/ccalls.jl:33 [inlined]
+  [4] CuContext(pctx::CuPrimaryContext)
+    @ CUDA ~/.julia/packages/CUDA/724Sm/lib/cudadrv/context.jl:197
+  [5] context(dev::CuDevice)
+    @ CUDA ~/.julia/packages/CUDA/724Sm/lib/cudadrv/state.jl:238
+  [6] TaskLocalState (repeats 2 times)
+    @ ~/.julia/packages/CUDA/724Sm/lib/cudadrv/state.jl:50 [inlined]
+  [7] task_local_state!()
+    @ CUDA ~/.julia/packages/CUDA/724Sm/lib/cudadrv/state.jl:79
+  [8] device
+    @ ~/.julia/packages/CUDA/724Sm/lib/cudadrv/state.jl:189 [inlined]
+  [9] adapt_storage(to::CUDADevice{Nothing, Missing}, x::Vector{Float32})
+    @ CUDAExt ~/.julia/packages/MLDataDevices/4qHOT/ext/CUDAExt.jl:64
+ [10] adapt_structure
+    @ ~/.julia/packages/Adapt/2UZ81/src/Adapt.jl:57 [inlined]
+ [11] adapt
+    @ ~/.julia/packages/Adapt/2UZ81/src/Adapt.jl:40 [inlined]
+ [12] adapt_structure
+    @ ~/.julia/packages/ComponentArrays/wtXLb/src/componentarray.jl:80 [inlined]
+ [13] adapt
+    @ ~/.julia/packages/Adapt/2UZ81/src/Adapt.jl:40 [inlined]
+ [14] Fix1
+    @ ./operators.jl:1118 [inlined]
+ [15] ExcludeWalk
+    @ ~/.julia/packages/Functors/LbNAu/src/walks.jl:126 [inlined]
+ [16] CachedWalk
+    @ ~/.julia/packages/Functors/LbNAu/src/walks.jl:177 [inlined]
+ [17] execute(::Functors.CachedWalk{Functors.ExcludeWalk{Functors.DefaultWalk, Base.Fix1{typeof(Adapt.adapt), CUDADevice{Nothing, Missing}}, typeof(MLDataDevices.isleaf)}, Functors.NoKeyword, Functors.WalkCache{Any, Any, Functors.ExcludeWalk{Functors.DefaultWalk, Base.Fix1{typeof(Adapt.adapt), CUDADevice{Nothing, Missing}}, typeof(MLDataDevices.isleaf)}, IdDict{Any, Any}}}, ::ComponentVector{Float32, Vector{Float32}, Tuple{Axis{(layer_1 = ViewAxis(1:336, Axis(layer_1 = ViewAxis(1:112, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_2 = ViewAxis(113:224, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_3 = ViewAxis(225:336, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))))), layer_2 = ViewAxis(337:1208, Axis(weight = ViewAxis(1:864, ShapedAxis((3, 3, 3, 4, 8))), bias = ViewAxis(865:872, Shaped1DAxis((8,))))), layer_3 = ViewAxis(1209:1425, Axis(weight = ViewAxis(1:216, ShapedAxis((3, 3, 3, 8, 1))), bias = ViewAxis(217:217, Shaped1DAxis((1,))))))}}})
+    @ Functors ~/.julia/packages/Functors/LbNAu/src/walks.jl:55
+ [18] fmap(::Function, ::ComponentVector{Float32, Vector{Float32}, Tuple{Axis{(layer_1 = ViewAxis(1:336, Axis(layer_1 = ViewAxis(1:112, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_2 = ViewAxis(113:224, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))), layer_3 = ViewAxis(225:336, Axis(weight = ViewAxis(1:108, ShapedAxis((3, 3, 3, 1, 4))), bias = ViewAxis(109:112, Shaped1DAxis((4,))))))), layer_2 = ViewAxis(337:1208, Axis(weight = ViewAxis(1:864, ShapedAxis((3, 3, 3, 4, 8))), bias = ViewAxis(865:872, Shaped1DAxis((8,))))), layer_3 = ViewAxis(1209:1425, Axis(weight = ViewAxis(1:216, ShapedAxis((3, 3, 3, 8, 1))), bias = ViewAxis(217:217, Shaped1DAxis((1,))))))}}}; exclude::Function, walk::Functors.DefaultWalk, cache::IdDict{Any, Any}, prune::Functors.NoKeyword)
+    @ Functors ~/.julia/packages/Functors/LbNAu/src/maps.jl:11
+ [19] fmap
+    @ ~/.julia/packages/Functors/LbNAu/src/maps.jl:3 [inlined]
+ [20] AbstractDevice
+    @ ~/.julia/packages/MLDataDevices/4qHOT/src/public.jl:516 [inlined]
+ [21] train_on_dataset(dataset_dir::String, epochs::Int64)
+    @ Main ~/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:208
+ [22] top-level scope
+    @ ~/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:276
+in expression starting at /home/jm/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:275
+Initializing dataset training over: test_data/dataset_Lu
+Using device: CUDADevice{Nothing, Missing}(nothing)

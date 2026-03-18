@@ -12,7 +12,7 @@ using ..Utils: interpolate_my, generate_affine_coords, is_cuda_array, interpolat
 using KernelAbstractions
 using CUDA
 
-export rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, computeIndexToPhysicalPointMatrices_Julia, transformIndexToPhysicalPoint_Julia, get_voxel_center_Julia, get_real_center_Julia, Rodrigues_rotation_matrix, crop_image_around_center
+export rotate_mi, crop_mi, pad_mi, translate_mi, scale_mi, computeIndexToPhysicalPointMatrices_Julia, transformIndexToPhysicalPoint_Julia, get_voxel_center_Julia, get_real_center_Julia, Rodrigues_rotation_matrix, crop_image_around_center, pad_or_crop_mi
 export affine_transform_mi, create_affine_matrix, compose_affine_matrices
 
 function computeIndexToPhysicalPointMatrices_Julia(im::MedImage)::Matrix{Float64}
@@ -67,6 +67,16 @@ ChainRulesCore.@non_differentiable get_real_center_Julia(::Any)
 ChainRulesCore.@non_differentiable computeIndexToPhysicalPointMatrices_Julia(::Any)
 ChainRulesCore.@non_differentiable transformIndexToPhysicalPoint_Julia(::Any, ::Any)
 
+"""
+    Rodrigues_rotation_matrix(direction::NTuple{9,Float64}, axis::Int, angle::Float64)::Matrix{Float64}
+
+Compute a 3x3 rotation matrix for a given axis and angle, adjusted for image direction.
+
+# Arguments
+- `direction`: The direction cosine matrix from `MedImage`.
+- `axis`: Rotation axis index (1=X, 2=Y, 3=Z).
+- `angle`: Rotation angle in radians.
+"""
 function Rodrigues_rotation_matrix(direction::NTuple{9,Float64}, axis::Int, angle::Float64)::Matrix{Float64}
   img_direction = direction
   axis_angle = if axis == 3
@@ -96,13 +106,13 @@ end
 ChainRulesCore.@non_differentiable Rodrigues_rotation_matrix(::Any, ::Any, ::Any)
 
 function crop_image_around_center(image::AbstractArray{T,3}, new_dims::Tuple{Int,Int,Int}, center::Tuple{Int,Int,Int}) where {T}
-  start_z = max(1, center[1] - new_dims[1] ÷ 2)
+  start_z = max(1, center[1] - div(new_dims[1], 2))
   end_z = min(size(image, 1), start_z + new_dims[1] - 1)
 
-  start_y = max(1, center[2] - new_dims[2] ÷ 2)
+  start_y = max(1, center[2] - div(new_dims[2], 2))
   end_y = min(size(image, 2), start_y + new_dims[2] - 1)
 
-  start_x = max(1, center[3] - new_dims[3] ÷ 2)
+  start_x = max(1, center[3] - div(new_dims[3], 2))
   end_x = min(size(image, 3), start_x + new_dims[3] - 1)
   cropped_image = image[start_z:end_z, start_y:end_y, start_x:end_x]
   return cropped_image
@@ -115,27 +125,55 @@ function build_rotation_transform(image::MedImage, axis::Int, angle::Float64)
   v_center = collect(get_voxel_center_Julia(image.voxel_data))
   rotation_transformation = LinearMap(RotXYZ(R))
   translation = Translation(v_center...)
-  transkation_center = Translation(-v_center...)
-  return translation ∘ rotation_transformation ∘ transkation_center
+  translation_center = Translation(-v_center...)
+  return compose(translation, rotation_transformation, translation_center)
 end
 ChainRulesCore.@non_differentiable build_rotation_transform(::Any, ::Any, ::Any)
 
+"""
+    rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator_enum, crop::Bool=true)::MedImage
+
+Rotate a `MedImage` around a specified axis and angle.
+
+# Arguments
+- `image`: The input `MedImage`.
+- `axis`: Axis index (1, 2, or 3).
+- `angle`: Angle in radians.
+- `Interpolator`: Interpolation method to use.
+- `crop`: If `true`, the image is cropped to maintain dimensions (default: `true`).
+
+# Returns
+- `MedImage`: The rotated image.
+"""
 function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Interpolator_enum, crop::Bool=true)::MedImage
-  combined_transformation = build_rotation_transform(image, axis, angle)
+  if !crop
+      error("rotate_mi with crop=false is not fully supported currently")
+  end
 
-  img = image.voxel_data
-
-  if crop
-      out_size = size(img)
-      indices = CartesianIndices(out_size)
-      indices_vec = vec(collect(indices))
-
-      points_vec = map(idx -> begin
-          pt = [Float64(idx[1]), Float64(idx[2]), Float64(idx[3])]
-          combined_transformation(pt)
-      end, indices_vec)
-
-      points_to_interpolate = reduce(hcat, points_vec)
+  # Compute rotation matrix in physical space
+  R_phys = Rodrigues_rotation_matrix(image, axis, angle)
+  
+  # Compute Index-to-Physical matrix M
+  M_mat = computeIndexToPhysicalPointMatrices_Julia(image)
+  
+  # Compute index-space rotation matrix: A = M^-1 * R * M
+  # This correctly handles non-isovolumetric spacing and different directions
+  A_idx = inv(M_mat) * R_phys * M_mat
+  
+  # Prepare 4x4 affine matrix for affine_transform_mi
+  # Note: affine_transform_mi expects a matrix that maps index-offsets
+  affine_matrix = Matrix{Float64}(I, 4, 4)
+  affine_matrix[1:3, 1:3] = A_idx
+  affine_matrix[4, 4] = 1.0
+  
+  # Compute index-space center of rotation (1-based)
+  # This is the physical center mapped back to index space
+  C_phys = collect(get_real_center_Julia(image))
+  C_idx = inv(M_mat) * (C_phys .- collect(image.origin)) .+ 1.0
+  
+  # Use the high-performance fused affine transform
+  return affine_transform_mi(image, affine_matrix, Interpolator; center_of_rotation=Tuple(C_idx))
+end
 
       # Interpolate
       # Use spacing (1,1,1) so that points are treated as indices
@@ -143,17 +181,20 @@ function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Int
       extrap_val = Float64(median(extract_corners(img)))
       resampled_flat = interpolate_my(points_to_interpolate, img, (1.0,1.0,1.0), Interpolator, false, extrap_val, true)
 
-      resampled_image = reshape(resampled_flat, out_size)
+"""
+    crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::MedImage
 
-      image = update_voxel_data(image, resampled_image)
-  else
-      error("rotate_mi with crop=false is not fully supported in this patch")
-  end
+Crop a `MedImage` starting from `crop_beg` with dimensions `crop_size`.
 
-  return image
-end
+# Arguments
+- `im`: The input `MedImage`.
+- `crop_beg`: 0-based starting indices (x, y, z).
+- `crop_size`: Target dimensions (width, height, depth).
+- `Interpolator`: Interpolation method (used if resizing).
 
-
+# Returns
+- `MedImage`: The cropped image with updated origin.
+"""
 function crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::MedImage
 
   julia_beg = crop_beg .+ 1
@@ -221,6 +262,21 @@ function ChainRulesCore.rrule(::typeof(pad_dim), arr, dim, l, r, val)
     return y, pad_dim_pullback
 end
 
+"""
+    pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64}, pad_val, Interpolator::Interpolator_enum)::MedImage
+
+Pad a `MedImage` at the beginning and end of each axis.
+
+# Arguments
+- `im`: The input `MedImage`.
+- `pad_beg`: Number of voxels to add at the start of (x, y, z).
+- `pad_end`: Number of voxels to add at the end of (x, y, z).
+- `pad_val`: Value used for padding.
+- `Interpolator`: Interpolation method.
+
+# Returns
+- `MedImage`: The padded image with updated origin.
+"""
 function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{Int64,Int64,Int64}, pad_val, Interpolator::Interpolator_enum)::MedImage
 
   data = im.voxel_data
@@ -235,7 +291,73 @@ function pad_mi(im::MedImage, pad_beg::Tuple{Int64,Int64,Int64}, pad_end::Tuple{
   return padded_im
 end
 
+"""
+    pad_or_crop_mi(im::MedImage, target_dims::Tuple{Int, Int, Int})
 
+Resizes the MedImage to the target dimensions by centrally padding or cropping.
+Corrects the spatial origin to maintain physical alignment.
+Supports 3D and 4D (multichannel) voxel data.
+"""
+function pad_or_crop_mi(im::MedImage, target_dims::Tuple{Int, Int, Int})
+    data = im.voxel_data
+    curr_dims = size(data)
+    
+    is_4d = (ndims(data) == 4)
+    spatial_dims = is_4d ? curr_dims[1:3] : curr_dims
+    
+    # Calculate difference
+    diffs = target_dims .- spatial_dims
+    
+    # Center the resizing
+    offsets_beg = floor.(Int, diffs ./ 2)
+    offsets_end = diffs .- offsets_beg
+    
+    new_data = data
+    new_origin = collect(im.origin)
+    
+    # Direction diagonals for origin shift
+    dir_diag = (im.direction[1], im.direction[5], im.direction[9])
+    
+    for i in 1:3
+        d = diffs[i]
+        if d > 0
+            # Pad
+            new_data = pad_dim(new_data, i, offsets_beg[i], offsets_end[i], zero(eltype(new_data)))
+            new_origin[i] -= im.spacing[i] * offsets_beg[i] * dir_diag[i]
+        elseif d < 0
+            # Crop (offsets_beg is negative)
+            skip = -offsets_beg[i]
+            take = target_dims[i]
+            
+            # Bounds check for safety (should not exceed current size)
+            skip = min(skip, spatial_dims[i] - take)
+            
+            new_data = selectdim(new_data, i, (skip + 1):(skip + take))
+            new_origin[i] += im.spacing[i] * skip * dir_diag[i]
+        end
+    end
+    
+    # Copy to ensure it's a standard array and not just a view
+    new_data = copy(new_data)
+    
+    return update_voxel_and_spatial_data(im, new_data, Tuple(new_origin), im.spacing, im.direction)
+end
+
+
+"""
+    translate_mi(im::MedImage, translate_by::Int64, translate_in_axis::Int64, Interpolator::Interpolator_enum)::MedImage
+
+Translate a `MedImage` by shifting its origin.
+
+# Arguments
+- `im`: The input `MedImage`.
+- `translate_by`: Number of voxels to translate by.
+- `translate_in_axis`: Axis index (1, 2, or 3).
+- `Interpolator`: Interpolation method (used if resizing).
+
+# Returns
+- `MedImage`: The translated image with a new origin.
+"""
 function translate_mi(im::MedImage, translate_by::Int64, translate_in_axis::Int64, Interpolator::Interpolator_enum)::MedImage
   origin_val = im.origin[translate_in_axis] + translate_by * im.spacing[translate_in_axis]
   translated_origin = ntuple(i -> i == translate_in_axis ? origin_val : im.origin[i], 3)
@@ -263,6 +385,19 @@ function build_scale_points(old_size, scale_tuple)
 end
 ChainRulesCore.@non_differentiable build_scale_points(::Any, ::Any)
 
+"""
+    scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::MedImage
+
+Scale a `MedImage` by a given factor, resampling the voxel data.
+
+# Arguments
+- `im`: The input `MedImage`.
+- `scale`: Scaling factor (scalar or 3-tuple).
+- `Interpolator`: Interpolation method to use.
+
+# Returns
+- `MedImage`: The scaled image with updated dimensions and spacing.
+"""
 function scale_mi(im::MedImage, scale::Union{Float64, Tuple{Float64,Float64,Float64}}, Interpolator::Interpolator_enum)::MedImage
 
   scale_tuple = scale isa Float64 ? (scale, scale, scale) : scale
@@ -296,11 +431,22 @@ function rotate_mi(image::BatchedMedImage, axis::Int, angle::Union{Float64, Abst
     matrices = map(1:batch_size) do b
         current_angle = (angle isa AbstractVector) ? angle[b] : angle
         current_direction = image.direction[b]
-        R_sub = Rodrigues_rotation_matrix(current_direction, axis, current_angle)
+        current_spacing = image.spacing[b]
+        
+        # Physical rotation matrix
+        R_phys = Rodrigues_rotation_matrix(current_direction, axis, current_angle)
+        
+        # Index-to-Physical matrix M = D * S
+        D = reshape(collect(current_direction), 3, 3)
+        S = Diagonal(collect(current_spacing))
+        M = D * S
+        
+        # Index-space matrix: A = M^-1 * R * M
+        A_idx = inv(M) * R_phys * M
 
-        return [R_sub[1,1] R_sub[1,2] R_sub[1,3] 0.0;
-                R_sub[2,1] R_sub[2,2] R_sub[2,3] 0.0;
-                R_sub[3,1] R_sub[3,2] R_sub[3,3] 0.0;
+        return [A_idx[1,1] A_idx[1,2] A_idx[1,3] 0.0;
+                A_idx[2,1] A_idx[2,2] A_idx[2,3] 0.0;
+                A_idx[3,1] A_idx[3,2] A_idx[3,3] 0.0;
                 0.0        0.0        0.0        1.0]
     end
 
@@ -505,6 +651,16 @@ function compose_affine_matrices(matrices...)
 end
 
 """
+    affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, Interpolator::Interpolator_enum; output_size=nothing, center_of_rotation=nothing)
+
+Applies an affine transformation to a single image.
+Transform is applied in index space relative to the image center (default) or `center_of_rotation` if supplied.
+"""
+function affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, Interpolator::Interpolator_enum; output_size=nothing, center_of_rotation=nothing)::MedImage
+    batched = create_batched_medimage([image])
+    res_batched = affine_transform_mi(batched, affine_matrix, Interpolator; output_size=output_size, center_of_rotation=center_of_rotation)
+    return unbatch_medimage(res_batched)[1]
+end
     affine_transform_mi(image::BatchedMedImage, affine_matrix, Interpolator::Interpolator_enum; output_size=nothing)
 
 Applies an affine transformation to a batch of images.

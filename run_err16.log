@@ -1,0 +1,1034 @@
+Initializing dataset training over: test_data/dataset_Lu
+=== Epoch 1 ===
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_0__Pat116
+    Loss: 2.903226e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_2__Pat49
+    Loss: 8.522463e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_3__Pat49
+    Loss: 2.924992e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat10
+    Loss: 5.4864177e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat101
+    Loss: 7.222662e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat102
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat103
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat104
+    Loss: 5.343789e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat105
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat106
+    Loss: 6.446795e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat108
+    Loss: 3.4591855e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat109
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat11
+    Loss: 4.1653283e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat110
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat111
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat112
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat114
+    Loss: 5.177063e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat115
+    Loss: 1.6353422e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat117
+    Loss: 1.270571e30
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat118
+    Loss: 2.5330498e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat119
+    Loss: 4.9286347e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat120
+    Loss: 2.5774542e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat121
+    Loss: 1.04572575e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat122
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat123
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat124
+    Loss: 4.6997245e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat125
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat127
+    Loss: 2.0233535e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat128
+    Loss: 1.4454155e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat13
+    Loss: 5.6437707e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat139
+    Loss: 2.7452561e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat14
+    Loss: 5.141384e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat142
+    Loss: 1.4762419e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat145
+    Loss: 2.592718e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat15
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat16
+    Loss: 4.258543e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat17
+    Loss: Inf
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat19
+    Loss: 1.3833326e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat2
+    Loss: 2.4088565e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat20
+    Loss: 7.4434203e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat21
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat22
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat24
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat25
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat27
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat28
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat29
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat3
+    Loss: 2.4938721e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat30
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat31
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat32
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat33
+    Loss: 4.8617763e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat34
+    Loss: 2.9749784e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat35
+    Loss: 1.3876984e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat4
+    Loss: 3.9917016e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat44
+    Loss: 1.0910741e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat45
+    Loss: 9.496356e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat46
+    Loss: 3.4568165e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat47
+    Loss: 5.2969504e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat48
+    Loss: 5.2048477e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat49
+    Loss: 4.299965e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat5
+    Loss: 2.4249149e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat50
+    Loss: 1.4782279e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat51
+    Loss: 1.14164945e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat52
+    Loss: 6.88051e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat53
+    Loss: 6.0002417e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat54
+    Loss: 2.8356264e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat55
+    Loss: 2.9941842e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat56
+    Loss: 1.5977241e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat58
+    Loss: 2.4313941e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat6
+    Loss: 2.1201534e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat60
+    Loss: 2.1191686e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat61
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat64
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat65
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat65
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat67
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat68
+    Loss: 5.8950304e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat7
+    Loss: 1.1828431e30
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat74
+    Loss: 3.0889125e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat75
+    Loss: 6.1456427e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat76
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat79
+    Loss: 1.729584e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat8
+    Loss: 1.0333795e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat82
+    Loss: 7.5271464e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat83
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat84
+    Loss: Inf
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat86
+    Loss: 5.4793805e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat87
+    Loss: 4.7260627e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat88
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat89
+    Loss: 8.53667e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat9
+    Loss: 7.888281e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat90
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat91
+    Loss: 1.1156347e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat93
+    Loss: 1.8678363e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat94
+    Loss: 3.129145e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat96
+    Loss: 1.2322024e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat97
+    Loss: 1.7066264e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat98
+    Loss: 8.937757e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_10__Pat2
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_10__Pat2
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_10__Pat25
+    Loss: 1.5298111e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_11__Pat114
+    Loss: 1.1515146e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_11__Pat25
+    Loss: 1.2419582e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_12__Pat114
+    Loss: 8.8198945e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_13__Pat114
+    Loss: 9.50068e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat1
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat10
+    Loss: 3.238293e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat101
+    Loss: 3.602504e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat102
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat103
+    Loss: 6.468173e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat104
+    Loss: 6.136295e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat105
+    Loss: 4.5654614e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat106
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat108
+    Loss: 5.761007e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat109
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat11
+    Loss: 6.316547e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat110
+    Loss: 2.364025e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat111
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat112
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat114
+    Loss: 6.37476e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat115
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat117
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat118
+    Loss: 2.4162237e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat119
+    Loss: 1.9755365e21
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat120
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat121
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat122
+    Loss: 8.779266e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat123
+    Loss: 7.763165e21
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat124
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat125
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat127
+    Loss: 3.2808438e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat128
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat13
+    Loss: 1.5785928e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat131
+    Loss: 6.082374e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat139
+    Loss: 0.3507153
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat14
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat142
+    Loss: 5.8858877e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat15
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat16
+    Loss: 2.8422773e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat17
+    Loss: 3.7465632e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat19
+    Loss: 7.166744e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat2
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat20
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat21
+    Loss: 4.183148e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat22
+    Loss: 5.488344e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat24
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat25
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat27
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat28
+    Loss: 1.1694374e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat29
+    Loss: 1.2657988e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat3
+    Loss: 1.7892801e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat30
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat31
+    Loss: 2.0210444e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat32
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat33
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat34
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat35
+    Loss: 2.3516933e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat4
+    Loss: 5.734504e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat44
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat45
+    Loss: 7.4419783e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat46
+    Loss: 4.7438362e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat48
+    Loss: 1.3522661e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat49
+    Loss: 1.5547075e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat5
+    Loss: 7.879307e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat50
+    Loss: 3.3312466e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat51
+    Loss: 3.522351e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat52
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat53
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat54
+    Loss: 2.2802413e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat55
+    Loss: 4.4393362e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat56
+    Loss: 2.0514956e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat58
+    Loss: 1.8613625e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat6
+    Loss: 3.99563e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat60
+    Loss: 1.5940556e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat61
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat61
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat64
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat64
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat65
+    Loss: 1.3202835e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat67
+    Loss: 4.8518908e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat68
+    Loss: 6.5553503e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat7
+    Loss: 6.326299e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat74
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat74
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat75
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat75
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat76
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat79
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat8
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat82
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat83
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat84
+    Loss: 1.2388352e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat86
+    Loss: 1.5953609e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat87
+    Loss: 1.0327103e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat88
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat89
+    Loss: 3.4402086e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat9
+    Loss: 3.804553e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat90
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat91
+    Loss: 1.06131844e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat93
+    Loss: 1.2617108e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat94
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat95
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat96
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat97
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat98
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat98
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat1
+    Loss: 9.185182e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat10
+    Loss: 4.623622e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat103
+    Loss: 7.1728407e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat104
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat105
+    Loss: 1.1912859e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat108
+    Loss: 4.466947e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat11
+    Loss: 2.916222e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat111
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat114
+    Loss: 9.834099e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat118
+    Loss: 2.2606129e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat119
+    Loss: 9.784198e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat121
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat122
+    Loss: 1.4560266e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat124
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat127
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat128
+    Loss: 1.2857335e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat13
+    Loss: 2.634134e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat14
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat15
+    Loss: 3.8540834e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat16
+    Loss: 2.8899914e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat17
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat2
+    Loss: 2.054489e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat20
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat21
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat22
+    Loss: 7.192152e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat25
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat27
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat28
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat29
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat3
+    Loss: 1.1203692e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat30
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat31
+    Loss: 4.788425e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat34
+    Loss: 3.6629157e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat35
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat45
+    Loss: 5.8804323e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat46
+    Loss: 2.1945175e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat47
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat5
+    Loss: 7.9489983e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat51
+    Loss: 1.2688021e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat52
+    Loss: 1.7099953e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat54
+    Loss: 4.8786715e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat55
+    Loss: 2.6749865e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat6
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat60
+    Loss: 8.5388854e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat61
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat64
+    Loss: 1.141665e30
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat67
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat67
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat68
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat68
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat75
+    Loss: 1.5102208e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat8
+    Loss: 9.140624e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat82
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat87
+    Loss: 2.6482736e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat9
+    Loss: 3.2052564e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat91
+    Loss: 5.46075e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat93
+    Loss: 1.251328e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat94
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_2__Pat95
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat1
+    Loss: 7.5114745e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat10
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat103
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat105
+    Loss: 2.9721168e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat108
+    Loss: 1.00978875e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat11
+    Loss: 4.236807e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat111
+    Loss: 4.783539e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat114
+    Loss: 8.807001e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat118
+    Loss: 1.260899e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat119
+    Loss: 2.1339692e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat121
+    Loss: 1.1648593e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat122
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat124
+    Loss: 2.518506e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat127
+    Loss: 9.65304e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat128
+    Loss: 6.210156e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat13
+    Loss: 1.0340219e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat14
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat15
+    Loss: 6.0462054e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat16
+    Loss: 3.9330491e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat17
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat2
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat20
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat21
+    Loss: 5.3771804e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat22
+    Loss: 1.01333e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat25
+    Loss: 3.6215666e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat27
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat28
+    Loss: 8.579736e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat29
+    Loss: 7.496346e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat3
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat30
+    Loss: 5.962095e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat31
+    Loss: 1.4358436e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat35
+    Loss: 8.3428514e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat45
+    Loss: 5.6656228e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat46
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat47
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat5
+    Loss: 1.2045058e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat51
+    Loss: 2.4010057e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat52
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat52
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat54
+    Loss: 1.4646638e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat55
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat6
+    Loss: 5.8950378e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat60
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat60
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat61
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat61
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat64
+    Loss: 4.3825336e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat67
+    Loss: 2.5622212e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat68
+    Loss: 3.324148e21
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat75
+    Loss: 2.3963346e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat8
+    Loss: 1.1591903e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat82
+    Loss: 3.3484977e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat87
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat9
+    Loss: 5.8703806e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat91
+    Loss: 5.311215e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat93
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat94
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat95
+    Loss: 3.5886467e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat1
+    Loss: 7.5225984e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat10
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat103
+    Loss: 3.4208126e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat108
+    Loss: 8.859469e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat11
+    Loss: 9.478762e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat114
+    Loss: 1.9688651e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat127
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat14
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat14
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat15
+    Loss: 4.318708e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat16
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat17
+    Loss: 2.6836023e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat2
+    Loss: 5.8075383e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat20
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat25
+    Loss: 5.187169e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat28
+    Loss: 2.8072345e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat3
+    Loss: 1.8000555e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat30
+    Loss: 7.061287e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat31
+    Loss: 9.3117623e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat46
+    Loss: 3.4162422e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat47
+    Loss: 4.005326e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat49
+    Loss: 6.7392293e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat5
+    Loss: 7.462739e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat51
+    Loss: 3.0382798e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat52
+    Loss: 5.4683937e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat6
+    Loss: 7.808408e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat68
+    Loss: 6.46075e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat75
+    Loss: 3.8449694e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat82
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat9
+    Loss: 8.796234e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat91
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat95
+    Loss: 4.6253948e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat1
+    Loss: 3.4264853e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat103
+    Loss: 5.0352274e25
+  Processing patient: 
+[1194601] signal (2): Interrupt
+in expression starting at /home/jm/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:290
+inflate_fast at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libz.so.1 (unknown line)
+inflate at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/bin/../lib/julia/libz.so.1 (unknown line)
+inflate! at /home/jm/.julia/packages/CodecZlib/lEc2s/src/libz.jl:127 [inlined]
+process at /home/jm/.julia/packages/CodecZlib/lEc2s/src/decompression.jl:195
+callprocess at /home/jm/.julia/packages/TranscodingStreams/O3BYF/src/stream.jl:685
+#fillbuffer#7 at /home/jm/.julia/packages/TranscodingStreams/O3BYF/src/stream.jl:624
+fillbuffer at /home/jm/.julia/packages/TranscodingStreams/O3BYF/src/stream.jl:610 [inlined]
+sloweof at /home/jm/.julia/packages/TranscodingStreams/O3BYF/src/stream.jl:222
+eof at /home/jm/.julia/packages/TranscodingStreams/O3BYF/src/stream.jl:213 [inlined]
+unsafe_read at /home/jm/.julia/packages/TranscodingStreams/O3BYF/src/stream.jl:385
+unsafe_read at ./io.jl:773 [inlined]
+read! at ./io.jl:791 [inlined]
+read_volume at /home/jm/.julia/packages/NIfTI/f1zfR/src/volume.jl:18
+unknown function (ip: 0x7b7ff1d73b55)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+#niread#12 at /home/jm/.julia/packages/NIfTI/f1zfR/src/NIfTI.jl:245
+niread at /home/jm/.julia/packages/NIfTI/f1zfR/src/NIfTI.jl:239 [inlined]
+load_patient_data at /home/jm/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:44
+train_on_dataset at /home/jm/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:215
+unknown function (ip: 0x7b7ff1d7333c)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+do_call at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/interpreter.c:126
+eval_value at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/interpreter.c:223
+eval_stmt_value at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/interpreter.c:174 [inlined]
+eval_body at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/interpreter.c:617
+jl_interpret_toplevel_thunk at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/interpreter.c:775
+jl_toplevel_eval_flex at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/toplevel.c:934
+jl_toplevel_eval_flex at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/toplevel.c:877
+ijl_toplevel_eval_in at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/toplevel.c:985
+eval at ./boot.jl:385 [inlined]
+include_string at ./loading.jl:2146
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+_include at ./loading.jl:2206
+include at ./Base.jl:495
+jfptr_include_46653.1 at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/lib/julia/sys.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+exec_options at ./client.jl:323
+_start at ./client.jl:557
+jfptr__start_83114.1 at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/lib/julia/sys.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+true_main at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jlapi.c:582
+jl_repl_entrypoint at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jlapi.c:731
+main at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/cli/loader_exe.c:58
+unknown function (ip: 0x7b80a382a574)
+__libc_start_main at /lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+unknown function (ip: 0x4010b8)
+unknown function (ip: (nil))
+Allocations: 217991946 (Pool: 215760097; Big: 2231849); GC: 8123
+  Activating project at `~/project_ssd/MedImages.jl`
+FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat108
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat114
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat127
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat14
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat15
+    Loss: 8.042192e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat16
+    Loss: Inf
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat17
+    Loss: 1.3407646e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat2
+    Loss: 1.6932944e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat20
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat25
+    Loss: 3.8611912e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat28
+    Loss: 1.7643628e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat3
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat30
+    Loss: 2.1564481e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat31
+    Loss: 3.630855e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat46
+    Loss: 7.946638e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat47
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat49
+    Loss: 1.8387655e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat5
+    Loss: 9.195095e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat52
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat6
+    Loss: 4.8078066e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat68
+    Loss: 2.654774e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat75
+    Loss: 1.4239337e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat82
+    Loss: 4.883233e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat9
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat91
+    Loss: 6.393313e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat95
+    Loss: 2.64815e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat1
+    Loss: 3.5603513e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat103
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat108
+    Loss: 9.1599985e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat114
+    Loss: 9.382973e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat14
+    Loss: 1.05482334e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat15
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat15
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat16
+    Loss: 3.9608967e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat17
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat2
+    Loss: 1.2464919e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat20
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat25
+    Loss: 7.1297046e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat31
+    Loss: 2.0450356e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat46
+    Loss: 1.9409718e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat47
+    Loss: 7.285893e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat49
+    Loss: 3.714727e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat52
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat52
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat95
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat1
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat108
+    Loss: 2.6669293e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat114
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat14
+    Loss: 2.079749e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat15
+    Loss: 1.4168704e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat16
+    Loss: 3.7916058e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat17
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat2
+    Loss: 3.780609e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat20
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat25
+    Loss: 1.1741592e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat31
+    Loss: 3.6666674e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat47
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat47
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat49
+    Loss: 5.8150326e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_7__Pat52
+    Loss: 2.3155593e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_8__Pat114
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_8__Pat114
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_8__Pat14
+    Loss: 2.3475387e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_8__Pat15
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_8__Pat2
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_8__Pat2
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_8__Pat20
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_8__Pat25
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_8__Pat31
+    Loss: 3.430232e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_9__Pat114
+    Loss: 7.032887e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_9__Pat2
+    Loss: 5.893536e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_9__Pat20
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_9__Pat25
+    Loss: 7.703626e22
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_9__Pat31
+    Loss: 3.4138613e27
+  Average Epoch Loss: NaN
+=== Epoch 2 ===
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_0__Pat116
+    Loss: 1.06478075e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_2__Pat49
+    Loss: 1.0536456e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_3__Pat49
+    Loss: 5.3866197e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat10
+    Loss: 3.5839972e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat101
+    Loss: 6.837336e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat102
+    Loss: 3.149758e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat103
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat104
+    Loss: 5.4154398e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat105
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat106
+    Loss: 6.136387e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat108
+    Loss: 2.5569768e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat109
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat11
+    Loss: 8.189951e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat110
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat111
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat112
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat114
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat115
+    Loss: 2.9249193e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat117
+    Loss: 2.9950554e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat118
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat119
+    Loss: 6.4113884e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat120
+    Loss: 6.0352407e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat121
+    Loss: 1.1546571e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat122
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat123
+    Loss: 5.071798e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat124
+    Loss: 1.50533825e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat125
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat127
+    Loss: 1.1080685e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat128
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat13
+    Loss: 4.4408954e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat139
+    Loss: 2.1511802e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat14
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat142
+    Loss: 2.1901298e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat145
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat15
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat16
+    Loss: 1.2013915e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat17
+    Loss: 2.074213e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat19
+    Loss: 4.273809e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat2
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat20
+    Loss: 2.1545143e28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat21
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat22
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat24
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat25
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat27
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat28
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat28
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat29
+Missing files in test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat3
+    Loss: 2.5183026e29
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat30
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat31
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat32
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat33
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat34
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat35
+    Loss: 2.7128171e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat4
+    Loss: 5.0609316e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat44
+    Loss: 8.939578e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat45
+    Loss: 5.555442e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat46
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat47
+    Loss: 2.2913516e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat48
+    Loss: 4.7009716e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat49
+    Loss: 1.4154084e25
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat5
+    Loss: 1.4286461e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat50
+    Loss: 7.127623e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat51
+    Loss: 2.8689407e23
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat52
+    Loss: NaN
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat53
+    Loss: 3.4427046e27
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat54
+    Loss: 5.9454992e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat55
+    Loss: 1.7635508e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat56
+    Loss: 9.7064605e26
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat58
+    Loss: 3.177258e24
+  Processing patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat6

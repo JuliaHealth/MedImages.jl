@@ -5,6 +5,16 @@ using ..MedImage_data_struct: MedImage, BatchedMedImage
 export calculate_suv_factor
 
 """
+    calculate_suv_factor(mi::MedImage)
+
+Calculates the SUV factor for a single MedImage.
+Returns Float64 or Nothing if calculation fails.
+"""
+function calculate_suv_factor(mi::MedImage)::Union{Float64, Nothing}
+    return _calculate_suv_from_metadata(mi.metadata)
+end
+
+"""
     calculate_suv_factor(batched_image::BatchedMedImage)
 
 Calculates SUV factors for a batch of images.
@@ -194,7 +204,7 @@ function calculate_suv_statistics(batched_image::BatchedMedImage, mask::MedImage
 
     # Check if spatial dimensions match
     if img_size[1:3] != mask_size
-        throw(DimensionMismatch("Image batch slice dimensions $(img_size[1:3]) and mask dimensions \$mask_size do not match"))
+        throw(DimensionMismatch("Image batch slice dimensions $(img_size[1:3]) and mask dimensions $mask_size do not match"))
     end
 
     batch_size = img_size[4]
@@ -208,7 +218,7 @@ function calculate_suv_statistics(batched_image::BatchedMedImage, mask::MedImage
     for i in 1:batch_size
         factor = suv_factors[i]
         if factor === nothing
-             error("SUV calculation failed for batch index \$i: Missing or invalid metadata")
+             error("SUV calculation failed for batch index $i: Missing or invalid metadata")
         end
 
         if voxel_count == 0
@@ -242,7 +252,7 @@ function calculate_suv_statistics(batched_image::BatchedMedImage, mask::BatchedM
     mask_size = size(mask.voxel_data)
 
     if img_size != mask_size
-        throw(DimensionMismatch("Image batch dimensions \$img_size and mask batch dimensions \$mask_size do not match"))
+        throw(DimensionMismatch("Image batch dimensions $img_size and mask batch dimensions $mask_size do not match"))
     end
 
     batch_size = img_size[4]
@@ -253,7 +263,7 @@ function calculate_suv_statistics(batched_image::BatchedMedImage, mask::BatchedM
     for i in 1:batch_size
         factor = suv_factors[i]
         if factor === nothing
-             error("SUV calculation failed for batch index \$i: Missing or invalid metadata")
+             error("SUV calculation failed for batch index $i: Missing or invalid metadata")
         end
 
         slice = view(batched_image.voxel_data, :, :, :, i)
