@@ -1,0 +1,202 @@
+
+[1151808] signal (2): Interrupt
+in expression starting at /home/jm/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:294
+muladd at ./float.jl:414 [inlined]
+muladd at ./promotion.jl:459 [inlined]
+#conv_direct!#628 at /home/jm/.julia/packages/NNlib/srXYX/src/impl/conv_direct.jl:114
+conv_direct! at /home/jm/.julia/packages/NNlib/srXYX/src/impl/conv_direct.jl:59
+unknown function (ip: 0x7f93e425417a)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+#conv_direct!#627 at /home/jm/.julia/packages/NNlib/srXYX/src/impl/conv_direct.jl:50
+conv_direct! at /home/jm/.julia/packages/NNlib/srXYX/src/impl/conv_direct.jl:47 [inlined]
+conv_group at /home/jm/.julia/packages/NNlib/srXYX/src/conv.jl:209
+#conv!#306 at /home/jm/.julia/packages/NNlib/srXYX/src/conv.jl:218
+conv! at /home/jm/.julia/packages/NNlib/srXYX/src/conv.jl:185 [inlined]
+#conv#240 at /home/jm/.julia/packages/NNlib/srXYX/src/conv.jl:88 [inlined]
+conv at /home/jm/.julia/packages/NNlib/srXYX/src/conv.jl:83 [inlined]
+#2 at /home/jm/.julia/packages/LuxLib/ZJ3gh/ext/ForwardDiffExt.jl:61
+#225 at ./generator.jl:0 [inlined]
+iterate at ./generator.jl:47 [inlined]
+collect_to! at ./array.jl:892 [inlined]
+collect_to_with_first! at ./array.jl:870 [inlined]
+collect at ./array.jl:844
+_ntuple at ./ntuple.jl:37
+ntuple at ./ntuple.jl:19 [inlined]
+#conv#1 at /home/jm/.julia/packages/LuxLib/ZJ3gh/ext/ForwardDiffExt.jl:61
+conv at /home/jm/.julia/packages/LuxLib/ZJ3gh/ext/ForwardDiffExt.jl:51 [inlined]
+conv at /home/jm/.julia/packages/LuxLib/ZJ3gh/src/impl/conv.jl:109 [inlined]
+conv at /home/jm/.julia/packages/LuxLib/ZJ3gh/src/impl/conv.jl:100 [inlined]
+fused_conv at /home/jm/.julia/packages/LuxLib/ZJ3gh/src/impl/conv.jl:190
+fused_conv at /home/jm/.julia/packages/LuxLib/ZJ3gh/src/impl/conv.jl:177 [inlined]
+fused_conv_bias_activation at /home/jm/.julia/packages/LuxLib/ZJ3gh/src/api/conv.jl:37 [inlined]
+##c::Convinternal#340 at /home/jm/.julia/packages/Lux/GCC0y/src/layers/conv.jl:259 [inlined]
+Conv at /home/jm/.julia/packages/ReactantCore/SEqVX/src/ReactantCore.jl:286 [inlined]
+apply at /home/jm/.julia/packages/LuxCore/kQC9S/src/LuxCore.jl:155
+unknown function (ip: 0x7f93e42894a0)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+macro expansion at ./abstractarray.jl:0 [inlined]
+applychain at /home/jm/.julia/packages/Lux/GCC0y/src/layers/containers.jl:577
+Chain at /home/jm/.julia/packages/Lux/GCC0y/src/layers/containers.jl:575 [inlined]
+apply at /home/jm/.julia/packages/LuxCore/kQC9S/src/LuxCore.jl:155 [inlined]
+ude_func at /home/jm/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:144
+ODEFunction at /home/jm/.julia/packages/SciMLBase/RJROr/src/scimlfunctions.jl:2670 [inlined]
+UDerivativeWrapper at /home/jm/.julia/packages/SciMLBase/RJROr/src/function_wrappers.jl:165 [inlined]
+chunk_mode_jacobian at /home/jm/.julia/packages/ForwardDiff/egQMG/src/jacobian.jl:200
+jacobian at /home/jm/.julia/packages/ForwardDiff/egQMG/src/jacobian.jl:24 [inlined]
+jacobian at /home/jm/.julia/packages/DifferentiationInterface/afUhd/ext/DifferentiationInterfaceForwardDiffExt/onearg.jl:622
+unknown function (ip: 0x7f93e427aa40)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jacobian at /home/jm/.julia/packages/DifferentiationInterface/afUhd/ext/DifferentiationInterfaceForwardDiffExt/onearg.jl:527
+jacobian at /home/jm/.julia/packages/OrdinaryDiffEqDifferentiation/qvYUh/src/derivative_wrappers.jl:134
+calc_J at /home/jm/.julia/packages/OrdinaryDiffEqDifferentiation/qvYUh/src/derivative_utils.jl:133 [inlined]
+calc_W at /home/jm/.julia/packages/OrdinaryDiffEqDifferentiation/qvYUh/src/derivative_utils.jl:672
+update_W! at /home/jm/.julia/packages/OrdinaryDiffEqDifferentiation/qvYUh/src/derivative_utils.jl:792
+update_W! at /home/jm/.julia/packages/OrdinaryDiffEqDifferentiation/qvYUh/src/derivative_utils.jl:731 [inlined]
+nlsolve! at /home/jm/.julia/packages/OrdinaryDiffEqNonlinearSolve/VssNh/src/nlsolve.jl:34
+perform_step! at /home/jm/.julia/packages/OrdinaryDiffEqSDIRK/x9yQd/src/sdirk_perform_step.jl:379
+perform_step! at /home/jm/.julia/packages/OrdinaryDiffEqSDIRK/x9yQd/src/sdirk_perform_step.jl:362 [inlined]
+solve! at /home/jm/.julia/packages/OrdinaryDiffEqCore/mNgXc/src/solve.jl:843
+unknown function (ip: 0x7f93e426649f)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+#__solve#69 at /home/jm/.julia/packages/OrdinaryDiffEqCore/mNgXc/src/solve.jl:10
+__solve at /home/jm/.julia/packages/OrdinaryDiffEqCore/mNgXc/src/solve.jl:1 [inlined]
+#solve_call#32 at /home/jm/.julia/packages/DiffEqBase/4RFWW/src/solve.jl:172
+solve_call at /home/jm/.julia/packages/DiffEqBase/4RFWW/src/solve.jl:137 [inlined]
+#solve_up#38 at /home/jm/.julia/packages/DiffEqBase/4RFWW/src/solve.jl:630 [inlined]
+solve_up at /home/jm/.julia/packages/DiffEqBase/4RFWW/src/solve.jl:603 [inlined]
+#solve#37 at /home/jm/.julia/packages/DiffEqBase/4RFWW/src/solve.jl:587 [inlined]
+solve at /home/jm/.julia/packages/DiffEqBase/4RFWW/src/solve.jl:575
+unknown function (ip: 0x7f93e422d80b)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+#_concrete_solve_adjoint#319 at /home/jm/.julia/packages/SciMLSensitivity/XiGYZ/src/concrete_solve.jl:625
+_concrete_solve_adjoint at /home/jm/.julia/packages/SciMLSensitivity/XiGYZ/src/concrete_solve.jl:466 [inlined]
+#_solve_adjoint#51 at /home/jm/.julia/packages/DiffEqBase/4RFWW/src/solve.jl:1088 [inlined]
+_solve_adjoint at /home/jm/.julia/packages/DiffEqBase/4RFWW/src/solve.jl:1065 [inlined]
+#rrule#2 at /home/jm/.julia/packages/DiffEqBase/4RFWW/ext/DiffEqBaseChainRulesCoreExt.jl:28 [inlined]
+rrule at /home/jm/.julia/packages/DiffEqBase/4RFWW/ext/DiffEqBaseChainRulesCoreExt.jl:22 [inlined]
+rrule at /home/jm/.julia/packages/ChainRulesCore/Vsbj9/src/rules.jl:144 [inlined]
+chain_rrule_kw at /home/jm/.julia/packages/Zygote/55SqB/src/compiler/chainrules.jl:246 [inlined]
+macro expansion at /home/jm/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0 [inlined]
+_pullback at /home/jm/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:81
+unknown function (ip: 0x7f93e421a5d5)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+do_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/builtins.c:768
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+do_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/builtins.c:768
+_apply at ./boot.jl:838
+adjoint at /home/jm/.julia/packages/Zygote/55SqB/src/lib/lib.jl:211 [inlined]
+_pullback at /home/jm/.julia/packages/ZygoteRules/CkVIK/src/adjoint.jl:67 [inlined]
+#solve#37 at /home/jm/.julia/packages/DiffEqBase/4RFWW/src/solve.jl:587 [inlined]
+_pullback at /home/jm/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+unknown function (ip: 0x7f93e4210c19)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+do_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/builtins.c:768
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+do_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/builtins.c:768
+_apply at ./boot.jl:838
+adjoint at /home/jm/.julia/packages/Zygote/55SqB/src/lib/lib.jl:211 [inlined]
+_pullback at /home/jm/.julia/packages/ZygoteRules/CkVIK/src/adjoint.jl:67 [inlined]
+solve at /home/jm/.julia/packages/DiffEqBase/4RFWW/src/solve.jl:575 [inlined]
+_pullback at /home/jm/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+unknown function (ip: 0x7f93e420f805)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+predict_dosemap at /home/jm/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:159 [inlined]
+_pullback at /home/jm/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+loss_function at /home/jm/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:168 [inlined]
+_pullback at /home/jm/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+#2 at /home/jm/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:268 [inlined]
+_pullback at /home/jm/.julia/packages/Zygote/55SqB/src/compiler/interface2.jl:0
+unknown function (ip: 0x7f93fc3f9db0)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+do_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/builtins.c:768
+pullback at /home/jm/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:96
+pullback at /home/jm/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:94
+unknown function (ip: 0x7f93fc3ed0c0)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+do_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/builtins.c:768
+withgradient at /home/jm/.julia/packages/Zygote/55SqB/src/compiler/interface.jl:211
+value_and_gradient at /home/jm/.julia/packages/DifferentiationInterface/afUhd/ext/DifferentiationInterfaceZygoteExt/DifferentiationInterfaceZygoteExt.jl:115 [inlined]
+value_and_gradient! at /home/jm/.julia/packages/DifferentiationInterface/afUhd/ext/DifferentiationInterfaceZygoteExt/DifferentiationInterfaceZygoteExt.jl:131
+unknown function (ip: 0x7f93fc3eccc5)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+fg! at /home/jm/.julia/packages/OptimizationBase/y7Tug/ext/OptimizationZygoteExt.jl:57
+unknown function (ip: 0x7f93fc3ebf1c)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+__solve at /home/jm/.julia/packages/OptimizationOptimisers/duyYv/src/OptimizationOptimisers.jl:88
+solve! at /home/jm/.julia/packages/OptimizationBase/y7Tug/src/solve.jl:236
+unknown function (ip: 0x7f93fc386c25)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+#solve_call#9 at /home/jm/.julia/packages/OptimizationBase/y7Tug/src/solve.jl:282
+solve_call at /home/jm/.julia/packages/OptimizationBase/y7Tug/src/solve.jl:269 [inlined]
+#solve_up#8 at /home/jm/.julia/packages/OptimizationBase/y7Tug/src/solve.jl:265 [inlined]
+solve_up at /home/jm/.julia/packages/OptimizationBase/y7Tug/src/solve.jl:256 [inlined]
+#solve#2 at /home/jm/.julia/packages/OptimizationBase/y7Tug/src/solve.jl:104
+solve at /home/jm/.julia/packages/OptimizationBase/y7Tug/src/solve.jl:93
+unknown function (ip: 0x7f93fc37ca50)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+train_on_patient at /home/jm/project_ssd/MedImages.jl/elsarticle/dosimetry/train_ude.jl:285
+unknown function (ip: 0x7f93fc36ef05)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+do_call at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/interpreter.c:126
+eval_value at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/interpreter.c:223
+eval_stmt_value at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/interpreter.c:174 [inlined]
+eval_body at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/interpreter.c:617
+jl_interpret_toplevel_thunk at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/interpreter.c:775
+jl_toplevel_eval_flex at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/toplevel.c:934
+jl_toplevel_eval_flex at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/toplevel.c:877
+ijl_toplevel_eval_in at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/toplevel.c:985
+eval at ./boot.jl:385 [inlined]
+include_string at ./loading.jl:2146
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+_include at ./loading.jl:2206
+include at ./Base.jl:495
+jfptr_include_46653.1 at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/lib/julia/sys.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+exec_options at ./client.jl:323
+_start at ./client.jl:557
+jfptr__start_83114.1 at /home/jm/.julia/juliaup/julia-1.10.10+0.x64.linux.gnu/lib/julia/sys.so (unknown line)
+_jl_invoke at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:2895 [inlined]
+ijl_apply_generic at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/gf.c:3077
+jl_apply at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/julia.h:1982 [inlined]
+true_main at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jlapi.c:582
+jl_repl_entrypoint at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/src/jlapi.c:731
+main at /cache/build/builder-amdci5-7/julialang/julia-release-1-dot-10/cli/loader_exe.c:58
+unknown function (ip: 0x7f94ab62a574)
+__libc_start_main at /lib/x86_64-linux-gnu/libc.so.6 (unknown line)
+unknown function (ip: 0x4010b8)
+unknown function (ip: (nil))
+Allocations: 107299237 (Pool: 107142126; Big: 157111); GC: 1918
+  Activating project at `~/project_ssd/MedImages.jl`
+┌ Warning: Slow fallback implementation invoked for conv!  You probably don't want this; check your datatypes.
+│   yT = Float64
+│   T1 = Float64
+│   T2 = Float32
+└ @ NNlib ~/.julia/packages/NNlib/srXYX/src/conv.jl:192
+Processing patient: test_data/dataset_Lu/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat10
+Building Optimization Problem via Optimization.jl and Zygote...

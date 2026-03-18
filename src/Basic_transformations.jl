@@ -649,25 +649,10 @@ Applies an affine transformation to a single image.
 Transform is applied in index space relative to the image center (default) or `center_of_rotation` if supplied.
 """
 function affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, Interpolator::Interpolator_enum; output_size=nothing, center_of_rotation=nothing)::MedImage
-    # Reuse the batched implementation to ensure consistency
-    # We wrap the single image in a vector, batch it, transform, then unbatch
     batched = create_batched_medimage([image])
     res_batched = affine_transform_mi(batched, affine_matrix, Interpolator; output_size=output_size, center_of_rotation=center_of_rotation)
     return unbatch_medimage(res_batched)[1]
-
-    affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, Interpolator::Interpolator_enum; output_size=nothing)
-
-Applies an affine transformation to a single MedImage.
-Transform is applied in index space relative to the image center.
-"""
-function affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, Interpolator::Interpolator_enum; output_size=nothing, center_of_rotation=nothing)::MedImage
-    batched = create_batched_medimage([image])
-    transformed_batched = affine_transform_mi(batched, affine_matrix, Interpolator; output_size=output_size, center_of_rotation=center_of_rotation)
-    return unbatch_medimage(transformed_batched)[1]
-
 end
-
-"""
     affine_transform_mi(image::BatchedMedImage, affine_matrix, Interpolator::Interpolator_enum; output_size=nothing)
 
 Applies an affine transformation to a batch of images.
