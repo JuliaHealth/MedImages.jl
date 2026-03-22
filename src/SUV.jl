@@ -28,15 +28,7 @@ function calculate_suv_factor(batched_image::BatchedMedImage)::Vector{Union{Floa
     return res
 end
 
-"""
-    calculate_suv_factor(med_image::MedImage)
 
-Calculates the SUV factor for a single image.
-Returns a Union{Float64, Nothing}.
-"""
-function calculate_suv_factor(med_image::MedImage)::Union{Float64, Nothing}
-    return _calculate_suv_from_metadata(med_image.metadata)
-end
 
 function _calculate_suv_from_metadata(meta::Dict{Any, Any})::Union{Float64, Nothing}
     # 1. Get Patient Weight in kg

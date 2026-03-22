@@ -51,7 +51,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
 UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
-Wandb = "ad70616a-06c9-5745-b1f1-6a5f42545108"
+
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]

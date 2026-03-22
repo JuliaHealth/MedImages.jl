@@ -30,3 +30,14 @@ wandb/
 checkpoint_epoch_10.jls
 checkpoint_latest.jls
 checkpoint_epoch_20.jls
+elsarticle/dosimetry/data/
+model_tuning_W16_D5_LR0.0005.jls
+model_tuning_W16_D3_LR0.001.jls
+model_tuning_W16_D3_LR0.0005.jls
+elsarticle/dosimetry/vis_results/
+model_tuning_W16_D5_LR0.001.jls
+.gitignore
+model_tuning_W32_D3_LR0.0005.jls
+.gitignore
+model_tuning_W32_D5_LR0.0005.jls
+model_tuning_W32_D3_LR0.001.jls

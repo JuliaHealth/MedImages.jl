@@ -1,0 +1,55 @@
+  Activating project at `~/MedImages.jl`
+┌ Warning: CHOLMOD version incompatibility
+│ 
+│ Julia was compiled with CHOLMOD version 4.0.4. It is
+│ currently linked with version 5.3.1.
+│ This might cause Julia to terminate when working with
+│ sparse matrix factorizations, e.g. solving systems of
+│ equations with \.
+│ 
+│ It is recommended that you use Julia with the same major
+│ version of CHOLMOD as the one used during the build, or
+│ download the generic binaries from www.julialang.org,
+│ which ship with the correct versions of all dependencies.
+└ @ SparseArrays.CHOLMOD ~/miniforge/envs/sciml_env/share/julia/stdlib/v1.10/SparseArrays/src/solvers/cholmod.jl:206
+┌ Warning: You are using a non-official build of Julia. This may cause issues with CUDA.jl.
+│ Please consider using an official build from https://julialang.org/downloads/.
+└ @ CUDA ~/.julia/packages/CUDA/724Sm/src/initialization.jl:170
+Using device: CUDADevice{Nothing, Missing}(nothing)
+Loaded model.
+Evaluating patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47
+  Running inference...
+  Validation MAE: 54560.39
+Evaluating patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat48
+  Running inference...
+  Validation MAE: 7.12742e6
+Evaluating patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat58
+  Running inference...
+  Validation MAE: 559.8775
+Evaluating patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat52
+  Running inference...
+  Validation MAE: 204.88345
+Evaluating patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat53
+  Running inference...
+  Validation MAE: 18858.154
+Evaluating patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat52
+  Running inference...
+  Validation MAE: 306.64642
+Evaluating patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat55
+  Running inference...
+  Validation MAE: Inf
+Evaluating patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_6__Pat46
+  Running inference...
+  Validation MAE: 719.7555
+Evaluating patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_5__Pat47
+  Running inference...
+  Validation MAE: 1339.4536
+Evaluating patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat46
+  Running inference...
+  Validation MAE: 396.3357
+Evaluating patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_4__Pat52
+  Running inference...
+  Validation MAE: 189.6106
+Evaluating patient: FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_3__Pat55
+  Running inference...
+  Validation MAE: 2328.3333
