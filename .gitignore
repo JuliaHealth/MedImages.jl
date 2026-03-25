@@ -41,3 +41,8 @@ model_tuning_W32_D3_LR0.0005.jls
 .gitignore
 model_tuning_W32_D5_LR0.0005.jls
 model_tuning_W32_D3_LR0.001.jls
+elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47/approx.bin
+elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47/cnn.bin
+elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47/ct.bin
+elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47/orig.bin
+elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47/ude.bin
