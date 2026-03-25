@@ -175,6 +175,11 @@ function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Int
   return affine_transform_mi(image, affine_matrix, Interpolator; center_of_rotation=Tuple(C_idx))
 end
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> upstream/main
 """
     crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::MedImage
 
