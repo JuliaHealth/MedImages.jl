@@ -1,9 +1,0 @@
---- BENCHMARK: FUSED VS LEGACY AFFINE ---
-Image Size: (128, 128, 128), Batch Size: 4
-Warming up...
-
-Running Benchmark...
-Legacy Implementation Median Time: 0.1471 s
-Fused Implementation Median Time: 0.1118 s
-
-Speedup: 1.32x

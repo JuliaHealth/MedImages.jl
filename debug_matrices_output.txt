@@ -1,6 +1,0 @@
---- DEBUG BATCHED ROTATION ---
-Matrix 1 (angle 0.0): [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]
-Matrix 2 (angle 90.0): [1.0 0.0 0.0; 0.0 6.123233995736766e-17 -1.0; 0.0 1.0 6.123233995736766e-17]
-0 deg mean diff: 0.0
-0 deg max diff: 0.0
-SUCCESS: Mean diff 0.0 < 1e-4
