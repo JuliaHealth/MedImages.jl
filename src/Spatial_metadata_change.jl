@@ -39,12 +39,6 @@ function resample_to_spacing(im::BatchedMedImage, new_spacing::Union{Tuple{Float
     # Logic for handling shared vs unique spacing
 
 
-"""
-    change_orientation(im::MedImage, goal_orientation::Orientation_code)::MedImage
-    change_orientation(im::MedImage, goal_orientation::String)::MedImage
-
-Change the orientation of a `MedImage` to a target orientation (e.g., "RAS", "LPS").
-
     # If consistent, we can proceed.
     # We need to adapt `resample_kernel_launch` to handle batches.
     # Currently `resample_kernel_launch` takes (image_data, old_spacing, new_spacing, new_dims, ...)
@@ -131,6 +125,13 @@ Change the orientation of a `MedImage` to a target orientation (e.g., "RAS", "LP
         metadata = im.metadata
     )
 end
+
+
+"""
+    change_orientation(im::MedImage, goal_orientation::Orientation_code)::MedImage
+    change_orientation(im::MedImage, goal_orientation::String)::MedImage
+
+Change the orientation of a `MedImage` to a target orientation (e.g., "RAS", "LPS").
 
 # Returns
 - `MedImage`: A new image object with the requested orientation.
