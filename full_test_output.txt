@@ -1,3 +1,0 @@
-DEBUG: 0 deg rotation mean diff = 0.0, max diff = 0.0
-Test Summary:                       | Pass  Total  Time
-BatchedMedImage Comprehensive Tests |   31     31  7.0s
