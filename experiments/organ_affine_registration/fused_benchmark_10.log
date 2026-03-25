@@ -1,6 +1,0 @@
---- Raw GPU Throughput Benchmark (10 subjects, Mode: none) ---
-Progress:  20%|████████▎                                |  ETA: 0:00:53[KProgress:  30%|████████████▎                            |  ETA: 0:00:35[KProgress:  40%|████████████████▍                        |  ETA: 0:00:25[KProgress:  50%|████████████████████▌                    |  ETA: 0:00:18[KProgress:  60%|████████████████████████▋                |  ETA: 0:00:14[KProgress:  70%|████████████████████████████▊            |  ETA: 0:00:10[KProgress:  80%|████████████████████████████████▊        |  ETA: 0:00:06[KProgress:  90%|████████████████████████████████████▉    |  ETA: 0:00:03[KProgress: 100%|█████████████████████████████████████████| Time: 0:00:29[K
-
-Results:
-Total Time: 29.41s
-Average: 2.9409s/subject
