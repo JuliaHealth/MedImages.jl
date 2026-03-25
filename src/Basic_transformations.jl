@@ -8,7 +8,7 @@ using Statistics
 using ..MedImage_data_struct
 using ..MedImage_data_struct: Nearest_neighbour_en, Linear_en, B_spline_en
 using ..Load_and_save: update_voxel_data, update_voxel_and_spatial_data
-using ..Utils: interpolate_my, generate_affine_coords, is_cuda_array, interpolate_fused_affine, extract_corners
+using ..Utils: interpolate_my, generate_affine_coords, is_cuda_array, interpolate_fused_affine, extract_corners, create_batched_medimage, unbatch_medimage
 using KernelAbstractions
 using CUDA
 

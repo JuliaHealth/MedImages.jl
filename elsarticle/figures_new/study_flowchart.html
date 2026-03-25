@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: white; padding: 40px; width: 1000px; }
+    .container { display: flex; flex-direction: column; align-items: center; }
+    .box { 
+        border: 2px solid #2c3e50; 
+        border-radius: 10px; 
+        padding: 20px; 
+        width: 300px; 
+        text-align: center; 
+        background: #ecf0f1;
+        box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+        margin: 20px 0;
+        position: relative;
+    }
+    .box::after {
+        content: "▼";
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #2c3e50;
+        font-size: 20px;
+    }
+    .box.last::after { content: ""; }
+    .header { font-weight: bold; font-size: 18px; color: #2980b9; margin-bottom: 10px; }
+    .content { font-size: 14px; color: #34495e; }
+    .experiment-row { display: flex; justify-content: space-around; width: 100%; margin-top: 20px; }
+    .exp-box {
+        border: 2px solid #27ae60;
+        border-radius: 8px;
+        padding: 15px;
+        width: 250px;
+        background: #f8fff9;
+        text-align: center;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="box">
+            <div class="header">1. Data Acquisition</div>
+            <div class="content">Raw Multi-modal Data<br>(DICOM / NIfTI)<br>CT, PET, SPECT</div>
+        </div>
+        <div class="box">
+            <div class="header">2. MedImages.jl Core</div>
+            <div class="content">Metadata Preservation<br>ISO-Resampling<br>Batched Transformations</div>
+        </div>
+        <div class="box">
+            <div class="header">3. Differentiable Pipeline</div>
+            <div class="content">Native Julia GPU Kernels<br>AD Integration (Zygote/Enzyme)</div>
+        </div>
+        <div class="header" style="margin-top:20px; font-size:22px;">4. SciML Applications</div>
+        <div class="experiment-row">
+            <div class="exp-box">
+                <div class="header">Voxel-wise Dosimetry</div>
+                <div class="content">UDE vs CNN vs FNO<br>Heterogeneous Transport</div>
+            </div>
+            <div class="exp-box">
+                <div class="header">Differentiable Registration</div>
+                <div class="content">Multi-scale 3D ResNet<br>Fused GPU Loss</div>
+            </div>
+            <div class="exp-box">
+                <div class="header" style="color:#e67e22">Clinical Validation</div>
+                <div class="content">SUV Precision<br>Metadata Integrity</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

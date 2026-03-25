@@ -22,72 +22,66 @@
 \maketitle
 
 \begin{abstract}
-This report details the implementation, iterative development, and comprehensive benchmarking of Universal Differential Equation (UDE) models for voxel-level $^{177}$Lu-PSMA dosimetry. By embedding deep 3D residual networks within mechanistic pharmacokinetic equations, we demonstrate that SciML models can capture high-fidelity radiation transport physics ($r > 0.96$) while maintaining clinical real-time performance.
+This report details the implementation and benchmarking of Universal Differential Equation (UDE) models for voxel-level dosimetry. We demonstrate that UDEs achieve high-fidelity radiation transport physics ($r = 0.957$) using $64^3$ voxel patches, significantly outperforming analytical baselines while maintaining clinical real-time performance.
 \end{abstract}
 
-\section{The Mathematical Framework: Governing Equations}
+\section{Model Architectures and Data Flow}
 
-The core of our approach is a 4-state UDE system integrated over a 300-hour (12.5-day) therapeutic window. The system explicitly separates biological kinetics from radiation transport.
+We implemented three primary architectures to evaluate the tradeoff between mechanistic constraints and black-box capacity. All models operate on 3D volumetric patches.
 
-\subsection{Activity Kinetics (Mechanistic PK)}
-The temporal evolution of activity $\mathbf{A}(\mathbf{r}, t)$ follows a compartmental structure:
-\begin{align}
-    \frac{dA_{blood}}{dt} &= -(k_{10} + \lambda_{phys}) A_{blood} - \sum_{\text{voxels}} \text{Uptake} + \sum_{\text{voxels}} \text{Washout} \\
-    \frac{dA_{free}(\mathbf{r}, t)}{dt} &= \text{Uptake}(\mathbf{r}, t) - (k_{out} + \lambda_{phys}) A_{free}(\mathbf{r}, t) \\
-    \frac{dA_{bound}(\mathbf{r}, t)}{dt} &= k_3 A_{free} \left( 1 - \frac{A_{bound}}{B_{MAX}} \right) - (k_4 + \lambda_{phys}) A_{bound}(\mathbf{r}, t)
-\end{align}
-Where $\text{Uptake}(\mathbf{r}, t)$ is distributed spatially according to the initial SPECT activity $A_0$, acting as a proxy for local vascularization density.
+\subsection{Inputs, Outputs, and General Data Flow}
+All models process three-dimensional anatomical and functional data to predict the final cumulative dose.
+\begin{enumerate}
+    \item \textbf{Anatomical Prior}: CT Hounsfield Units (HU) converted to physical mass density $\rho$ (g/cm$^3$).
+    \item \textbf{Functional Prior}: [$^{177}$Lu]Lu-PSMA SPECT activity (Bq) providing initial radiopharmaceutical distribution.
+    \item \textbf{Analytical Prior}: (Optional) Fast water-equivalent dosemap approximation $D_{approx}$.
+\end{enumerate}
 
-\subsection{The Dose rate Equation (Universal Discovery)}
-The absorbed dose $D(\mathbf{r}, t)$ is the integral of the dose rate $\dot{D}$, where we use a neural network $\mathcal{N}_\theta$ to discover the non-local transport residuals (cross-fire and heterogeneous scattering):
-\begin{equation}
-    \dot{D}_{total}(\mathbf{r}, t) = \text{Softplus} \left( \underbrace{\frac{A_{total}(\mathbf{r}, t) \cdot \lambda_{conv}}{m(\mathbf{r}) + \epsilon}}_{\text{Analytical Local Deposition}} + \underbrace{\mathcal{N}_\theta(\mathbf{A}_{std}, \rho_{std}, D_{approx, std})}_{\text{Learned Transport Residual}} \right)
-\end{equation}
-The use of \textbf{Softplus} ensures that energy deposition remains strictly non-negative, while the additive residual formulation allows the model to predict dose in regions where local activity is zero (capturing photon cross-fire).
+\paragraph{UDE Data Flow:} The system initializes a mechanistic pharmacokinetic (PK) model. At each time-step of the numerical integration, the current activity state and CT density are processed by a neural network to calculate the \textit{residual dose rate}. This rate is added to the physical local deposition rate and integrated over a 300-hour therapeutic window to produce the final 3D dosemap.
 
-\section{The Chronology of Development}
+\paragraph{CNN Data Flow:} The SPECT, CT, and $D_{approx}$ maps are concatenated into a multi-channel 3D volume. The network performs a direct end-to-end mapping using a deep residual stack to predict the voxel-wise cumulative dose in a single forward pass.
 
-The final high-fidelity state was reached through four distinct phases of refinement, addressing critical bottlenecks in numerical stability and physical scaling.
-
-\subsection{Phase 1: Multiplicative Physics (Initial UDE)}
-*   \textbf{Strategy}: $\dot{D} = \dot{D}_{base} \cdot \exp(\mathcal{N}_\theta)$.
-*   \textbf{Outcome}: Diverged.
-*   \textbf{Insight}: Multiplicative residuals cannot predict dose in voxels where source activity is zero, making it impossible to learn cross-fire radiation.
-
-\subsection{Phase 2: Black-Box Baseline (3D CNN)}
-*   \textbf{Strategy}: Mapping SPECT/CT directly to Dose using standard 3D CNNs.
-*   \textbf{Outcome}: Correlation $\rho \approx 0$.
-*   \textbf{Insight}: Numerical ranges spanning 12 orders of magnitude (Bq to Gy) and lack of temporal constraints prevented the optimizer from establishing any spatial relationship.
-
-\subsection{Phase 3: Input Standardization (UDE Breakthrough)}
-*   \textbf{Strategy}: Implemented **Z-score Normalization** for all inputs and switched to **Additive Softplus** residuals.
-*   \textbf{Outcome}: Successful convergence. Pearson $r$ reached **0.88**.
-*   \textbf{Insight}: Standardizing features allowed the neural network to "see" tissue density gradients (HU) relative to activity peaks.
-
-\subsection{Phase 4: Structural Stabilization (Final State)}
-*   \textbf{Strategy}: Added **Group Normalization** (for batch size 1) and **Huber Loss**.
-*   \textbf{Outcome}: Peak performance. Pearson $r$ reached **0.966**.
-*   \textbf{Insight}: GroupNorm provided the intra-volume stability needed for 3D medical patches, while Huber loss neutralized the impact of noisy clinical SPECT pixels.
-
-\section{Performance Benchmarks}
+\subsection{Parameter Count Comparison}
+To ensure a fair comparison, the **No-Approx UDE** and **Stabilized CNN** were designed with matched capacities.
 
 \begin{table}[h!]
 \centering
-\caption{Final Metric Comparison: Model vs. Analytical Baseline}
+\caption{Trainable Parameter Count across Architectures}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Model} & \textbf{Width} & \textbf{Depth (ResBlocks)} & \textbf{Parameters} \\ \midrule
+UDE Heavy & 16 & 2 & 29,489 \\
+\textbf{No-Approx UDE} & \textbf{32} & \textbf{3} & \textbf{169,121} \\
+Stabilized CNN & 32 & 3 & 169,953 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Performance Benchmarks}
+
+The results presented below were obtained using **$64 \times 64 \times 64$ voxel patches**. It is important to note that performance trends were highly **consistent with $32 \times 32 \times 32$ patches**, although the larger $64^3$ spatial context was required to achieve peak correlations by capturing long-range scattering.
+
+\begin{table}[h!]
+\centering
+\caption{Final Metric Comparison ($64^3$ Patches)}
 \begin{tabular}{lccc}
 \toprule
 \textbf{Metric} & \textbf{No-Approx UDE} & \textbf{Stabilized CNN} & \textbf{Analytical Baseline} \\ \midrule
-Pearson Correlation ($r$) & \textbf{0.966} & 0.923 & 0.930 \\
+Pearson Correlation ($r$) & \textbf{0.957} & 0.939 & 0.912 \\
 Inference Speed (ms) & 8.4 ms & 1.7 ms & \textbf{0.5 ms} \\
 Physically Consistent? & \textbf{Yes} & No & Yes \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{elsarticle/figures_new/dosimetry_comparison_64.png}
+    \caption{\textbf{High-Fidelity Dosimetry Comparison.} Verification of high-uptake regions in Pat 47. (A) CT context. (B) Monte Carlo target. (C) No-Approx UDE shows the tightest agreement ($r=0.957$). (D) Stabilized CNN. (E) Analytical baseline.}
+    \label{fig:dosimetry_64}
+\end{figure}
+
 \section{Conclusion}
-The **No-Approx UDE** is the definitive production architecture. By embedding the neural network inside the physical derivative of the dose rate, we achieve high-fidelity results that black-box models cannot replicate, proving that physics-integrated learning is essential for precision medicine.
+The **No-Approx UDE** architecture is the definitive production model for precision dosimetry. By matching the parameters of a deep CNN while maintaining physical consistency, it offers the most robust path for capturing heterogeneous radiation transport.
 
 \end{document}
-
-
-do it in this direction: left up, left down - original data, middle - segmentation masks, middle right after transformations, right end  differences as a diagram or something (Bland–Altman plot or better)

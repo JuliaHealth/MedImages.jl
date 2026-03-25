@@ -50,8 +50,8 @@ function main()
         pre_path = joinpath(pre_dir, filename)
         create_nii_from_medimage(resampled_image, pre_path)
         
-        # Rotate 60 degrees in y axis (axis=2)
-        rotated_image = rotate_mi(resampled_image, 2, 60.0, interp_type)
+        # Rotate 60 degrees in X axis (axis=1)
+        rotated_image = rotate_mi(resampled_image, 1, 60.0, interp_type)
         
         # Save to post
         post_path = joinpath(post_dir, filename)
