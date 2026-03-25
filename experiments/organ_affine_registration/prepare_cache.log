@@ -1,18 +1,0 @@
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_0__Pat116, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_2__Pat49, files missing.
-Caching subjects...  12%|███▉                           |  ETA: 0:00:03[KSkipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Iodine_3__Pat49, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat10, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat101, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat102, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat103, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat104, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat105, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat106, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat108, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat109, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat11, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat110, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat111, files missing.
-Skipping FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_0__Pat112, files missing.
-Caching subjects... 100%|███████████████████████████████| Time: 0:00:00[K
-Cache created at /media/jm/hddData/projects_new/MedImages.jl/experiments/organ_affine_registration/cache_fdm_16.h5
