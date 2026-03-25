@@ -175,11 +175,7 @@ function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Int
   return affine_transform_mi(image, affine_matrix, Interpolator; center_of_rotation=Tuple(C_idx))
 end
 
-      # Interpolate
-      # Use spacing (1,1,1) so that points are treated as indices
-      # Use median of 8 corners of the image as the extrapolation value
-      extrap_val = Float64(median(extract_corners(img)))
-      resampled_flat = interpolate_my(points_to_interpolate, img, (1.0,1.0,1.0), Interpolator, false, extrap_val, true)
+
 
 """
     crop_mi(im::MedImage, crop_beg::Tuple{Int64,Int64,Int64}, crop_size::Tuple{Int64,Int64,Int64}, Interpolator::Interpolator_enum)::MedImage
@@ -661,6 +657,7 @@ function affine_transform_mi(image::MedImage, affine_matrix::Matrix{Float64}, In
     res_batched = affine_transform_mi(batched, affine_matrix, Interpolator; output_size=output_size, center_of_rotation=center_of_rotation)
     return unbatch_medimage(res_batched)[1]
 end
+"""
     affine_transform_mi(image::BatchedMedImage, affine_matrix, Interpolator::Interpolator_enum; output_size=nothing)
 
 Applies an affine transformation to a batch of images.
