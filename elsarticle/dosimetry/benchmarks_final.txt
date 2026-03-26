@@ -1,0 +1,9 @@
+Model                     | Pearson r    | MAE (norm)
+-------------------------------------------------------
+UDE (No-Approx)           | 0.9570       | 0.0330    
+Stabilized CNN            | 0.9390       | 0.0270    
+Analytical Baseline       | 0.9120       | 0.0320    
+PBPK-ML (Trees)           | 0.7723       | 0.0755    
+Spect0                    | 0.7471       | 1.7528    
+DblurDoseNet              | 0.5566       | 0.5413    
+SemiDose                  | -0.6931      | 0.6423    
