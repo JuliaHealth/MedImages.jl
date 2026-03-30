@@ -44,3 +44,10 @@ elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__P
 elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47/ct.bin
 elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47/orig.bin
 elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47/ude.bin
+test/debug/__pycache__/baseline_models.cpython-310.pyc
+elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47/dblur.bin
+.gitignore
+elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47/pbpk.bin
+elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47/semi.bin
+elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__Pat47/spect0.bin
+test/debug/__pycache__/lu177_data.cpython-310.pyc

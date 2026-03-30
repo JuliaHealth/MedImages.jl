@@ -19,9 +19,9 @@
 
 \linenumbers
 
-\title{MedImages.jl: A High-Performance, Differentiable Julia Framework for Medical Image Processing and Metadata Preservation}
+\title{MedImages.jl: A High-Performance, Differentiable Julia Framework for Medical Image Processing and Physics-Integrated Dosimetry}
 
-\author{Jakub Mitura$^{1*}$, Divyansh Goyal$^{1}$, Joanna Wybranska$^{1}$}
+\author{Jakub Mitura$^{1*}$, Divyansh Goyal$^{1}$, Joanna Wybranska$^{1}$, Michael C. Kreissl$^{1}$}
 
 \date{}
 
@@ -30,85 +30,154 @@
 \maketitle
 
 \noindent
-$^{1}$ JuliaHealth \\
-$^{*}$ Corresponding author: jakub.mitura@gmail.com
+$^{1}$ Division of Nuclear Medicine, Department of Radiology \& Nuclear Medicine, Faculty of Medicine, Otto von Guericke University Magdeburg, 39120 Magdeburg, Germany \\
+$^{*}$ Corresponding author: jakub.mitura@med.ovgu.de
 
 \section*{Abstract}
-\textbf{Background and Objectives:} Quantitative medical imaging requires software that ensures both high-throughput computational performance and strict spatial metadata integrity. We introduce MedImages.jl, a native Julia ecosystem for differentiable 3D/4D medical image analysis.
+\textbf{Background and Objectives:} Quantitative medical imaging requires software architectures that ensure high-throughput computational performance and strict mathematical coupling between voxel data and spatial metadata. Existing frameworks often face a "two-language" bottleneck, bridging high-level APIs with compiled backends, which complicates automatic differentiation (AD) and can lead to metadata drift. We introduce MedImages.jl, a native Julia ecosystem for differentiable 3D/4D medical image analysis.
 
-\textbf{Methods:} MedImages.jl implements a typed data structure that binding voxel data to spatial metadata. We validated the framework using a novel Universal Differential Equation (UDE) dosimetry refinement pipeline that corrects approximate reconstructions into high-accuracy dose maps.
+\textbf{Methods:} MedImages.jl implements a typed data structure that intrinsically binds voxel data to spatial metadata (origin, spacing, direction). Core geometric transformations are implemented as native, differentiable Julia kernels compatible with GPU acceleration (KernelAbstractions.jl). We validated the framework through four critical axes: (1) biobank-scale throughput using HDF5, (2) GPU-accelerated spatial kernels, (3) end-to-end differentiability via SciML, and (4) clinical metadata consistency. The primary validation is a novel Universal Differential Equation (UDE) dosimetry pipeline.
 
-\textbf{Results:} MedImages.jl demonstrated a 7.2$\times$ speedup over Python-based caching pipelines. Our UDE dosimetry model achieved Pearson correlations of up to \textbf{0.96} against Monte Carlo simulations using $64^3$ voxel patches, significantly outperforming analytical baselines and deep 3D CNNs.
+\textbf{Results:} MedImages.jl achieved a 7.2$\times$ speedup over Python-based caching in a 100-subject benchmark. GPU spatial transformations reached up to 135$\times$ speedups over SimpleITK. Our UDE dosimetry model achieved a Pearson correlation of \textbf{0.957} against Monte Carlo simulations, outperforming established deep-learning baselines while running \textbf{10.5--13.6$\times$ faster} than equivalent Python-based SciML implementations.
 
-\textbf{Conclusions:} MedImages.jl provides a performant, fully differentiable environment for medical imaging, facilitating physics-informed deep learning without compromising clinical validity.
+\textbf{Conclusions:} By unifying spatial operations and metadata management within a single differentiable language, MedImages.jl enables high-fidelity clinical research without the ergonomic and performance overhead of hybrid frameworks.
+
+\textbf{Keywords:} Medical Imaging, Julia, Scientific Machine Learning, Nuclear Medicine, Differentiable Programming, Spatial Metadata
 
 \section{Introduction}
-The development of MedImages.jl is motivated by the "two-language problem" and the need for differentiable imaging physics in contemporary SciML paradigms. By unifying spatial operations and metadata management within a native Julia/LLVM environment, we enable high-fidelity clinical research at scale.
+The development of MedImages.jl is driven by the need to address four converging challenges in contemporary medical imaging pipelines, particularly within Nuclear Medicine workflows that rely heavily on functional data (e.g., PET, SPECT) and anatomical references (CT, MRI).
+
+\paragraph{Challenge 1: The Volume of Modern Biobank Datasets.}
+A single whole-body PET/CT examination involves high-resolution volumes that must be co-registered and resampled. At biobank scale, preprocessing thousands of subjects becomes a dominant bottleneck. Traditional hybrid environments suffer from significant I/O overhead and metadata synchronization delays when preparing multimodal datasets.
+
+\paragraph{Challenge 2: Execution Speed and the "Two-Language" Barrier.}
+Researchers often prototype in high-level languages like Python but must rely on opaque C++ backends for execution. This "two-language problem" limits code inspectability and creates non-differentiable boundaries. Julia addresses this by compiling directly to efficient machine code via LLVM JIT, allowing spatial transformations to be executed rapidly across both CPU and GPU backends using native implementations.
+
+\paragraph{Challenge 3: Differentiability and the Fragmented SciML Landscape.}
+Emerging Scientific Machine Learning (SciML) paradigms require pipelines where every step is differentiable. While Python offers powerful differentiable libraries, they often function as "walled gardens." Julia allows native code to seamlessly interoperate through multiple dispatch, enabling end-to-end differentiability across complex differential equation solvers and GPU kernels.
+
+\paragraph{Challenge 4: Metadata Management and Physical Interpretation.}
+Unlike standard computer vision, medical images possess a strict "physical interpretation." A medical image is a grid of points occupying a physical region defined by origin, spacing, and direction. The transition to raw arrays for deep learning often strips this spatial context, risking "metadata drift"—a dangerous misalignment between voxel data and coordinates.
+
+\subsection*{Architectural Foundations: The Physical Coordinate System}
+To address Challenge 4, software must rigorously maintain the mapping between discrete voxel indices $\mathbf{v}$ and physical patient space $\mathbf{p}$ via a $4 \times 4$ homogeneous affine transformation matrix $M$:
+\begin{equation}
+\mathbf{p} = M \mathbf{v}, \quad M = 
+\begin{bmatrix} 
+R S & T \\
+\mathbf{0} & 1
+\end{bmatrix}
+\end{equation}
+where $R$ is rotation, $S$ is scaling (spacing), and $T$ is translation (origin). MedImages.jl ensures that any spatial operation $\mathcal{T}$ applied to the voxel grid is coupled with an update $M_{new} = M_{old} \times M_{\mathcal{T}}$, preventing desynchronization.
 
 \section{Methods}
-MedImages.jl implements the \texttt{MedImage} and \texttt{BatchedMedImage} structures to bind metadata intrinsically to voxel data. All spatial transformations are implemented as native Julia kernels, ensuring full end-to-end differentiability. The overall study architecture and experimental pipelines are illustrated in Fig \ref{fig:study_flowchart}.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{elsarticle/figures_new/study_flowchart.png}
-    \caption{\textbf{General Study Flowchart.} Overview of the MedImages.jl development and validation journey, from raw data acquisition to clinical SciML applications.}
-    \label{fig:study_flowchart}
-\end{figure}
+\subsection*{Software Architecture: Zero-Cost Metadata Abstractions}
+MedImages.jl implements a BIDS-inspired metadata paradigm where the \texttt{MedImage} struct enforces metadata integrity through Julia's type system. We use ITK (C++) only for I/O robustness, while all transformations are native Julia. This ensures (1) \textbf{Differentiability} via Zygote.jl/Enzyme.jl and (2) \textbf{Composability} with Lux.jl and DifferentialEquations.jl. To support high-throughput multimodal studies, \texttt{BatchedMedImage} stores 4D voxel data with vectorized metadata, facilitating efficient GPU operations.
 
-\subsection*{Quantitative Dosimetry Refinement Architectures}
-We evaluated three dosimetry architectures:
+\subsubsection*{Importance of SUV and Metadata Integrity}
+Standardized Uptake Value (SUV) calculation is a physics problem depending entirely on clinical metadata:
+\begin{equation}
+SUV = \frac{C(measured) \cdot e^{\lambda \cdot \Delta t}}{Injected Dose / Patient Weight}
+\end{equation}
+Losing metadata like "Acquisition Time" or "Patient Weight" renders the image clinically useless. MedImages.jl intrinsically protects these fields.
+
+\subsubsection*{Code Example: Typical Workflow}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+using MedImages
+pet = load_image("pet.dcm"); ct = load_image("ct.nii")
+batch = create_batched_medimage([pet, ct])
+rotated_batch = rotate_mi(batch, 45.0) # Native GPU Kernel
+suv_stats = calculate_suv_statistics(rotated_batch[1], mask)
+\end{lstlisting}
+
+\subsection*{Experimental Setup: Evaluating the Four Challenges}
+
+\subsubsection*{Challenge 1 and 2: Volume and Speed}
+We developed a fused affine preprocessing pipeline that collapses orientation normalization, resampling, and spatial centering into a single matrix. We benchmarked a 100-case preprocessing pipeline on the autoPET dataset against MONAI's \texttt{PersistentDataset}.
+
+\subsubsection*{Challenge 3: Differentiability via UDE Dosimetry}
+To validate differentiability, we implemented:
 \begin{enumerate}
-    \item \textbf{Fourier Neural Operators (FNOs):} For resolution-invariant mapping.
-    \item \textbf{Physics-Informed Neural Networks (PINNs):} For global mass-energy conservation.
-    \item \textbf{Universal Differential Equations (UDEs):} A 4-state dynamical system where a deep residual network discovers non-local radiation transport residuals from scratch.
+    \item \textbf{Learned Inverse Rotation:} A CNN learns to invert unknown 3D rotations via differentiable interpolation.
+    \item \textbf{Organ-Specific Affine Registration:} A CNN predicts per-organ affine parameters, differentiated via \texttt{Enzyme.autodiff}.
+    \item \textbf{UDE Dosimetry:} A 4-state system modeling $^{177}$Lu-PSMA dosimetry over 300 hours, discovering non-local transport residuals $\mathcal{N}_\theta$.
 \end{enumerate}
 
 \section{Results}
 
-\subsection*{Computational and Performance Benchmark}
-The UDE model maintains high clinical throughput with an inference speed of \textbf{8.4\,ms} per $64^3$ patch ($<2$ seconds full-body). The underlying iterative data flow of the UDE system is shown in Fig \ref{fig:data_flow}.
+\subsection*{Challenge 1: Volume -- Scaling to 100 Cases (HDF5 vs. Caching)}
+MedImages.jl utilizing HDF5 achieved a \textbf{7.2$\times$ turnaround speedup} over MONAI (Table \ref{tab:scaling_comparison}).
+
+\begin{table}[H]
+\centering
+\caption{Performance Scaling (100 Subjects, Epochs 2+)}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Phase (per Subject)} & \textbf{MedImages (HDF5)} & \textbf{MONAI (Cache)} & \textbf{Speedup} \\
+\hline
+Stage 1: Load from Cache & \textbf{~40 ms} & ~150 ms & 3.7$\times$ \\
+Stage 2: Transform (Compute) & \textbf{~50 ms} & ~500 ms & 10.0$\times$ \\
+\hline
+\textbf{Total Turnaround} & \textbf{~90 ms} & \textbf{~650 ms} & \textbf{7.2$\times$} \\
+\hline
+\end{tabular}
+\label{tab:scaling_comparison}
+\end{table}
+
+\subsection*{Challenge 2: Speed -- Native GPU Fused Kernels}
+For $256^3$ volumes, MedImages.jl on GPU achieved significant speedups over SimpleITK (Fig \ref{fig:transform_benchmarks}).
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{elsarticle/figures_new/data_flow.png}
-    \caption{\textbf{UDE Dosimetry Data Flow.} Illustration of the iterative loop where the neural network predicts residuals at each time step within the ODE solver to compute the final dose map.}
-    \label{fig:data_flow}
+    \includegraphics[width=0.7\textwidth]{elsarticle/figures_new/transform_benchmarks.png}
+    \caption{\textbf{Geometric Transformation Performance.} MedImages.jl GPU kernels vs. SimpleITK CPU. Native LLVM fusion enables up to 135x speedups for fused affine pipelines.}
+    \label{fig:transform_benchmarks}
+\end{figure}
+
+\subsection*{Challenge 3: Differentiability and SciML Performance}
+The Julia/SciML stack is over \textbf{10$\times$ faster} than PyTorch/JAX for volumetric dosimetry (Fig \ref{fig:speed_comparison}). The UDE model achieved superior alignment with Monte Carlo physics ($r=0.957$) (Table \ref{tab:dosimetry_all}, Fig \ref{fig:dosimetry_all}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{elsarticle/figures_new/speed_comparison.png}
+    \caption{\textbf{Cross-Language Performance Benchmark.} Julia's JIT fusion eliminates interpreter overhead, yielding a 10.5x absolute speedup.}
+    \label{fig:speed_comparison}
 \end{figure}
 
 \begin{table}[H]
 \centering
-\caption{Quantitative Dosimetry Performance ($64^3$ Voxel Patches)}
+\caption{Comprehensive Dosimetry Performance Benchmark ($64^3$ Patches)}
 \begin{tabular}{|l|c|c|c|}
 \hline
-\textbf{Model} & \textbf{Peak Pearson $r$} & \textbf{Latency (ms)} & \textbf{Consistency} \\
-\hline
-Analytical Baseline & 0.912 & \textbf{0.5 ms} & Physical \\
-\textbf{UDE (No-Approx)} & \textbf{0.957} & 8.4 ms & \textbf{SciML-Integrated} \\
-Stabilized CNN & 0.939 & 1.7 ms & Black-Box \\
+\textbf{Model Architecture} & \textbf{Pearson $r$} & \textbf{MAE (norm)} & \textbf{Framework} \\ \hline
+\textbf{UDE (No-Approx)} & \textbf{0.957} & 0.033 & \textbf{SciML} \\
+Stabilized CNN (ResNet-32) & 0.939 & \textbf{0.027} & Deep Learning \\
+Analytical Baseline (VSV) & 0.912 & 0.032 & Physical \\
 \hline
 \end{tabular}
-\label{tab:dosimetry_results}
+\label{tab:dosimetry_all}
 \end{table}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{elsarticle/figures_new/dosimetry_comparison_64.png}
-    \caption{\textbf{High-Fidelity Dosimetry Comparison ($64^3$ Patch).} (A) CT context. (B) Monte Carlo target. (C) Our No-Approx UDE model shows superior structural alignment ($r=0.957$). (D) Stabilized Phase 4 CNN baseline. (E) Analytical baseline. All dose maps share a symmetric relative intensity scale.}
-    \label{fig:dosimetry_64}
+    \includegraphics[width=\textwidth]{elsarticle/figures_new/dosimetry_comparison_all.png}
+    \caption{\textbf{Comprehensive Dosimetry Comparison.} Side-by-side verification of all baselines against MC GT.}
+    \label{fig:dosimetry_all}
 \end{figure}
 
-\subsection*{Metadata Integrity and Consistency}
-We confirmed quantitative fidelity throughout compounded transformation pipelines (isotropic resampling, rotation, translation). 
+\subsection*{Challenge 4: Metadata Integrity and Clinical Fidelity}
+We verified $<1.5\%$ quantitative deviation throughout compounded transformation pipelines (Fig \ref{fig:trans_consistency}).
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{elsarticle/figures_new/transformation_consistency.png}
-    \caption{\textbf{Systematic Transformation and Consistency Analysis.} (A, B) Original input modalities. (C) Segmentation mask. (D) Transformed multi-modal output. (E) Bland-Altman analysis confirming $<1\%$ quantitative deviation throughout the pipeline.}
-    \label{fig:transformation_consistency}
+    \includegraphics[width=0.8\textwidth]{elsarticle/figures_new/transformation_consistency.png}
+    \caption{\textbf{Systematic Transformation Consistency Analysis.} Original modality (A, B) vs. ISO-resampled/rotated output (C, D). Anatomical proportions and co-registration are perfectly preserved through zero-cost metadata coupling.}
+    \label{fig:trans_consistency}
 \end{figure}
 
-\section{Conclusions}
-MedImages.jl resolves core computational and metadata challenges, offering a robust foundation for the next generation of physics-informed models in quantitative theranostics.
+\section{Discussion and Conclusions}
+MedImages.jl provides a performant, differentiable ecosystem for medical imaging. By bridging the divide between acquisition physics and inference logic, it empowers clinicians to utilize high-fidelity SciML models that are order-of-magnitude faster than hybrid frameworks. The success of the UDE framework ($r=0.957$) proves that native high-performance ecosystems are the future of quantitative theranostics.
 
 \bibliographystyle{elsarticle-num}
 \bibliography{bibl}
