@@ -53,3 +53,4 @@ elsarticle/dosimetry/vis_results_64/FDM_DPI-2024-7-KRN_Lu177_PSMA__SPECT_Tc_1__P
 test/debug/__pycache__/lu177_data.cpython-310.pyc
 *.pth
 *.jld
+*.joblib
