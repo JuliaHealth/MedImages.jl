@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Challenge 3: Differentiability (UDEs)</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --knowns: #3498db;
+            --unknowns: #e67e22;
+            --medimages: #27ae60;
+            --bg: #f8f9fa;
+        }
+        body { font-family: 'Inter', sans-serif; background: white; margin: 0; padding: 40px; display: flex; justify-content: center; }
+        .container { width: 1200px; display: flex; flex-direction: column; gap: 40px; }
+        
+        .row { display: flex; justify-content: space-between; align-items: stretch; gap: 30px; }
+        
+        /* 2. Knowledge Gap: Walled Garden */
+        .walled-garden { width: 30%; border: 4px solid #e74c3c; border-radius: 20px; padding: 20px; background: #fff5f5; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .cage { width: 150px; height: 120px; border: 5px solid #333; position: relative; background: repeating-linear-gradient(90deg, transparent, transparent 20px, #333 20px, #333 25px); margin: 20px 0; }
+        .cage-text { font-size: 14px; font-weight: 900; background: white; padding: 2px 10px; border: 1px solid #333; margin-top: 10px; }
+
+        /* 3. How Addressed: UDE Integrator */
+        .ude-integrator { width: 65%; border: 4px solid var(--medimages); border-radius: 20px; padding: 30px; background: #f0fff4; display: flex; justify-content: space-around; align-items: center; position: relative; }
+        .node { padding: 20px; border-radius: 15px; border: 3px solid; text-align: center; font-weight: bold; width: 180px; }
+        .node.knowns { border-color: var(--knowns); background: #ebf5fb; color: var(--knowns); }
+        .node.unknowns { border-color: var(--unknowns); border-style: dashed; background: #fffaf0; color: var(--unknowns); }
+        
+        .central-hub { width: 140px; height: 140px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #f1c40f; font-size: 60px; font-weight: bold; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.2); }
+        .central-hub::before { content: ''; position: absolute; width: 160px; height: 160px; border: 4px dashed var(--primary); border-radius: 50%; animation: spin 15s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* 4. Experiments */
+        .results-panel { padding: 30px; background: var(--bg); border: 3px solid var(--primary); border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 50px; }
+        .clinical-frame { width: 200px; height: 250px; border: 3px solid var(--primary); border-radius: 10px; overflow: hidden; }
+        .clinical-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .badge { background: var(--medimages); color: white; padding: 20px 40px; border-radius: 50px; font-size: 28px; font-weight: 900; box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Challenge Header -->
+        <div style="text-align: center; background: var(--bg); padding: 20px; border: 3px solid var(--primary); border-radius: 15px;">
+            <h1 style="margin: 0; font-size: 28px;">3. Challenge: Physics-in-the-Loop Differentiability</h1>
+            <p style="margin: 5px 0 0; color: #666;">Integrating mechanistic knowns with learned uncertainties</p>
+        </div>
+
+        <div class="row">
+            <!-- Knowledge Gap -->
+            <div class="walled-garden">
+                <div style="font-weight: 900; color: #e74c3c;">WALLED GARDENS</div>
+                <div class="cage">
+                    <div style="margin-top: 30px; font-weight: bold;">PyTorch<br>JAX</div>
+                </div>
+                <p style="font-size: 14px;">Broken AD Graph through mechanistic simulators</p>
+            </div>
+
+            <!-- How Addressed -->
+            <div class="ude-integrator">
+                <div class="node knowns">
+                    <div style="font-size: 12px; margin-bottom: 5px;">MECHANISTIC</div>
+                    S<sub>homo</sub>, λ<sub>phys</sub>, CF, ρ
+                </div>
+                <div style="font-size: 40px;">➔</div>
+                <div class="central-hub">∫</div>
+                <div style="font-size: 40px; color: var(--unknowns);">←</div>
+                <div class="node unknowns">
+                    <div style="font-size: 12px; margin-bottom: 5px;">NEURAL RESIDUAL</div>
+                    N<sub>θ</sub>(A, ρ, ∇ρ)
+                </div>
+            </div>
+        </div>
+
+        <!-- Experiments -->
+        <div class="results-panel">
+            <div class="clinical-frame">
+                <img src="clinical_assets/dose_overlay_ct.png" alt="Clinical Dose Overlay">
+            </div>
+            <div style="text-align: left;">
+                <div class="badge">Pearson r = 0.957</div>
+                <p style="font-weight: bold; margin-top: 15px;">Monte Carlo-Level Fidelity Achieved Natively</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

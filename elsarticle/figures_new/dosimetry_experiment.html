@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quantitative Dosimetry Comparison</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --dl: #e74c3c;
+            --analytical: #f39c12;
+            --sciml: #27ae60;
+            --bg: #f8f9fa;
+        }
+        body { font-family: 'Inter', sans-serif; background: white; margin: 0; padding: 40px; display: flex; justify-content: center; }
+        .container { width: 1300px; display: flex; flex-direction: column; gap: 30px; }
+        
+        .lanes { display: flex; justify-content: space-between; gap: 20px; }
+        .lane { width: 32%; padding: 25px; border-radius: 20px; border: 4px solid #ddd; background: white; display: flex; flex-direction: column; align-items: center; gap: 20px; position: relative; }
+        .lane.champion { border-color: var(--sciml); background: #f0fff4; box-shadow: 0 10px 30px rgba(39, 174, 96, 0.1); }
+        
+        .lane-title { font-weight: 900; font-size: 18px; text-align: center; height: 50px; }
+        
+        .icon-v { height: 80px; display: flex; align-items: center; justify-content: center; }
+        .map-frame { width: 180px; height: 220px; border: 2px solid var(--primary); border-radius: 8px; overflow: hidden; background: black; }
+        .map-frame img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .metric-badge { width: 100%; padding: 15px 0; border-radius: 10px; color: white; font-weight: 900; text-align: center; font-size: 20px; }
+        .lane.dl .metric-badge { background: var(--dl); }
+        .lane.analytical .metric-badge { background: var(--analytical); }
+        .lane.champion .metric-badge { background: var(--sciml); }
+
+        .shield-golden { width: 80px; height: 80px; background: #f1c40f; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; border: 3px solid #d4ac0d; }
+
+        /* Speed bar */
+        .speed-bar-container { width: 100%; padding: 25px; background: var(--bg); border: 3px solid var(--primary); border-radius: 20px; display: flex; align-items: center; gap: 30px; }
+        .speed-track { flex-grow: 1; height: 20px; background: #ddd; border-radius: 10px; position: relative; overflow: hidden; }
+        .speed-fill { width: 90%; height: 100%; background: linear-gradient(90deg, var(--analytical), var(--sciml)); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div style="text-align: center; background: var(--bg); padding: 25px; border: 3px solid var(--primary); border-radius: 15px;">
+            <h1 style="margin: 0; font-size: 32px;">High-Fidelity 177Lu-PSMA Dosimetry Comparison</h1>
+            <p style="margin: 5px 0 0; color: #666; font-weight: bold;">Mapping Functional SPECT/CT to Monte Carlo Ground Truth</p>
+        </div>
+
+        <div class="lanes">
+            <!-- Lane 1: DL -->
+            <div class="lane dl">
+                <div class="lane-title">PURE DEEP LEARNING<br>(3D U-NET)</div>
+                <div class="icon-v">
+                    <div style="width: 60px; height: 60px; background: #333; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; border-radius: 5px;">BLACK BOX</div>
+                </div>
+                <div class="map-frame"><img src="clinical_assets/dl_artifacts.png"></div>
+                <div class="metric-badge">Pearson r = 0.557</div>
+                <p style="font-size: 13px; text-align: center; font-weight: bold; color: var(--dl);">Fails Physical Constraints</p>
+            </div>
+
+            <!-- Lane 2: Analytical -->
+            <div class="lane analytical">
+                <div class="lane-title">CLINICAL ANALYTICAL<br>(PYTHON VSV)</div>
+                <div class="icon-v">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="16" y2="18"></line></svg>
+                </div>
+                <div class="map-frame"><img src="clinical_assets/vsv_homo.png"></div>
+                <div class="metric-badge">Pearson r = 0.912</div>
+                <p style="font-size: 13px; text-align: center; font-weight: bold; color: var(--analytical);">Ignores Heterogeneity</p>
+            </div>
+
+            <!-- Lane 3: SciML -->
+            <div class="lane champion">
+                <div class="lane-title">SCIML UDE / JULIA<br>(NO-APPROX)</div>
+                <div class="icon-v">
+                    <div class="shield-golden">
+                        <span>S<sub>homo</sub></span>
+                        <span>+</span>
+                        <span>N<sub>θ</sub></span>
+                    </div>
+                </div>
+                <div class="map-frame"><img src="clinical_assets/ude_highfi.png"></div>
+                <div class="metric-badge">Pearson r = 0.957</div>
+                <p style="font-size: 13px; text-align: center; font-weight: bold; color: var(--sciml);">State-of-the-Art Fidelity</p>
+            </div>
+        </div>
+
+        <!-- Speed Bar -->
+        <div class="speed-bar-container">
+            <div style="font-weight: 900; font-size: 14px;">PYTHON VSV</div>
+            <div class="speed-track"><div class="speed-fill"></div></div>
+            <div style="font-weight: 900; font-size: 14px; color: var(--sciml);">JULIA UDE</div>
+            <div style="font-weight: 900; font-size: 20px; color: var(--sciml);">10× SPEEDUP</div>
+        </div>
+        <p style="text-align: center; font-size: 14px; color: #666; margin: 0;">MedImages.jl / SciML maintains a <b>10× Speed Advantage</b> over traditional Python analytical frameworks.</p>
+    </div>
+</body>
+</html>

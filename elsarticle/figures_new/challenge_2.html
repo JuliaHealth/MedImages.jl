@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Challenge 2: The Two-Language Barrier</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --python: #3498db;
+            --cpp: #95a5a6;
+            --julia: #27ae60;
+            --bg: #f8f9fa;
+        }
+        body { font-family: 'Inter', sans-serif; background: white; margin: 0; padding: 40px; display: flex; justify-content: center; }
+        .container { width: 1200px; display: flex; flex-direction: column; gap: 30px; }
+        
+        .panel { padding: 30px; border-radius: 20px; border: 4px solid #ddd; position: relative; }
+        
+        /* 1 & 2. Python Side */
+        .panel.legacy { border-color: #e74c3c; background: #fff5f5; }
+        .interop-row { display: flex; align-items: center; justify-content: center; gap: 40px; }
+        .puzzle-group { display: flex; align-items: center; }
+        .brick-wall { width: 20px; height: 120px; background: #7f8c8d; border: 2px solid #333; position: relative; }
+        .brick-wall::after { content: 'BRICK WALL'; position: absolute; transform: rotate(-90deg); left: -40px; top: 40px; font-weight: 900; font-size: 12px; width: 100px; }
+
+        /* 3. Julia Side */
+        .panel.medimages { border-color: var(--julia); background: #f0fff4; }
+        .unified-row { display: flex; align-items: center; justify-content: center; gap: 60px; }
+        .gear-icon { width: 120px; height: 120px; animation: spin 10s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* 4. Experiments / Speedometer */
+        .metrics-row { display: flex; align-items: center; justify-content: space-around; padding: 30px; background: var(--bg); border: 3px solid var(--primary); border-radius: 20px; }
+        .speedometer { width: 200px; height: 100px; border: 10px solid #333; border-bottom: none; border-radius: 200px 200px 0 0; position: relative; background: linear-gradient(90deg, #27ae60, #f1c40f, #e74c3c); }
+        .needle { position: absolute; bottom: 0; left: 50%; width: 6px; height: 80px; background: black; transform-origin: bottom center; transform: rotate(80deg); }
+        
+        .resampling-sequence { display: flex; gap: 10px; }
+        .resampling-frame { width: 100px; height: 100px; border: 2px solid var(--primary); border-radius: 5px; overflow: hidden; }
+        .resampling-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+        .big-stat { font-size: 48px; font-weight: 900; color: var(--julia); }
+        .label { font-size: 18px; font-weight: bold; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Python Ecosystem -->
+        <div class="panel legacy">
+            <div style="font-weight: 900; margin-bottom: 20px;">PYTHON ECOSYSTEM: WRAPPING C++</div>
+            <div class="interop-row">
+                <div class="puzzle-group">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="var(--python)" stroke="white" stroke-width="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                    <div style="font-size: 40px;">+</div>
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="var(--cpp)" stroke="white" stroke-width="1"><rect x="2" y="2" width="20" height="20" rx="2"></rect></svg>
+                </div>
+                <div style="font-size: 40px;">➔</div>
+                <div class="brick-wall"></div>
+                <div style="text-align: center;">
+                    <div style="color: #e74c3c; font-size: 24px; font-weight: 900;">6.69 ms</div>
+                    <div class="label">CPU BOTTLENECK</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Julia Ecosystem -->
+        <div class="panel medimages">
+            <div style="font-weight: 900; margin-bottom: 20px;">MEDIMAGES.JL: PURE JULIA / LLVM JIT</div>
+            <div class="unified-row">
+                <svg class="gear-icon" viewBox="0 0 24 24" fill="none" stroke="var(--julia)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <div style="font-size: 40px; color: var(--julia);">➔</div>
+                <div class="resampling-sequence">
+                    <div class="resampling-frame"><img src="clinical_assets/resampling_ct.png"></div>
+                    <div class="resampling-frame" style="transform: scale(0.8); opacity: 0.7;"><img src="clinical_assets/resampling_ct.png"></div>
+                    <div class="resampling-frame" style="transform: scale(0.6); opacity: 0.4;"><img src="clinical_assets/resampling_ct.png"></div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="color: var(--julia); font-size: 24px; font-weight: 900;">0.83 ms</div>
+                    <div class="label">NATIVE GPU</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics -->
+        <div class="metrics-row">
+            <div class="speedometer"><div class="needle"></div></div>
+            <div style="text-align: center;">
+                <div class="big-stat">135×</div>
+                <div class="label">FUSED AFFINE ACCELERATION</div>
+            </div>
+            <div style="text-align: center;">
+                <div class="big-stat" style="color: var(--julia);">115×</div>
+                <div class="label">SPATIAL RESAMPLING</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

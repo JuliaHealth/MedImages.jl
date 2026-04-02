@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Challenge 4: Metadata Management</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --legacy: #e74c3c;
+            --medimages: #27ae60;
+            --bg: #f8f9fa;
+        }
+        body { font-family: 'Inter', sans-serif; background: white; margin: 0; padding: 40px; display: flex; justify-content: center; }
+        .container { width: 1200px; display: flex; flex-direction: column; gap: 30px; }
+        
+        .row { display: flex; justify-content: space-between; align-items: stretch; gap: 20px; }
+        .panel { padding: 25px; border-radius: 20px; border: 4px solid #ddd; background: white; }
+
+        /* 2. Knowledge Gap: Scissors */
+        .legacy-drift { width: 35%; border-color: var(--legacy); background: #fff5f5; text-align: center; }
+        .scissors-icon { font-size: 60px; margin: 20px 0; display: block; transform: rotate(-45deg); }
+        .trash-bin { width: 80px; height: 100px; border: 4px solid #333; margin: 0 auto; position: relative; border-radius: 0 0 10px 10px; background: #eee; }
+        .trash-bin::before { content: 'TAGS'; font-size: 10px; font-weight: 900; line-height: 100px; }
+
+        /* 3. How Addressed: 3D Stack */
+        .protected-stack { width: 60%; border-color: var(--medimages); background: #f0fff4; position: relative; }
+        .cube-container { width: 350px; height: 300px; margin: 0 auto; position: relative; perspective: 1000px; }
+        .slice-stack { position: absolute; top: 50px; left: 50px; transform: rotateX(45deg) rotateZ(-15deg); }
+        .slice { width: 200px; height: 100px; border: 2px solid var(--primary); background: rgba(255,255,255,0.8); position: absolute; box-shadow: 0 10px 20px rgba(0,0,0,0.2); overflow: hidden; opacity: 0.9; }
+        .slice img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* 4. Aligned Results */
+        .results-panel { padding: 30px; border: 5px solid var(--primary); border-radius: 30px; background: var(--bg); display: flex; align-items: center; justify-content: space-around; }
+        .magnifying-glass { width: 180px; height: 180px; border: 10px solid #333; border-radius: 50%; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+        .magnifying-glass::after { content: ''; position: absolute; bottom: -45px; right: -25px; width: 15px; height: 80px; background: #333; transform: rotate(-45deg); border-radius: 10px; }
+
+        .shield-icon { width: 80px; height: 80px; position: absolute; right: 20px; bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div style="background: var(--bg); padding: 20px; border: 3px solid var(--primary); border-radius: 15px; text-align: center;">
+            <h1 style="margin: 0;">4. Challenge: Theranostic Metadata Integrity</h1>
+            <p style="margin: 5px 0 0; color: #666;">Coregistering Functional and Anatomical Patient Grids</p>
+        </div>
+
+        <div class="row">
+            <!-- Knowledge Gap -->
+            <div class="panel legacy-drift">
+                <div style="font-weight: 900; color: var(--legacy);">METADATA DRIFT</div>
+                <span class="scissors-icon">✂</span>
+                <p style="font-family: monospace; font-size: 14px;">sitk.GetArrayFromImage()</p>
+                <div class="trash-bin"></div>
+                <p style="font-size: 14px; margin-top: 15px;">Spacing & Origin Discarded</p>
+            </div>
+
+            <!-- How Addressed -->
+            <div class="panel protected-stack">
+                <div style="font-weight: 900; color: var(--medimages); margin-bottom: 20px;">PROTECTED BATCHEDMEDIMAGE</div>
+                <div class="cube-container">
+                    <div class="slice-stack">
+                        <div class="slice" style="transform: translateZ(0px);"><img src="clinical_assets/ct_slice.png"></div>
+                        <div class="slice" style="transform: translateZ(40px);"><img src="clinical_assets/dosemap_slice.png"></div>
+                        <div class="slice" style="transform: translateZ(80px);"><img src="clinical_assets/spect_nac_slice.png"></div>
+                        <div class="slice" style="transform: translateZ(120px);"><img src="clinical_assets/spect_ac_slice.png"></div>
+                    </div>
+                </div>
+                <svg class="shield-icon" viewBox="0 0 24 24" fill="var(--medimages)" stroke="white" stroke-width="1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <div style="position: absolute; right: 110px; bottom: 30px; text-align: right; font-size: 12px; font-weight: bold;">
+                    Physical Metadata Bound:<br>Origin, Spacing, Direction
+                </div>
+            </div>
+        </div>
+
+        <!-- Experiments -->
+        <div class="results-panel">
+            <div class="cube-container" style="height: 200px; transform: scale(0.8);">
+                <div class="slice-stack" style="transform: rotateX(45deg) rotateZ(30deg);">
+                    <div class="slice" style="transform: translateZ(0px);"><img src="clinical_assets/ct_slice_rot.png"></div>
+                    <div class="slice" style="transform: translateZ(30px);"><img src="clinical_assets/dosemap_slice_rot.png"></div>
+                    <div class="slice" style="transform: translateZ(60px);"><img src="clinical_assets/spect_nac_slice_rot.png"></div>
+                    <div class="slice" style="transform: translateZ(90px);"><img src="clinical_assets/spect_ac_slice_rot.png"></div>
+                </div>
+            </div>
+            <div style="font-size: 40px;">➔</div>
+            <div class="magnifying-glass">
+                <div style="font-size: 12px; color: #666; font-weight: 800;">SUV CONSISTENCY</div>
+                <div style="font-size: 32px; font-weight: 900; color: var(--medimages);">&lt; 1.5%</div>
+                <div style="font-size: 12px; font-weight: 800;">DEVIATION</div>
+            </div>
+            <div style="max-width: 300px;">
+                <h3 style="margin: 0; color: var(--medimages);">METADATA SYNCHRONIZED</h3>
+                <p style="font-size: 14px;">Flawless alignment across compound affine transformations.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

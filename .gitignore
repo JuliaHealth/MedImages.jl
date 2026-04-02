@@ -54,3 +54,6 @@ test/debug/__pycache__/lu177_data.cpython-310.pyc
 *.pth
 *.jld
 *.joblib
+*.h5
+*.jls
+render_venv/
