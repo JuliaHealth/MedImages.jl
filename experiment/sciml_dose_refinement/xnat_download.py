@@ -18,12 +18,10 @@ logger = logging.getLogger(__name__)
 
 # Configuration
 XNAT_SERVER = "https://imaging-platform.diz-ag.med.ovgu.de"
-XNAT_ALIAS = "3efd0638-d27e-496d-b95a-320b0f93ef24"
-XNAT_SECRET = "fkaGxFiKntJVbuUtC5FQL7TwwqW3zQBQn5sXmvq6q7RHCe7V0ptRj6eCS2Futx7M"
+XNAT_ALIAS = "5ce23897-3467-4932-a29e-e256d77aea35"
+XNAT_SECRET = "x4G94myEK6umDnJcEEU6jUuFGbVReywm6HeDwEddEhZYvcpZsb6d2KKJzHOygAZa"
 PROJECT_ID = "Lu117 recon"
 DOWNLOAD_DIR = "/DATA"
-
-
 
 
 def create_download_directory(base_dir):

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Challenge 1: Biobank Volume Bottleneck</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --legacy: #e74c3c;
+            --medimages: #27ae60;
+            --bg: #f8f9fa;
+        }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: white; margin: 0; padding: 40px; display: flex; justify-content: center; }
+        .container { width: 1200px; display: flex; flex-direction: column; gap: 40px; }
+        
+        /* 1. Challenge Panel */
+        .section-header { display: flex; align-items: center; gap: 20px; padding: 20px; background: var(--bg); border: 3px solid var(--primary); border-radius: 15px; }
+        .icon-box { width: 60px; height: 60px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; }
+        .header-text h1 { margin: 0; font-size: 28px; color: var(--primary); }
+        .header-text p { margin: 5px 0 0; color: #666; font-size: 18px; }
+
+        .flow-row { display: flex; justify-content: space-between; position: relative; }
+
+        /* 2 & 3. Knowledge Gap and How Addressed */
+        .lane { width: 46%; padding: 30px; border-radius: 20px; border: 4px solid #ddd; display: flex; flex-direction: column; align-items: center; gap: 20px; background: white; transition: transform 0.2s; }
+        .lane.legacy { border-color: var(--legacy); background: #fff5f5; }
+        .lane.medimages { border-color: var(--medimages); background: #f0fff4; }
+        
+        .lane-title { font-size: 22px; font-weight: 800; text-transform: uppercase; }
+        .visual-metaphor { height: 150px; display: flex; align-items: center; justify-content: center; position: relative; }
+        
+        /* Icons via SVG */
+        .svg-icon { width: 100px; height: 100px; }
+        
+        .stat-badge { padding: 10px 20px; border-radius: 50px; font-weight: bold; font-size: 20px; color: white; }
+        .legacy .stat-badge { background: var(--legacy); }
+        .medimages .stat-badge { background: var(--medimages); }
+
+        /* 4. Results Panel */
+        .results-node { align-self: center; width: 60%; padding: 40px; border: 5px solid var(--primary); border-radius: 30px; display: flex; flex-direction: column; align-items: center; background: var(--bg); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .mip-frame { width: 250px; height: 300px; background: black; border-radius: 10px; overflow: hidden; margin-bottom: 20px; border: 2px solid var(--primary); }
+        .mip-frame img { width: 100%; height: 100%; object-fit: contain; }
+        .results-text { font-size: 32px; font-weight: 900; color: var(--medimages); text-align: center; }
+
+        /* Arrows */
+        .arrow-down { font-size: 40px; color: #ccc; margin: -20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 1. Challenge -->
+        <div class="section-header">
+            <div class="icon-box">
+                <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m8 17 4 4 4-4"></path></svg>
+            </div>
+            <div class="header-text">
+                <h1>1. Challenge: Biobank-Scale Data Ingestion</h1>
+                <p>Scaling to 10,000+ multimodal studies (SPECT/CT/PET)</p>
+            </div>
+        </div>
+
+        <div class="flow-row">
+            <!-- 2. Knowledge Gap -->
+            <div class="lane legacy">
+                <div class="lane-title" style="color: var(--legacy);">Legacy Bottleneck</div>
+                <div class="visual-metaphor">
+                    <!-- Funnel Icon (Tabler style) -->
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v2l-6 8v8l-4 2v-10l-6-8z"></path></svg>
+                </div>
+                <div style="text-align: center;">
+                    <p><b>MONAI PersistentDataset</b></p>
+                    <p>Pickle/Pt Serialization Friction</p>
+                </div>
+                <div class="stat-badge">~650 ms / subject</div>
+            </div>
+
+            <!-- 3. How Addressed -->
+            <div class="lane medimages">
+                <div class="lane-title" style="color: var(--medimages);">MedImages.jl Solution</div>
+                <div class="visual-metaphor">
+                    <!-- SSD + GPU Icon (Lucide style) -->
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line><line x1="7" y1="10" x2="7" y2="3"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="17" y1="10" x2="17" y2="3"></line></svg>
+                </div>
+                <div style="text-align: center;">
+                    <p><b>Zero-Serialization HDF5</b></p>
+                    <p>Native Fused GPU Kernels</p>
+                </div>
+                <div class="stat-badge">~90 ms / subject</div>
+            </div>
+        </div>
+
+        <!-- 4. Experiments -->
+        <div class="results-node">
+            <div class="mip-frame">
+                <img src="clinical_assets/mip_wholebody.png" alt="Clinical MIP">
+            </div>
+            <div class="results-text">7.2× SPEEDUP</div>
+            <p style="font-weight: bold;">Unlocking Biobank-Scale Turnaround</p>
+        </div>
+    </div>
+</body>
+</html>
