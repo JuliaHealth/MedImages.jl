@@ -134,9 +134,13 @@ function resample_to_image(im_fixed::BatchedMedImage, im_moving::BatchedMedImage
     
     device_M = is_cuda_array(im_moving.voxel_data) ? CuArray(M_batch) : M_batch
     val_ext = (value_to_extrapolate == Nothing) ? 0.0f0 : Float32(value_to_extrapolate)
-    new_data = interpolate_fused_affine(im_moving.voxel_data, device_M, new_size, interpolator_enum)
-    
+    resampled_flat = interpolate_fused_affine(im_moving.voxel_data, device_M, new_size, interpolator_enum, false, 0.0, nothing)
+
+    batch_size = size(im_moving.voxel_data, 4)
+    new_data = reshape(resampled_flat, new_size..., batch_size)
+
     if eltype(im_moving.voxel_data) != Float32
+
         new_data = cast_to_array_b_type(new_data, im_moving.voxel_data)
     end
 

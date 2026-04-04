@@ -10,7 +10,7 @@ using CUDA
 using ChainRulesCore
 using Statistics
 
-export resample_to_spacing, change_orientation, resample_to_image
+export resample_to_spacing, change_orientation, resample_to_image, change_orientation_main
 
 """
     resample_to_spacing(im::MedImage, new_spacing::Tuple{Float64,Float64,Float64}, interpolator_enum::Interpolator_enum, use_cuda=false)::MedImage
@@ -74,8 +74,11 @@ function resample_to_spacing(im::BatchedMedImage, new_spacing::Union{Tuple{Float
     device_M = is_cuda_array(im.voxel_data) ? CuArray(M_batch) : M_batch
     
     # Call the high-performance fused kernel
-    new_data = interpolate_fused_affine(im.voxel_data, device_M, first_new_size, interpolator_enum)
+    resampled_flat = interpolate_fused_affine(im.voxel_data, device_M, first_new_size, interpolator_enum, false, 0.0, nothing)
     
+    batch_size = size(im.voxel_data, 4)
+    new_data = reshape(resampled_flat, first_new_size..., batch_size)
+
     if eltype(im.voxel_data) != Float32
         new_data = cast_to_array_b_type(new_data, im.voxel_data)
     end

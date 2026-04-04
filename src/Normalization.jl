@@ -1,6 +1,7 @@
 module Normalization
 
 using ..MedImage_data_struct: MedImage, BatchedMedImage
+using Accessors
 using Statistics
 using ChainRulesCore
 
@@ -214,15 +215,11 @@ end
 
 # Helper to deepcopy and update voxel data
 function copy_with_new_data(mi::MedImage, new_data)
-    new_mi = deepcopy(mi)
-    new_mi.voxel_data = new_data
-    return new_mi
+    return @set mi.voxel_data = new_data
 end
 
 function copy_with_new_data(bmi::BatchedMedImage, new_data)
-    new_bmi = deepcopy(bmi)
-    new_bmi.voxel_data = new_data
-    return new_bmi
+    return @set bmi.voxel_data = new_data
 end
 
 end # module

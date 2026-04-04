@@ -57,7 +57,7 @@ end
 
             try
                 result = MedImages.Brute_force_orientation.get_orientations_vectors(TEST_NIFTI_FILE)
-                @test result isa Dict || result isa Tuple || result isa NamedTuple
+                @test result isa Dict || result isa Tuple || result isa NamedTuple || result isa AbstractVector
             catch e
                 @test_broken false
                 @info "Error getting orientation vectors: $e"

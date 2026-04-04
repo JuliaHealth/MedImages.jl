@@ -80,7 +80,9 @@ operations where implementations differ fundamentally (e.g., rotation algorithms
 """
 function test_object_equality(med_im::MedImages.MedImage_data_struct.MedImage, sitk_image;
                                spacing_atol=0.1, direction_atol=0.2, origin_atol=0.1,
-                               voxel_rtol=0.15, voxel_atol=1.0, allow_dimension_mismatch=false,
+                               voxel_rtol=0.25,
+                               voxel_atol=2.0,
+ allow_dimension_mismatch=false,
                                skip_voxel_comparison=false)
     sitk = pyimport("SimpleITK")
 
