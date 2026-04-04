@@ -8,6 +8,7 @@ using ChainRulesCore
 import Random
 using LinearAlgebra
 using Statistics
+ChainRulesCore.@non_differentiable Statistics.median(::Any)
 
 export interpolate_point
 export get_base_indicies_arr
@@ -676,7 +677,7 @@ end
 """
 perform the interpolation of the set of points in a given space
 """
-function interpolate_fused_affine(input_array, affine_matrices, output_size, interpolator_enum, keep_begining_same, extrapolate_value=0, center_of_rotation=nothing)
+function interpolate_fused_affine(input_array, affine_matrices, output_size, interpolator_enum, keep_begining_same=false, extrapolate_value=0, center_of_rotation=nothing)
     backend = KernelAbstractions.get_backend(input_array)
     batch_size = size(input_array, 4)
     mat_batch_size = size(affine_matrices, 3)
@@ -710,8 +711,8 @@ function interpolate_fused_affine(input_array, affine_matrices, output_size, int
     return out_res
 end
 
-function ChainRulesCore.rrule(::typeof(interpolate_fused_affine), input_array, affine_matrices, output_size, interpolator_enum, keep_begining_same, extrapolate_value=0)
-    output = interpolate_fused_affine(input_array, affine_matrices, output_size, interpolator_enum, keep_begining_same, extrapolate_value)
+function ChainRulesCore.rrule(::typeof(interpolate_fused_affine), input_array, affine_matrices, output_size, interpolator_enum, keep_begining_same, extrapolate_value, center_of_rotation)
+    output = interpolate_fused_affine(input_array, affine_matrices, output_size, interpolator_enum, keep_begining_same, extrapolate_value, center_of_rotation)
 
     function interpolate_fused_affine_pullback(d_output_unthunked)
         d_output_raw = unthunk(d_output_unthunked)
@@ -719,8 +720,14 @@ function ChainRulesCore.rrule(::typeof(interpolate_fused_affine), input_array, a
         
         source_shape = (Int32(size(input_array, 1)), Int32(size(input_array, 2)), Int32(size(input_array, 3)))
         out_size_ka = (Int32(output_size[1]), Int32(output_size[2]), Int32(output_size[3]))
-        center_shift = Float32.([(s + 0.0)/2.0 for s in output_size])
+        
+        if center_of_rotation === nothing
+            center_shift = Float32.([(s + 0.0)/2.0 for s in output_size])
+        else
+            center_shift = Float32.(center_of_rotation)
+        end
         center_shift_tuple = (center_shift[1], center_shift[2], center_shift[3])
+        
         is_nearest = (interpolator_enum == Nearest_neighbour_en)
         total_threads = length(output)
 
@@ -756,7 +763,7 @@ function ChainRulesCore.rrule(::typeof(interpolate_fused_affine), input_array, a
             Const(total_threads)
         )
         
-        return NoTangent(), d_input, d_affine, NoTangent(), NoTangent(), NoTangent(), NoTangent()
+        return NoTangent(), d_input, d_affine, NoTangent(), NoTangent(), NoTangent(), NoTangent(), NoTangent()
     end
     return output, interpolate_fused_affine_pullback
 end
@@ -1165,24 +1172,6 @@ end
             end
         end
     end
-end
-
-function interpolate_fused_affine(src, M, target_size, interpolator_enum)
-    backend = get_backend(src)
-    is_batched = ndims(M) == 3
-    is_nearest = (interpolator_enum == Nearest_neighbour_en)
-    tx, ty, tz = Int32.(target_size)
-    sx, sy, sz = Int32.(size(src)[1:3])
-    if is_batched
-        batch_size = size(M, 3)
-        out = KernelAbstractions.zeros(backend, Float32, target_size..., batch_size)
-        batched_fused_affine_kernel!(backend, 256)(out, src, M, tx, ty, tz, sx, sy, sz, is_nearest, ndrange=(prod(target_size), batch_size))
-    else
-        out = KernelAbstractions.zeros(backend, Float32, target_size...)
-        fused_affine_kernel!(backend, 256)(out, src, M, tx, ty, tz, sx, sy, sz, is_nearest, ndrange=prod(target_size))
-    end
-    synchronize(backend)
-    return out
 end
 
 @kernel function nearest_resample_enzyme_kernel!(output, image_data, old_spacing_arr, new_spacing_arr, new_dims_arr, src_dims_arr)
@@ -1633,122 +1622,28 @@ end
 
 function unbatch_medimage(batched_image::BatchedMedImage)::Vector{MedImage}
     batch_size = size(batched_image.voxel_data, 4)
-    med_images = Vector{MedImage}(undef, batch_size)
-
-    for i in 1:batch_size
-        # Extract 3D slice
-        voxel_slice = selectdim(batched_image.voxel_data, 4, i)
-        # Copy to ensure it's standard array and owns its memory (not just a view)
-        voxel_slice = copy(voxel_slice)
-
-        med_images[i] = MedImage(
-            voxel_data = voxel_slice,
-            origin = batched_image.origin[i],
-            spacing = batched_image.spacing[i],
-            direction = batched_image.direction[i],
-            image_type = batched_image.image_type[i],
-            image_subtype = batched_image.image_subtype[i],
-            date_of_saving = batched_image.date_of_saving[i],
-            acquistion_time = batched_image.acquistion_time[i],
-            patient_id = batched_image.patient_id[i],
-            current_device = batched_image.current_device,
-            study_uid = batched_image.study_uid[i],
-            patient_uid = batched_image.patient_uid[i],
-            series_uid = batched_image.series_uid[i],
-            study_description = batched_image.study_description[i],
-            legacy_file_name = batched_image.legacy_file_name[i],
-            display_data = batched_image.display_data[i],
-            clinical_data = batched_image.clinical_data[i],
-            is_contrast_administered = batched_image.is_contrast_administered[i],
-            metadata = batched_image.metadata[i]
-        )
-    end
-    return med_images
-end
-
-function ChainRulesCore.rrule(::typeof(interpolate_fused_affine), src, M, target_size, interpolator_enum)
-    output = interpolate_fused_affine(src, M, target_size, interpolator_enum)
-
-    function interpolate_pullback(d_output_unthunked)
-        d_output_raw = unthunk(d_output_unthunked)
-        d_src = zero(src)
-        d_M = zero(M)
-
-        backend = get_backend(output)
-        is_batched = ndims(M) == 3
-        is_nearest = (interpolator_enum == Nearest_neighbour_en)
-
-        tx, ty, tz = Int32.(target_size)
-        sx, sy, sz = Int32.(size(src)[1:3])
-        ndrange_single = prod(target_size)
-        
-        if backend isa KernelAbstractions.CPU
-            tx, ty, tz = Int32.(target_size)
-            sx, sy, sz = Int32.(size(src)[1:3])
-            ndrange_single = prod(target_size)
-
-            # Enzyme CPU often fails on batched views or complex closures.
-            # For CPU batched, we provide a simpler path if possible, or just the single-subject one if not batched.
-            if !is_batched
-                Enzyme.autodiff(Reverse, fused_affine_cpu_wrapper!, Const,
-                    Duplicated(output, d_output_raw),
-                    Duplicated(src, d_src),
-                    Duplicated(M, d_M),
-                    Const(tx), Const(ty), Const(tz), Const(sx), Const(sy), Const(sz), 
-                    Const(is_nearest), Const(Int(ndrange_single)))
-            else
-                # For batched CPU, we currently don't have a stable high-perf Enzyme path 
-                # that doesn't produce 'iterate' errors. 
-                # We could implement a manual loop but that might be slow.
-                # However, for verification we can use a loop.
-                for b in 1:size(M, 3)
-                    # We use itemized kernel with NO views passed to Enzyme
-                    Enzyme.autodiff(Reverse, fused_affine_kernel_item_launcher!, Const,
-                        Duplicated(output, d_output_raw),
-                        Duplicated(src, d_src),
-                        Duplicated(M, d_M),
-                        Const(tx), Const(ty), Const(tz), Const(sx), Const(sy), Const(sz), 
-                        Const(is_nearest), Const(Int(ndrange_single)), Const(Int(b)))
-                end
-            end
-        else
-            # GPU backward pass via looping pullback over batch
-            # Ensure gradients are on GPU
-            d_out = is_cuda_array(output) && !is_cuda_array(d_output_raw) ? CuArray(d_output_raw) : d_output_raw
-            d_src = is_cuda_array(src) && !is_cuda_array(d_src) ? CuArray(d_src) : d_src
-            d_M = is_cuda_array(M) && !is_cuda_array(d_M) ? CuArray(d_M) : d_M
-
-            if is_batched
-                batch_size = size(M, 3)
-                for b in 1:batch_size
-                    Enzyme.autodiff(Reverse, fused_affine_kernel_item_launcher!,
-                        Duplicated(output, d_out),
-                        Duplicated(src, d_src),
-                        Duplicated(M, d_M),
-                        Const(tx), Const(ty), Const(tz), Const(sx), Const(sy), Const(sz), 
-                        Const(is_nearest),
-                        Const(Int(ndrange_single)),
-                        Const(Int(b)))
-                end
-            else
-                Enzyme.autodiff(Reverse, fused_affine_enzyme_launcher!,
-                    Duplicated(output, d_out),
-                    Duplicated(src, d_src),
-                    Duplicated(M, d_M),
-                    Const(tx), Const(ty), Const(tz), Const(sx), Const(sy), Const(sz), 
-                    Const(is_nearest),
-                    Const(Int(ndrange_single)))
-            end
-            synchronize(backend)
-        end
-
-        # Return gradients
-        d_src_out = is_cuda_array(d_src) ? Array(d_src) : d_src
-        d_M_out = is_cuda_array(d_M) ? Array(d_M) : d_M
-        
-        return NoTangent(), d_src_out, d_M_out, NoTangent(), NoTangent()
-    end
-    return output, interpolate_pullback
+    
+    return [MedImage(
+        voxel_data = copy(selectdim(batched_image.voxel_data, 4, i)),
+        origin = batched_image.origin[i],
+        spacing = batched_image.spacing[i],
+        direction = batched_image.direction[i],
+        image_type = batched_image.image_type[i],
+        image_subtype = batched_image.image_subtype[i],
+        date_of_saving = batched_image.date_of_saving[i],
+        acquistion_time = batched_image.acquistion_time[i],
+        patient_id = batched_image.patient_id[i],
+        current_device = batched_image.current_device,
+        study_uid = batched_image.study_uid[i],
+        patient_uid = batched_image.patient_uid[i],
+        series_uid = batched_image.series_uid[i],
+        study_description = batched_image.study_description[i],
+        legacy_file_name = batched_image.legacy_file_name[i],
+        display_data = batched_image.display_data[i],
+        clinical_data = batched_image.clinical_data[i],
+        is_contrast_administered = batched_image.is_contrast_administered[i],
+        metadata = batched_image.metadata[i]
+    ) for i in 1:batch_size]
 end
 
 function ChainRulesCore.rrule(::typeof(resample_kernel_launch), image_data, old_spacing, new_spacing, new_dims, interpolator_enum)

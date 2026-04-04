@@ -40,8 +40,7 @@ using LinearAlgebra
 
     @testset "Histogram Matching" begin
         target_data = rand(Float32, 10, 10, 10) .+ 50.0 # Shifted distribution
-        target_mi = deepcopy(mi)
-        target_mi.voxel_data = target_data
+        target_mi = update_voxel_data(mi, target_data)
         
         matched_mi = histogram_match(mi, target_mi)
         

@@ -204,17 +204,20 @@ mkpath(DEBUG_DIR)
     end
 
     # Differentiability Tests
-    @testset "Differentiability Tests" begin
-        @test_skip "Differentiability tests skipped due to environment memory constraints"
-        #=
-        try
-            using Zygote
-            include("differentiability_tests/test_gradients.jl")
-        catch e
-            @warn "Zygote not available or failed to load: $e"
-            @test_skip "Zygote required for differentiability tests"
+    if get(ENV, "SKIP_DIFFERENTIABILITY", "false") != "true"
+        @testset "Differentiability Tests" begin
+            try
+                using Zygote
+                include("differentiability_tests/test_gradients.jl")
+            catch e
+                @warn "Zygote not available or failed to load: $e"
+                @test_skip "Zygote required for differentiability tests"
+            end
         end
-        =#
+    else
+        @testset "Differentiability Tests" begin
+            @test_skip "Differentiability tests skipped via environment variable"
+        end
     end
 
     # Normalization Tests

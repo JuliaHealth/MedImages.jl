@@ -4,7 +4,6 @@ using Dictionaries, Dates, PyCall
 using Accessors, UUIDs, ITKIOWrapper
 using ..MedImage_data_struct
 using ..MedImage_data_struct: MedImage, BatchedMedImage
-using ..Brute_force_orientation
 using ..Utils
 export load_image
 export update_voxel_and_spatial_data

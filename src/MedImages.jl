@@ -36,12 +36,12 @@ export CPU_current_device, CUDA_current_device, AMD_current_device, ONEAPI_curre
 
 include("MedImage_data_struct.jl")
 include("Orientation_dicts.jl")
-include("Brute_force_orientation.jl")
 include("Utils.jl")
 include("Load_and_save.jl")
 include("Basic_transformations.jl")
 include("Spatial_metadata_change.jl")
 include("Resample_to_target.jl")
+include("Brute_force_orientation.jl")
 include("HDF5_manag.jl")
 include("SUV.jl")
 include("Normalization.jl")

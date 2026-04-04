@@ -162,9 +162,7 @@ function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Int
   
   # Prepare 4x4 affine matrix for affine_transform_mi
   # Note: affine_transform_mi expects a matrix that maps index-offsets
-  affine_matrix = Matrix{Float64}(I, 4, 4)
-  affine_matrix[1:3, 1:3] = A_idx
-  affine_matrix[4, 4] = 1.0
+  affine_matrix = vcat(hcat(A_idx, [0.0, 0.0, 0.0]), [0.0 0.0 0.0 1.0])
   
   # Compute index-space center of rotation (1-based)
   # This is the physical center mapped back to index space

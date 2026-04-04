@@ -16,11 +16,11 @@ const TEST_LPI = MedImages.MedImage_data_struct.ORIENTATION_LPI
 const FIXED_DATE = DateTime(2024, 1, 1)
 
 # Helper to create mock image
-function create_mock_medimage(data)
+function create_mock_medimage(data; spacing=(1.0, 1.0, 1.0))
     MedImage(
         voxel_data = data,
         origin = (0.0, 0.0, 0.0),
-        spacing = (1.0, 1.0, 1.0),
+        spacing = spacing,
         direction = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),
         image_type = TEST_MRI,
         image_subtype = TEST_SUBTYPE,
@@ -37,8 +37,7 @@ end
         data_moving = rand(Float32, 10, 10, 10)
         # Fixed image (defines grid)
         data_fixed = zeros(Float32, 5, 5, 5) # Smaller grid
-        im_fixed = create_mock_medimage(data_fixed)
-        im_fixed.spacing = (2.0, 2.0, 2.0) # Different spacing
+        im_fixed = create_mock_medimage(data_fixed, spacing=(2.0, 2.0, 2.0))
 
         function loss(x)
             # Create fresh moving image with tracked data
@@ -160,8 +159,6 @@ end
 
     # --- Batched Differentiability Tests ---
     # Disabled due to Zygote issues with complex mutable struct pullback (Jnew error).
-    # Forward pass and single-image differentiability are verified.
-    # GPU compatibility for batched ops is implemented via KernelAbstractions.
     @testset "Batched Differentiability" begin
         # Test differentiability of batched rotate
         data = rand(Float32, 10, 10, 10)
@@ -169,25 +166,14 @@ end
 
         function loss_batch(x)
             # Create batched image structure (mocked)
-            # x is 4D array
             img1 = create_mock_medimage(x[:,:,:,1])
             img2 = create_mock_medimage(x[:,:,:,2])
             batch = create_batched_medimage([img1, img2])
-
-            # Rotate batch
-            # We want to differentiate w.r.t input data x
-            # Note: create_batched_medimage might not be Zygote-friendly if it uses array mutation?
-            # It uses `cat`.
-            # But `img1.voxel_data` is `x[:,:,:,1]` (view/getindex).
 
             # Rotate
             rotated_batch = MedImages.rotate_mi(batch, 1, 45.0, TEST_LINEAR)
             return sum(rotated_batch.voxel_data)
         end
-
-        # We need to ensure `create_batched_medimage` is differentiable or manually construct struct
-        # `create_batched_medimage` does `cat([img.voxel_data]...)`.
-        # Zygote supports cat.
 
         grads = Zygote.gradient(loss_batch, data_batch)
         @test grads[1] !== nothing

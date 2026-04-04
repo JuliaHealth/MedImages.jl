@@ -157,12 +157,12 @@ end
         # Spacing1: 2.0 (downsample), Spacing2: 2.0 (downsample)
         # Result size should be 16x16x16
         spacings = [(2.0, 2.0, 2.0), (2.0, 2.0, 2.0)]
-        res_space = resample_to_spacing(batch, spacings, Linear_en)
+        res_space = MedImages.resample_to_spacing(batch, spacings, Linear_en)
         @test size(res_space.voxel_data)[1:3] == (16, 16, 16)
 
         # Error check for inconsistent size
         spacings_bad = [(2.0, 2.0, 2.0), (4.0, 4.0, 4.0)]
-        @test_throws ErrorException resample_to_spacing(batch, spacings_bad, Linear_en)
+        @test_throws ErrorException MedImages.resample_to_spacing(batch, spacings_bad, Linear_en)
 
         # Resample to Image
         # Fixed Batch (Reference): Size 16x16x16, Spacing 2.0
@@ -171,7 +171,7 @@ end
             MedImage(voxel_data=zeros(Float32, 16, 16, 16), origin=(0.0,0.0,0.0), spacing=(2.0,2.0,2.0), direction=img.direction, image_type=MedImages.MedImage_data_struct.MRI_type, image_subtype=MedImages.MedImage_data_struct.T1_subtype, patient_id="ref2")
         ])
 
-        res_img = resample_to_image(fixed_batch, batch, Linear_en)
+        res_img = MedImages.resample_to_image(fixed_batch, batch, Linear_en)
         @test size(res_img.voxel_data) == (16, 16, 16, 2)
         @test res_img.spacing[1] == (2.0, 2.0, 2.0)
     end

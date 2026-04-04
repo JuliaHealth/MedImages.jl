@@ -1,5 +1,5 @@
 module Brute_force_orientation
-using ..Orientation_dicts, ..MedImage_data_struct
+using ..Orientation_dicts, ..MedImage_data_struct, ..Load_and_save, ..Spatial_metadata_change
 
 using Interpolations
 using Combinatorics
@@ -80,8 +80,8 @@ function change_image_orientation(path_nifti, orientation)
     # Create a DICOMOrientImageFilter
     orient_filter = sitk.DICOMOrientImageFilter()
 
-    # Convert the orientation enum to a string using the dictionary
-    orientation_str = orientation_enum_to_string[orientation]
+    # Convert the orientation enum to a string if needed
+    orientation_str = orientation isa String ? orientation : orientation_enum_to_string[orientation]
     # println("Setting orintation to : ", orientation_str)
 
     # Set the desired orientation (ensure it's a string)
@@ -96,6 +96,7 @@ function change_image_orientation(path_nifti, orientation)
 
     # Write the oriented image back to the file
     sitk.WriteImage(oriented_image, path_nifti)
+    return oriented_image
 end
 
 
@@ -253,9 +254,9 @@ function brute_force_find_from_sitk_single(path_nifti, or_enum_1::Orientation_co
     p, c = brute_force_find_perm_rev(sitk_image1_arr, sitk_image2_arr)
 
     p_spac = brute_force_find_perm_spacing(collect(sitk_image1.GetSpacing()), collect(sitk_image2.GetSpacing()))
-    path_nifti_temp = "/home/jm/projects_new/MedImage.jl/test_data/synthethic_small_temp.nii.gz"
+    path_nifti_temp = path_nifti * "_temp.nii.gz"
     sitk.WriteImage(sitk_image1, path_nifti_temp)
-    med_im = load_image(path_nifti_temp)
+    med_im = load_image(path_nifti_temp, "CT")
 
     # get idea how to get ransformed origin
     origin_perm = establish_orginn_transformation(med_im, sitk_image2, or_enum_2, p, c, p_spac)
