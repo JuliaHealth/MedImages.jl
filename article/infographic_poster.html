@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedImages.jl Infographic Poster</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a; /* Deep Blue */
+            --secondary: #10b981; /* Accent Green */
+            --accent-red: #ef4444;
+            --bg-light: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --julia-purple: #9558b2;
+            --julia-green: #389826;
+            --julia-red: #cb3c33;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .poster-container {
+            width: 1200px; /* A0-ish ratio but smaller for web viewing */
+            background: white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 60px;
+            border-top: 15px solid var(--primary);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+
+        .authors {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .affiliation {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            color: var(--primary);
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .narrative-step {
+            margin-bottom: 15px;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .step-content {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .highlight-box {
+            background: #f0f9ff;
+            border-left: 5px solid var(--primary);
+            padding: 15px;
+            margin: 20px 0;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .stat-badge {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        figure {
+            margin: 20px 0 0 0;
+            text-align: center;
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        figcaption {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .comparison-table th {
+            background: #f8fafc;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .comparison-table tr:last-child {
+            background: #ecfdf5;
+            font-weight: 700;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .availability {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .icon-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="poster-container">
+        <header>
+            <h1>MedImages.jl</h1>
+            <p style="font-size: 1.5rem; color: var(--text-dark); margin-bottom: 20px;">A High-Performance, Differentiable Julia Framework for Medical Image Processing and Metadata Preservation</p>
+            <div class="authors">Jakub Mitura, Divyansh Goyal, Michael C. Kreissl, Joanna Wybranska</div>
+            <div class="affiliation">Division of Nuclear Medicine, Otto von Guericke University Magdeburg, Germany</div>
+        </header>
+
+        <div class="grid">
+            <!-- Challenge 1 -->
+            <div class="card">
+                <h2><i data-lucide="database"></i> The Volume Bottleneck</h2>
+                <div class="narrative-step">
+                    <span class="step-title">The Challenge</span>
+                    <p class="step-content">Preprocessing biobank-scale datasets (10,000+ studies) is an immense I/O and hardware bottleneck.</p>
+                </div>
+                <div class="narrative-step">
+                    <span class="step-title">The Problem with Python</span>
+                    <p class="step-content">Reliance on Pickle/Pt dict-based serialization (MONAI, TorchIO) causes memory buildup and friction.</p>
+                </div>
+                <div class="highlight-box">
+                    <span class="stat-badge" style="background: var(--primary);">Zero-Serialization</span>
+                    MedImages.jl: HDF5 Persistence + Fused Affine GPU Kernels.
+                </div>
+                <p class="step-content"><strong>Result:</strong> 7.2&times; Faster turnaround time, unlocking thousands of studies.</p>
+                <figure>
+                    <img src="infographic_assets/figures/data_flow.png" alt="Data Flow Visualization">
+                    <figcaption>Biobank dataset: 10,000+ multimodal studies.</figcaption>
+                </figure>
+            </div>
+
+            <!-- Challenge 2 -->
+            <div class="card">
+                <h2><i data-lucide="zap"></i> The Two-Language Barrier</h2>
+                <div class="narrative-step">
+                    <span class="step-title">The Challenge</span>
+                    <p class="step-content">Researchers prototype in high-level languages while relying on opaque C++ binaries (SimpleITK) for speed.</p>
+                </div>
+                <div class="narrative-step">
+                    <span class="step-title">The Knowledge Gap</span>
+                    <p class="step-content">SimpleITK CPU filters act as a "brick wall" for native GPU acceleration and AD inspection.</p>
+                </div>
+                <div class="highlight-box">
+                    <span class="stat-badge" style="background: var(--julia-purple);">LLVM JIT Unified</span>
+                    Pure Julia Stack: Direct hardware acceleration via KernelAbstractions.jl.
+                </div>
+                <p class="step-content"><strong>Result:</strong> 135&times; Fused Affine & 115&times; Resampling Acceleration.</p>
+                <figure>
+                    <img src="infographic_assets/figures/speed_comparison.png" alt="Speed Benchmarks">
+                    <figcaption>Unified Julia gear bypassing the Python/C++ brick wall.</figcaption>
+                </figure>
+            </div>
+
+            <!-- Challenge 3 -->
+            <div class="card">
+                <h2><i data-lucide="git-branch"></i> Differentiability & UDEs</h2>
+                <div class="narrative-step">
+                    <span class="step-title">The Challenge</span>
+                    <p class="step-content">Modeling voxel-level dosimetry requires integrating physical laws into ML training loops.</p>
+                </div>
+                <div class="narrative-step">
+                    <span class="step-title">The SciML Solution</span>
+                    <p class="step-content">4-State Universal Differential Equations (UDE) natively integrate mechanistic knowns with neural residuals.</p>
+                </div>
+                <div class="highlight-box">
+                    <span class="stat-badge" style="background: var(--julia-green);">Expression Problem Solved</span>
+                    Monte Carlo-level accuracy while avoiding framework "Walled Gardens".
+                </div>
+                <p class="step-content"><strong>Result:</strong> Pearson r = 0.9221 (Monte Carlo Fidelity).</p>
+                <figure>
+                    <img src="infographic_assets/figures/differentiability.png" alt="Differentiable Pipeline">
+                    <figcaption>UDE Integrator: Mechanistic Knowns + Neural Residual Corrector.</figcaption>
+                </figure>
+            </div>
+
+            <!-- Challenge 4 -->
+            <div class="card">
+                <h2><i data-lucide="shield-check"></i> Metadata Management</h2>
+                <div class="narrative-step">
+                    <span class="step-title">The Challenge</span>
+                    <p class="step-content">Decoupling spatial metadata during conversion to NumPy tensors leads to catastrophic "Metadata Drift".</p>
+                </div>
+                <div class="narrative-step">
+                    <span class="step-title">The Innovation</span>
+                    <p class="step-content">BatchedMedImage explicitly binds physical metadata (origin, spacing, direction) to the voxel tensor.</p>
+                </div>
+                <div class="highlight-box">
+                    <span class="stat-badge" style="background: var(--primary);">Protected Metadata</span>
+                    Clinical Metadata perfectly synchronized: SUV consistency &lt; 1.5% deviation.
+                </div>
+                <p class="step-content"><strong>Result:</strong> Flawless quantitative alignment across massive multimodal batches.</p>
+                <figure>
+                    <img src="infographic_assets/figures/suv_consistency.png" alt="SUV Consistency">
+                    <figcaption>Multi-modal alignment preserved after compounded transformations.</figcaption>
+                </figure>
+            </div>
+
+            <!-- Challenge 5: Quantitative Comparison -->
+            <div class="card full-width">
+                <h2><i data-lucide="bar-chart-3"></i> <sup>177</sup>Lu-PSMA Dosimetry: Performance Comparison</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                    <div>
+                        <p class="step-content">Our SciML-based UDE model isolates known mechanistic physics (primary deposition) from neural corrections (secondary scattering), matching Monte Carlo fidelity at 10&times; the speed of analytical frameworks.</p>
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Pearson ($r$)</th>
+                                    <th>MAE (mGy)</th>
+                                    <th>Inf (s)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Analytical Baseline</td>
+                                    <td>0.8249</td>
+                                    <td>700.43</td>
+                                    <td>0.35</td>
+                                </tr>
+                                <tr>
+                                    <td>DblurDoseNet (CNN)</td>
+                                    <td>0.5566</td>
+                                    <td>1102.34</td>
+                                    <td>2.04</td>
+                                </tr>
+                                <tr>
+                                    <td>CNN+Approx (Hybrid)</td>
+                                    <td>0.8924</td>
+                                    <td>482.11</td>
+                                    <td>1.99</td>
+                                </tr>
+                                <tr>
+                                    <td>UDE IMPROVED</td>
+                                    <td>0.9221</td>
+                                    <td>359.49</td>
+                                    <td>140.85</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <figure>
+                            <img src="infographic_assets/figures/comparison_dosemaps.png" alt="Dose Map Comparison">
+                            <figcaption>Qualitative Comparison: Analytical vs. UDE vs. MC Reference.</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="availability">
+                <i data-lucide="github"></i> github.com/JuliaHealth/MedImages.jl
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <span class="stat-badge">7.2&times; Throughput</span>
+                <span class="stat-badge">135&times; Speedup</span>
+                <span class="stat-badge">AD Differentiable</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

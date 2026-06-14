@@ -416,8 +416,8 @@ end
         batch2 = create_batched_medimage([MedImage(voxel_data=data2, origin=(0.0,0.0,0.0), spacing=(1.0,1.0,1.0), direction=(1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0), image_type=MedImages.MedImage_data_struct.MRI_type, image_subtype=MedImages.MedImage_data_struct.T1_subtype, patient_id="p2")])
 
         center_y_shift = (10.0, 2.0, 10.0)
-        # Rotate 90 deg around axis 3 (X) to match direction vector expectation
-        res_rot_off = rotate_mi(batch2, 3, 90.0, Nearest_neighbour_en; center_of_rotation=center_y_shift)
+        # Rotate -90 deg around axis 1 (X) to match direction vector expectation
+        res_rot_off = rotate_mi(batch2, 1, -90.0, Nearest_neighbour_en; center_of_rotation=center_y_shift)
 
         # Check expected location (10, 2, 18)
         @test res_rot_off.voxel_data[10, 2, 18, 1] == 1.0

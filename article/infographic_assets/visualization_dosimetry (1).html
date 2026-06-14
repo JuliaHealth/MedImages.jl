@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SciML Dosimetry Digital Twin Architecture</title>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                tags: 'ams'
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #0B0F19;
+            --bg-panel: #131A2A;
+            --bg-card: #1C2438;
+            --sidebar-bg: #0A0E17;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            
+            /* Stage Accent Colors */
+            --spect-color: #f97316;    /* Orange */
+            --physics-color: #0ea5e9;  /* Cyan */
+            --bio-color: #10b981;      /* Emerald */
+            --ai-color: #d946ef;       /* Fuchsia */
+            --ai-sub-color: #a855f7;   /* Purple for Directionality */
+            --radio-color: #ef4444;    /* Red */
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            line-height: 1.6;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 300px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            padding: 40px 20px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar h3 {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+        }
+
+        .nav-link {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-weight: 600;
+            background: rgba(255,255,255,0.02);
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            transform: translateX(4px);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 300px;
+            padding: 50px;
+            width: calc(100% - 300px);
+            max-width: 1500px;
+        }
+
+        header { margin-bottom: 60px; }
+        
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(90deg, var(--physics-color), var(--ai-color), var(--spect-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 0;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            font-weight: 800;
+        }
+
+        .subtitle { 
+            color: var(--text-muted); 
+            font-size: 1.15rem; 
+            max-width: 950px; 
+            margin: 0;
+        }
+
+        /* Panel Styling */
+        .panel {
+            background-color: var(--bg-panel);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 60px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border-top: 4px solid #fff;
+            scroll-margin-top: 40px;
+        }
+
+        .panel-stage1 { border-top-color: var(--spect-color); }
+        .panel-stage2 { border-top-color: var(--physics-color); }
+        .panel-stage3 { border-top-color: var(--bio-color); }
+        .panel-stage4 { border-top-color: var(--ai-color); }
+        .panel-stage5 { border-top-color: var(--radio-color); }
+
+        .panel-title {
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px dashed rgba(255,255,255,0.15);
+            padding-bottom: 15px;
+            font-weight: 700;
+        }
+
+        /* Equation Container */
+        .math-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 30px 20px;
+            overflow-x: auto;
+            margin-bottom: 40px;
+            font-size: 1.15rem;
+            box-shadow: inset 0 4px 15px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        
+        .math-label {
+            display: block;
+            text-align: left;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+
+        /* Pathways Visualizer */
+        .pathway {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 35px;
+            padding: 25px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            border: 1px dashed rgba(255,255,255,0.15);
+        }
+        .path-node { 
+            padding: 12px 20px; 
+            border-radius: 8px; 
+            background: rgba(255,255,255,0.03); 
+            text-align: center;
+            font-weight: 600;
+            border: 2px solid transparent;
+        }
+        .path-node small { 
+            display: block; 
+            font-family: monospace; 
+            font-size: 0.95rem; 
+            margin-top: 6px; 
+            opacity: 0.8;
+            font-weight: normal;
+        }
+        .pathway .arrow { color: var(--text-muted); font-size: 1.6rem; font-weight: bold;}
+
+        /* Detail Cards Grid */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        .var-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-left: 5px solid;
+            border-radius: 10px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .var-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        .var-card.s1 { border-left-color: var(--spect-color); }
+        .var-card.s2 { border-left-color: var(--physics-color); }
+        .var-card.s3 { border-left-color: var(--bio-color); }
+        .var-card.s4 { border-left-color: var(--ai-color); }
+        .var-card.s4-dir { border-left-color: var(--ai-sub-color); background: rgba(168, 85, 247, 0.05); border-color: rgba(168, 85, 247, 0.3); }
+        .var-card.s5 { border-left-color: var(--radio-color); }
+
+        .var-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .var-name {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #fff;
+        }
+        
+        .var-symbol {
+            font-family: monospace;
+            background: rgba(0,0,0,0.4);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Badges & Content */
+        .badge-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 6px 0;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-align: center;
+            width: 95px;
+            flex-shrink: 0;
+            border: 1px solid;
+        }
+        .badge.def { background: rgba(56, 189, 248, 0.1); color: #38BDF8; border-color: rgba(56,189,248,0.3); }
+        .badge.constraint { background: rgba(248, 113, 113, 0.1); color: #F87171; border-color: rgba(248,113,113,0.3); }
+        .badge.dist { background: rgba(168, 85, 247, 0.1); color: #c084fc; border-color: rgba(168,85,247,0.3); }
+
+        .var-text {
+            font-size: 0.98rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+        .var-text strong { color: #fff; }
+        .var-text code { 
+            background: rgba(0,0,0,0.4); 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-family: monospace; 
+            color: #fff;
+            font-size: 0.9em;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 1100px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; width: 100%; padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h3>Digital Twin Engine</h3>
+    <a href="#stage1" class="nav-link" style="border-left-color: var(--spect-color);">1. SPECT Calibration</a>
+    <a href="#stage2" class="nav-link" style="border-left-color: var(--physics-color);">2. CT Mass Normalization</a>
+    <a href="#stage3" class="nav-link" style="border-left-color: var(--bio-color);">3. Compartmental PK (UDE)</a>
+    <a href="#stage4" class="nav-link" style="border-left-color: var(--ai-color);">4. AI Transport Corrector</a>
+    <a href="#stage5" class="nav-link" style="border-left-color: var(--radio-color);">5. Radiobiology (DSB)</a>
+</div>
+
+<div class="main-content">
+    <header>
+        <h1>Exhaustive SciML <sup>177</sup>Lu-PSMA Digital Twin</h1>
+        <div class="subtitle">Complete programmatic mapping detailing Mechanism Equations, Explicit Directionality Mathematics, Subcellular Variables, and Thermodynamic Constraints natively coupling Universal Differential Equations with Monte Carlo Dosimetry.</div>
+    </header>
+
+    <section id="stage1" class="panel panel-stage1">
+        <h2 class="panel-title" style="color: var(--spect-color);">📸 Stage 1: SPECT Initial Activity Calibration</h2>
+        
+        <div class="math-box">
+            $$
+            \underbrace{A_{true}(\mathbf{r}, 0)}_{\substack{\color{#f97316}{\text{Absolute Ground Truth (Bq)}}}} 
+            = 
+            \frac{ \overbrace{(A_{obs}(\mathbf{r}, 0) \cdot \text{Rescale Slope}) + \text{Rescale Intercept}}^{\substack{\color{#f97316}{\text{DICOM Float Conversion}} \\ \color{#f97316}{\downarrow}}} }
+            { \underbrace{CF}_{\substack{\color{#f97316}{\uparrow} \\ \color{#f97316}{\text{Camera Calibration}}}} \cdot \underbrace{RC(\mathbf{r})}_{\substack{\color{#f97316}{\uparrow} \\ \color{#f97316}{\text{Recovery Coeff.}}}} }
+            $$
+        </div>
+
+        <div class="grid-cards">
+            <div class="var-card s1">
+                <div class="var-header">
+                    <span class="var-name">Observed Counts</span>
+                    <span class="var-symbol">\(A_{obs}(\mathbf{r},0)\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Raw 3D matrix of relative voxel intensities output natively by the SPECT scanner.</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">Strictly \(\ge 0\). Iterative OSEM reconstructions mathematically yield negative background counts due to scatter algorithms; must clamp explicitly via <code>max(0, A)</code>.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Follows a strict Poisson distribution (raw photons), shifting to Correlated Multivariate Gaussian noise post-reconstruction.</span></div>
+            </div>
+
+            <div class="var-card s1">
+                <div class="var-header">
+                    <span class="var-name">Camera Factor</span>
+                    <span class="var-symbol">\(CF\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Scanner-specific physical sensitivity multiplier translating generic Counts to Bq.</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">Strictly \(> 0\). <strong>Double-Calibration Trap:</strong> If DICOM Units Tag (0054,1001) reads <code>BQML</code>, CF mathematically MUST default to \(1.0\) to prevent severe patient under-dosing.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Fixed deterministic scalar derived strictly from institutional hardware phantom scans.</span></div>
+            </div>
+            
+            <div class="var-card s1">
+                <div class="var-header">
+                    <span class="var-name">Recovery Coeff.</span>
+                    <span class="var-symbol">\(RC(\mathbf{r})\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Structure-specific Look-Up Table (LUT) mapped to restore amplitude lost to spatial Partial Volume Effects (PVE).</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">Bounded \((0.0, 1.0]\). Cannot recover >100%. Must strictly be mapped to bounded ROIs; applying continuously over voxel arrays violently amplifies "Gibbs ringing" edge artifacts.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Non-parametric discrete scaling defined by NEMA volume sphere phantoms.</span></div>
+            </div>
+
+            <div class="var-card s1">
+                <div class="var-header">
+                    <span class="var-name">True Activity</span>
+                    <span class="var-symbol">\(A_{true}(\mathbf{r}, 0)\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Verified, absolutely quantified initial biological condition (\(t=0\)) feeding the PK ODE system.</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">Must logically evaluate strictly mathematically to \(\ge 0\).</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Heavily Log-Normal structural distribution internally tracking chaotic, fractal-like biological angiogenesis (blood vessel formation).</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stage2" class="panel panel-stage2">
+        <h2 class="panel-title" style="color: var(--physics-color);">🦴 Stage 2: CT Anatomy & Physical Voxel Mass Normalization</h2>
+        
+        <div class="math-box">
+            $$
+            \begin{aligned}
+            \underbrace{\rho(\mathbf{r})}_{\substack{\color{#0ea5e9}{\text{Mass Density}} \\ \color{#0ea5e9}{\text{(g/cm}^3\text{)}}}} &= 
+            \begin{cases} 
+            1.0 + slope_{air} \cdot HU(\mathbf{r}) & \text{if } HU \le 0 \text{ (Air to Water)}\\
+            1.0 + slope_{tissue} \cdot HU(\mathbf{r}) & \text{if } HU > 0 \text{ (Water to Bone)}
+            \end{cases} \\[15pt]
+            \underbrace{m(\mathbf{r})}_{\substack{\color{#0ea5e9}{\text{Target Voxel}} \\ \color{#0ea5e9}{\text{Mass (kg)}}}} &= V_{voxel} \cdot \rho(\mathbf{r})
+            \end{aligned}
+            $$
+        </div>
+
+        <div class="grid-cards">
+            <div class="var-card s2">
+                <div class="var-header">
+                    <span class="var-name">Hounsfield Units</span>
+                    <span class="var-symbol">\(HU(\mathbf{r})\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Native 3D X-ray attenuation array evaluating patient macroscopic structural anatomy.</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">Bounded \([-1024, 3000]\). <strong>Iodine Shielding Trap:</strong> High-Z contrast (\(HU > 300\)) triggers photoelectric (\(Z^3\)) attenuation instead of Compton (\(Z/A\)). Software must rigorously enforce Non-contrast bounds to prevent AI mass hallucinations.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Forms a sharp Multimodal Gaussian Mixture Model bounded by 12-bit scanner limits.</span></div>
+            </div>
+            
+            <div class="var-card s2">
+                <div class="var-header">
+                    <span class="var-name">Target Mass</span>
+                    <span class="var-symbol">\(m(\mathbf{r})\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">The critical spatial denominator essential for converting total Deposited Energy (Joules) directly into specific Absorbed Dose (\(1 \text{ Gy} = 1 \text{ J/kg}\)).</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">Strictly \(> 0\). <strong>Air Void Singularity:</strong> Must rigorously clip \(\rho \ge 0.05 \text{ g/cm}^3\) to prevent catastrophic \(1/0\) NaN explosions during Neural Network backpropagation.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Spatially heterogeneous array creating immense dosimetric disparity evaluating low-mass lung targets (\(\approx 0.3\)) versus high-mass bone targets (\(\approx 1.9\)).</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stage3" class="panel panel-stage3">
+        <h2 class="panel-title" style="color: var(--bio-color);">🧫 Stage 3: Compartmental PK (Voxel-Wise Tumour Sink & Internalization)</h2>
+        
+        <div class="pathway">
+            <div class="path-node" style="border-color: #ef4444; color: #ef4444;">🩸 Blood Pool<br><small>\(A_{blood}\)</small></div>
+            <span class="arrow">⇌</span> 
+            <div class="path-node" style="border-color: var(--text-muted); color: var(--text-main);">💧 Interstitial<br><small>\(A_{free}\)</small></div>
+            <span class="arrow">⇌</span> 
+            <div class="path-node" style="border-color: var(--bio-color); color: var(--bio-color);">🛡️ Surface Binding<br><small>\(A_{surface}\)</small></div>
+            <span class="arrow">⇌</span> 
+            <div class="path-node" style="border-color: var(--physics-color); color: var(--physics-color);">♻️ Endosomal Recyc.<br><small>\(A_{endo}\)</small></div>
+            <span class="arrow">⟶</span> 
+            <div class="path-node" style="border-color: var(--ai-color); color: var(--ai-color);">💀 Lysosomal Deg.<br><small>\(A_{lyso}\)</small></div>
+        </div>
+        
+        <div class="math-box" style="text-align: left; padding-left: 40px;">
+            $$
+            \begin{aligned}
+            \frac{d \color{#10b981}{A_{surface}}}{dt} &= k_3 A_{free}\underbrace{\left(1 - \frac{M_{bound}}{B_{MAX}(\mathbf{r})}\right)}_{\substack{\color{#10b981}{\text{Saturable Tumour Sink}} \\ \color{#10b981}{\text{Michaelis-Menten Threshold}}}} + k_{recycle}\color{#0ea5e9}{A_{endo}} - (k_4 + k_5 + \lambda_{phys})\color{#10b981}{A_{surface}} \\[15pt]
+            \frac{d \color{#0ea5e9}{A_{endo}}}{dt} &= k_5 \color{#10b981}{A_{surface}} - (k_{recycle} + k_{deg} + \lambda_{phys})\color{#0ea5e9}{A_{endo}} \\[15pt]
+            \frac{d \color{#d946ef}{A_{lyso}}}{dt} &= k_{deg} \color{#0ea5e9}{A_{endo}} - \lambda_{phys}\color{#d946ef}{A_{lyso}} \\[15pt]
+            \frac{dTIA}{dt} &= A_{free} + \color{#10b981}{A_{surface}} + \color{#0ea5e9}{A_{endo}} + \color{#d946ef}{A_{lyso}} + v_b(\mathbf{r}) \cdot V_{voxel} \cdot \frac{A_{blood}}{V_{blood}}
+            \end{aligned}
+            $$
+        </div>
+
+        <div class="grid-cards">
+            <div class="var-card s3">
+                <div class="var-header">
+                    <span class="var-name">Surface Binding</span>
+                    <span class="var-symbol">\(A_{surface}(t)\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Activity actively and reversibly bound strictly to extracellular membrane PSMA targets awaiting clathrin-coated endocytosis.</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">\(\ge 0\). <strong>Thermodynamic Mass Conservation:</strong> If physical decay (\(\lambda_{phys}\)) and clearance (\(k_{10}\)) are forced to \(0\), mathematical ODE solvers MUST continuously conserve absolute total molar system mass infinitely.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Forms strict continuous multi-exponential Time-Activity Curve (TAC) transient peaks.</span></div>
+            </div>
+
+            <div class="var-card s3">
+                <div class="var-header">
+                    <span class="var-name">Receptor Saturation</span>
+                    <span class="var-symbol">\(B_{MAX}(\mathbf{r})\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Absolute local native threshold of available PSMA receptors directing the Tumour Sink Effect. Learned explicitly as an AI Neural Target.</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">Molarity \(M_{bound} \le B_{MAX}\). Fractional multiplier strictly mathematically clamped via <code>max(0.0, ...)</code> to actively prevent stiff temporal solvers from pushing cellular thermodynamic affinities into negative domains.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Log-Normal. <strong>Never a flat scalar.</strong> Generated continuously via 3D Perlin Noise algorithms to synthetically emulate highly chaotic biological expression.</span></div>
+            </div>
+            
+            <div class="var-card s3">
+                <div class="var-header">
+                    <span class="var-name">Time-Integ. Activity</span>
+                    <span class="var-symbol">\(TIA(\mathbf{r})\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Continuous robust Riemann integral array evaluating the total physical disintegrations generated natively inside the DifferentialEquations.jl solver.</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">Must strictly mathematically evaluate monotonically ascending over integration timelines (\(dTIA/dt \ge 0\)).</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Log-Normal spatial density limits aligning perfectly to ultimate voxel dose boundaries.</span></div>
+            </div>
+            
+            <div class="var-card s3">
+                <div class="var-header">
+                    <span class="var-name">Systemic Constants</span>
+                    <span class="var-symbol">\(\lambda_{phys}, k_{10}\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Immutable physical radioactive decay (\(\lambda_{phys} = 4.34 \times 10^{-3} \text{ h}^{-1}\)) and absolute renal clearance (\(k_{10}\)).</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">Excretion strictly scales dynamically against individual patient Glomerular Filtration Rate (eGFR) defined explicitly via blood lab results.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Blood pool circulation natively modeled extremely rapidly at 1 minute ($\lambda_{bc} \approx 41.58 \text{ h}^{-1}$) capturing early kinetic injection physics.</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stage4" class="panel panel-stage4">
+        <h2 class="panel-title" style="color: var(--ai-color);">🧠 Stage 4: SciML Radiation Transport & Directional Ray-Tracing</h2>
+        
+        <div class="math-box">
+            <span class="math-label">1. Homogeneous Transport Base & Neural Residual Corrector</span>
+            $$
+            \begin{aligned}
+            E_{base, total}(\mathbf{r}) &= TIA \ast \left( \overline{E}_{\beta} K_{\beta, lung} + \overline{E}_{\gamma} K_{\gamma, water} \right) \\[18pt]
+            D_{phys}(\mathbf{r}) &= \frac{E_{base, total}}{m(\mathbf{r})} \cdot \exp\left( \underbrace{\mathcal{N}_\theta(E_{base,total}, \ \rho, \ \nabla\rho, \ \vec{\Phi}_{ray})}_{\substack{\color{#d946ef}{\text{Neural Specific Absorbed Fraction Corrector}} \\ \color{#d946ef}{\text{Resolving Heterogeneous Tissue Attenuation}}}} \right)
+            \end{aligned}
+            $$
+        </div>
+
+        <div class="math-box" style="border-color: rgba(168, 85, 247, 0.4); background: rgba(0,0,0,0.6);">
+            <span class="math-label" style="color: var(--ai-sub-color);">2. Directional Vector Mathematics & Backscatter Geometry Trigger</span>
+            $$
+            \begin{aligned}
+            \text{Density Gradient: } \quad \nabla\rho(\mathbf{r}) &= \left\langle \frac{\partial \rho}{\partial x}, \frac{\partial \rho}{\partial y}, \frac{\partial \rho}{\partial z} \right\rangle \\[18pt]
+            \underbrace{\vec{\Phi}_{ray}(\mathbf{r})}_{\substack{\color{#a855f7}{\text{Incoming Radiation}} \\ \color{#a855f7}{\text{Vector Field}}}} &= \underbrace{\frac{1}{\int_V TIA \, dV}}_{\substack{\text{Activity} \\ \text{Normalization}}} \int_{V} \underbrace{\frac{TIA(\mathbf{r}')}{4\pi |\mathbf{r} - \mathbf{r}'|^2}}_{\text{Inverse Square Law}} \underbrace{\exp\left( -\int_{\mathbf{r}'}^{\mathbf{r}} \mu(\mathbf{l}) dl \right)}_{\text{Radiological Attenuation}} \underbrace{\frac{\mathbf{r} - \mathbf{r}'}{|\mathbf{r} - \mathbf{r}'|}}_{\substack{\text{Direction Unit} \\ \text{Vector } \mathbf{\hat{\Omega}}}} \, d^3\mathbf{r}' \\[18pt]
+            \text{Neural Boundary Trigger} &\propto \underbrace{\nabla\rho(\mathbf{r}) \cdot \vec{\Phi}_{ray}(\mathbf{r})}_{\substack{\color{#a855f7}{\text{Dot Product: Mathematically evaluates if incoming flux}} \\ \color{#a855f7}{\text{is colliding directly perpendicularly against a dense interface.}}}}
+            \end{aligned}
+            $$
+        </div>
+
+        <div class="grid-cards">
+            <div class="var-card s4">
+                <div class="var-header">
+                    <span class="var-name">Deposition Kernels</span>
+                    <span class="var-symbol">\(K_{\beta}, K_{\gamma}\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Dual high-fidelity 3D physical probability convolution matrices generating baseline geometric momentum strictly pre-computed via offline Monte Carlo tracking.</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">Integral over spatial domain rigorously sums to exactly \(1.0\). Secondary \(\gamma\)-sum fundamentally prevents profound remote organ geometry truncation inside low-density lung tissues mathematically.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Isotropic spherical probability fall-off tracking strict inverse-square (\(1/r^2\)) spatial limits.</span></div>
+            </div>
+
+            <div class="var-card s4">
+                <div class="var-header">
+                    <span class="var-name">Neural Network</span>
+                    <span class="var-symbol">\(\mathcal{N}_\theta\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Deep Learning SciML explicit mapping structure discovering heterogeneous scattering density boundaries and electron backscatter residual routes completely missed analytically.</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text"><strong>Energy Conservation Limit (\(\lambda_{EC}\)):</strong> The AI CANNOT arbitrarily alter bounds. Reverse-mode automatic differentiation penalty firmly ensures \(\iiint D_{phys} m \, dV \equiv \iiint E_{base} \, dV\) natively restricting it to strict geometric relocation physics.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Exponentially bounded roughly \([-0.69, 0.69]\), establishing a secure physical scalar multiplier \(\in [0.5, 2.0]\).</span></div>
+            </div>
+
+            <div class="var-card s4-dir">
+                <div class="var-header">
+                    <span class="var-name">Directional Vector Flux</span>
+                    <span class="var-symbol">\(\vec{\Phi}_{ray}(\mathbf{r})\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">First-Order Directional embeddings calculated explicitly via unscattered 3D Boltzmann ray-tracing geometry natively mapped away from the radioactive TIA source manifolds.</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text"><strong>Factorization Normalization:</strong> Must be divided by the integral total activity domain so the network evaluates pure <em>geometry</em> instead of massive activity amplitudes. Must preserve perfect 360-degree radial vector propagation symmetry without displaying latent Cartesian grid bias.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Multi-dimensional unscattered Cartesian vector mapping mathematically evaluated strictly in \(\mathbb{R}^3\).</span></div>
+            </div>
+
+            <div class="var-card s4-dir">
+                <div class="var-header">
+                    <span class="var-name">Boundary Interaction</span>
+                    <span class="var-symbol">\(\nabla\rho \cdot \vec{\Phi}_{ray}\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Mathematical Dot Product evaluated internally by the neural architecture. Defines the exact geometric relationship between local anatomical tissue density slopes (\(\nabla\rho\)) and the incoming radiation stream (\(\vec{\Phi}_{ray}\)).</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text"><strong>Backscatter Trigger:</strong> If the dot product is heavily negative, the radiation is structurally colliding perpendicularly with a dense boundary (e.g., Cortical bone), explicitly teaching the network to reverse energy flow (backscatter) into the softer tissue space.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Highly dynamic angular distribution bounded \([-1, 1]\) scaling the absolute magnitude of the local density gradient laplacian.</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stage5" class="panel panel-stage5">
+        <h2 class="panel-title" style="color: var(--radio-color);">☢️ Stage 5: Continuous Radiobiology (Lea-Catcheside LDR DSB)</h2>
+        
+        <div class="math-box">
+            $$
+            \frac{d DSB}{dt} = \underbrace{\epsilon(\mathbf{r}) \dot{D}(t)}_{\substack{\color{#ef4444}{\text{OER Modulated}} \\ \color{#ef4444}{\text{Lethal Damage Formation}}}} - \underbrace{\lambda_{repair} DSB(t)}_{\substack{\color{#ef4444}{\text{Continuous Sublethal}} \\ \color{#ef4444}{\text{Enzymatic Repair}}}}
+            $$
+        </div>
+
+        <div class="grid-cards">
+            <div class="var-card s5">
+                <div class="var-header">
+                    <span class="var-name">Double-Strand Brk</span>
+                    <span class="var-symbol">\(DSB(t)\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Continuous integration state variable natively calculating cumulative absolute lethal DNA structural damage without post-hoc BED limit approximations.</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">\(\ge 0\). <strong>Steady-State Equilibrium Trap:</strong> Handled against a flawlessly flat constant dose rate \(\dot{D}\), the tracking mathematical ODE MUST perfectly asymptote safely to precisely \(\epsilon\dot{D} / \lambda_{repair}\).</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Produces distinctly complex Asymmetric temporal Bell Curves (rising logarithmically sharply initially, structurally decaying completely into flat zero bounds trailing deeply across sequential weeks).</span></div>
+            </div>
+
+            <div class="var-card s5">
+                <div class="var-header">
+                    <span class="var-name">Radiosensitivity</span>
+                    <span class="var-symbol">\(\epsilon(\mathbf{r})\)</span>
+                </div>
+                <div class="badge-row"><span class="badge def">Definition</span> <span class="var-text">Cellular explicit spatial coefficient defining fundamental biological vulnerability scaling natively evaluating structural dose mappings. Explicitly captures Oxygen Enhancement Ratio (OER) effects.</span></div>
+                <div class="badge-row"><span class="badge constraint">Constraint</span> <span class="var-text">Strictly \(\epsilon > 0\). Deep synthetic data geometric pretraining mandates the array values inherently plummet perfectly 50-70% cleanly targeting the physical geometric center synthetically defining extreme radiation resistance boundaries inside anoxic necrotic tumour cores natively.</span></div>
+                <div class="badge-row"><span class="badge dist">Distribution</span> <span class="var-text">Log-Normal structural mapping trailing decay tracking radially spanning perfectly from oxygenated rim dimensions toward deep hypoxic centers.</span></div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+</body>
+</html>

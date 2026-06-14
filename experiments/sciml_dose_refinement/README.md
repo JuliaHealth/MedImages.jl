@@ -55,3 +55,11 @@ To evaluate all models and generate metrics:
 - `dosimetry/`: Utility scripts for dose processing.
 - `logs/`: SLURM and local execution logs.
 - `slurm/`: Job submission scripts for high-performance clusters.
+
+## Recent Physics Refinements
+
+Based on clinical physics review, the core `train_ude_no_approx.jl` was upgraded to strictly adhere to absolute mathematical modeling conventions for $^{177}$Lu-PSMA TRT:
+1. **Absolute Image Quantification**: Implemented exact scaling via parameterized Camera Calibration Factors (`CF`) and DICOM `Rescale Slope`.
+2. **Partial Volume Tracking**: Integrated explicit hooks for spatial Recovery Coefficients (`RC`). It is noted structurally that this primarily governs accurate tracking for per-ROI evaluation rather than per-voxel.
+3. **Parametrized Hardware Calibration**: The Hounsfield Unit conversion mapping (`hu_to_density`) was parameterized to support tailorable `slope_air` and `slope_tissue` coefficients mapped individually for specific clinical CT hardware configurations.
+4. **Spatial Density Gradients ($\nabla \rho$)**: The `build_no_approx_model` neural architecture was expanded from two to **three parallel input branches**. The instantaneous physical density gradient ($\nabla \rho$) is analytically computed via 3D finite differences in the data-pipe and fed continuously to the neural residual $\mathcal{N}_\theta$. This enables mathematically constrained learning of heterogeneous Compton scattering at organ boundaries.

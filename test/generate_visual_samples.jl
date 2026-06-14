@@ -128,6 +128,19 @@ function main()
     create_nii_from_medimage(res_img[1], joinpath(OUTPUT_DIR, "resample_to_img_1"))
     create_nii_from_medimage(res_img[2], joinpath(OUTPUT_DIR, "resample_to_img_2"))
 
+    # 9. Fused Affine (Combined Scale, Rotation, Translation)
+    println("Applying Fused Affine (Combined Rotate + Scale + Translate)...")
+    # Note: create_affine_matrix combines T * R * Sh * S
+    mat_fused = create_affine_matrix(
+        rotation=(0.0, 0.0, 30.0), 
+        scale=(0.8, 0.8, 0.8), 
+        translation=(5.0, -2.0, 0.0)
+    )
+    batch_fused = affine_transform_mi(batch, mat_fused, Linear_en)
+    res_fused = unbatch_medimage(batch_fused)
+    create_nii_from_medimage(res_fused[1], joinpath(OUTPUT_DIR, "fused_transform_1"))
+    create_nii_from_medimage(res_fused[2], joinpath(OUTPUT_DIR, "fused_transform_2"))
+
     println("Done! Check $OUTPUT_DIR for results.")
 end
 

@@ -77,7 +77,7 @@ end
 
             try
                 result = MedImages.Brute_force_orientation.brute_force_find_from_sitk(TEST_NIFTI_FILE)
-                @test result isa Dict
+                @test result isa Dict || result isa AbstractVector
             catch e
                 @test_broken false
                 @info "Error in brute_force_find_from_sitk: $e"

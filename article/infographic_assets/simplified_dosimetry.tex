@@ -1,0 +1,216 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cite}
+\usepackage{booktabs}
+\usepackage{tabularx}
+
+\geometry{a4paper, margin=1in}
+
+% Code listing style for Julia
+\lstdefinelanguage{Julia}%
+  {morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
+      end,export,false,for,function,immutable,import,importall,if,in,%
+      macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
+      using,while},%
+   sensitive=true,%
+   alsoother={$},%
+   morecomment=[l]\#,%
+   morecomment=[n]{\#=}{=\#},%
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+}[keywords,comments,strings]%
+
+\lstset{%
+    language         = Julia,
+    basicstyle       = \ttfamily\small,
+    keywordstyle     = \bfseries\color{blue},
+    stringstyle      = \color{magenta},
+    commentstyle     = \color{green!50!black},
+    showstringspaces = false,
+    numbers          = none,
+    numberstyle      = \tiny\color{gray},
+    stepnumber       = 1,
+    numbersep        = 10pt,
+    tabsize          = 4,
+    showspaces       = false,
+    showtabs         = false,
+    frame            = single,
+    rulecolor        = \color{black!30},
+    backgroundcolor  = \color{gray!5},
+    breaklines       = true
+}
+
+\title{\textbf{Simplified Universal Differential Equations for $^{177}$Lu-PSMA Therapy Dosimetry}}
+\author{Scientific Machine Learning (SciML) Implementation Guide}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Targeted radiopharmaceutical therapy (TRT) using $^{177}$Lu-PSMA requires patient-specific voxel-level dosimetry. This paper presents a simplified programmatic framework using \texttt{DifferentialEquations.jl} and the SciML ecosystem to formulate a Universal Differential Equation (UDE). While still leveraging neural networks to learn unknown biological and physical corrections, this implementation intentionally employs older, classical simplifying assumptions—such as linear pharmacokinetics, uniform water-equivalent tissue density, and single-kernel convolution—to drastically reduce mathematical and computational complexity.
+\end{abstract}
+
+\section{Introduction}
+Scientific Machine Learning (SciML) offers a path to bridge the gap between fast analytical models and slow Monte Carlo (MC) simulations by combining \textbf{Universal Differential Equations (UDEs)} with patient-specific imaging data \cite{KennedyLugassi2020}. By shifting complex unknown physics to a data-driven neural network ($\mathcal{N}_\theta$), the baseline mechanistic differential equations can be vastly simplified to rely on standard historical approximations.
+
+\section{Learning Objectives: Simplified Physics vs. Data-Driven Discovery}
+
+The UDE framework partitions the dosimetry problem into \textit{Mechanistic Knowns} (using classical approximations) and \textit{Learned Uncertainties}.
+
+\subsection{Simplified Compartmental Pharmacokinetics (PK)}
+\textbf{What is Known (Simplified Constraints):}
+\begin{itemize}
+    \item \textbf{Radiological Constants:} Physical decay constant $\lambda_{phys} = 4.34 \times 10^{-3} \text{ h}^{-1}$.
+    \item \textbf{Linear Mass Balance:} We assume a basic mono-compartmental tissue model. Tracers exchange between the blood pool and tissues based on strictly constant uptake ($k_{in}$) and washout ($k_{out}$) rates. Complex mechanisms like cell-surface binding and endosomal internalization are lumped into a single generic tissue state.
+    \item \textbf{Standard Excretion:} Blood clearance ($k_{10}$) is applied uniformly, sidestepping patient-specific Glomerular Filtration Rate (GFR) scaling.
+    \item \textbf{Direct Activity Calibration:} SPECT imaging counts are assumed to be globally calibrated to absolute activity without dynamic application of spatial Recovery Coefficients (RC) to natively resolve Partial Volume Effects.
+\end{itemize}
+
+\textbf{What needs to be Learned (Neural Targets):}
+\begin{itemize}
+    \item \textbf{Kinetic Drift:} Since the linear assumption naturally misses "Tumour Sink" receptor saturation and non-linear retention dynamics, a neural network corrector $\mathcal{N}_{PK}$ is embedded within the ODE to learn these complex cycle-dependent physiological behaviors directly from data.
+\end{itemize}
+
+\subsection{Simplified Radiation Transport and Scattering}
+\textbf{What is Known (Simplified Constraints):}
+\begin{itemize}
+    \item \textbf{Water-Equivalence ($\rho = 1.0$):} We assume standard water density globally ($\rho = 1.0 \text{ g/cm}^3$). This bypasses the complex requirement to map CT Hounsfield Units (HU) to specific voxel mass, mathematically treating the entire patient volume as a homogeneous medium.
+    \item \textbf{Single Dose Voxel Kernel ($K_{water}$):} Instead of explicitly separating beta traversals and gamma broad-range photon projection, overall energy deposition is calculated via a single isotropic convolution matrix. The base energy deposition is governed by: $\dot{E}_{base} = \tilde{A} \ast K_{water}$.
+\end{itemize}
+
+\textbf{What needs to be Learned (Neural Targets):}
+\begin{itemize}
+    \item \textbf{Spatial Heterogeneity Residuals:} Because the baseline convolution inherently miscalculates radiation transport in disparate physical matrices like lung or bone, a spatial neural network ($\mathcal{N}_{dose}$) evaluates the baseline dose map to apply localized multiplicative corrections, effectively attempting to learn the dosimetric shifts natively resolved by true multi-density transport.
+\end{itemize}
+
+\section{Simplified UDE Model Architecture}
+
+\subsection{The Governing System of Equations}
+\textbf{1. PK Sub-system (Single Tissue Compartment UDE):}
+\begin{align}
+    \frac{dA_{blood}}{dt} &= -(k_{10} + k_{in} + \lambda_{phys}) A_{blood} + k_{out} A_{tissue} \\
+    \frac{dA_{tissue}}{dt} &= k_{in} A_{blood} - (k_{out} + \lambda_{phys}) A_{tissue} + \mathcal{N}_{PK}(A_{tissue}, \theta_{PK})
+\end{align}
+
+\textbf{2. Transport Sub-system (Time-Integrated Activity and Dose):}
+The continuous ODE directly integrates a macroscopic Time-Integrated Activity (TIA) loop:
+\begin{equation}
+    \frac{dTIA}{dt} = A_{tissue}
+\end{equation}
+
+The static TIA map ($\tilde{A}$) is convolved with the single homogeneous kernel to yield the baseline dose. The spatial neural network ($\mathcal{N}_{dose}$) processes this baseline scalar array to generate a specific absorbed fraction multiplier:
+\begin{equation}
+    D_{phys}(\mathbf{r}) = E_{base}(\mathbf{r}) \cdot \exp \Big(\mathcal{N}_{dose} \big(E_{base}(\mathbf{r}), \theta_{dose}\big)\Big)
+\end{equation}
+
+\textbf{3. Classical BED Approximation:}
+We abandon the continuous Markovian Sublethal Damage tracing and dynamic repopulation penalties for a standard, steady-state Biologically Effective Dose (BED) approach:
+\begin{equation}
+    \text{BED}(\mathbf{r}) \approx D_{phys}(\mathbf{r}) \cdot \left[ 1 + \frac{D_{phys}(\mathbf{r})}{\alpha/\beta} \cdot \frac{T_{1/2, repair}}{T_{1/2, eff} + T_{1/2, repair}} \right]
+\end{equation}
+
+\section{Variable Provenance and Data Sources}
+
+To successfully initialize and evaluate the UDE framework, input parameters must be correctly aggregated from known physics, biological literature, imaging data, and DICOM metadata. Table \ref{tab:variables} explicitly details the origin and extraction method for every constant and variable in this simplified model.
+
+\begin{table}[h!]
+\centering
+\caption{Data Provenance for Variables and Constants in the Simplified UDE Model.}
+\label{tab:variables}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{@{}l l p{0.22\linewidth} X@{}}
+\toprule
+\textbf{Variable / Constant} & \textbf{Symbol} & \textbf{Category / Source} & \textbf{Derivation \& Extraction Method} \\ \midrule
+
+\multicolumn{4}{c}{\textbf{1. Known Physical Quantities}} \\ \midrule
+Physical Decay Constant & $\lambda_{phys}$ & Known Physics & Extracted from standard nuclear decay tables (e.g., NNDC). For $^{177}$Lu, exactly $4.34 \times 10^{-3} \text{ h}^{-1}$. \\
+Dose Point Kernel & $K_{water}$ & Known Physics & Pre-computed 3D probability matrix generated via external Monte Carlo simulations (e.g., Geant4) tracking decays in a homogeneous water medium. \\ \midrule
+
+\multicolumn{4}{c}{\textbf{2. Imaging Data \& DICOM Metadata}} \\ \midrule
+Tissue Activity & $A_{tissue}(\mathbf{r},t)$ & Derived from SPECT & Reconstructed 3D voxel array extracted directly from quantitative SPECT emission scans. \\
+Blood-Pool Activity & $A_{blood}(t)$ & Derived from SPECT & Extracted from SPECT by drawing a volumetric Region of Interest (ROI) over the left ventricle/aorta, or via physical multi-timepoint venous blood sampling. \\
+Absolute Calibration & $CF$, Rescale & Derived from DICOM & Extracted directly from SPECT DICOM headers: \texttt{(0028,1053)} Rescale Slope and \texttt{(0028,1052)} Rescale Intercept. Verified by \texttt{(0054,1001)} Units (e.g., Bq/mL). \\
+Voxel Volume & $V_{voxel}$ & Derived from DICOM & Calculated geometrically via \texttt{(0028,0030)} Pixel Spacing ($X \times Y$) and \texttt{(0018,0050)} Slice Thickness ($Z$). \\
+Anatomical Masking & ROIs / $\mathbf{r}$ & Derived from CT & Unenhanced CT spatial arrays are utilized to structurally draw Regions of Interest (ROIs) for segmenting tumors and bounding anatomy. \\
+Tissue Mass Density$^*$ & $\rho(\mathbf{r})$ & Derived from CT & Natively derived by mapping CT Hounsfield Units (HU) to mass density. \textit{(*Note: Globally forced to $1.0 \text{ g/cm}^3$ in this simplified model).} \\ \midrule
+
+\multicolumn{4}{c}{\textbf{3. Biological \& Clinical Parameters}} \\ \midrule
+Clearance Rate & $k_{10}$ & Biological Literature & Standardized systemic clearance assumption derived from baseline population averages. \\
+Base Exchange Rates & $k_{in}, k_{out}$ & Biological Literature & Baseline linear values extracted from historical population-averaged compartmental modeling studies for $^{177}$Lu-PSMA. \\
+Radiobiology Constants & $\alpha/\beta$, $T_{1/2, repair}$ & Biological Literature & Tissue-specific radiosensitivity and DNA sublethal damage repair rates derived from in-vitro assays and clinical literature. \\ \midrule
+
+\multicolumn{4}{c}{\textbf{4. SciML and Derived Mathematical Parameters}} \\ \midrule
+Time-Integrated Activity & $TIA$ ($\tilde{A}$) & Derived Math & Continuous numerical integration (Area Under the Curve) of $A_{tissue}(t)$ by the ODE solver. \\
+Base Energy Map & $E_{base}(\mathbf{r})$ & Derived Math & Fast Fourier Transform (FFT) spatial convolution of the static $TIA$ array and the $K_{water}$ point kernel. \\
+Kinetic Neural Weights & $\theta_{PK}$ & SciML (Learned) & Optimized dynamically by the UDE via reverse-mode automatic differentiation against longitudinal data to mathematically correct linear PK assumptions. \\
+Spatial Neural Weights & $\theta_{dose}$ & SciML (Learned) & Learned weights of the spatial network $\mathcal{N}_{dose}$ that map the simplified base scalar dose to an absorbed fraction multiplier to pseudo-correct for ignored physical densities. \\ \bottomrule
+\end{tabularx}
+\end{table}
+
+\section{SciML Implementation Details}
+
+\begin{lstlisting}[language=Julia]
+function simplified_dosimetry_ude!(du, u, p, t)
+    # 1. State Recovery (using @views to avoid unrolled ODE heap allocations)
+    A_blood = u[1]
+    A_tissue = @view u[2:N+1]
+    
+    # 2. Linear PK Layer Mechanics
+    blood_flow_in = sum(p.k_in .* A_blood)
+    blood_flow_out = sum(p.k_out .* A_tissue)
+    
+    # 3. UDE Embedding: Neural network evaluates current state for non-linear kinetic corrections
+    nn_drift = p.N_PK(A_tissue, p.theta_PK)
+    
+    # 4. Core ODEs
+    du[1] = -(p.k10 + sum(p.k_in) + p.lambda_phys) * A_blood + blood_flow_out
+    @. du[2:N+1]  = (p.k_in * A_blood) - (p.k_out * A_tissue) - (p.lambda_phys * A_tissue) + nn_drift
+    
+    # 5. Time-Integrated Activity (TIA) Accumulation
+    @. du[N+2:2N+1] = A_tissue
+end
+
+# POST-INTEGRATION SPATIAL DOSE CALCULATION
+final_TIA = sol.u[end][N+2:2N+1]
+
+# Single Kernel Convolution assuming water-equivalence
+E_base = compute_base_convolution(final_TIA, p.K_water)
+
+# The NN receives the scalar base energy to generate a multiplicative offset
+nn_correction = compute_spatial_corrector(E_base, p.theta_dose)
+
+# Multiply base energy by the learned network modifier (exponential mathematically bounds > 0)
+D_phys = E_base .* exp.(nn_correction)
+\end{lstlisting}
+
+\section{Limitations and Simplifying Assumptions}
+
+To formulate this computationally lightweight framework and offload structural geometry strictly to the optimization matrices, several critical physical and biological mechanics native to $^{177}$Lu-PSMA therapy were intentionally excluded. Domain experts must interpret these baseline results within the strict boundaries of the following assumed limitations:
+
+\begin{enumerate}
+    \item \textbf{Homogeneous Water-Equivalence:} The model completely omits explicit anatomical CT Hounsfield Unit (HU) mass-density conversions. By incorrectly assuming the entire voxel grid exists at standard water density ($\rho = 1.0 \text{ g/cm}^3$), the formulation natively miscalculates true physical target mass normalizations ($1 \text{ Gy} = 1 \text{ J/kg}$). This explicitly forces massive mass overestimations (and thus severe underdosing) in the lungs ($\rho \approx 0.3 \text{ g/cm}^3$), and underestimations in cortical bone ($\rho \approx 1.9 \text{ g/cm}^3$).
+    \item \textbf{Single Aggregated Dose Kernel:} The model operates using a solitary standard water-equivalent dose point kernel. It completely discards the explicit dual-kernel tracking natively required to decouple the short-range therapeutic $\beta^-$ cascades ($\approx 1.8 - 6.0 \text{ mm}$) from distant deep-tissue organ cross-fire originating from the secondary 113/208 keV gamma photons ($\sim 10-15\%$ total output).
+    \item \textbf{Linear Pharmacokinetics (No Saturable Sinks):} True biological maximum receptor capacities ($B_{MAX}$) were structurally omitted. By forcing linear, non-saturable exchange bounds via constants, the analytical portion of the ODE is completely mathematically blind to the "Tumour Sink Effect".
+    \item \textbf{Lumped Compartmental Sub-States:} Distinct physiological tracer states were universally aggregated into a single mono-compartment. This entirely ignores the true mathematical disparity between reversible surface-bound competitive states ($A_{surface}$) and deeply shielded, irreversibly endocytosed clathrin-coated traps ($A_{internal}$).
+    \item \textbf{Isotropic Scattering Blindness:} By removing First-Order Directional Vector Flux fields ($\vec{\Phi}_{ray}$) and localized continuous anatomical density boundary gradients ($\nabla \rho$) from the neural network input parameters, $\mathcal{N}_{dose}$ strictly assesses localized scalar magnitude. Natively, it cannot mathematically conceptualize or track asymmetrical geometric radiation backscatter spawned by abrupt tissue-to-air boundaries.
+    \item \textbf{Static Radiobiology Limits:} We discarded individual dynamic voxel post-hoc $T_{treat}(\mathbf{r})$ scaling arrays for BED calculations. Evaluating exclusively on generic, protracted standard decay steady-states heavily miscalculates absolute tumor repopulation penalties in fast-clearing lesion regions.
+    \item \textbf{No Contrast Shielding Protections:} Because CT density gradients were dropped, the model explicitly removes the structural checkpoints necessary to identify and quarantine high-$Z$ Intravenous Iodine Contrast hallucinations via severe photoelectric scaling ($Z^3$).
+    \item \textbf{Idealized Matrix Calibrations:} System-specific DICOM tag calibration factors ($CF$), explicit blood-pool cross-fire limits ($v_b$), and structure-specific Partial Volume Recovery Coefficients ($RC$) were removed, forcing the framework to falsely operate under the pretense of perfectly scaled, artifact-free baseline quantitative arrays.
+\end{enumerate}
+
+\section{Conclusion}
+By offloading virtually all complex anatomical and biological heterogeneities directly to the universal neural correctors ($\mathcal{N}_{PK}$ and $\mathcal{N}_{dose}$), and strictly adopting historical linear and water-equivalent baseline states, this framework serves as a streamlined, fast-executing foundation for applying Scientific Machine Learning in targeted radiopharmaceutical modeling. 
+
+\bibliographystyle{unsrt}
+\bibliography{bibl}
+
+\end{document}

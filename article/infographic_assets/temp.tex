@@ -1,0 +1,371 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[top=0.85in,left=2.75in,footskip=0.75in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{changepage}
+\usepackage[utf8x]{inputenc}
+\usepackage{textcomp,marvosym}
+\usepackage{cite}
+\usepackage{nameref,hyperref}
+\usepackage[right]{lineno}
+\usepackage{microtype}
+%\DisableLigatures[f]{encoding = *, family = * }
+\usepackage[table]{xcolor}
+\usepackage{array}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+% Note: This template is based on PLOS Computational Biology requirements.
+% It assumes you have the plos2015.bst file for bibliography if you use \bibliographystyle{plos2015}.
+% If not, use \bibliographystyle{unsrt} or similar.
+
+\linenumbers
+
+\title{MedImages.jl: A High-Performance, Differentiable Julia Framework for Medical Image Processing and Metadata Preservation}
+
+\author{Jakub Mitura$^{1*}$, Divyansh Goyal$^{1}$,  Michael C. Kreissl $^{1}$, Joanna Wybranska$^{1}$}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\noindent
+$^{1}$ Division of Nuclear Medicine, Department of Radiology \& Nuclear Medicine, Faculty of Medicine, Otto von Guericke University Magdeburg, 39120 Magdeburg, Germany \\
+$^{*}$ Corresponding author: jakub.mitura@med.ovgu.de \\
+Full Postal Address: Leipziger Str. 44, 39120 Magdeburg, Germany \\
+Telephone: 00493916713000
+
+\section*{Abstract}
+\textbf{Background and Objectives:} Quantitative medical imaging, particularly in Nuclear Medicine, requires software that ensures both high-throughput computational performance and strict spatial metadata integrity. Existing frameworks often face a "two-language" bottleneck, bridging high-level APIs with compiled backends, which complicates automatic differentiation (AD) and can lead to metadata drift during preprocessing. We introduce MedImages.jl, a native Julia ecosystem for 3D/4D medical image analysis.
+
+\textbf{Methods:} MedImages.jl implements a typed data structure that intrinsically binds voxel data to spatial metadata (origin, spacing, direction). Core geometric transformations are implemented as native, differentiable Julia kernels compatible with GPU acceleration (KernelAbstractions.jl) and SciML AD engines (Zygote.jl). The framework integrates HDF5 for high-throughput I/O and supports batched multimodality operations.
+
+\textbf{Results:} In a 100-subject PET/CT preprocessing benchmark, MedImages.jl demonstrated a 7.2$\times$ total turnaround speedup compared to standard Python-based caching pipelines. GPU-accelerated spatial transformations achieved up to 135$\times$ speedups over established single-threaded C++ baselines like SimpleITK. We validated end-to-end differentiability through a spatial transformer network and multi-organ affine registration, and confirmed that Standardized Uptake Value (SUV) calculations match established clinical tools to double-precision accuracy.
+
+\textbf{Conclusions:} MedImages.jl provides a performant, fully differentiable environment for medical image processing. By unifying spatial operations and metadata management within a single language, it facilitates large-scale clinical research and physics-informed deep learning without compromising clinical validity.
+
+\textbf{Keywords:} Medical Imaging, Julia, Scientific Machine Learning, Nuclear Medicine, Differentiable Programming, Spatial Metadata
+
+\section{Introduction}
+
+The development of MedImages.jl is driven by the need to address four converging challenges in contemporary medical imaging pipelines, particularly within Nuclear Medicine workflows that rely heavily on functional data (e.g., PET, SPECT) and anatomical references (CT, MRI).
+
+\paragraph{Challenge 1: The Volume of Modern Biobank Datasets.}
+A single whole-body PET/CT examination involves high-resolution 3D volumes that must be co-registered, resampled, and quantitatively normalized. At biobank scale---encompassing thousands of subjects---preprocessing these massive volumetric datasets becomes a dominant bottleneck. In traditional hybrid environments (SimpleITK \cite{LowekampChen2013}, MONAI \cite{CardosoLi2022}), I/O overhead and metadata synchronization account for a significant portion of processing time, leading to substantial delays in multimodal dataset preparation \cite{Dexl_2025}.
+
+\paragraph{Challenge 2: Execution Speed and the "Two-Language" Barrier.}
+Researchers often prototype in high-level languages like Python but must rely on compiled C++ backends for execution speed. This "two-language problem" complicates deployment and limits code inspectability. Julia \cite{BezansonChen2018} addresses this by compiling directly to efficient machine code via LLVM JIT, allowing spatial transformations to be executed rapidly across both CPU and GPU backends using native implementations rather than wrapped binaries.
+
+\paragraph{Challenge 3: Differentiability and the Fragmented SciML Landscape.}
+Emerging Scientific Machine Learning (SciML) paradigms require pipelines where every computational step is differentiable. While Python offers powerful differentiable libraries (e.g., PyTorch, JAX, TensorFlow), they often function as "walled gardens." Composing a pipeline requires forcing the entire ecosystem to commit to a single framework, creating friction when integrating third-party tools or classical numerical solvers \cite{PalBhattacharya2024, EschleGl2023}. Julia addresses this structural fragmentation by solving the "expression problem" through multiple dispatch, allowing native code across different packages to seamlessly interoperate \cite{RoeschGreener2023}. Because Julia's automatic differentiation engines (e.g., Zygote.jl \cite{Fischer_2019}, Enzyme.jl) operate at the compiler level, they can differentiate through arbitrary code, including complex differential equation solvers and GPU kernels, without requiring users to rewrite logic into a specific tensor framework. MedImages.jl introduces a critical tool to make this unique, highly composable SciML ecosystem widely accessible to medical imaging researchers.
+
+\paragraph{Challenge 4: Metadata Management and Physical Interpretation.}
+Unlike standard computer vision, medical images possess a strict "physical interpretation." A medical image is a grid of points occupying a physical region defined by an origin, spacing, and direction. The transition from medical image formats (DICOM, NIfTI) to raw numerical arrays for deep learning often strips this spatial context. This risks "metadata drift"—a potentially dangerous misalignment between voxel data and its spatial coordinates during preprocessing or augmentation.
+
+MedImages.jl provides a unified, GPU-accelerated, and differentiable imaging framework designed explicitly to address these four challenges. The structure of this paper, including the methodology and results, is organized around validating solutions to these core axes.
+
+\subsection{Architectural Foundations: The Coordinate System and Metadata}
+Addressing Challenge 4 (Metadata Management) requires ensuring that data remains defined within a physical coordinate system. To accurately integrate functional data with anatomical data across different spatial resolutions, software must rigorously maintain the mapping between discrete voxel indices and physical patient space. This mapping from voxel coordinates $\mathbf{v} = [i, j, k, 1]^\top$ to continuous world coordinates $\mathbf{p} = [x, y, z, 1]^\top$ relies on a $4 \times 4$ homogeneous affine transformation matrix $M$:
+\begin{equation}
+\mathbf{p} = M \mathbf{v}, \quad M = 
+\begin{bmatrix} 
+R S & T \\
+\mathbf{0} & 1
+\end{bmatrix}
+\end{equation}
+where $R$ is the $3 \times 3$ rotation matrix, $S$ is a diagonal scaling matrix (voxel spacing), and $T$ is the translation vector (origin). MedImages.jl ensures that any spatial operation $\mathcal{T}$ applied to the voxel grid is mathematically coupled with an update $M_{new} = M_{old} \times M_{\mathcal{T}}$, preventing spatial desynchronization.
+
+Furthermore, quantitative nuclear medicine relies on precise temporal and clinical metadata. The Standardized Uptake Value (SUV), a critical metric for PET/CT, is calculated as:
+\begin{equation}
+SUV = \frac{C(t)}{ID / BW}
+\end{equation}
+where $C(t)$ is the decay-corrected radioactive concentration, $ID$ is the injected dose, and $BW$ is patient body weight. Discarding parameters such as \textit{Acquisition Time} or \textit{Patient Weight} compromises the quantitative utility of the image. MedImages.jl intrinsically protects these fields within its data structures.
+
+\section{Methods}
+
+\subsection*{Software Architecture}
+MedImages.jl implements a metadata paradigm inspired by the Brain Imaging Data Structure (BIDS) standard, organizing and validating clinical metadata rigorously. The core \texttt{MedImage} struct enforces metadata integrity through Julia's type system. Unlike array-based deep learning workflows where converting to tensors discards spatial context, MedImages.jl intrinsically binds metadata (origin, spacing, direction, patient ID, acquisition timestamp) to the structural definition of the medical image.
+
+ITK (C++) is used via wrapper primarily for I/O robustness (NIfTI, DICOM parsing), while spatial transformations are implemented natively in Julia. This ensures: (1) \textbf{Differentiability}—operations integrate with Zygote.jl/Enzyme.jl; (2) \textbf{Composability}—seamless integration with Lux.jl and DifferentialEquations.jl.
+
+To support high-throughput analysis of multimodal studies, MedImages.jl introduces \texttt{BatchedMedImage}, which stores 4D voxel data $(x, y, z, \text{batch})$. Crucially, the spatial metadata (origin, spacing, direction) is vectorized. This design allows each 3D slice within the batch to maintain unique spatial properties while residing in a unified 4D tensor, facilitating efficient batched operations where identical geometric transformations can be dispatched to the GPU in a single pass. To minimize I/O bottlenecks for large datasets, the framework supports HDF5-based storage.
+
+\subsubsection*{Code Example: Typical Workflow}
+The following snippet demonstrates loading a multimodal pair, rotating them simultaneously using the batched structure, and computing the SUV:
+
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+using MedImages
+
+# Load PET and CT (DICOM metadata is preserved)
+pet = load_image("patient_1/pet.dcm")
+ct = load_image("patient_1/ct.nii")
+
+# Create a batched tensor to process simultaneously
+batch = create_batched_medimage([pet, ct])
+
+# Rotate both volumes by 45 degrees around Z-axis (GPU supported)
+rotated_batch = rotate_mi(batch, 45.0)
+
+# Extract SUV statistics for the PET scan using an ROI mask
+suv_stats = calculate_suv_statistics(rotated_batch[1], roi_mask)
+println("Mean SUV: ", suv_stats.mean_suv)
+\end{lstlisting}
+
+\subsection*{Functionalities and I/O Robustness}
+MedImages.jl provides a comprehensive set of functionalities optimized for 3D medical image processing:
+\begin{itemize}
+    \item \textbf{Robust I/O:} Loading of various medical image formats (NIfTI, DICOM) using \texttt{ITKIOWrapper}.
+    \item \textbf{Native Julia Transformations:} Functions to modify spatial properties of 3D volumes (\texttt{rotate\_mi}, \texttt{translate\_mi}, \texttt{scale\_mi}, \texttt{resample\_to\_spacing}, \texttt{crop\_mi}, \texttt{pad\_mi}).
+    \item \textbf{Resample to Target:} Resamples a moving image to match the spatial geometry of a reference image.
+    \item \textbf{GPU Acceleration:} All transformations transparently support GPU execution via KernelAbstractions.jl.
+    \item \textbf{HDF5 Support:} Fast loading and saving of 3D images using HDF5, speeding up I/O for intermediate processing and reducing the "loading penalty" common in deep learning pipelines.
+    \item \textbf{Autodifferentiation:} All spatial transformations have well-defined gradients via Zygote.jl and Enzyme.jl.
+    \item \textbf{Orientation Management:} Robust tools to handle and convert between neuroimaging coordinate systems.
+\end{itemize}
+
+\subsection*{Experimental Setup: Evaluating the Four Challenges}
+To systematically evaluate the framework against the four core challenges, several experimental pipelines were designed. To ensure transparency in our evaluation methodology, we summarize the specific datasets and image volumes utilized across the experimental series and the final dosimetry application in Table~\ref{tab:dataset_mapping}.
+
+\begin{table}[H]
+\centering
+\caption{Mapping of datasets to specific experiments and clinical evaluations.}
+\label{tab:dataset_mapping}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|p{0.30\textwidth}|p{0.25\textwidth}|p{0.35\textwidth}|}
+\hline
+\textbf{Experiment / Series} & \textbf{Data Type} & \textbf{Scope / Sample Size} \\
+\hline
+Scalability Benchmark & Clinical PET/CT & 100 cases from autoPET dataset \cite{Dexl_2025} \\
+\hline
+Execution Speed & Clinical 3D Volume & Single volume ($256 \times 256 \times 128$) \\
+\hline
+SUV / Consistency & Clinical Lu-177 SPECT & 10 cases (Full transformation pipeline) \\
+\hline
+Differentiability & Synthetic Phantom & 3D structural line grid ($16^3$ voxels) \\
+\hline
+Learned Rotation & Synthetic Batch & 120 configurations (100 train / 20 test) \\
+\hline
+Dosimetry: UDE & Clinical Cohort & 43 Training / 7 Validation patients \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection*{Evaluating Volume and Speed}
+For large-scale studies requiring standardized preprocessing of heterogeneous medical volumes, we developed a fused affine preprocessing pipeline that collapses multiple spatial transformations---orientation normalization, spacing resampling, and spatial centering---into a single $4 \times 4$ affine matrix. This matrix is precomputed on the CPU from spatial metadata, then applied via a custom KernelAbstractions.jl kernel with unrolled trilinear interpolation on the GPU.
+
+To evaluate the framework under high-throughput production loads (Challenge 1: Volume), we benchmarked a 100-case preprocessing pipeline on the autoPET dataset \cite{Dexl_2025} against MONAI's \texttt{PersistentDataset} mechanism. A 100-case dataset was selected to represent a typical multimodality workflow bottleneck: physically disparate modalities (PET and CT) must be loaded and strictly aligned to a common spatial reference frame---meaning they share the identical voxel spacing, direction cosines, and origin---so they can be safely concatenated into a single multi-channel tensor for deep learning ingestion. 
+
+To assess raw execution speed (Challenge 2: Speed), we benchmarked isolated transformations across multiple scales. SimpleITK benchmarks were executed strictly on the CPU, as it does not natively support GPU acceleration for these geometric filters. Conversely, MedImages.jl and MONAI benchmarks utilized GPU execution to demonstrate the high throughput enabled by natively fused kernels. All experiments described are open-source and reproducible via the codebase provided in this repository.
+
+\subsubsection*{Evaluating Differentiability (SciML Integrations)}
+To validate end-to-end differentiability (Challenge 3), we implemented three paradigms:
+\begin{enumerate}
+    \item \textbf{Learned Inverse Rotation (Differentiable Geometric CNN):} A neural network learns to predict and invert unknown 3D rotations applied to volumetric data. To avoid confusion with modern attention-based architectures, we clarify that this uses a standard 3D Convolutional Neural Network (CNN) as a spatial regressor. The CNN predicts three Euler angles, which are converted to an affine matrix to generate a differentiable sampling grid for MedImages.jl's \texttt{interpolate\_pure} function. 
+    \item \textbf{Organ-Specific Affine Registration:} A 3D CNN predicts per-organ affine parameters. The loss computation is a single GPU kernel fusing affine transformation, a barycenter distance penalty, and trilinear interpolation loss, differentiated via \texttt{Enzyme.autodiff}.
+    \item \textbf{Quantitative Dosimetry Refinement via Universal Differential Equations:} A pipeline designed to correct approximate 3D SPECT reconstructions into high-accuracy, patient-specific dose maps. By embedding neural residual networks within a mechanistic differential equation \cite{Berman_2024}, this approach aims to emulate the accuracy of full Monte Carlo (MC) tracking while maintaining the interpretability essential for medical practice.
+\end{enumerate}
+
+The clinical imperative for high-accuracy dosimetry has never been more acute as radiation oncology transitions toward personalized interventions like Targeted Radionuclide Therapy (TRT) and Transarterial Radioembolization (TARE). Historically, dosimetry relied on simplified Medical Internal Radiation Dose (MIRD) formalisms that assumed uniform activity distribution within source organs. While standard clinical methods have transitioned to voxel-based S-values and convolution kernels, they often assume a homogeneous medium, leading to significant errors at tissue interfaces or highly heterogeneous regions (e.g., lungs). While Monte Carlo techniques solve this by tracking stochastic particle interactions, their massive computational burden restricts their clinical utility.
+
+To address this, our pipeline models dose deposition as a parameterized dynamical system. We utilized a cohort of 50 patient studies, partitioned into a \textbf{Training Set (43 patients)} and an independent \textbf{Validation / Hold-out Set (7 patients)}. Unlike purely data-driven networks that act as "black boxes," UDEs explicitly satisfy the need for interpretability by treating dose refinement over integration steps as an Initial Value Problem (IVP):
+\begin{equation}
+\frac{dD}{dt} = f_{\text{mechanistic}}(S, C, D) + \text{NN}(S, C, D; \theta)
+\end{equation}
+Here, $S$ is the measured SPECT activity, $C$ is the CT-derived tissue density, and $D$ is the cumulative dose. The $f_{\text{mechanistic}}$ term provides a strong inductive bias by hard-coding well-understood primary physical laws—specifically, local energy deposition modeled as proportional to activity and local tissue density. This constraint ensures data efficiency and safety, as the model produces physically plausible results even in regions poorly represented in training data. 
+
+The neural residual network, $\text{NN}_{\theta}$, is the "universal" component embedded directly within the differential equation to learn the highly complex, non-local scattering phenomena (e.g., Compton and Rayleigh scattering) and secondary emissions (e.g., Bremsstrahlung) that cause energy to be deposited at a distance from the source activity. By training against high-fidelity MC ground truths, the network learns to approximate the residual difference between the simple mechanistic physics model and the true dose distribution. To ensure strict differentiability across the entire 5D tensor without encountering Zygote.jl array mutability tracking limitations, this IVP is solved using a custom, out-of-place manual 5-step Euler integration loop rather than standard \texttt{SciMLSensitivity} adjoints.
+
+
+\section{Results}
+To demonstrate that MedImages.jl resolves the core computational and metadata challenges, our results are structured along the axes defined in the Introduction.
+
+\subsection*{Challenge 1: Volume -- Scaling to 100 Cases (HDF5 vs. Caching)}
+To evaluate the framework under high-throughput loads, we benchmarked a 100-case preprocessing pipeline on the autoPET dataset. The core computational task was a multi-modal alignment pipeline, resampling highly heterogeneous PET and CT volumes to a standardized $512 \times 512 \times 512$ isotropic grid. 
+
+In clinical practice, "alignment" implies mathematically mapping the voxel grid of a functional image (e.g., PET, which often has lower resolution and varying spatial origins) to the exact coordinate space of an anatomical reference image (e.g., CT). This requires generating a continuous interpolation grid based on the source metadata (origin, spacing, and direction cosine matrix) and resampling the raw voxel intensities. This alignment is the foundational prerequisite for modern multimodality analysis; Convolutional Neural Networks (CNNs) require multi-channel tensors where pixel $(i,j,k)$ in the PET channel corresponds to the exact same physical tissue location as pixel $(i,j,k)$ in the CT channel. Due to the massive scale of 3D modalities, this continuous spatial resampling is often the dominant bottleneck in deep learning pipelines.
+
+For a fair comparison of computational overhead in this high-volume scenario, we evaluated performance for high-frequency training loops (Epochs 2+), assuming data has been initially processed and cached. We compared MedImages.jl utilizing HDF5 against MONAI's \texttt{PersistentDataset} mechanism. It should be noted that this compares different data persistence strategies—HDF5 vs. Pickle/Pt-based caching—as much as the underlying framework performance.
+
+\begin{table}[H]
+\centering
+\caption{Definitive Performance Comparison (100 Subjects, Epochs 2+)}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Phase (per Subject)} & \textbf{MedImages (HDF5)} & \textbf{MONAI (PersistentDataset)} & \textbf{Speedup} \\
+\hline
+Stage 1: Load from Cache & \textbf{~40 ms} & ~150 ms & 3.7$\times$ \\
+Stage 2: Transform (Compute) & \textbf{~50 ms} & ~500 ms & 10.0$\times$ \\
+\hline
+\textbf{Total Turnaround} & \textbf{~90 ms} & \textbf{~650 ms} & \textbf{7.2$\times$} \\
+\hline
+\end{tabular}
+\label{tab:scaling_comparison}
+\end{table}
+
+Overall, MedImages.jl achieved a 7.2$\times$ total turnaround speedup compared to the MONAI PersistentDataset baseline.
+
+\subsection*{Challenge 2: Speed -- GPU Acceleration Benchmarks}
+MedImages.jl was benchmarked on CPU and GPU backends (NVIDIA RTX 3090, Intel Core Ultra 9 285K). For $256 \times 256 \times 128$ volumes, MedImages.jl on GPU achieved significant speedups compared to SimpleITK on CPU:
+\begin{itemize}
+    \item \textbf{Resampling (Nearest Neighbor):} 115$\times$ speedup vs CPU, 17$\times$ vs SimpleITK.
+    \item \textbf{Orientation Changes:} 71$\times$ speedup vs CPU, 31$\times$ vs SimpleITK.
+    \item \textbf{Fused Affine Transformation:} 135$\times$ speedup vs CPU, 8.1$\times$ vs SimpleITK.
+\end{itemize}
+
+Regarding the Fused Affine Pipeline defined in the methods, benchmarking on 100 subjects resampled to a $512^3$ target grid demonstrated per-subject GPU kernel times of under 200\,ms, confirming the pipeline's suitability for biobank-scale processing.
+
+\subsection*{Challenge 3: Differentiability and SciML Validation}
+The Julia ecosystem is uniquely positioned for SciML because its automatic differentiation frameworks (Zygote.jl, Enzyme.jl) can differentiate through arbitrary native code, including custom spatial transformations. Nuclear medicine imaging is inherently quantitative, but its key readouts (e.g., SUV, time–activity curves, absorbed dose) are highly sensitive to geometric preprocessing such as resampling, rotation, and registration. In practice, these operations must often be integrated into AI pipelines for motion correction, longitudinal alignment, and learned preprocessing, where transform parameters are optimized jointly with network weights. However, many commonly used imaging backends execute spatial resampling outside the automatic differentiation graph, preventing end-to-end training through geometric steps \cite{Berman_2024}. To demonstrate that MedImages.jl enables fully differentiable volumetric spatial operations suitable for nuclear medicine workflows, we implement several SciML validation tests.
+
+\subsubsection*{Differentiability Verification Tests}
+To rigorously validate correctness, we verified that Zygote.jl returns non-trivial, structurally correct gradients across all spatial transforms. For identity-preserving operations (\texttt{translate\_mi}, \texttt{pad\_mi}), the gradient propagates as $\mathbf{1}$ without corruption. For spatially selective operations (\texttt{crop\_mi}), the gradient is $1$ inside the cropped region and $0$ outside. For the fused affine interpolation kernel, we validated CPU/GPU gradient consistency to within $10^{-4}$.
+
+\subsubsection*{Learned Spatial Transformations}
+In the Learned Inverse Rotation experiment, end-to-end differentiability of the geometric pipeline was confirmed using synthetic single-case batched configurations. Over 20 training epochs, the CNN successfully optimized the predicted Euler angles, consistently reducing the mean squared reconstruction error (MSE) between the de-rotated output and the original target by over 65\%. This demonstrates that differentiable augmentation and dynamic learned preprocessing---which are often difficult or rare in standardized imaging pipelines \cite{Shi_2023}---can be seamlessly achieved using native Julia operations.
+
+Similarly, the Organ-Specific Affine Registration pipeline converged using the custom fused GPU loss kernel. The ability of Enzyme.jl to compute exact reverse-mode gradients through the highly branched KernelAbstractions.jl code validated that complex spatial regularizations can be trained natively on the GPU without hand-writing CUDA adjoints.
+
+\subsubsection*{Quantitative Dosimetry Refinement Performance}
+The UDE-based dosimetry refinement pipeline successfully corrected approximate SPECT reconstructions into high-accuracy equivalents. The Universal Differential Equation model achieved steady convergence, reaching an MSE of $4.14 \times 10^{-4}$. 
+
+Crucially, the interpretability of the UDE approach is profound: it successfully isolates the known mechanistic physics (primary deposition) from the unknown statistical noise (complex scattering). This allows clinical physicists to independently verify the contribution of the mechanistic term, ensuring that primary dose components adhere to established standard models. Simultaneously, the neural residual robustly corrects secondary scattering artifacts rather than hallucinating primary energy distributions. 
+
+This level of precision is paramount in therapeutic nuclear medicine, where ablative doses are delivered to tumor tissue (e.g., Hepatocellular Carcinoma via Yttrium-90 microspheres) while attempting to spare healthy organs. Standard dose kernels fail to account for the heterogeneous density of tissue interfaces and "leakage" across boundaries. By learning these non-local interactions from MC data, the UDE framework generates a more accurate spatial representation of the dose distribution. This enables clinicians to confidently rely on critical volumetric coverage metrics, such as Dose-Volume Histograms (DVHs) to calculate D95 (minimum dose covering 95\% of the target volume) and D70, predicting pathological response rates accurately without the prohibitive computational costs of full Monte Carlo execution.
+
+\subsection*{Challenge 4: Metadata Management and Clinical Fidelity}
+We verified the quantitative accuracy of MedImages.jl by comparing its Standardized Uptake Value (SUV) calculations against the gold standard SimpleITK. Due to Julia's high-precision handling of temporal and clinical metadata, MedImages.jl achieves identical results for SUVbw (Body Weight) calculations, matching SimpleITK's output up to $10^{-14}$ in double precision. This ensures that the massive speedups achieved through GPU acceleration do not compromise clinical validity, a fact verifiable through the open-source benchmarks in this repository.
+
+Furthermore, we conducted an end-to-end consistency experiment on a cohort of 10 clinical subjects to verify that metadata preservation and quantitative fidelity are maintained throughout complex spatial transformation pipelines. For each patient, automated liver masks were generated using \textit{TotalSegmentator} as spatial references. The evaluation involved a multi-modal sequence consisting of (1) converting PET intensities to SUV, (2) resampling the functional data to the native CT target space to ensure baseline alignment, (3) changing the spacing to a 2.0\,mm isotropic grid, (4) applying a 45-degree rotation around the Z-axis, and (5) applying a 10-voxel translation along the X-axis. For the segmentation masks, nearest-neighbor interpolation was strictly applied to prevent boundary blurring, while linear interpolation was utilized for the continuous intensities.
+
+Quantitative analysis across the 10-patient cohort demonstrated exceptional consistency. The Mean SUV deviation was only \textbf{0.17\%} (range: 0.00\%--0.40\%) and the gross liver volume deviation was \textbf{0.10\%} (range: 0.01\%--0.28\%). These minor deviations are fundamentally attributable to discrete grid resampling and interpolation artifacts rather than underlying metadata deterioration. Figure \ref{fig:suv_consistency} visually illustrates the multi-modal alignment for a representative case.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/transformation_consistency.png}
+    \caption{\textbf{Quantitative Consistency Under Compounded Spatial Transformations (Sagittal Views).}
+    The four-panel composite shows sagittal slices of a representative subject before and after a sequence of spatial transformations (isotropic 2.0\,mm resampling, 45\textdegree{} Z-rotation, X-translation). MedImages.jl preserves spatial alignment and clinical metadata throughout, with Mean SUV and volume varying by $<0.2\%$ on average across the 10-patient cohort.}
+    \label{fig:suv_consistency}
+\end{figure}
+
+\subsubsection*{Illustrative Example: Multi-Modal Batched Processing in Theranostics}
+
+Theranostic radioligand therapy workflows integrate longitudinal patient imaging acquired at different time points, on different devices and reconstruction pipelines---e.g., [$^{177}$Lu]Lu-PSMA SPECT with and without attenuation correction (AC/NAC), voxel-wise absorbed dose maps, and CT---where each modality retains its own voxel grid, datatype, and spatial metadata (spacing, origin, orientation).  
+
+To demonstrate the capability of \texttt{BatchedMedImage} in handling complex, multi-modal datasets typical for theranostics workflows, we processed a dataset of four typical examinations, each containing a distinct imaging modality:
+\begin{enumerate}
+    \item [$^{177}$Lu]Lu-PSMA SPECT with attenuation correction (AC)
+    \item [$^{177}$Lu]Lu-PSMA SPECT without attenuation correction (NAC)
+    \item [$^{177}$Lu]Lu-PSMA Dosemap (voxel-wise absorbed dose)
+    \item Computed Tomography (CT) for anatomical reference
+\end{enumerate}
+
+The images were loaded into a single \texttt{BatchedMedImage} object, preserving their individual spatial metadata and voxel types. A batched rotation transformation was then applied simultaneously to all four modalities. Figure \ref{fig:batched_rotation} illustrates the results, showcasing the original axial slices (left) and the rotated output (right). 
+
+The ability to apply identical geometric transformations across functional (SPECT, Dosemap) and anatomical (CT) data in a single operation ensures perfect spatial alignment is maintained during augmentation or registration tasks, which is critical for accurate dosimetry and treatment planning.
+
+% \begin{figure}[H]
+%    \centering
+%    \begin{minipage}{0.48\textwidth}
+%        \centering
+%        \includegraphics[width=\linewidth]{figures/orig.png}
+%        \caption*{A: Original}
+%    \end{minipage}
+%    \hfill
+%    \begin{minipage}{0.48\textwidth}
+%        \centering
+%        \includegraphics[width=\linewidth]{figures/rot.png}
+%        \caption*{B: Rotated}
+%    \end{minipage}
+%    \caption{\textbf{Simultaneous Batched Rotation of Multi-Modal Theranostic Data.} 
+%    Panel A displays the original axial slices of four distinct modalities stored within a single \texttt{BatchedMedImage} structure: (Top-Left) [$^{177}$Lu]Lu-PSMA SPECT AC, (Top-Right) [$^{177}$Lu]Lu-PSMA SPECT NAC, (Bottom-Left) [$^{177}$Lu]Lu-PSMA Dosemap, and (Bottom-Right) CT. 
+%    Panel B shows the result after applying a single \texttt{rotate\_mi} operation to the batch. The spatial integrity and alignment between the functional distribution (SPECT/Dose) and anatomical structure (CT) are preserved during the transformation.}
+%    \label{fig:batched_rotation}
+% \end{figure}
+
+
+\section{Discussion}
+As biomedical imaging increasingly embraces complex multimodal, multidimensional, and longitudinal studies, alongside scientific machine learning (SciML), the interoperability and performance of data management frameworks become critical. Our results indicate that MedImages.jl’s metadata handling paradigm, combined with seamless integration into the Julia scientific ecosystem, provides a highly performant and differentiable framework that systematically addresses the three core challenges outlined in the Introduction.  
+
+\subsection*{Addressing Challenges 1 and 2 (Volume and Speed): The Advantage of Native Fused Kernels}
+Integration of metadata within the \texttt{MedImage} structure directly translates into performance gains observed in our benchmarks. The 7.2$\times$ turnaround advantage observed in high-frequency training loops is primarily attributed to MedImages.jl's integration with HDF5 -- which bypasses the serialization costs inherent in many Python caching mechanisms -- and its single-pass Fused Affine kernel. By mathematically collapsing the entire spatial transformation stack (normalization, resampling, centering, etc.) into a single CUDA execution, MedImages.jl eliminates the memory traffic and synchronization overhead associated with sequential operation queues, providing a highly efficient solution for biobank-scale deployments.
+
+\subsection*{Addressing Challenge 2 (Metadata Management): Comparing Metadata Architectures}
+Modern Python frameworks like MONAI \cite{CardosoLi2022} have introduced sophisticated mechanisms to couple metadata with image arrays. MONAI utilizes a MetaTensor structure, appending a metadata dictionary to the PyTorch Tensor. A similar design pattern appears in TorchIO \cite{perezgarcia2021torchio}, which prioritizes convenient multimodal coordination but still builds its core processing around external imaging backends. TorchIO approaches the problem through a hierarchical Subject class system. Although effective for multi-modal synchronization, TorchIO is primarily a manager of third-party backends  like SimpleITK or NiBabel \cite{perezgarcia2021torchio} This the dependency chain maintains a layer of indirection that can lead to memory management issues in large-scale training \cite{perezgarcia2021torchio}.
+
+In contrast, MedImages.jl leverages Julia's type system to bind metadata directly within the \texttt{MedImage} struct. As summarized in Table \ref{tab:metadata_comparison}, by removing the runtime overhead associated with dictionary-based metadata access, this approach contributes to the improved performance observed in our benchmarks. Furthermore, the native implementation of core geometric transformations in Julia enables MedImages.jl to maintain the automatic differentiation graph across processing steps. This is particularly relevant for imaging workflows that incorporate scientific machine learning, where gradient information may be lost when operations are passed to non-differentiable compiled backends \cite{perezgarcia2021torchio} 
+
+\begin{table}[H]
+\centering
+\caption{Comparative Metadata Architectures in Modern Frameworks}
+\begin{tabular}{|p{2.5cm}|p{3.5cm}|p{3.5cm}|p{3.5cm}|}
+\hline
+\textbf{Framework} & \textbf{Metadata Storage Mechanism} & \textbf{Preservation Strategy} & \textbf{Potential Interoperability Constraints} \\
+\hline
+SimpleITK & Internal C++ Struct & Encapsulated in \texttt{itk::Image} & User-dependent retention (often discarded upon conversion to NumPy). \\
+\hline
+MONAI & MetaTensor (Dict-based) & Metadata dictionary moves with tensor & Dictionary lookup overhead; potential orientation flip during ITK interoperability. \\
+\hline
+TorchIO & Subject Class Attributes & Multi-modal synchronization & Potential memory buildup during extensive transformation histories. \\
+\hline
+MedImages.jl & Typed Julia Struct & Explicit binding within struct & N/A (Native Julia stack). \\
+\hline
+\end{tabular}
+\label{tab:metadata_comparison}
+\end{table}
+
+\subsection*{The Primacy of Clinical and Temporal Metadata}
+The lack of standardization in medical imaging preprocessing pipelines can pose a reproducibility challenge \cite{Esteban_2018}. In such settings, metadata drift, defined as the decoupling of spatial or clinical metadata from voxel data, may introduce clinically relevant errors. For example, it can lead to displacement of treatment margins in radiotherapy or compromise quantitative interpretation in PET/CT when decay-related timing information is lost \cite{LowekampChen2013}. Quantitative nuclear medicine is particularly dependent on the integrity of clinical and temporal metadata, as standardized uptake value (SUV) calculations explicitly require accurate injection and acquisition times. In theranostic workflows, this requirement must be maintained while applying identical geometric transformations across multiple co-registered modalities, such as [$^{177}$Lu]Lu-PSMA SPECT AC/NAC, absorbed-dose maps, and CT.
+
+MedImages.jl addresses this by design: the \texttt{BatchedMedImage} abstraction allows single-call, batched geometric transforms to be applied consistently across modalities without manual bookkeeping. Our cross-platform validation confirms that the SUV conversion factors extracted by MedImages.jl achieve mathematical identity with established SimpleITK benchmarks to a precision of $10^{-14}$. This numerical equivalence ensures that researchers transitioning to Julia can maintain absolute continuity with legacy clinical findings while gaining the performance required for massive biobank-scale analysis.
+
+\subsection*{Addressing Challenge 3 (Differentiability): Navigating the Framework Ecosystem}
+We do not advocate replacing established tools wholesale. Rather, we recommend choosing the framework that best matches the task at hand, especially when differentiability and complex scientific computing are core requirements.
+
+\paragraph{When established Python frameworks remain the pragmatic choice.}
+For teams with substantial legacy Python codebases, switching frameworks carries non-trivial migration costs. MONAI provides a mature library of ready-made components---pretrained segmentation networks, standardized data-loading pipelines, and extensive augmentation transforms---that can be deployed with minimal custom code. Similarly, SimpleITK offers a comprehensive catalogue of classical filters whose correctness has been validated across decades. When the research question can be answered with an existing pipeline and the primary requirement is rapid prototyping within a specific tensor framework (like PyTorch), these tools remain highly efficient.
+
+\paragraph{When MedImages.jl offers a clear advantage for SciML.}
+The Julia-based approach becomes compelling when research transcends standard convolutional network training and enters the realm of physics-informed models or custom numerical workflows \cite{RoeschGreener2023}:
+\begin{itemize}
+    \item \textbf{Unifying the Fractured SciML Landscape.} In Python, moving a differentiable model from PyTorch to a JAX-based differential equation solver often requires significant code rewriting or bridging overhead. Julia's multiple dispatch solves the expression problem, meaning essentially all packages are interoperable natively \cite{PalBhattacharya2024, EschleGl2023}. MedImages.jl serves as the critical entry point to make this uniquely unified SciML ecosystem accessible for medical imaging.
+    \item \textbf{Novel algorithm development.} When researchers need to implement a new spatial transformation, loss function, or physics-informed model from scratch, Julia's single-language stack eliminates the need to write C++/CUDA extensions. The algorithm can be prototyped, debugged, and GPU-accelerated within the same language, with full automatic differentiation support.
+    \item \textbf{Cross-domain scientific computing.} Julia's ecosystem uniquely bridges medical imaging with adjacent scientific domains---DifferentialEquations.jl for pharmacokinetic modelling, KomaMRI.jl \cite{CastilloPassiCoronado2023} for MRI pulse-sequence simulation, Flux.jl/Lux.jl \cite{pal2023lux} for deep learning---all within a single runtime. This composability enables workflows that would otherwise require fragile inter-process communication between Python, MATLAB, and C++ components.
+    \item \textbf{Differentiable imaging physics.} Tasks such as learned registration, differentiable augmentation, or physics-informed neural networks require gradients to flow through spatial transformations. MedImages.jl's native Julia kernels integrate directly with Zygote.jl and Enzyme.jl, whereas MONAI and TorchIO must fall back on non-differentiable C++ backends for many geometric operations.
+\end{itemize}
+
+
+MedImages.jl offers a path forward---a future where imaging physics is integrated directly into the deep learning pipeline, where hardware acceleration is transparent and ubiquitous, and where the metadata that defines our physical world is preserved with the same rigor as the pixel values themselves. By bridging the divide between the physics of acquisition and the logic of inference, and by addressing the entwined challenges of \textbf{Volume} and \textbf{Speed} with a 7.2$\times$ faster turnaround than traditional caching frameworks \cite{Shi_2023}, MedImages.jl empowers researchers and clinicians to unlock the full potential of medical imaging as a precise, quantitative science. This performance is especially critical for large-scale multi-center studies and meta-analyses, where the ability to process thousands of subjects with absolute metadata integrity enables research that was previously computationally infeasible.
+
+
+\subsection*{Limitations}
+While MedImages.jl offers significant advantages in execution speed and differentiability, adopting the Julia ecosystem presents certain trade-offs. The most notable is the "time-to-first-plot" or compilation latency. Because Julia uses Just-In-Time compilation, the first execution of a complex spatial transformation incurs a compilation penalty, making initial startup slower than equivalent interpreted Python code. Furthermore, running full test suites or deploying models with heavy dependencies (e.g., CUDA.jl, Lux.jl, Zygote.jl) requires significant development memory, occasionally causing out-of-memory (OOM) issues on constrained hardware. Finally, while the Julia machine learning ecosystem is growing rapidly, it does not yet match the sheer volume of pre-trained models and plug-and-play architectural components available in the PyTorch/MONAI ecosystem.
+
+\section{Conclusions}
+The development of MedImages.jl addresses core computational and metadata challenges in modern medical imaging. By leveraging Julia's compilation architecture and type system, the library provides a unified framework where physical accuracy, computational performance, and end-to-end differentiability are achieved simultaneously. The native implementation of spatial transformations allows for transparent integration with SciML pipelines, offering a robust foundation for the next generation of physics-informed models in molecular imaging and quantitative theranostics.
+In practice, we envision a complementary workflow: established MONAI/SimpleITK pipelines for routine clinical deployment, and MedImages.jl for research frontiers where performance, differentiability, or algorithmic novelty are the primary requirements.
+
+\section*{Availability and Future Directions}
+MedImages.jl is open-source and available at \url{https://github.com/JuliaHealth/MedImages.jl}. All experiments described in this paper, including performance benchmarks and differentiability validations, are reproducible via the scripts provided in the repository's \texttt{experiment} directory.
+
+Future work will focus on:
+\begin{enumerate}
+    \item Integrating with advanced reconstruction frameworks (KomaMRI.jl \cite{CastilloPassiCoronado2023}, GIRFReco.jl \cite{JaffrayWu2024}) for end-to-end physics-informed learning.
+    \item Implementing differentiable registration algorithms leveraging Zygote.jl.
+    \item Expanding support for standardized formats like DICOM-SEG via Highdicom \cite{BridgeGorman2022} integration.
+    \item Developing architectural foundations for clinical-grade AI agents (e.g., VoxelPrompt) capable of multi-modal "Medical Superintelligence" benchmarks where absolute metadata integrity is a prerequisite for safe automated diagnostics.
+\end{enumerate}
+
+\section*{Declarations}
+\textbf{Ethics approval and consent to participate:} This research relies solely on retrospective analysis of fully anonymized, publicly available datasets. No new human subjects data was collected. Therefore, formal ethics committee approval and informed consent were not required. \\
+\textbf{Declaration of competing interests:} The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. \\
+\textbf{Funding sources:} This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors. \\
+\textbf{Declaration of generative AI and AI-assisted technologies:} During the preparation of this work, the author(s) used generative AI and AI-assisted technologies for improving style and assisting in code development. After using these tools, the authors reviewed and edited the content as needed and take full responsibility for the content of the published article.
+
+\bibliographystyle{elsarticle-num}
+\bibliography{bibl}
+
+\end{document}
