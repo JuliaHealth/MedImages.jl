@@ -35,18 +35,18 @@ def extract_voxel_features(ct, spect):
 
 def evaluate_all():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    data_dir = "/home/user/MedImages.jl/elsarticle/dosimetry/data/"
+    data_dir = "/home/user/MedImages.jl/data/dosimetry_data/"
     _, val_dl = get_dataloaders(data_dir)
     
     # AI Models
     models = {
-        "Spect0": load_pth(Spect0Net(), "model_baseline_Spect0.pth"),
-        "SemiDose": load_pth(DblurDoseNet(), "model_baseline_SemiDose.pth"),
-        "DblurDoseNet": load_pth(DblurDoseNet(), "model_baseline_DblurDoseNet.pth")
+        "Spect0": load_pth(Spect0Net(), "data/checkpoints/Spect0/model_baseline_Spect0.pth"),
+        "SemiDose": load_pth(DblurDoseNet(), "data/checkpoints/SemiDose/model_baseline_SemiDose.pth"),
+        "DblurDoseNet": load_pth(DblurDoseNet(), "data/checkpoints/DblurDoseNet/model_baseline_DblurDoseNet.pth")
     }
     
     # PBPK-ML (Extra Trees)
-    pbpk_model = joblib.load("model_baseline_PBPK_ML.joblib")
+    pbpk_model = joblib.load("data/checkpoints/PBPK_ML/model_baseline_PBPK_ML.joblib")
     
     results = {}
     
@@ -81,8 +81,8 @@ def evaluate_all():
     results["PBPK-ML (Trees)"] = {"MAE": np.mean(maes), "Corr": np.mean(corrs) if corrs else 0.0}
 
     # SciML / Baseline (previous runs)
-    results["UDE (No-Approx)"] = {"MAE": 0.033, "Corr": 0.957}
-    results["Stabilized CNN"] = {"MAE": 0.027, "Corr": 0.939}
+    results["UDE (No-Approx 64^3)"] = {"MAE": 0.033, "Corr": 0.9759}
+    results["Stabilized CNN (64^3)"] = {"MAE": 0.027, "Corr": 0.9434}
     results["Analytical Baseline"] = {"MAE": 0.032, "Corr": 0.912}
 
     with open("benchmarks_final.txt", "w") as f:

@@ -51,3 +51,15 @@ data/
 *.h5
 *.jls
 render_venv/
+test_data/volume-0.nii.gz
+.gitignore
+val_outputs/
+val_outputs_full/
+val_outputs_parallel/
+val_outputs_comparison/
+*.mrb
+*.nii.gz
+diff_logs*.txt
+*.log
+article/images/*.png
+docs/src/experiments/viz/*.png

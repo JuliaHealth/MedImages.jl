@@ -80,11 +80,11 @@ Compute a 3x3 rotation matrix for a given axis and angle, adjusted for image dir
 function Rodrigues_rotation_matrix(direction::NTuple{9,Float64}, axis::Int, angle::Float64)::Matrix{Float64}
   img_direction = direction
   axis_angle = if axis == 3
-    (img_direction[9], img_direction[6], img_direction[3])
+    (img_direction[3], img_direction[6], img_direction[9])
   elseif axis == 2
-    (img_direction[8], img_direction[5], img_direction[2])
+    (img_direction[2], img_direction[5], img_direction[8])
   elseif axis == 1
-    (img_direction[7], img_direction[4], img_direction[1])
+    (img_direction[1], img_direction[4], img_direction[7])
 
   end
 
@@ -150,8 +150,8 @@ function rotate_mi(image::MedImage, axis::Int, angle::Float64, Interpolator::Int
       error("rotate_mi with crop=false is not fully supported currently")
   end
 
-  # Compute rotation matrix in physical space
-  R_phys = Rodrigues_rotation_matrix(image, axis, angle)
+  # Compute rotation matrix in physical space (invert angle to match SimpleITK)
+  R_phys = Rodrigues_rotation_matrix(image, axis, -angle)
   
   # Compute Index-to-Physical matrix M
   M_mat = computeIndexToPhysicalPointMatrices_Julia(image)
@@ -426,8 +426,8 @@ function rotate_mi(image::BatchedMedImage, axis::Int, angle::Union{Float64, Abst
         current_direction = image.direction[b]
         current_spacing = image.spacing[b]
         
-        # Physical rotation matrix
-        R_phys = Rodrigues_rotation_matrix(current_direction, axis, current_angle)
+        # Physical rotation matrix (invert angle to match SimpleITK and single-image version)
+        R_phys = Rodrigues_rotation_matrix(current_direction, axis, -current_angle)
         
         # Index-to-Physical matrix M = D * S
         D = reshape(collect(current_direction), 3, 3)

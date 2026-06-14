@@ -1,0 +1,472 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cite}
+\usepackage{booktabs}
+\usepackage{tabularx}
+
+\geometry{a4paper, margin=1in}
+
+% Code listing style for Julia
+\lstdefinelanguage{Julia}%
+  {morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
+      end,export,false,for,function,immutable,import,importall,if,in,%
+      macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
+      using,while},%
+   sensitive=true,%
+   alsoother={$},%
+   morecomment=[l]\#,%
+   morecomment=[n]{\#=}{=\#},%
+   morestring=[s]{"}{"},%
+   morestring=[m]{'}{'},%
+}[keywords,comments,strings]%
+
+\lstset{%
+    language         = Julia,
+    basicstyle       = \ttfamily\small,
+    keywordstyle     = \bfseries\color{blue},
+    stringstyle      = \color{magenta},
+    commentstyle     = \color{green!50!black},
+    showstringspaces = false,
+    numbers          = none,
+    numberstyle      = \tiny\color{gray},
+    stepnumber       = 1,
+    numbersep        = 10pt,
+    tabsize          = 4,
+    showspaces       = false,
+    showtabs         = false,
+    frame            = single,
+    rulecolor        = \color{black!30},
+    backgroundcolor  = \color{gray!5},
+    breaklines       = true
+}
+
+\title{\textbf{Learning High-Fidelity Monte Carlo Dosimetry from SPECT/CT using Universal Differential Equations for $^{177}$Lu-PSMA Therapy}}
+\author{Scientific Machine Learning (SciML) Implementation Guide}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Targeted radiopharmaceutical therapy (TRT) using $^{177}$Lu-PSMA requires highly accurate, patient-specific voxel-level dosimetry. This paper presents a exhaustive programmatic framework using \texttt{DifferentialEquations.jl} and the SciML ecosystem to formulate a Universal Differential Equation (UDE). By embedding a neural network corrector within the radiation transport equations, we rapidly learn the complex transformation from homogeneous kernel convolutions to high-fidelity MC dosemaps. This implementation explicitly incorporates all established physical, biological, and imaging variables for $^{177}$Lu-PSMA, including system-specific calibration, saturable receptor kinetics, and biphasic clearance.
+\end{abstract}
+
+\section{Introduction}
+Scientific Machine Learning (SciML) offers a path to bridge the gap between fast but inaccurate analytical models and slow gold-standard Monte Carlo (MC) simulations by combining \textbf{Universal Differential Equations (UDEs)} with patient-specific anatomical (CT) and functional (SPECT) data \cite{KennedyLugassi2020}.
+
+\section{Learning Objectives: Known Physics vs. Data-Driven Discovery}
+
+The UDE framework partitions the dosimetry problem into \textit{Mechanistic Knowns} and \textit{Learned Uncertainties}.
+
+\subsection{Compartmental Pharmacokinetics (PK)}
+\textbf{What is Known (Mechanistic Constraints):}
+\begin{itemize}
+    \item \textbf{Radiological Constants:} Physical decay constant $\lambda_{phys} = 4.34 \times 10^{-3} \text{ h}^{-1}$ and mean energy per decay $\bar{E}_i$ \cite{ReschFouladgar2023, StabinMadsen2019}.
+    \item \textbf{Conservation of Mass:} Mass-balance equations for tracer movement between the central blood compartment and tissue voxels. For $^{177}$Lu-PSMA, the \textbf{blood circulation rate} $\lambda_{bc}$ is defined as $\ln(2)/1 \text{ min} \approx 41.58 \text{ h}^{-1}$, representing a circulation half-life of 1 minute to model the rapid initial organ uptake post-injection \cite{HardiansyahYousefzadehNowshahr2024}.
+    \item \textbf{Renal Clearance Scaling:} Excretion rate $k_{10}$ scales with individual Glomerular Filtration Rate (GFR) \cite{HardiansyahYousefzadehNowshahr2024}.
+    \item \textbf{Imaging Corrections:} Initial activity scaling via the \textbf{Camera Calibration Factor} ($CF$) and resolution recovery via \textbf{Recovery Coefficients} ($RC$). $CF$ is derived from DICOM tags \texttt{(0054,1001)} (Units, e.g., Bq/ml or counts/s/MBq) and quantified using \texttt{(0028,1053)} (Rescale Slope) and \texttt{(0028,1052)} (Rescale Intercept) to convert raw counts to activity \cite{GleisnerChouin2022}. $RC$ values are applied as structure-specific look-up tables based on object size (e.g., from NEMA phantom measurements) to correct for Partial Volume Effects (PVE) \cite{KlettingSchimmel2015}.
+\end{itemize}
+
+\textbf{What needs to be Learned (Neural Targets):}
+\begin{itemize}
+    \item \textbf{Voxel-Wise $B_{MAX}$:} Local receptor saturation thresholds defining the \textit{Tumour Sink Effect} \cite{BegumThieme2018}.
+    \item \textbf{Kinetic Drift:} Cycle-dependent shifts in uptake rates ($k_{in}, k_{out}$) due to tumour regression \cite{OkamotoThieme2016, SiebingaVeen2024}.
+\end{itemize}
+
+\subsection{Radiation Transport and Scattering}
+\textbf{What is Known (Mechanistic Constraints):}
+\begin{itemize}
+    \item \textbf{Base Physics:} \textbf{Energy Deposition Kernels} (Dual $K_{\beta, lung}$ and $K_{\gamma, water}$) and \textbf{Hounsfield Unit (HU) to mass density} ($\rho$) conversion \cite{GtzSchmidkonz2019}.
+    \item \textbf{Energy Deposition Kernel ($K_{base}$):} To ensure maximum physical geometry tracking for $1.8 \text{ mm}$ to $6.0 \text{ mm}$ beta traversal, $K_{\beta, lung}$ is a dimensionless 3D probability matrix calculated via Monte Carlo simulations in a lung-equivalent medium ($\rho \approx 0.3 \text{ g/cm}^3$). If purely water gradients are used natively, the base geometry completely truncates any radiation calculation in lower-density lung tissues ($0 \cdot \exp = 0$). Furthermore, to accurately capture distant organ cross-fire and prevent premature truncation of the 113/208 keV gamma emissions (representing roughly 10-15\% of total absorbed dose), a secondary broad-range gamma kernel ($K_{\gamma, water}$) is summed into the convolutional base. By establishing dual initial convolution matrices ($\dot{\text{Energy}}_{base} = \tilde{A} \ast (\bar{E}_{\beta} K_{\beta, lung} + \bar{E}_{\gamma} K_{\gamma, water})$), the "baseline" implicitly expands to track both short-range scalar momentum and deep-tier photon projection geometry natively.
+    \item \textbf{HU-to-Density ($\rho$) Conversion:} Anatomical CT data is transformed into a voxel-wise mass density map ($\rho(\mathbf{r})$) using a parameterized \textbf{bi-linear calibration curve}. This curve maps HU values to physical density based on scanner-specific phantom measurements, typically using two linear segments with a breakpoint at the density of water ($HU=0, \rho=1.0$). By default, reasonable constants ($\text{slope}_{air} = 0.001$, $\text{slope}_{tissue} = 0.0007$) are provided, but these should be tailored to specific hospital hardware:
+    \begin{equation}
+        \rho = \begin{cases} 1.0 + \text{slope}_{air} \cdot HU & HU \leq 0 \text{ (Air to Water)} \\ 1.0 + \text{slope}_{tissue} \cdot HU & HU > 0 \text{ (Water to Bone)} \end{cases}
+    \end{equation}
+    This density map is essential for calculating the target mass $m(\mathbf{r})$ and serves as a primary spatial input for the neural corrector $\mathcal{N}_\theta$ \cite{GtzSchmidkonz2019, BaileyMarquis2022}.
+    \item \textbf{Energy-to-Dose Normalization:} The fundamental definition of absorbed dose is energy deposited per unit mass ($1 \text{ Gy} = 1 \text{ J/kg}$). In the UDE framework, the transport sub-system initially calculates the total energy deposited in a voxel. To convert this to a clinically relevant dose rate $\dot{D}$ (Gy/h), the energy must be normalized by the \textbf{target voxel mass} $m(\mathbf{r})$:
+    \begin{equation}
+        m(\mathbf{r}) = V_{voxel} \cdot \rho(\mathbf{r})
+    \end{equation}
+    where $V_{voxel}$ is the constant physical volume of the voxel (derived from DICOM Pixel Spacing and Slice Thickness) and $\rho(\mathbf{r})$ is the spatially varying density map derived from the CT HU conversion. This voxel-specific normalization is critical for accurately modeling energy deposition in heterogeneous tissues, such as the low-mass lung ($ \rho \approx 0.3 \text{ g/cm}^3$) versus high-mass cortical bone ($\rho \approx 1.9 \text{ g/cm}^3$), where identical energy deposition results in vastly different absorbed doses \cite{GtzSchmidkonz2019, StabinMadsen2019}.
+\end{itemize}
+
+\textbf{What needs to be Learned (Neural Targets):}
+\begin{itemize}
+    \item \textbf{Heterogeneous Scattering and Directional Backscatter:} The corrector $\mathcal{N}_\theta$ learns residuals caused by density gradients $\nabla \rho$ and mass-energy absorption variations $\mu_{en}/\rho$ \cite{BaileyMarquis2022, MikellKappadath2016}. To facilitate this without generating directional blindness toward incoming trajectories, the neural network explicitly evaluates four input branches: the scalar baseline energy field ($E_{base}$), the local physical density space ($\rho$), spatial density boundary gradients, explicitly defined as the 3D Jacobian spatial gradient tensor ($\nabla\rho = \left\langle \frac{\partial \rho}{\partial x}, \frac{\partial \rho}{\partial y}, \frac{\partial \rho}{\partial z} \right\rangle$), and crucially, an explicit First-Order Directional Vector Flux field ($\vec{\Phi}_{ray}(\mathbf{r})$).. This vector flux field is extracted via unscattered ray-tracing algorithms over the $\tilde{A}$ manifold, enforcing natively required backscattering directions where simple un-vectored gradients blind traditional algorithms. Activity ($A_{total}$) is intentionally factored out to strictly enforce the radiation superposition principle.
+\end{itemize}
+
+\section{Radionuclide and Pharmacokinetic Constants for $^{177}$Lu-PSMA}
+
+\subsection{Physical and Radiological Constants}
+\begin{itemize}
+    \item \textbf{Physical Half-life ($T_{1/2,phys}$):} $\approx 6.647$ days (159.5 hours) \cite{HardiansyahYousefzadehNowshahr2024}.
+    \item \textbf{Physical Decay Constant ($\lambda_{phys}$):} $4.34 \times 10^{-3} \text{ h}^{-1}$ \cite{ReschFouladgar2023}.
+    \item \textbf{Mean Photon Energies:} Primary peaks at 113 keV and 208 keV \cite{StabinMadsen2019}.
+    \item \textbf{Mean Beta ($\beta^-$) Energy:} $\approx 133.6$ keV ($E_{max} = 497$ keV). This is the primary driver of local therapeutic absorbed dose.
+    \item \textbf{Absorbed Dose per Activity (Kidneys):} $0.49 - 0.88$ Gy/GBq \cite{ChuamsaamarkkeeCharoenphun2025, OkamotoThieme2016}.
+\end{itemize}
+
+\subsection{Organ-Specific Kinetic Constants}
+\begin{table}[h!]
+\centering
+\caption{Kinetic Parameters for $^{177}$Lu-PSMA-617 and $^{177}$Lu-PSMA-I\&T.}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Target Region} & \textbf{Effective $T_{1/2}$ (h)} & \textbf{Uptake Rate $k_{in}$ (h$^{-1}$)} & \textbf{Washout Rate $k_{out}$ (h$^{-1}$)} \\ \midrule
+Tumours (PSMA-617) & 50 -- 72 \cite{PetersHofferber2021} & 0.000248 \cite{SiebingaPriv2023} & 0.00902 \cite{SiebingaPriv2023} \\
+Tumours (PSMA-I\&T) & 30 -- 55 \cite{SiebingaVeen2024} & 0.00967 \cite{SiebingaVeen2024} & 0.0247 \cite{SiebingaVeen2024} \\
+Kidneys (PSMA-617) & 28 -- 39 \cite{PetersHofferber2021} & 0.00867 \cite{SiebingaPriv2023} & 0.0141 \cite{SiebingaPriv2023} \\
+Salivary Glands & 32.5 -- 42 \cite{PetersPriv2021} & 0.0238 \cite{SiebingaPriv2023} & 0.0140 \cite{SiebingaPriv2023} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Comprehensive Variable and Parameter Mapping}
+This section provides a summarized mapping of all variables and parameters integrated into the SciML framework, categorized by their primary extraction source and mathematical role.
+
+\begin{table}[h!]
+\centering
+\caption{Comprehensive Mapping of Model Variables and Parameters.}
+\label{tab:variables_mapping}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}l l l X@{}}
+\toprule
+\textbf{Variable / Parameter} & \textbf{Symbol} & \textbf{Source} & \textbf{Origin / Extraction Details} \\ \midrule
+\multicolumn{4}{c}{\textbf{1. Extracted from DICOM Metadata (Headers)}} \\ \midrule
+Measurement Units & N/A & DICOM Tag & Tag (0054,1001). String used to check if the scanner natively outputs absolute BQML or raw COUNTS. \\
+Rescale Quantifiers & Slope, Intercept & DICOM Tag & Tags (0028,1053) and (0028,1052). Used to convert 16-bit integer pixel values into true floating-point activities. \\
+Physical Voxel Vol. & $V_{voxel}$ & DICOM Tag & Calculated dimensionally using the PixelSpacing (X,Y) and SliceThickness (Z) metadata tags. \\ \midrule
+\multicolumn{4}{c}{\textbf{2. Raw Imaging \& Calibration Hardware}} \\ \midrule
+Observed Activity & $A_{obs}(\mathbf{r}, 0)$ & SPECT Image & The raw 3D matrix of voxel intensity values output by the SPECT scanner. \\
+Hounsfield Units & $HU(\mathbf{r})$ & CT Image & The native 3D matrix of scalar X-ray attenuation values representing anatomy. \\
+Calibration Slopes & $slope_{air}, slope_{tissue}$ & CT Phantoms & Derived by scanning hardware phantoms (like the Catphan CTP401 module) to map HU limits to specific mass densities. \\
+Camera Cal. Factor & $CF$ & SPECT Phantoms & Scanner-specific activity scaler. Forced to 1.0 if the DICOM Units tag already reads BQML. \\
+Recovery Coeffs. & $RC(\mathbf{r})$ & SPECT Phantoms & Structure-specific Look-up Tables derived from NEMA phantom volume curves to correct Partial Volume Effects (PVE). \\ \midrule
+\multicolumn{4}{c}{\textbf{3. Known Physical \& Radiological Constants}} \\ \midrule
+Physical Half-life & $T_{1/2, phys}$ & Physics & 159.5 hours (6.647 days). Fixed property of $^{177}$Lu. \\
+Physical Decay & $\lambda_{phys}$ & Physics & Calculated analytically: $\ln(2)/159.5 \approx 4.34 \times 10^{-3} \text{ h}^{-1}$. \\
+Mean Energies & $E_\beta, E_\gamma$ & Physics & Isotope properties: Beta $\approx 133.6$ keV. Gammas $\approx 113$ \& 208 keV. \\
+Deposition Kernels & $K_{\beta, lung}, K_{\gamma, water}$ & Physics & 3D probability convolution matrices pre-computed offline via Monte Carlo simulations. \\
+Blood Circulation & $\lambda_{bc}$ & Mechanics & Defined as $\ln(2)/1 \text{ min} \approx 41.58 \text{ h}^{-1}$ to model rapid mass-balance movement. \\ \midrule
+\multicolumn{4}{c}{\textbf{4. Patient Clinical Data \& Biological Literature}} \\ \midrule
+Renal Excretion & $k_{10}$ & Clinical Labs & Scaled dynamically using the individual patient's Glomerular Filtration Rate (eGFR) blood lab results. \\
+Specific Activity & $SA_{MBq/nmol}$ & Radiopharmacy & The exact molar stoichiometry of the radiopharmaceutical batch prepared for the specific patient. \\
+Base PK Rates & $k_{in}, k_{out}, k_3, k_4, k_5$ & Literature & Initialization priors governing base tumor uptake, washout, and cell internalization sourced from trials. \\
+Radiobiology Limits & $\alpha, \beta, \lambda_{repair}$ & Literature & Constants for Sublethal Damage Repair (SLDR) and multi-track interactions. \\ \\ \midrule
+\multicolumn{4}{c}{\textbf{5. Derived Spatial \& Mathematical Maps}} \\ \midrule
+True Initial Activity & $A_{true}(\mathbf{r}, 0)$ & Derived (Math) & Evaluated via Eq 3: $(A_{obs} \times \text{Slope} + \text{Intercept}) / (CF \times RC)$. \\
+Mass Density Map & $\rho(\mathbf{r})$ & Derived (CT) & Calculated voxel-by-voxel by applying the phantom-derived calibration slopes to the raw CT HU matrix. \\
+Target Voxel Mass & $m(\mathbf{r})$ & Derived (CT/Math) & Computed as $V_{voxel} \times \rho(\mathbf{r})$. The crucial normalization denominator for converting energy to Absorbed Dose (1 Gy=1 J/kg). \\
+Time-Integr. Activity & TIA / $\tilde{A}$ & Derived (ODE) & The continuous integration of the $A$ vectors over time, generated by the \texttt{DifferentialEquations.jl} PK solver. \\
+Density Gradients & $\nabla \rho$ & Derived (CT/Math) & Spatial boundary features computed via continuous central differences over the $\rho(\mathbf{r})$ map. \\
+Directional Flux & $\vec{\Phi}_{ray}(\mathbf{r})$ & Derived (Math) & Unscattered Cartesian vectors extracted via ray-tracing over the TIA manifold to give the AI 3D backscatter awareness. \\
+Base Energy Field & $E_{base, total}$ & Derived (Physics) & Computed via 3D FFT Convolution of the TIA mapping against the $K_\beta$ and $K_\gamma$ physics kernels. \\ \midrule
+\multicolumn{4}{c}{\textbf{6. Machine Learning Targets (SciML)}} \\ \midrule
+Receptor Saturation & $B_{MAX}(\mathbf{r})$ & Learned & The absolute Tumour Sink Effect limits. Discovered voxel-by-voxel by observing saturation plateaus in the temporal data. \\
+Kinetic Drift & $\Delta k_{in}, \Delta k_{out}$ & Learned & Cycle-dependent shifts in the uptake/washout rates caused by the tumor biologically regressing due to radiation damage. \\
+Specific Abs. Fraction & $\mathcal{N}_\theta(\dots)$ & Learned & The Neural Network corrector. It ingests $[E_{base}, \rho, \nabla \rho, \vec{\Phi}_{ray}]$ to learn complex scatter residuals and output a scalar modifier. \\
+Hypoxia Modifier & $OER(\mathbf{r})$ & Learned & Neural-discovered spatial oxygen starvation mapping, bounded via a sigmoid activation to physical limits $[1.0, 3.0]$. \\
+Energy Conservation & $\lambda_{EC}$ & SciML Constraint & An algorithmic constraint. A reverse-mode auto-diff penalty preventing the AI from creating or destroying physical radiation energy. \\ \bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Exhaustive UDE Model Architecture}
+
+\subsection{Initial Activity Calibration}
+The observed SPECT activity $A_{obs}(\mathbf{r}, 0)$ must be scaled before integration. However, modern quantitative SPECT reconstructions natively embed absolute quantification directly into the \texttt{Rescale Slope} (DICOM Tag 0028,1053) yielding Bq/mL. A strict conditional check on the Units Tag \texttt{(0054,1001)} is required to prevent extreme under-dosing via double-calibration. If units are natively \texttt{BQML}, $CF$ strictly defaults to $1.0$:
+\begin{equation}
+    A_{true}(\mathbf{r}, 0) = \frac{\left( A_{obs}(\mathbf{r}, 0) \cdot \text{Rescale Slope} \right) + \text{Rescale Intercept}}{CF \cdot RC(\mathbf{r})}
+\end{equation}
+Furthermore, applying an empirical Recovery Coefficient ($RC(\mathbf{r})$) dynamically at the voxel level is statistically unstable and risks violently amplifying high-frequency Gibbs artifacts at lesion edges; instead, it must be restricted strictly to \textit{bounding ROI volumes}.
+
+\subsection{The Govering System of Equations}
+\textbf{1. PK Sub-system (Voxel-Wise Surface Binding, Endosomal Recycling, and Lysosomal Degradation):}
+To accurately reflect long-term retention and receptor recycling, the internalized compartment is split into endosomal and lysosomal pathways:
+\begin{align}
+    \frac{dA_{surface}}{dt} &= k_3 A_{free} \left( 1 - \frac{M_{bound}}{B_{MAX}(\mathbf{r})} \right) + k_{recycle} A_{endo} - (k_4 + k_5 + \lambda_{phys}) A_{surface} \\
+    \frac{dA_{endo}}{dt} &= k_5 A_{surface} - (k_{recycle} + k_{deg} + \lambda_{phys}) A_{endo} \\
+    \frac{dA_{lyso}}{dt} &= k_{deg} A_{endo} - \lambda_{phys} A_{lyso}
+\end{align}
+(Where $M_{bound}(t)$ tracks total attached molarity, and cell lysis eventually releases internalized activity back into the interstitial space).
+
+\textbf{2. Transport and Continuous Radiobiology (Continuous LQ and Hypoxia):}
+Instead of a simple linear approximation or discrete post-hoc BED calculations, the ODE natively splits DNA damage into a transient \textbf{Sublethal Damage ($S$)} pool subject to continuous enzymatic repair, and the irreversible accumulation of \textbf{Lethal Lesions ($L$)}. To account for spatial hypoxia, the physical dose rate $\dot{D}(\mathbf{r}, t)$ is dynamically scaled by a neural-learned Oxygen Enhancement Ratio ($OER$).
+\begin{align}
+    \frac{dTIA}{dt} &= A_{free} + A_{surface} + A_{endo} + A_{lyso} + v_b(\mathbf{r}) \cdot V_{voxel} \cdot \frac{A_{blood}}{V_{blood}} \\
+    \dot{D}_{eff}(\mathbf{r}, t) &= \frac{\dot{D}(\mathbf{r}, t)}{OER(\mathbf{r})} \\
+    \frac{dS}{dt} &= \dot{D}_{eff}(\mathbf{r}, t) - \lambda_{repair} S(t) \\
+    \frac{dL}{dt} &= \underbrace{\alpha \dot{D}_{eff}(\mathbf{r}, t)}_{\text{Single-track kills}} + \underbrace{2\beta \dot{D}_{eff}(\mathbf{r}, t) S(t)}_{\text{Multi-track misrepairs}}
+\end{align}
+Because unconstrained neural networks can generate mathematically unphysical resistance levels (or negative sensitivities), the learned Hypoxia modifier is algorithmically bounded using a sigmoid ($\sigma$) activation function mapped between known physical limits (where maximum $OER_{max} \approx 3.0$):
+\begin{equation}
+    OER(\mathbf{r}) = 1.0 + (OER_{max} - 1.0) \cdot \sigma\left(\mathcal{N}_\phi(k_{in}(\mathbf{r}), \nabla\rho(\mathbf{r}), \dots)\right)
+\end{equation}
+
+
+\section{Physics and Mathematical Analysis of Model Subsystems}
+
+This section provides a comprehensive, expert-level physics and mathematical analysis of the fundamental subsystems governing the dosimetry model. It details the captured versus missing physical phenomena, strict numerical bounds and validation checks, probable statistical distributions of the variables, and strategies for synthetic data generation for each subsystem.
+
+\subsection{Group 1: CT Density and Voxel Mass Normalization}
+
+The density and mass mapping equations establish the physical domain structure:
+\begin{align}
+    \rho(\mathbf{r}) &= 1.0 + \text{slope} \cdot HU(\mathbf{r}) \label{eq:density_group1} \\
+    m(\mathbf{r}) &= V_{voxel} \cdot \rho(\mathbf{r}) \label{eq:mass_group1}
+\end{align}
+
+\begin{enumerate}
+    \item \textbf{Captured vs. Missing Physics:} Eq \ref{eq:density_group1} captures macroscopic physical mass density via X-ray attenuation, which is dominated by Compton scattering (linear scaling with electron density $Z/A$). However, it misses the Photoelectric Effect (which has a $Z^3$ dependency). For high-Z materials (e.g., intravenous Iodine contrast or metal implants, $HU > 300$), this linear scaling hallucinates massive, incorrect physical densities (bone-like). Additionally, it natively targets static geometries, missing 4D-CT respiratory motion blurring (temporal mass averaging).
+    \item \textbf{Numerical Bounds \& Validations:} The Hounsfield Units, $HU(\mathbf{r})$, are roughly bounded between $[-1024, \sim 3000]$ due to 12-bit CT hardware limits. The physical density $\rho(\mathbf{r})$ and mass $m(\mathbf{r})$ must be strictly $> 0$. If mass drops to 0, Eq \ref{eq:mass_group1} causes a $1/0$ singularity in downstream dose normalizations. The validation code must enforce a hard physical clipping limit: if $\rho \le 0.05 \text{ g/cm}^3$ (air void), then $D_{phys} \equiv 0$.
+    \item \textbf{Probable Ranges \& Distributions:} Human tissue density is highly non-Gaussian; it forms a \textbf{Gaussian Mixture Model (Multimodal)}. This presents as a sharp, narrow peak at -1000 HU (Air), a broad Gaussian at -700 HU (Lungs), a massive spike at 0 HU (Soft Tissue/Water), and a heavy, flat right-tail from +300 to +1500 HU (Cortical Bone).
+    \item \textbf{Synthetic Data Generation:} Create 3D NumPy arrays of geometric primitives (e.g., a $\rho=1.0$ cylinder surrounded by $\rho=0.3$ lung) to represent geometry. CT photon starvation noise is mathematically \textit{Poisson-Gaussian mixed}; therefore, add zero-mean Gaussian noise with variance scaling by density. To simulate Partial Volume Effects (PVE) at organ boundaries, apply a 3D Gaussian Blur to smear sharp edges. To simulate Beam Hardening (Cupping), apply an inverted 3D parabolic function to artificially lower the HU values strictly in the center of dense objects.
+\end{enumerate}
+
+\subsection{Group 2: Initial Activity Calibration}
+
+The observed SPECT counts are calibrated to absolute activity considering detector properties:
+\begin{equation}
+    A_{true}(\mathbf{r}, 0) = \frac{(A_{obs}(\mathbf{r}, 0) \cdot \text{Slope}) + \text{Intercept}}{CF \cdot RC(\mathbf{r})}
+\end{equation}
+
+\begin{enumerate}
+    \item \textbf{Captured vs. Missing Physics:} Translates relative gamma camera events into absolute physical disintegrations (Bq), compensating for detector sensitivity ($CF$) and spatial spill-out/resolution loss ($RC$). It misses camera detector dead-time (non-linear saturation where the camera misses counts at extreme activities). Furthermore, treating the Recovery Coefficient $RC(\mathbf{r})$ as a localized scalar multiplier mathematically ignores that spatial blurring is a cross-voxel convolution, risking violent amplification of ``Gibbs ringing'' artifacts at edges.
+    \item \textbf{Numerical Bounds \& Validations:} $A_{obs}(\mathbf{r},0)$ must be strictly $\ge 0$. Iterative reconstructions (OSEM) often yield mathematically negative background counts due to scatter subtraction algorithms, which must be clamped via a \texttt{ReLU()} or \texttt{max(0, A)} trap. $CF$ must be strictly $> 0$; if DICOM units strictly read \texttt{BQML}, $CF \equiv 1.0$ must be enforced to prevent double-calibration. $RC(\mathbf{r})$ is bounded $(0.0, 1.0]$, as one cannot recover $>100\%$ of a signal.
+    \item \textbf{Probable Ranges \& Distributions:} Raw radioactive photon decay strictly follows a \textbf{Poisson distribution}. Following image reconstruction, background noise becomes a correlated Multivariate Gaussian. True activity within a tumour heavily follows a \textbf{Log-Normal distribution} due to chaotic, fractal-like angiogenesis (blood vessel formation).
+    \item \textbf{Synthetic Data Generation:} Assign a uniform activity (e.g., $100$ MBq) to a synthetic ground-truth 3D tumour shape. To simulate the physics of a SPECT collimator (spatial blurring), apply a 3D Convolution with a wide Gaussian point-spread function (FWHM $\approx 12-15$ mm). Because radioactive decay is quantized, pass the resulting continuous array through a \texttt{numpy.random.poisson()} generator to yield realistic, noisy scanner counts.
+\end{enumerate}
+
+\subsection{Group 3: Pharmacokinetics (PK) Sub-System}
+
+The UDE establishes a non-linear ODE structure for receptor mapping:
+\begin{equation}
+    \frac{dA_{surface}}{dt} = k_3 A_{free}\left(1 - \frac{M_{bound}}{B_{MAX}(\mathbf{r})}\right) - \dots
+\end{equation}
+
+\begin{enumerate}
+    \item \textbf{Captured vs. Missing Physics:} Captures extracellular to intracellular transport, saturable Michaelis-Menten receptor binding (the Tumour Sink Effect via $B_{MAX}$ limits), endocytosis, and radioactive decay. It currently misses interstitial spatial diffusion (Darcy flow); the ODEs treat every voxel as an isolated, perfectly mixed box exchanging solely with blood, completely ignoring tracer diffusion gradients between neighboring voxels.
+    \item \textbf{Numerical Bounds \& Validations:} All temporal states $A_{state}(t) \ge 0$. The Time-Integrated Activity (TIA) must be monotonically increasing ($\frac{dTIA}{dt} \ge 0$). For the saturation limit, $M_{bound}(t) \le B_{MAX}(\mathbf{r})$. The saturation multiplier $\left(1 - \frac{M_{bound}}{B_{MAX}}\right)$ must mathematically stay $\in [0, 1]$. If $M_{bound}$ exceeds receptors, it forces unphysical negative binding, and thereby requires explicit \texttt{max(0.0, ...)} clamping. Crucially, regarding thermodynamic mass conservation: if physical decay $\lambda_{phys} = 0$ and biological clearance $k_{10} = 0$, the sum of all $A$ values across the grid MUST remain perfectly constant over infinite time.
+    \item \textbf{Probable Ranges \& Distributions:} Time-Activity Curves strictly follow \textbf{multi-exponential} shapes. Biological parameters across a tumour ($B_{MAX}$, $k_{in}$) strictly follow \textbf{Log-Normal distributions}.
+    \item \textbf{Synthetic Data Generation:} Tumours are highly heterogeneous. Do not use a flat scalar for $B_{MAX}$ inside synthetic cylinders; map $B_{MAX}$ using a continuous \textbf{3D Perlin Noise} algorithm to simulate chaotic, clumpy biological receptor expression. To simulate clinical data, solve the ODEs continuously, but sample the curves at sparse, discrete time points (e.g., 4h, 24h) yielding heteroscedastic Gaussian noise to simulate patient/scanner calibration drift.
+\end{enumerate}
+
+
+\subsection{Group 4: Continuous Radiobiology (cLQ and SciML Hypoxia)}
+
+Tracking the continuous formation of lethal lesions natively:
+\begin{equation}
+    \frac{dS}{dt} = \dot{D}_{eff}(t) - \lambda_{repair} S(t) \quad \text{and} \quad \frac{dL}{dt} = \alpha \dot{D}_{eff}(t) + 2\beta \dot{D}_{eff}(t) S(t)
+\end{equation}
+
+\begin{enumerate}
+    \item \textbf{Captured vs. Missing Physics:} By separating damage into Sublethal ($S(t)$) and Lethal ($L(t)$) states, this system captures both the linear (single-track) and quadratic (two-track simultaneous misrepair) mechanisms of the Linear-Quadratic (LQ) model natively over continuous time (Zaider-Minerbo formulation). Furthermore, by embedding a SciML Hypoxia modifier ($OER$), the network explicitly learns the \textbf{Oxygen Enhancement Ratio} spatially, mathematically dampening radiation efficacy in dense, poorly vascularized tumor cores. It misses cell cycle redistribution (resensitization as cells shift from S-phase to G2/M-phase).
+    \item \textbf{Numerical Bounds \& Validations:} Both biological states $S(t) \ge 0$ and $L(t) \ge 0$. The OER neural output is strictly constrained to $OER \in [1.0, 3.0]$ preventing negative sensitivities or zero-dose singularities. \textbf{Steady-State Trap:} Mathematically, if inputting a perfectly constant dose rate $\dot{D}_{eff}$, the sublethal pool $S(t)$ must asymptote perfectly to $\frac{\dot{D}_{eff}}{\lambda_{repair}}$. Consequently, the accumulation rate of Lethal Lesions asymptotes to $\frac{dL}{dt} = \alpha \dot{D}_{eff} + \frac{2\beta}{\lambda_{repair}} \dot{D}_{eff}^2$. Integrating this precisely reproduces the analytical Lea-Catcheside G-factor formula for continuous LDR brachytherapy, proving unbroken physical continuity.
+    \item \textbf{Probable Ranges \& Distributions:} $S(t)$ forms an \textbf{asymmetric bell curve} over time (rising steeply as early dose is deposited, and decaying as biological washout outpaces physical isotope decay). $L(t)$ is \textbf{strictly monotonically increasing}, representing the cumulative probability of definitive cell death (where survival fraction is $e^{-L}$).
+    \item \textbf{Synthetic Data Generation:} To train the Hypoxia neural branch ($\mathcal{N}_\phi$) prior to clinical data, map the spatial distance from the tumor edge. Assign a purely oxic $OER = 1.0$ at the highly vascularized rim. Programmatically force the core geometry to $OER = 3.0$ to simulate a chemically resistant, anoxic necrotic core. Target data can then be generated by evaluating the ODEs, forcing the SciML framework to discover the hidden hypoxia distribution from blunted temporal macroscopic survival curves.
+\end{enumerate}
+
+\subsection{Group 5: SciML Radiation Transport \& Neural Corrector}
+Deriving absorbed dose natively couples FFT convolutions with unscattered Boltzmann ray-tracing and AI correctors:
+\begin{align}
+    E_{base,total}(\mathbf{r}) &= TIA \ast (\bar{E}_{\beta} K_{\beta,lung} + \bar{E}_{\gamma} K_{\gamma,water}) \\
+    \vec{\Phi}_{ray}(\mathbf{r}) &= \underbrace{\frac{1}{\iiint_V TIA(\mathbf{r}') \, d^3\mathbf{r}'}}_{\text{Activity Normalization}} \iiint_{V} \underbrace{\frac{TIA(\mathbf{r}')}{4\pi |\mathbf{r} - \mathbf{r}'|^2}}_{\text{Inverse-Square}} \underbrace{\exp\left( -\int_{\mathbf{r}'}^{\mathbf{r}} \mu(\mathbf{l}) \, dl \right)}_{\text{Attenuation}} \underbrace{\frac{\mathbf{r} - \mathbf{r}'}{|\mathbf{r} - \mathbf{r}'|}}_{\text{Direction } \mathbf{\hat{\Omega}}} \, d^3\mathbf{r}' \label{eq:ray_tracing} \\
+    D_{phys}(\mathbf{r}) &= \frac{E_{base,total}(\mathbf{r})}{m(\mathbf{r})} \cdot \exp\Big(\mathcal{N}_\theta(E_{base,total}, \rho, \nabla\rho, \vec{\Phi}_{ray})\Big)
+\end{align}
+
+Equation \ref{eq:ray_tracing} computes the directional vector flux by integrating the unscattered primary photon/electron trajectories over the source volume $V$, accounting for inverse-square falloff and radiological attenuation $\mu$, strictly normalized by the total integrated activity to enforce mathematical superposition. 
+
+To mathematically determine if radiation is colliding with a dense boundary (triggering backscatter) or skimming parallel to it, the Neural Network evaluates the interaction between the density gradient and the incoming flux vector. This geometric collision trigger, $\tau(\mathbf{r})$, is expressed as a dot product:
+\begin{equation}
+    \tau(\mathbf{r}) = \nabla\rho(\mathbf{r}) \cdot \vec{\Phi}_{ray}(\mathbf{r})
+\end{equation}
+Because the gradient $\nabla\rho$ points toward increasing density, a heavily \textbf{positive} product ($\tau \gg 0$) indicates that the radiation is moving directly into a high-density interface (like bone), physically cueing the network to reroute energy backward.
+
+\begin{enumerate}
+    \item \textbf{Captured vs. Missing Physics:} Base FFT convolutions track isotropic homogeneous energy. The explicit evaluation of the collision trigger $\tau(\mathbf{r})$ allows the network to natively learn directional \textbf{electron backscattering} and heterogeneous attenuation. It misses explicit Bremsstrahlung\textbf{electron backscattering} and heterogenous attenuation. It misses explicit Bremsstrahlung (secondary X-rays from betas decelerating in bone), meaning the NN must learn to hallucinate this background noise from training data alone.
+    \item \textbf{Numerical Bounds \& Validations:} The fundamental theorem of Energy Conservation states the AI cannot create or destroy energy. The spatial integral $\iiint D_{phys} \cdot m(\mathbf{r}) \, dV$ MUST strictly equal $\iiint E_{base,total} \, dV$ within a $10^{-5}$ float tolerance. If the network weights are initialized to 0, $\mathcal{N}_\theta = 0$, meaning $\exp(0) = 1.0$; the system correctly defaults back to strict standard physics: $D_{phys} = E_{base,total}/m(\mathbf{r})$. Inside a uniform water phantom, $\nabla\rho = 0$, thus the neural network must output $0$, preventing hallucinated dosimetric speckle.
+    \item \textbf{Probable Ranges \& Distributions:} Radiation dose follows the inverse-square law ($1/r^2$) and exponential decay ($e^{-\mu r}$). The density gradient ($\nabla\rho$) follows a highly leptokurtic \textbf{Laplace distribution} (mostly zeroes, spiking wildly at tissue interfaces). The network multiplier $\exp(\mathcal{N}_\theta)$ should logically bound between $\approx [0.5, 2.0]$.
+    \item \textbf{Synthetic Data Generation:} Create a binary cylinder (e.g., left half lung $\rho=0.3$, right half bone $\rho=1.8$) and place a point source of activity precisely on the boundary. Compute standard 3D FFT Convolution to get $E_{base,total}$. To create a ``Ground Truth'' target to teach the network physics, programmatically shift $\sim 5-10\%$ of the dose from the bone side \textit{backwards} into the lung side. Extract the vectors using unscattered ray-tracing. Feed the raw map, the gradients, and the vectors into the AI, and force it to learn the mathematical ``backscattered'' target map.
+\end{enumerate}
+
+\begin{table}[hbt!]
+\centering
+\caption{Mathematical Properties and Bounds of Primary System Parameters}
+\label{tab:parameter_bounds}
+\small
+\begin{tabularx}{\textwidth}{@{}l l l X@{}}
+\toprule
+\textbf{Parameter} & \textbf{Symbol} & \textbf{Numerical Limit} & \textbf{Probability Distribution} \\ \midrule
+Mass Density & $\rho(\mathbf{r})$ & $> 0.05 \text{ g/cm}^3$ & Gaussian Mixture (Air, Lung, Water, Bone) \\
+Hounsfield Units & $HU(\mathbf{r})$ & $[-1024, 3000]$ & Multimodal (Scanner hardware 12-bit limits) \\
+Observed Counts & $A_{obs}(\mathbf{r}, 0)$ & $\ge 0$ (Clamp negative OSEM) & Poisson (raw), Multivariate Gaussian (noise) \\
+True Tumour Uptake & $A_{true}(\mathbf{r}, 0)$ & $\ge 0$ & Log-Normal (chaotic vascularization/angiogenesis) \\
+Recovery Coefficient & $RC(\mathbf{r})$ & $(0.0, 1.0]$ & Non-parametric (Look-up Table scaling) \\
+Time-Integ. Activity & $TIA(\mathbf{r})$ & $\ge 0$, monotonically asc. & Log-Normal (Spatial integration limits) \\
+Receptor Saturation & $B_{MAX}(\mathbf{r})$ & $> 0$, $M_{bound} \le B_{MAX}$ & Log-Normal (stochastic cellular variation) \\
+Sublethal Damage & $S(t)$ & $\ge 0$ & Asymmetric Bell Curve over time \\
+Lethal Lesions & $L(t)$ & $\ge 0$, monotonically asc. & Cumulative probability of cell death \\
+Hypoxia Modifier & $OER(\mathbf{r})$ & $[1.0, 3.0]$ & Heavily right-skewed (mostly oxic) \\Density Gradient & $\nabla\rho$ & Locally zero in bulk tissue & Highly leptokurtic Laplace \\
+Network Modifier & $\exp(\mathcal{N}_\theta)$ & Logically $[0.5, 2.0]$ & Centers precisely on 1.0 (Identity physics) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\section{Synthetic Data Engineering and Pretraining}
+
+Because the neural network is embedded directly inside deterministic physical equations, standard data science workflows are insufficient. Here is an expert medical physics analysis of how synthetic data must be created and utilized for pretraining before any real clinical data is introduced.
+
+\subsection{Creation of Synthetic Data}
+To train the neural corrector without the confounding variables and overlapping noise of real clinical data, synthetic datasets must be meticulously engineered subsystem-by-subsystem to simulate specific physical, biological, and hardware phenomena:
+
+\begin{itemize}
+    \item \textbf{Anatomical Geometry \& CT Artifacts (Group 1):} Create 3D NumPy arrays using geometric primitives (e.g., a $\rho=1.0 \text{ g/cm}^3$ water cylinder surrounded by $\rho=0.3 \text{ g/cm}^3$ lung tissue). Simulate scanner limitations by adding zero-mean Gaussian noise scaled by density (mimicking photon starvation), applying a 3D Gaussian Blur to simulate Partial Volume Effects (PVE) at tissue boundaries, and using an inverted 3D parabolic function in the center of dense objects to artificially induce Beam Hardening (cupping) artifacts.
+    \item \textbf{SPECT Initial Activity Maps (Group 2):} Assign a uniform ground-truth activity (e.g., 100 MBq) to a synthetic tumor shape. Apply a 3D Convolution with a wide Gaussian Point-Spread Function (FWHM $\approx$ 12--15 mm) to replicate the spatial blurring of a SPECT collimator. Finally, pass the array through a \texttt{numpy.random.poisson()} generator to yield the discrete, noisy photon counts characteristic of quantized radioactive decay.
+    \item \textbf{Pharmacokinetics (PK) Temporal Dynamics (Group 3):} Tumors are highly heterogeneous. Instead of using a flat scalar for the receptor saturation limit ($B_{MAX}$), use a \textbf{continuous 3D Perlin Noise algorithm} to map $B_{MAX}$, simulating chaotic, clumpy biological receptor expression. Solve the continuous ODEs, but sample the resulting Time-Activity Curves at sparse discrete points (e.g., 4h, 24h) and inject heteroscedastic Gaussian noise to replicate patient/scanner calibration drift over multiple days.
+    \item \textbf{Continuous Radiobiology \& Hypoxia (Group 4):} Model the Oxygen Enhancement Ratio (OER) by mapping the radiosensitivity parameter ($\epsilon$). Keep $\epsilon$ at a baseline value near the tumor rim, but programmatically drop it by 50--70\% in the exact geometric center to simulate a chemically radiation-resistant, anoxic necrotic core.
+    \item \textbf{Generating the Ground Truth for the Neural Targets (Group 5):} The AI must learn what standard convolutions miss (like backscatter). Build a binary boundary phantom (e.g., left half lung $\rho=0.3$, right half bone $\rho=1.8$) and place a radioactive point source directly on the interface. Compute the standard 3D FFT base energy ($E_{base, total}$). \textit{Crucially, programmatically shift 5--10\% of the calculated dose from the bone side backwards into the lung side}. This manually injected backscatter creates the exact mathematical target map the AI must learn.
+\end{itemize}
+
+\subsection{Pretraining the Model with Synthetic Data}
+In a SciML architecture, the deep learning component only learns the \textit{residual physical phenomena}. Pretraining on synthetic data ensures the network obeys physical laws before being exposed to real patient variations.
+
+\begin{itemize}
+    \item \textbf{Teaching Directional Backscatter Awareness:} You feed the network the analytical baseline energy ($E_{base, total}$), local physical density ($\rho$), continuous spatial density boundaries ($\nabla\rho$), and importantly, unscattered ray-traced \textbf{First-Order Directional Vector Flux fields ($\vec{\Phi}_{ray}$)}. By internally evaluating the collision dot product $\tau(\mathbf{r}) = \nabla\rho(\mathbf{r}) \cdot \vec{\Phi}_{ray}(\mathbf{r})$, the network mathematically recognizes perpendicular collisions with dense boundaries ($\tau \gg 0$). It is trained until its output multiplier, $\exp(\mathcal{N}_{\theta})$, successfully maps the baseline dose to your synthetically shifted backscatter target. This explicitly cures "directional blindness," allowing the network to know exactly when and in which geometric direction the backscattered electrons should flow.
+    \item \textbf{Identity Physics \& Preventing "Dosimetric Speckle":} By pretraining the network on uniform synthetic soft-tissue phantoms where $\nabla\rho = 0$, the network learns that without physical density gradients, it must output exactly $0$ (yielding an exponential multiplier of $1.0$). This preserves standard classical physics in bulk tissues and prevents the AI from aggressively reacting to random CT Poisson noise and hallucinating fake dose boundaries.
+\end{itemize}
+
+\section{Physics-Informed Validation and Unit Testing Strategy}
+Before clinical deployment, standard unit tests are inadequate. The document mandates passing digital twins of \textbf{Catphan® physical CT phantoms} through the framework to enforce thermodynamic and stoichiometric limits mathematically. Here is an exhaustive strategy for generating software, sanity, and consistency checks:
+
+\subsection{Physical-to-Digital Validations (Using Catphan DICOMs)}
+The Catphan phantom provides established ground truths that must map correctly to your spatial arrays before the Neural Network executes.
+
+\noindent\textbf{HU-to-Density ($\rho$) Calibration Check (CTP401 Sensitometry Module):}
+\begin{itemize}
+    \item \textbf{The Check:} Equation 1 maps Hounsfield Units (HU) to mass density $\rho(\mathbf{r})$. If this mapping is incorrect, the voxel mass $m(\mathbf{r})$ normalization (Eq 2) will violently skew the absorbed dose.
+    \item \textbf{Test Implementation:} Extract the DICOM of the CTP401 Sensitometry module and mask the Regions of Interest (ROIs) for the 4 targets.
+    \item \textbf{Assertion:} Verify that the system calibrates $\text{slope}_{air}$ and $\text{slope}_{tissue}$ such that it yields the Catphan manual's specific gravities: Air (-1000 HU) $\rightarrow 0.00 \text{ g/cm}^3$, LDPE (-100 HU) $\rightarrow 0.92 \text{ g/cm}^3$, Acrylic (120 HU) $\rightarrow 1.18 \text{ g/cm}^3$, and Teflon (990 HU) $\rightarrow 2.16 \text{ g/cm}^3$. (Note: If the code uses the default 0.0007 slope for Teflon, it will yield $\sim 1.693$; this test actively forces the user to tune specific scanner hardware).
+\end{itemize}
+
+\noindent\textbf{Voxel Mass \& Spatial Linearity Verification (CTP401):}
+\begin{itemize}
+    \item \textbf{The Check:} Validating the extraction of physical $V_{voxel}$ from DICOM metadata.
+    \item \textbf{Test Implementation:} Use the four 3mm air/teflon holes in CTP401, which the manual states are exactly 50mm apart on center. Calculate the centroid distance between these holes in your digital array utilizing the parsed \texttt{PixelSpacing}.
+    \item \textbf{Assertion:} Assert the distance is strictly 50.0 mm ($\pm 0.5$ mm). If it fails, your spatial convolution matrix is warped.
+\end{itemize}
+
+\noindent\textbf{Air Void Singularity ($m(\mathbf{r}) \rightarrow 0$) Prevention (CTP401):}
+\begin{itemize}
+    \item \textbf{The Check:} Equation 7 divides by mass: $D_{phys}(\mathbf{r}) \propto 1/m(\mathbf{r})$.
+    \item \textbf{Test Implementation:} Calculate dose inside the CTP401 Air insert.
+    \item \textbf{Assertion:} Ensure the software implements a strict clipping boundary (e.g., $D_{phys} = 0$ if $\rho \le 0.05$) so that $1/0$ does not result in NaN or Inf tensors crashing the backpropagation.
+\end{itemize}
+
+\subsection{Consistency Checks of the SciML Spatial Layers}
+The Neural Corrector takes baseline energy, density, gradients, and flux vectors as inputs. These features must be rigorously verified against Catphan symmetries.
+
+\noindent\textbf{Gradient ($\nabla\rho$) Hallucination Check (CTP486):}
+\begin{itemize}
+    \item \textbf{The Check:} The network evaluates spatial density boundaries ($\nabla\rho$) computed via continuous central differences.
+    \item \textbf{Test Implementation:} Pass the CTP486 Image Uniformity Module into the pipeline. Since it is structurally uniform (5H to 18H, roughly water equivalent), its macroscopic gradients should be flat.
+    \item \textbf{Assertion:} Assert that the computed $\nabla\rho$ is exactly $0.0$ away from the edges. This guarantees the algorithm doesn't hallucinate structural boundaries out of pure CT Poisson noise.
+\end{itemize}
+
+\noindent\textbf{Directional Vector Flux ($\vec{\Phi}_{ray}$) Symmetry (CTP445 / CTP528):}
+\begin{itemize}
+    \item \textbf{The Check:} The framework calculates an explicit vector flux field to overcome directional blindness to backscatter.
+    \item \textbf{Test Implementation:} Simulate a synthetic point-source of Time-Integrated Activity (TIA) placed perfectly in the voxel containing the 0.28mm Tungsten carbide bead from the CTP445 module.
+    \item \textbf{Assertion:} Run the unscattered ray-tracing algorithms. Assert that the resulting $\vec{\Phi}_{ray}$ flux vectors propagate perfectly radially outward 360-degrees from the sub-pixel bead without Cartesian/grid bias.
+\end{itemize}
+
+\subsection{Universal Differential Equation (UDE) Invariants}
+These tests ensure the coupling of the deep learning corrector ($\mathcal{N}_\theta$) and the physics engine obeys thermodynamic and mathematical boundaries.
+
+\noindent\textbf{Thermodynamic Energy Conservation Limit:}
+\begin{itemize}
+    \item \textbf{The Check:} The SciML constraint limits the neural network to native geometric re-routing by actively enforcing the following physical Loss Function ($\mathcal{L}_{EC}$) penalty during backpropagation:
+    \begin{equation}
+        \mathcal{L}_{EC} = \lambda_{EC} \left( \iiint_V D_{phys}(\mathbf{r}) \cdot m(\mathbf{r}) \, d^3\mathbf{r} - \iiint_V E_{base,total}(\mathbf{r}) \, d^3\mathbf{r} \right)^2
+    \end{equation}
+    This strictly enforces the First Law of Thermodynamics, guaranteeing the AI cannot artificially create or destroy radiation energy.
+    \item \textbf{Test Implementation:} Intercept the forward pass of the model across any heterogeneous Catphan slice.
+    \item \textbf{Assertion:} Sum the total physical energy: \texttt{isapprox(sum(D\_phys .* m(r)), sum(E\_base\_total), rtol=1e-5)}. If the AI modifies the absolute total energy, the reverse-mode auto-diff penalty is failing.
+\end{itemize}
+
+\noindent\textbf{Epoch Zero Identity Map Test (Eq 7):}
+\begin{itemize}
+    \item \textbf{The Check:} The network evaluates specific absorbed fractions as a scalar wrapped in an exponential: $\cdot \exp(\mathcal{N}_\theta(\dots))$.
+    \item \textbf{Test Implementation:} Initialize your Neural ODE with entirely zeroed or untrained weights ($\mathcal{N}_\theta = 0.0$).
+    \item \textbf{Assertion:} Since $\exp(0) = 1.0$, assert that the predicted dose is identically equal to the baseline: $D_{phys}(\mathbf{r}) == \frac{E_{base,total}(\mathbf{r})}{m(\mathbf{r})}$. This proves the baseline Known Physics engine is strictly preserved prior to data-driven AI discovery.
+\end{itemize}
+
+\subsection{Software Logic \& PK Compartment Sanity Checks}
+Ensure the temporal \texttt{DifferentialEquations.jl} solvers and clinical logic do not leak tracer activity or violate expert bounds.
+
+\noindent\textbf{Compartmental Mass-Balance Conservation (Eqs 4-6):}
+\begin{itemize}
+    \item \textbf{The Check:} The continuous ODE must not leak stoichiometric mass.
+    \item \textbf{Test Implementation:} Disable physical decay ($\lambda_{phys} = 0$) and excretion ($k_{10} = 0$). Inject 100 MBq. Integrate the ODE to $t = 10,000$ hours.
+    \item \textbf{Assertion:} At any given timestep $t$, $\sum A_{blood} + \sum A_{free} + \sum A_{surface} + \sum A_{internal} == 100 \text{ MBq}$.
+\end{itemize}
+
+\noindent\textbf{Tumour Sink Saturation Hard-Limit ($B_{MAX}$):}
+\begin{itemize}
+    \item \textbf{The Check:} Binding flux must strictly respect the surface saturation threshold (Eq 4).
+    \item \textbf{Test Implementation:} Introduce a massively unrealistic tracer dose (e.g., $10^8$ MBq) into a voxel with an artificial limit of $B_{MAX} = 100$.
+    \item \textbf{Assertion:} The fractional binding multiplier \texttt{max(0.0, 1.0 - (M\_bound / B\_MAX))} must cleanly hit exactly 0.0. Ensure stiff ODE solvers do not cause this value to oscillate into the negative domain.
+\end{itemize}
+
+\noindent\textbf{DICOM Unit Double-Calibration Trap (Eq 3):}
+\begin{itemize}
+    \item \textbf{The Check:} Section 4.1 warns that modern SPECT natively embeds absolute Bq/mL. Double-calibrating underdoses the patient.
+    \item \textbf{Test Implementation:} Instantiate two mock DICOM \texttt{(0054,1001)} tags.
+    \item \textbf{Assertion:} If units = \texttt{BQML}, assert the code strictly evaluates $CF = 1.0$. If units = \texttt{COUNTS}, assert the pipeline applies standard empirical Calibration Factors.
+\end{itemize}
+
+\noindent\textbf{Iodine Contrast Shielding Hallucinations (Expert Constraint \#2):}
+\begin{itemize}
+    \item \textbf{The Check:} High-Z Intravenous contrast scales non-linearly due to photoelectric ($Z^3$) effects, breaking beta-particle electron density mapping.
+    \item \textbf{Test Implementation:} Feed the CTP401 Teflon insert (990 HU) into the pipeline as a proxy for contrast-enhanced blood pools.
+    \item \textbf{Assertion:} Because 990 HU $> 300$ HU, the software should trigger the native "Non-contrast CT initialization bounds" pre-flight check. Assert that an exception is raised, protecting the neural network from generating unphysical attenuation artifacts.
+\end{itemize}
+
+\subsection{Advanced Catphan-Based Stability Tests}
+\begin{itemize}
+    \item \textbf{Beam Hardening (Cupping) Invariance (CTP486):} Ingesting a scan with known 10-15 HU cupping artifacts, we assert that the Integral Non-Uniformity of the resulting physical dose $D_{phys}(\mathbf{r})$ remains statistically flat, ensuring dose "hotspots" are not hallucinated at the center.
+    \item \textbf{Z-Axis Kernel Truncation and SSP Integrity (CTP528/591):} A simulated sub-pixel point source must yield a Slice Sensitivity Profile (SSP) where the FWHM matches physical expectations, proving sub-voxel Z-axis spatial dispersion is correctly handled.
+    \item \textbf{High-Frequency Gradient ($\nabla \rho$) Aliasing (CTP446/528):} Projecting activity across the 21 lp/cm line pair gauge, we verify that $\mathcal{N}_\theta$ does not generate NaNs or "Gibbs ringing" artifacts at violent microscopic interfaces.
+    \item \textbf{Sub-Slice Partial Volume Singularity (CTP515):} Using 3--7mm cylinders, we confirm that $1/m(\mathbf{r})$ normalization safely resolves local micro-doses without triggering computational singularities at volume-averaged edges.
+    \item \textbf{Soft-Tissue Margin Noise Rejection (CTP263/515):} On low-contrast targets (0.3\%--1.0\%), the network must distinguish true boundaries from CT Poisson noise, outputting an identity multiplier ($\approx 1.0$) to prevent hallucinated dosimetric speckle.
+\end{itemize}
+
+\section{Expert Inquiry and Validated Constraints}
+
+Domain expert review of these formulations has structurally confirmed several native system boundaries natively protecting optimization matrices:
+\begin{enumerate}
+    \item \textbf{Auger Transmutation Explosions:} While $\sim 15\%$ of $^{177}$Lu decays trigger local internal conversion Auger cascades that fundamentally shred targeting DOTA tags, the physical mass disparity between cold/hot peptides implies evaluating solely a $\lambda_{phys}$ subtraction effectively governs specific activity.
+    \item \textbf{Iodine Contrast Shielding Hallucinations:} High-$Z$ Intravenous Contrast ($HU > 300$) scales wildly distinctly via photoelectric phenomena ($Z^3$) compared to pure beta-particle electron densities ($Z/A$). Evaluating iodine maps guarantees mathematical $\beta^-$ attenuation hallucinations, commanding strict Native Non-contrast CT initialization bounds.
+    \item \textbf{Directional Vector Embeddings:} Because scaling $\mathcal{N}_\theta$ completely without explicit continuous Vector Directional geometry fields permanently blinds convolutions toward asymmetrical backscatter resolutions, generating discrete Unscattered Ray-Tracing proxy fluxes prior to Deep Learning arrays formally overcomes native radiation symmetries!
+\end{enumerate}
+
+
+\begin{itemize}
+    \item \textbf{ Pharmacodynamic } "Historically, our compartmental system forces simple unbinding competitive states ($k_4$) looping into the free interstitial grid boundaries. However, PSMA-ligand configurations map violently toward irreversibly internalized clathrin-coated Endocytic compartments dynamically. Must the macro $A_{bound}$ vector completely separate into surface equilibrium parameters ($A_{surface}$) contrasting rigid integrated sinks ($A_{internal}$) structurally tracking deeply shielded activities?"
+    \item \textbf{Radiobiological} "Evaluating lethal scaling algorithms across Low Dose Rate trajectories involves severe uncertainties over dynamic repopulation variables. Because we definitively bound individual voxel $T_{treat}(\mathbf{r})$ metrics strictly to lethal duration drop points, should stochastic $G_2$ biological limits and direct Poisson-modeled structural DNA Double Strand Break evaluations overwrite the global $\alpha / \beta$ scalar matrix limits?"
+\end{itemize}
+
+\section{Conclusion}
+By integrating all variables from `table.txt` including calibration ($CF$), resolution ($RC$), and anatomical mass $m(\mathbf{r})$, this SciML framework provides a truly universal digital twin for precision $^{177}$Lu-PSMA therapy.
+
+\bibliographystyle{unsrt}
+\bibliography{bibl}
+
+\end{document}

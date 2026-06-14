@@ -16,15 +16,14 @@ const DOSE_CONV = 8.478f-8
 
 # --- Architectures ---
 
-function ResBlock(channels::Int)
-    return SkipConnection(Chain(Conv((3, 3, 3), channels => channels, pad=1, relu), Conv((3, 3, 3), channels => channels, pad=1)), +)
+function ResBlockNorm(channels::Int)
+    return SkipConnection(Chain(Conv((3, 3, 3), channels => channels, pad=1), GroupNorm(channels, 8, relu), Conv((3, 3, 3), channels => channels, pad=1), GroupNorm(channels, 8)), +)
 end
 
 function build_ude_no_approx_64()
     width, depth = 32, 3
-    branch_A = Conv((3, 3, 3), 1 => width, pad=1, relu); branch_ρ = Conv((3, 3, 3), 1 => width, pad=1, relu)
-    layers = Any[Parallel(+, branch_A, branch_ρ)]
-    for _ in 1:depth; push!(layers, ResBlock(width)); end
+    layers = Any[Parallel(+, Conv((3, 3, 3), 1 => width, pad=1, relu), Conv((3, 3, 3), 1 => width, pad=1, relu))]
+    for _ in 1:depth; push!(layers, ResBlockNorm(width)); end
     push!(layers, Conv((3, 3, 3), width => 1, pad=1))
     return Chain(layers...)
 end
@@ -32,7 +31,7 @@ end
 function build_cnn_approx_64()
     width, depth = 32, 3
     layers = Any[Conv((3, 3, 3), 3 => width, pad=1, relu)]
-    for _ in 1:depth; push!(layers, ResBlock(width)); end
+    for _ in 1:depth; push!(layers, ResBlockNorm(width)); end
     push!(layers, Conv((3, 3, 3), width => 1, pad=1))
     return Chain(layers...)
 end
@@ -51,8 +50,10 @@ end
 
 function predict_ude(model, θ, st, A0, den_p, vol_p)
     p_s = size(A0, 1)
-    dev = Lux.cpu_device()
+    dev = Lux.gpu_device()
+    CUDA.allowscalar(true)
     u0 = ComponentArray(A_blood=dev(Float32[sum(A0)*0.05f0]), A_free=A0.*0.45f0, A_bound=A0.*0.50f0, DOSE=zero(A0))
+    CUDA.allowscalar(false)
     function ude_func(u, p, t)
         A_t = u.A_free .+ u.A_bound
         A_t_std = (A_t .- mean(A_t)) ./ (std(A_t) + 1f-6)
@@ -66,7 +67,7 @@ function predict_ude(model, θ, st, A0, den_p, vol_p)
 end
 
 function run_single_eval_64()
-    dev = Lux.cpu_device(); rng = Random.default_rng()
+    dev = Lux.gpu_device(); rng = Random.default_rng()
     
     # Load and Fix
     θ_noapp_raw = dev(deserialize("data/checkpoints/UDE_NO_APPROX_64/model_best_UDE_NO_APPROX_64.jls"))

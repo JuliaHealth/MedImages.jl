@@ -1,0 +1,475 @@
+Discuss what these sources say about "Quantifies accuracy and precision" in the context of "Class 2: Technical Task-Specific".
+
+In the context of the “Class 2: Technical Task-Specific” evaluation, the quantification of accuracy and precision refers to the assessment of the technical performance of an AI algorithm in specific, clinically relevant tasks , such as detection or quantification.
+ \cite{JhaBradshaw2022}.
+Accuracy: In recognition tasks, this is assessed by discrimination accuracy , and in quantification tasks by measurement bias.
+ \cite{JhaBradshaw2022}A practical example of this is the evaluation of the accuracy in detecting lesions in AI-reconstructed low-dose PET images.
+ \cite{JhaBradshaw2022}The Area Under the Curve (AUC) is often used as a figure of merit (FoM) to quantify accuracy in classification tasks.
+ \cite{JhaBradshaw2022}.
+Precision: Precision is determined by the reproducibility and repeatability of the results.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}To measure accuracy, precision, and overall reliability in quantification tasks, researchers use metrics such as bias , variance, and mean squared ensemble error.
+ \cite{JhaBradshaw2022}.
+The sources explicitly emphasize that this technical evaluation does not assess the usefulness of the method for clinical decision-making or clinical endpoints.
+ \cite{JhaBradshaw2022}Since clinical decisions depend on numerous other factors (such as patient biology, medical history, or other tests), the "Class 2" evaluation is strictly limited to technical efficiency in controlled environments.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}A typical example of this phase is the demonstration that an AI-based method can accurately and precisely measure metabolic tumor volume (MTV), without investigating whether these more precise values ​​actually lead to a change in clinical treatment success.
+ \cite{JhaBradshaw2022}
+.
+Discuss what these sources say about “Demonstrates innovation” in the context of “Class 1: Proof-of-Concept”.
+
+The sources describe the main goal of a "Class 1: Proof-of-Concept" (POC) evaluation as being to quantitatively demonstrate the technological innovations of newly developed AI algorithms.
+ \cite{JhaBradshaw2022}This is achieved by using task-agnostic metrics, so-called Figures of Merit (FoMs), to demonstrate the novelty and potential of a proposed algorithm.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+To successfully demonstrate a promising technological innovation within the framework of such a POC test, the test procedure should be designed in such a way that the new algorithm is compared with reference methods, the current standard of care, and ideally with other state-of-the-art algorithms.
+ \cite{JhaBradshaw2022}.
+In this context, the sources emphasize important characteristics and limitations of this form of innovation assessment:
+Broader scope and rapid dissemination: Since a newly developed AI algorithm can be suitable for many different clinical tasks, the task-independent objective of a POC study enables timely publication and expands the potential application of the newly developed methods , as it is not necessary to immediately conduct complex, resource-intensive studies for each individual specific clinical task.
+ \cite{JhaBradshaw2022}.
+No clinical claims: Although POC studies provide important evidence that should motivate further clinical evaluations, no clinical or task-specific technical claims may be formulated based on these proof-of-concept evaluations.
+ \cite{JhaBradshaw2022}The evidence provided by these method development studies is insufficient to make reliable statements about how a trained algorithm will behave in actual clinical practice or in a specific clinical task.
+ \cite{BradshawBoellaard2021}.
+In summary, "Class 1" studies (also referred to in the sources as method development studies) primarily serve to introduce a novel method or to demonstrate the basic feasibility of a new application (proof-of-concept).
+ \cite{BradshawBoellaard2021}and thus create a basis for innovation for future, more in-depth clinical evaluations
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+Discuss what these sources say about "task-agnostic metrics" in the context of "Class 1: Proof-of-Concept".
+
+Within the framework of the “Class 1: Proof-of-Concept” (POC) evaluation , “task-agnostic metrics” (task-independent evaluation metrics or Figures of Merit , FoMs) serve to quantitatively demonstrate the technological innovation and the fundamental potential of a newly developed AI algorithm.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}Since newly developed AI methods are often suitable for a wide variety of clinical tasks, an immediate evaluation for all these specific scenarios would require countless studies and scarcely available resources.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}The use of task-independent metrics circumvents this problem and instead enables the rapid adoption of new technologies while simultaneously expanding their scope of application.
+ \cite{JhaBradshaw2022}.
+Although these metrics are not tied to a specific clinical diagnosis or task, they must be carefully selected to justify the algorithm's potential for more in-depth, clinically task-specific evaluations.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}The sources warn that poorly chosen metrics can produce misleading results.
+ \cite{JhaBradshaw2022}For example, if a noise reduction algorithm smooths an image too much at the expense of image resolution, an evaluation based solely on the contrast-to-noise ratio would be misleading; a metric such as the Structural Similarity Index would be more meaningful here.
+ \cite{JhaBradshaw2022}It is generally recommended that algorithms in this phase always be evaluated simultaneously using several task-independent metrics.
+ \cite{JhaBradshaw2022}Another typical example of such a metric is the root mean square error , which can be used, for example, for the basic evaluation of AI-supported PET reconstruction algorithms.
+ \cite{JhaBradshaw2022}.
+However, a central principle of POC evaluation is that clinical or task-specific technical performance claims (so-called "claims") must never be made on the basis of these task-independent metrics.
+ \cite{JhaBradshaw2022}The metrics serve only as initial proof of feasibility and explicitly do not provide any information about the actual performance or usefulness of the algorithm in a real clinical scenario.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}A correct evaluation claim in this first phase is strictly limited to describing performance based on the task-independent metric, without making any clinical promises.
+ \cite{JhaBradshaw2022}.
+Discuss what these sources say about "Class 1: Proof-of-Concept" in the context of "Evaluation Framework".
+
+“Class 1: Proof-of-Concept” (POC) is the first stage of a proposed 4-class evaluation framework for the systematic assessment of AI algorithms in nuclear medicine.
+ \cite{JhaBradshaw2022}
+.
+Objective and significance: The primary goal of the POC evaluation is to quantitatively demonstrate the technological innovations and novelty of a newly developed AI algorithm and to highlight its potential. 
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}A positive proof-of-concept provides the scientific justification and motivation to test the algorithm in later phases in a task-specific and clinically more detailed manner.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}This stage is optional in the overall framework, as it merely serves as initial proof of an algorithm's potential before it moves into the clinical testing phase.
+ \cite{JhaBradshaw2022}.
+Task-agnostic evaluation: A key feature of POC evaluation is the use of task-independent metrics (Figures of Merit, FoMs), such as the "Root Mean Square Error" (RMSE) or the "Structural Similarity Index". 
+ \cite{JhaBradshaw2022}
+This is based on pragmatic grounds: A new AI algorithm (for example, for segmentation) can often be useful for a wide variety of different clinical tasks; however, the immediate evaluation of all these tasks would require enormous resources and numerous studies.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}The task-independent approach thus enables faster publication and dissemination of new methods.
+ \cite{JhaBradshaw2022}However, this results in the strict limitation that, based on a POC evaluation, it may under no circumstances be claimed that the system is effective in clinical practice or for a specific clinical task.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+Best practices and study design (according to the RELAINCE Guidelines):
+Data collection: For POC studies, realistic simulations, physical phantoms, retrospective clinical data, or data from public databases can be used.
+ \cite{JhaBradshaw2022}It is an absolute requirement that there be no overlap between the test data of the POC evaluation and the data used for training or optimizing the model.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+Reference standards (ground truth): While the truth is precisely known in simulations or phantoms, for clinical data, curation by a single reader is often sufficient to define the reference standard.
+ \cite{JhaBradshaw2022}Attention must be paid to ensuring an appropriate quality of ground truth.
+ \cite{JhaBradshaw2022}.
+Method comparison: The new algorithm should be tested against existing reference methods, clinical standard procedures and preferably against other current state-of-the-art algorithms to demonstrate its technological superiority or novelty.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+Metric selection: The metrics should be deliberately chosen to be meaningful and not misleading. For example, a simple contrast-to-noise ratio would be misleading if an algorithm smooths the image too much, thereby ruining the resolution.
+ \cite{JhaBradshaw2022}The use of multiple FoMs is recommended.
+ \cite{JhaBradshaw2022}.
+Outcome and performance claim: At the end of the evaluation, a specific claim should be formulated that accurately describes the precise application (e.g., image reconstruction), the target patient population, the imaging protocol used, the reference standard, and the performance based on the metrics. 
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}The sources explicitly emphasize once again that a POC claim should never be interpreted as an indicator of the algorithm's actual behavior in real-world clinical practice.
+ \cite{JhaBradshaw2022}.
+Discuss what these sources say about "Controlled settings" in the context of "Class 2: Technical Task-Specific".
+
+The Class 2: Technical Task-Specific Evaluation aims to assess the technical performance of an AI algorithm in specific clinically relevant tasks such as the detection or quantification of lesions.
+ \cite{JhaBradshaw2022},
+ \cite{JhaBradshaw2022}To reliably quantify performance aspects such as accuracy (e.g., discrimination accuracy or measurement distortion) and precision (reproducibility and repeatability), it is necessary that these studies are carried out in strictly controlled environments (controlled settings).
+ \cite{JhaBradshaw2022},
+ \cite{JhaBradshaw2022}.
+The crucial aspect of these controlled settings is to selectively isolate the purely technical capabilities of AI, since real clinical decision-making is influenced by many other variables, such as medical history, specific patient biology, and the results of other medical tests.
+ \cite{JhaBradshaw2022}To ensure this controllability, the guidelines recommend three essential study types:
+Realistic simulations: These studies use anthropomorphic digital phantoms and precisely simulated scanner systems.
+ \cite{JhaBradshaw2022}The great advantage of this setting is that the "ground truth" (the underlying, objective truth of the data) is absolutely known.
+ \cite{JhaBradshaw2022},
+ \cite{JhaBradshaw2022}Parameters can be derived directly from clinical data to realistically represent population characteristics without endangering real patients.
+ \cite{JhaBradshaw2022}.
+Physical anthropomorphic phantoms: This involves the use of physical models that mimic human anatomy and physiology and are physically examined in a scanner.
+ \cite{JhaBradshaw2022}Here too, the ground truth is generally known, although experimental errors occur in determining the reference values ​​and should be taken into account in the statistical analysis.
+ \cite{JhaBradshaw2022}To claim clinical relevance in this setting, parameters such as tracer uptake must accurately reflect real clinical processes.
+ \cite{JhaBradshaw2022}.
+Clinical data studies: Under controlled conditions, clinical data are often used retrospectively to, for example, test the stability of an algorithm in test-retest scenarios.
+ \cite{JhaBradshaw2022}A key challenge of this controlled setting is that real patient data often lacks absolute ground truth.
+ \cite{JhaBradshaw2022},
+ \cite{JhaBradshaw2022}To maintain control, a high-quality reference standard must be established, for example through the consensus of several independent experts.
+ \cite{JhaBradshaw2022},
+ \cite{JhaBradshaw2022}.
+Controlling variability for causal identification: Controlled settings allow developers and researchers to keep individual system variables constant in order to systematically explore the performance limits of the algorithm. For example, in single-center or single-scanner studies, all technical acquisition and reconstruction protocols are kept strictly constant to measure in isolation how sensitive the AI ​​is to variability in patient characteristics such as age, gender, or disease properties. 
+ \cite{JhaBradshaw2022}In contrast, multicenter studies under controlled conditions allow for a structured investigation of the algorithm's sensitivity to different scanner models or acquisition protocols.
+ \cite{JhaBradshaw2022}.
+In summary, "controlled settings" in Class 2 evaluation form the necessary foundation for collecting reliable and isolated data on the technical reliability of an AI.
+ \cite{JhaBradshaw2022}This strict delimitation and control of variables is the essential intermediate step before an algorithm can be used in the more unpredictable, dynamic real-world clinical environment (Class 3).
+ \cite{JhaBradshaw2022},
+ \cite{JhaBradshaw2022}.
+Discuss what these sources say about "Class 3: Clinical Evaluation" in the context of the "Evaluation Framework".
+
+In the evaluation framework for AI algorithms in nuclear medicine, “Class 3: Clinical Evaluation” is a central and advanced stage, the main goal of which is to quantify the effectiveness of an algorithm in supporting and making decisions in real clinical practice.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+Aims and Scope While purely technical evaluations (Class 2) assess performance under controlled conditions, Class 3 focuses on measuring the actual added value and impact of AI on clinical decision-making. 
+ \cite{JhaBradshaw2022}AI algorithms that claim to improve diagnostic, predictive, prognostic, or therapeutic decisions absolutely require clinical evaluation.
+ \cite{JhaBradshaw2022}A practical example would be the evaluation of whether an AI-based reconstruction algorithm actually improves the clinical diagnosis of patients suspected of having cancer relapse.
+ \cite{JhaBradshaw2022}The evaluation is based on primary endpoints, such as improved accuracy or precision in capturing clinical outcomes.
+ \cite{JhaBradshaw2022}.
+Study design and methodology: The design of the evaluation study depends significantly on whether the AI ​​system works merely descriptively or provides direct recommendations for action (prescriptively). 
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}For the evaluation in Class 3, various study types are used:
+Retrospective studies: These utilize existing data sources, are cost-effective, and quick to conduct. They are suitable for evaluating descriptive AI, but cannot definitively prove causality between the AI ​​result and the clinical outcome and are susceptible to various biases (e.g., selection bias).
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+Prospective observational studies: In these studies, the endpoints of interest are recorded after the start of the study, but the algorithm does not influence the allocation of patients to specific interventions.
+ \cite{JhaBradshaw2022}.
+Prospective interventional studies: In these studies, which also include randomized controlled trials (RCTs) as the "gold standard", the choice of intervention depends on the AI ​​output.
+ \cite{JhaBradshaw2022}Such evaluations are crucial before prescriptive AI systems are widely used in clinical imaging.
+ \cite{HeringtonMcCradden2023}.
+Real-world studies (post-deployment): These analyze the performance and benefits of already regulatory-approved algorithms in real clinical data to verify long-term added value and potential new areas of application.
+ \cite{JhaBradshaw2022}.
+Data requirements and generalizability: A key requirement for clinical evaluation is that algorithms must be "frozen" – meaning they must no longer be in the training phase – and tested with data that is independent of the development data. 
+ \cite{BradshawBoellaard2021}To prove that the performance of the AI ​​is generalizable, the test data should come from different, preferably several, institutions.
+ \cite{JhaBradshaw2022}Diagnostic algorithms also require so-called "reader studies" in which specialists (e.g., nuclear medicine specialists or radiologists) assess how the AI ​​affects image interpretation or clinical decision-making.
+ \cite{BradshawBoellaard2021}.
+Reference Standards and Performance Metrics (Figures of Merit): Since the evaluation should have a direct bearing on clinical practice, a very high-quality reference standard must be defined. This can be established through hard clinical outcomes (such as overall survival or the absence of serious clinical events), external standards (e.g., biopsy findings), or expert-defined diagnoses. 
+ \cite{JhaBradshaw2022}
+.
+To quantify performance, clinically relevant metrics (Figures of Merit, FoMs) are used. Instead of purely technical metrics, parameters such as sensitivity, specificity, ROC curves, the area under the curve (AUC), as well as Kaplan-Meier estimators or predictive risk scores (for prediction tasks) are used to demonstrate the benefits of AI.
+ \cite{JhaBradshaw2022}.
+The final product: The "claim." The goal of a Class 3 study is to formulate a precise, quantifiable claim about the algorithm. This claim is strictly formalized and must include the following elements: the exact clinical task, the patient population tested, the imaging and analysis protocol used, a brief description of the study design (e.g., retrospective, blinded, number of readers), the process for defining the reference standard, and the final performance metric for quantifying the support for clinical decision-making. 
+ \cite{JhaBradshaw2022}.
+Discuss what these sources say about "Class 2: Technical Task-Specific" in the context of "Evaluation Framework".
+
+In the context of the 4-class evaluation framework proposed by the SNMMI AI Task Force, “Class 2” describes the so-called “Technical Task-Specific Evaluation” .
+ \cite{JhaBradshaw2022}
+ \cite{MillerKuronuma2022}.
+The sources provide the following detailed information about this evaluation class:
+Objective
+The primary goal of Class 2 evaluation is to quantify the technical performance of an AI algorithm in specific, clinically relevant tasks, such as lesion detection (classification) or the quantification of tumor features.
+ \cite{JhaBradshaw2022}
+.
+The evaluation focuses on technical aspects such as accuracy (e.g., discrimination accuracy in recognition tasks or measurement bias in quantification tasks) as well as the precision, repeatability, and reproducibility of the algorithm.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+It is explicitly emphasized that clinical benefit, impact on clinical decision-making, or patient outcomes are not evaluated during this phase.
+ \cite{JhaBradshaw2022}An example of such a study is the verification of the accuracy of an AI segmentation algorithm for measuring metabolic tumor volume (MTV), without evaluating whether this measurement changes the patient's treatment outcome.
+ \cite{JhaBradshaw2022}.
+Study design and test environment
+To evaluate technical performance, studies should be conducted in controlled environments.
+ \cite{JhaBradshaw2022}.
+Suitable study types include realistic simulations (e.g., virtual clinical trials with digital anthropomorphic phantoms), physical phantoms, or studies based on clinical data.
+ \cite{JhaBradshaw2022}.
+A distinction is made between single-center/single-scanner studies (to test, for example, the sensitivity to patient characteristics with constant technique) and multi-center studies (to demonstrate the robustness of the algorithm against different systems, acquisition protocols or software parameters).
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+Reference standards and methodology
+A key element is the definition of a high-quality reference standard (ground truth).
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}This standard is known in simulations and physical phantoms.
+ \cite{JhaBradshaw2022}In the case of clinical data, where the “true” solution is often lacking, a reference standard must be curated, ideally through blinded multi-reader studies with independent experts.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+The data cohort for the evaluation should be external, meaning it must not overlap with the training and validation data of the algorithm.
+ \cite{JhaBradshaw2022}.
+The information must be extracted optimally and in a task-specific manner, which is why human experts or validated numerical observer models are often used for evaluation.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+Performance metrics (Figures of Merit - FoMs)
+Performance is quantified using task-specific, objective metrics (FoMs).
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}Subjective metrics that do not correspond to the clinical task should be avoided.
+ \cite{JhaBradshaw2022}.
+For classification and recognition tasks, the area under the ROC curve (AUC) is recommended.
+ \cite{JhaBradshaw2022}.
+For quantification tasks, metrics such as bias, variance, and mean squared error (MSE) are used.
+ \cite{JhaBradshaw2022}.
+The output: The “claim” (performance expectation)
+The end product of a successful Class 2 evaluation is a so-called "claim" (benefit entitlement).
+ \cite{JhaBradshaw2022}This must clearly define for which clinical task the algorithm was evaluated, which study type it underwent, which imaging protocol was used, how the reference standard was defined, and what the performance measured with the FoMs is.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+An example of such a claim is: “A fully automated AI-based PET tumor segmentation algorithm delivered MTV values ​​with a normalized bias of X\\\\% [...] evaluated in physical phantom studies on a single scanner.”
+ \cite{JhaBradshaw2022}.
+Discuss what these sources say about “Assesses clinical utility” in the context of “Class 3: Clinical Evaluation”.
+
+In the context of “Class 3: Clinical Evaluation”, the sources define clinical utility as the decisive measure for the practical added value of an AI algorithm in everyday healthcare.
+The clinical evaluation aims to assess the impact of the AI ​​algorithm on clinical decisions , including diagnostic, prognostic, predictive, and therapeutic decisions.
+ \cite{JhaBradshaw2022}While technical evaluation merely quantifies performance under controlled conditions, clinical evaluation examines the actual clinical utility of AI in a practical, real-world environment and measures its added value for decision-making.
+ \cite{JhaBradshaw2022}The guidelines strongly emphasize that clinical utility, and not merely theoretical "in silico" performance (computer model performance), must be evaluated and transparently declared.
+ \cite{HeringtonMcCradden2023}
+ \cite{HeringtonMcCradden2023}.
+Furthermore, the sources highlight the following key aspects for assessing clinical utility:
+Clinical outcomes focus: The ultimate goal of medical imaging is to improve patient outcomes. To demonstrate clinical utility, particularly for predictive and prognostic AI tasks, endpoints such as overall survival, progression-free survival, significant clinical events, and hospitalizations should be used as the gold standard.
+ \cite{JhaBradshaw2022}.
+Improved resource efficiency: A reduction in resource consumption with comparable treatment outcomes is also considered evidence of clinical usefulness, for example, if the AI ​​tool results in fewer unnecessary follow-up examinations.
+ \cite{JhaBradshaw2022}.
+Specific Figures of Merit: In order to quantitatively assess clinical utility in predictive tasks, Kaplan-Meier estimators, predictive risk scores, and the median time to future events can be used in addition to standard metrics (such as AUC).
+ \cite{JhaBradshaw2022}.
+Protection against misdiagnosis and inequality: Evaluation in complex clinical practice is essential. The clinical use of AI tools without such an evaluation process carries the risk of harming patients through inappropriate diagnoses or treatments, wasting resources through inefficient applications, and further exacerbating existing health inequalities.
+ \cite{HeringtonMcCradden2023}.
+Discuss what these sources say about "Impacts decision making" in the context of "Class 3: Clinical Evaluation".
+
+In the context of “Class 3: Clinical Evaluation”, the primary goal is to quantify how effective an AI algorithm is in supporting and facilitating decision-making in everyday clinical practice.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}AI algorithms that claim to improve clinical decisions must undergo this clinical evaluation stage.
+ \cite{JhaBradshaw2022}.
+The sources highlight the following key aspects regarding the impact of AI on decision-making:
+Assessment of clinical added value: The Class 3 evaluation assesses the concrete added value of AI for decision-making based on measurable clinical endpoints. This includes improved accuracy and precision in diagnostic, predictive, prognostic, or therapeutic decisions.
+ \cite{JhaBradshaw2022}For diagnostic algorithms, expert studies (so-called reader studies) are required in which radiologists or nuclear medicine specialists assess how the AI ​​affects image interpretation and actual decision-making.
+ \cite{BradshawBoellaard2021}.
+Type of influence (descriptive vs. prescriptive): The study design in class 3 depends on the extent to which the AI ​​intervenes in the decision-making process. Descriptive AI does not provide direct treatment recommendations but can indirectly influence clinical decision-making (e.g., in diagnosis or staging); retrospective studies may suffice for this purpose.
+ \cite{JhaBradshaw2022}In contrast , prescriptive AI provides direct recommendations for clinical interventions. To demonstrate its influence on decisions and treatment outcomes, far stronger evidence, such as prospective interventional studies (e.g., randomized controlled trials), is recommended.
+ \cite{JhaBradshaw2022}.
+Selection of appropriate metrics and standards: To make the performance of an algorithm tangible and reliable for medical decision-making, it is emphasized that metrics such as sensitivity and specificity are often more clinically relevant than pure summary statistics such as AUC (area under the ROC curve).
+ \cite{JhaBradshaw2022}Furthermore, the reference standards against which the AI ​​is tested must be representative of the data and standards on which medical decision-making is normally based.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+Importance of explainability: A deeper understanding of how and why AI arrives at a particular decision (e.g., through "Explainable AI" or XAI) can theoretically help doctors and patients make more informed decisions and retain more control over the process.
+ \cite{BradshawMcCradden2023}At the same time, warnings are issued that such explanations could mistakenly lead doctors to blindly trust incorrect AI suggestions ("automation bias"), and that this could promote medical errors.
+ \cite{MillerKuronuma2022}
+ \cite{BradshawMcCradden2023}.
+Shared decision-making: The sources clarify that the use of AI must not undermine human autonomy. AI should always function only as one of several sources of information to make decisions together with the patient and prevent algorithmic paternalism.
+ \cite{HeringtonMcCradden2023}
+ \cite{HeringtonMcCradden2023}To ensure trustworthy clinical decision-making, human oversight ("human-in-the-loop" or "human-in-command") must always be maintained over the algorithms.
+ \cite{SabouryBradshaw2022}.
+Discuss what these sources say about "Class 4: Postdeployment" in the context of "Evaluation Framework".
+
+The evaluation framework for artificial intelligence (AI) in nuclear medicine divides the assessment of algorithms into four classes, with "Class 4: Postdeployment" (the evaluation after clinical introduction) representing the final phase.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}This class aims to monitor the performance, clinical utility, and long-term value of an AI algorithm in a dynamic, real-world clinical environment after it has been officially approved for use and implemented.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+In the context of “Class 4: Postdeployment”, the sources highlight the following main goals and strategies:
+1. Monitoring of performance and patient safety: Quality and patient safety are the top priorities after implementation. 
+ \cite{JhaBradshaw2022}Post-deployment evaluation includes continuous monitoring of the devices, tracking of adverse events, recalls, and corrective actions.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}Advanced logging mechanisms can, for example, measure how often AI is actually used in everyday clinical practice and how frequently manual interventions are needed in otherwise automated processes.
+ \cite{JhaBradshaw2022}.
+2. Routine plausibility checks through phantom studies To ensure that AI algorithms are not negatively affected by maintenance work or software updates, routine phantom studies of image quality serve as "sanity checks". 
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}This process routinely checks whether parameters such as contrast and SUV recovery (Standardized Uptake Value) are maintained and whether image artifacts are absent.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+3. Detection and Management of “Data Drift” (Data Shifts): AI systems operate in non-stationary environments after their introduction, where patient populations, demographic characteristics, hardware, and data collection and analysis protocols can change over time. 
+ \cite{JhaBradshaw2022}
+ \cite{HeringtonMcCradden2023}Post-deployment evaluation helps to identify this "data drift" in order to decide whether an algorithm needs to be recalibrated or retrained to maintain its performance.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}Continuous learning algorithms and algorithmic audits are possible tools to address this problem.
+ \cite{JhaBradshaw2022}
+ \cite{HeringtonMcCradden2023}.
+4. Off-label evaluation: AI models are typically trained for specific patient populations and indications. 
+ \cite{JhaBradshaw2022}In the post-deployment phase, it can be assessed whether the AI ​​is also useful outside of its original scope (off-label use).
+ \cite{JhaBradshaw2022}One example from the sources is an AI that was trained to classify lymphomas and lung cancer, but also delivered reliable results in clinical use with breast cancer patients.
+ \cite{JhaBradshaw2022}.
+5. Data collection for proactive development: Real-world clinical data generated after approval can be compiled to improve AI performance and develop new clinical hypotheses. 
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}Registries and multicenter observational studies help to identify weaknesses and uncover clinical needs that have not yet been adequately addressed.
+ \cite{JhaBradshaw2022}.
+Metrics (Figures of Merit - FoMs) for evaluation: While earlier phases primarily focused on diagnostic accuracy or purely technical metrics, the "Class 4" evaluation also focuses on metrics of real clinical benefit. 
+ \cite{JhaBradshaw2022}. This includes:
+Frequency of use of the algorithm in everyday clinical practice
+ \cite{JhaBradshaw2022}.
+The number of cases in which the AI-based method has changed clinical decisions or patient management
+ \cite{JhaBradshaw2022}.
+In summary, the Class 4 evaluation ensures that an algorithm remains trustworthy and functional in the real world, even as medical guidelines, disease patterns, and technological ecosystems evolve.
+ \cite{HeringtonMcCradden2023}.
+Discuss what these sources say about “Identifies data drift” in the context of “Class 4: Postdeployment”.
+
+Within the framework of the “Class 4: Postdeployment” evaluation (the evaluation after clinical deployment), the identification of “data drift” plays a central role for the long-term safety and reliability of an AI algorithm.
+Causes of data drift: AI systems operate in dynamic, non-stationary environments in real clinical practice.
+ \cite{JhaBradshaw2022}Over time, the distribution of the input data may differ from the original training data.
+ \cite{JhaBradshaw2022}. Such shifts typically arise from changes in patient demographics, disease frequency (prevalence), the hardware used (e.g., new scanners), or from adapted acquisition and analysis protocols.
+ \cite{JhaBradshaw2022}
+.
+Objectives of the Class 4 evaluation: Because the performance evaluation of AI is never fully completed, even after initial clinical approval.
+ \cite{HeringtonMcCradden2023}The post-deployment phase serves to continuously monitor the algorithm in real-world clinical practice and to ensure that it remains safe and effective over extended periods.
+ \cite{JhaBradshaw2022}The evaluation specifically helps to uncover potential data drift.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+Strategies for detection and remediation:
+To detect data shifts early as a warning signal, descriptors of the patient population (such as demographic characteristics) should be continuously monitored.
+ \cite{JhaBradshaw2022}.
+Furthermore, enhanced logging mechanisms can be used to collect aggregated data on AI performance and its actual use in clinical practice.
+ \cite{JhaBradshaw2022}.
+If changes in population characteristics (dataset shifts) are detected, physicians should verify the outputs of the AI ​​algorithm on randomly selected test cases.
+ \cite{JhaBradshaw2022}.
+Once a performance decline is identified, it must be assessed whether recalibration or retraining of the AI ​​model is necessary to maintain the original performance.
+ \cite{JhaBradshaw2022}
+ \cite{MillerKuronuma2022}.
+As a solution to react flexibly to data drift, the implementation of continuous learning strategies is also proposed, through which the algorithm can gradually adapt and improve.
+ \cite{JhaBradshaw2022}
+ \cite{MillerKuronuma2022}.
+Overall, the sources emphasize that this ongoing maintenance is essential to maintain confidence in the systems and to ensure that the algorithms consistently deliver reliable results, not only during software updates but also in evolving clinical ecosystems.
+ \cite{HeringtonMcCradden2023}
+ \cite{MillerKuronuma2022}.
+Discuss what these sources say about "Monitors real-world performance" in the context of "Class 4: Postdeployment".
+
+In the context of the “Class 4: Postdeployment” evaluation, real-world performance monitoring aims to continuously control the behavior of an AI algorithm in dynamic, everyday clinical environments after its approval and implementation.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+The sources highlight several key aspects of this surveillance in practice:
+Data drift detection: AI systems operate in non-stationary environments where patient populations, as well as clinical and surgical practices, can change over time.
+ \cite{JhaBradshaw2022}
+ \cite{HeringtonMcCradden2023}Post-deployment monitoring is crucial to detect such "dataset shifts" and assess whether the AI ​​algorithm needs to be recalibrated or retrained to maintain its performance and reliability.
+ \cite{JhaBradshaw2022}
+ \cite{HeringtonMcCradden2023}.
+Patient safety and quality control: Monitoring is essential to maintain the trustworthiness of a system after deployment.
+ \cite{HeringtonMcCradden2023}This includes compliance with reporting obligations for adverse events, recalls, and corrective actions.
+ \cite{JhaBradshaw2022}Algorithmic audits can also be used for performance monitoring.
+ \cite{HeringtonMcCradden2023}as well as advanced logging mechanisms to record, for example, how often the AI ​​is used or how much manual rework is required for automated steps.
+ \cite{JhaBradshaw2022}Routine phantom studies of image quality also serve as so-called "sanity checks" to ensure that routine maintenance or software updates have not negatively affected algorithm performance.
+ \cite{JhaBradshaw2022}.
+Evaluation of off-label use and new populations: Since real-world data from clinical use cover a much broader patient population than original prospective studies, this phase also allows for the evaluation of the tool outside its original scope of application.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}It is possible to assess how useful the algorithm is for diseases, populations, new camera models, or reconstruction methods that were not part of the original training data or claim.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+Proactive Development: An already deployed AI offers the possibility of cost-effectively bundling uniform data from numerous users, for example via registry approaches or observational studies across multiple centers.
+ \cite{JhaBradshaw2022}This real-world data can help develop new clinical hypotheses, gather feedback for developers, further improve device performance, and expedite approval for new clinical applications in a time- and cost-efficient manner.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}It is important that a careful study protocol and analysis plan are created in advance for this type of real-world study in order to avoid bias.
+ \cite{JhaBradshaw2022}.
+Discuss what these sources say about "Patient population demographics" in the context of "Components of a Claim".
+
+Within the framework of the "Components of a Claim", the sources require that the patient population for which the clinical AI task is defined must be described clearly and explicitly in the claim.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}The main reason for this is that the performance of an imaging algorithm can be significantly influenced by the physical and statistical characteristics of the patient group being studied.
+ \cite{JhaBradshaw2022}Therefore , results obtained in one specific population cannot necessarily be transferred to other patient groups.
+ \cite{JhaBradshaw2022}.
+To make the application limits transparent, a claim must specify concrete demographic data.
+ \cite{JhaBradshaw2022}This explicitly includes:
+Basic demographic characteristics such as gender, age and ethnicity
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+Additional parameters such as geographical location, specific disease stage, social determinants of health, and other disease- and application-relevant biological variables.
+ \cite{JhaBradshaw2022}.
+The detailed declaration of these demographic patient characteristics within the claim is of central importance in order to assess the generalizability of the algorithm to new, previously unseen data.
+ \cite{JhaBradshaw2022}If, for example, a study claims generalizability across different populations, external validation must demonstrate that the test cohort came from different demographic patient groups than the original cohort with which the model was developed.
+ \cite{JhaBradshaw2022}.
+Discuss what these sources say about "Components of a Claim" in the context of "AI in Nuclear Medicine (RELAINCE Guidelines)".
+
+A "claim" (a performance claim) provides a clear and descriptive characterization of the performance of an AI algorithm based on how well it supports a specific clinical task.
+ \cite{JhaBradshaw2022}According to the RELAINCE guidelines, every evaluation strategy for AI algorithms in nuclear medicine should always produce such a claim, which consists of five essential components.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}:
+1. A clear definition of the clinical task: It must be specified whether it is a classification task (e.g., lesion detection, tumor staging), a quantification task (e.g., measurement of metabolic tumor volume), or a combined classification and quantification task.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+2. The patient population: Since the algorithm's performance can be influenced by the patients' physical and statistical characteristics, the target population must be precisely defined in the claim.
+ \cite{JhaBradshaw2022}This includes relevant demographic and biological characteristics such as gender, ethnicity, age group, geographic location, and disease stage .
+ \cite{JhaBradshaw2022}.
+3. Definition of the imaging process: The performance of the AI ​​depends heavily on the hardware and the acquisition parameters.
+ \cite{JhaBradshaw2022}The claim must therefore specify the imaging system, the acquisition protocol, and the exact reconstruction and analysis parameters .
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}It must also be evident whether the algorithm was evaluated across multiple scanners or protocols.
+ \cite{JhaBradshaw2022}.
+4. Process for extracting task-specific information: It must be explained how the required information was obtained from the images. 
+ \cite{JhaBradshaw2022}If, for example, human observers were used to evaluate images and classify lesions, their level of expertise (e.g., trained radiologist vs. resident) must be specified, as this significantly influences the task outcome.
+ \cite{JhaBradshaw2022}.
+5. Assessment metric (Figure of Merit, FoM) and reference standard: In order to quantitatively describe performance on the task and make it comparable with the standard of care, the claim requires the specification of a specific metric (including confidence intervals).
+ \cite{JhaBradshaw2022}Furthermore, the process for defining the underlying reference standard must be described.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+The sources emphasize that the complete specification of all these components in the claim simultaneously demonstrates the generalizability of the AI ​​algorithm.
+ \cite{JhaBradshaw2022}By making transparent in the claim which populations, protocols, observers and scanners were included in the evaluation (e.g., within the framework of single or multicenter studies), it is clearly outlined how reliably the algorithm is expected to work with new, previously unseen data in clinical practice.
+ \cite{JhaBradshaw2022}This task-based evaluation approach is essential to avoid misleading interpretations about the actual clinical applicability of AI.
+ \cite{MillerKuronuma2022}.
+Discuss what these sources say about "Clinical task definition" in the context of "Components of a Claim".
+
+Within the framework of the “Components of a Claim”, the “Definition of the Clinical Task” is the first and fundamental component for purposefully characterizing the performance of an AI algorithm.
+ \cite{JhaBradshaw2022}
+The term "task" refers to the specific clinical goal for which a medical image was originally acquired.
+ \cite{JhaBradshaw2022}.
+In nuclear medicine, these clinical tasks can be roughly divided into three main categories.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}:
+Classification: The patient's image is used to classify the patient into one of several categories.
+ \cite{JhaBradshaw2022}Typical examples include lesion detection (e.g., determining whether cancer is present or not), determining the cancer stage from an oncological PET image, or predicting whether a patient will respond to a specific therapy.
+ \cite{JhaBradshaw2022}.
+Quantification: This involves estimating a numerical or statistical characteristic directly from the patient's medical record.
+ \cite{JhaBradshaw2022}Examples include the quantification of the Standardized Uptake Value (SUV), the metabolic tumor volume (MTV), the intralesional heterogeneity, or kinetic parameters from oncological PET images.
+ \cite{JhaBradshaw2022}.
+Combined classification and quantification: This category combines the tasks of categorization and numerical estimation.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+According to the sources, when defining the task for the evaluation claim, the specific methodological approaches for fulfilling the task must also be named.
+ \cite{JhaBradshaw2022}For example, in recognition tasks, it should be specified whether human observers or mathematical model observers are used.
+ \cite{JhaBradshaw2022}For quantification tasks, a distinction should be made between whether Bayesian or frequentist methods are used.
+ \cite{JhaBradshaw2022}Also relevant for describing the task is the specification of whether the studies involve one or multiple evaluators (single/multi-reader studies).
+ \cite{JhaBradshaw2022}.
+This precise task definition is inextricably linked to the analysis methods that are later used for performance evaluation, such as ROC analysis for detection tasks, ensemble bias and variance for quantification tasks, or "estimation ROC" for combined classification and quantification tasks.
+ \cite{JhaBradshaw2022}.
+Discuss what these sources say about "Imaging process details" in the context of "Components of a Claim".
+
+Within the framework of the "Components of a Claim", the precise definition of the imaging process is crucial , as the imaging system used, the acquisition protocol, and the reconstruction and analysis parameters can significantly influence the performance of an AI algorithm in a specific clinical task.
+ \cite{JhaBradshaw2022}.
+According to the sources, a complete "claim" must declare the following specific details about the imaging process :
+Imaging systems used: The type of hardware or scanner must be specified.
+ \cite{JhaBradshaw2022}An AI algorithm evaluated for a high-resolution PET system, for example, may rely on high-frequency image features that are not present in lower-resolution systems.
+ \cite{JhaBradshaw2022}.
+Image acquisition protocols and standards: Depending on the algorithm, specific acquisition parameters must be specified.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}This also includes indicating whether the image data complies with certain accreditation standards (such as the SNMMI-Clinical Trial Network, the RSNA QIBA profile, or the EARL standards).
+ \cite{JhaBradshaw2022}.
+Reconstruction and analysis parameters: These parameters must be precisely defined, as deviations directly affect the image material.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}Thus, an AI denoising algorithm developed for OSEM-reconstructed (Ordered-Subsets-Expectation-Maximization) images may not work for images with filtered back projection.
+ \cite{JhaBradshaw2022}Even a different number of OSEM iterations can lead to failure, as this changes the noise characteristics of the images.
+ \cite{JhaBradshaw2022}.
+Scope of evaluation: It must be explained whether the algorithm was evaluated on a single scanner, on multiple scanners (single/multicenter), or with several different protocols.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+By precisely declaring these technical details in the "claim", it is ultimately communicated transparently under which conditions the algorithm was tested and how generalizable it is to new, unseen data.
+ \cite{JhaBradshaw2022}.
+Discuss what these sources say about "information extraction strategy" in the context of "Components of a Claim".
+
+Within the framework of the "Components of a Claim," the sources emphasize that any task-based evaluation of an imaging algorithm requires a clear strategy for extracting task-specific information from the images.
+ \cite{JhaBradshaw2022}This so-called "process to extract task-specific information" must be specified in the final claim.
+ \cite{JhaBradshaw2022}
+.
+For classification tasks, a typical extraction strategy involves, for example, using human observers who read the images, detect lesions, and classify them into specific categories (e.g., malignant or benign).
+ \cite{JhaBradshaw2022}.
+Accurate documentation of this strategy in the claim is essential for the following reasons:
+Influence of observer competence: The qualifications of the individuals extracting the information (e.g., several trained radiologists versus a single radiologist, a resident, or an untrained reader) have a direct and significant influence on the measured performance of the algorithm on the respective task.
+ \cite{JhaBradshaw2022}.
+Confidence in validity: The choice of extraction strategy directly impacts how much confidence can ultimately be placed in the validity of the evaluated AI algorithm.
+ \cite{JhaBradshaw2022}.
+Since these dependencies apply not only to classification tasks but also to quantification tasks and combined tasks (joint classification/quantification), the guidelines make the precise declaration of the information extraction strategy an indispensable component of any formulated AI claim.
+ \cite{JhaBradshaw2022}.
+Discuss what these sources say about "Figure of Merit (FoM)" in the context of "Components of a Claim".
+
+In the context of the "Components of a Claim", the Figure of Merit (FoM) is the final core element for quantitatively describing the performance of an AI algorithm in a specific clinical task.
+ \cite{JhaBradshaw2022}
+.
+The sources highlight the following key aspects for defining FoMs within a claim:
+Comparability and definition of success: FoMs quantify the performance of the algorithm in such a way that a direct comparison with other methods or the current clinical standard (standard of care) becomes possible.
+ \cite{JhaBradshaw2022}They thus serve as a clear, measurable metric for the success of a method.
+ \cite{JhaBradshaw2022}.
+Transparency through confidence intervals: An isolated metric is not sufficient for a valid claim. FoMs must always be accompanied by confidence intervals (CIs).
+ \cite{JhaBradshaw2022}These intervals are essential to make the statistical uncertainty and reliability of the performance estimate transparent.
+ \cite{JhaBradshaw2022}.
+Dependence on a reference standard: In order to calculate and interpret a FoM at all, a reference standard (ground truth) is absolutely necessary.
+ \cite{JhaBradshaw2022}The claim must therefore explicitly state the process by which this reference standard was defined and determined.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
+As already explained in the discussions on evaluation classes 1 to 3, the specific choice of FoM depends heavily on the claim's objective – ranging from task-agnostic metrics in the proof-of-concept phase to highly task-specific clinical endpoints (such as AUC or survival time estimates) in clinical evaluation. Within the standardized claim, however, the FoM always constitutes the factual, numerical evidence for the performance claim.
+ \cite{JhaBradshaw2022}
+ \cite{JhaBradshaw2022}.
