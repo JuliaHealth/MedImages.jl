@@ -168,7 +168,7 @@ function _pydicom_ds_to_dict(ds)
             end
             d[key] = seq_list
         # Handle MultiValue
-        elseif typeof(val) <: PyObject && pybuiltin("isinstance")(val, pyimport("pydicom.multival.MultiValue"))
+        elseif typeof(val) <: PyObject && pybuiltin("isinstance")(val, pyimport("pydicom.multival").MultiValue)
              d[key] = collect(val)
         else
              d[key] = val

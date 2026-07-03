@@ -22,14 +22,14 @@ def create_challenge_1():
     ax.text(25, 82, "Traditional Pipeline", ha='center', fontsize=14, fontweight='bold')
     ax.text(25, 75, "MONAI PersistentDataset\n~650 ms / subject", ha='center', fontsize=12, color='#e74c3c', fontweight='bold')
     ax.text(25, 68, "Pickle/Pt Serialization Bottleneck", ha='center', fontsize=10, color='#7f8c8d')
-    ax.text(40, 82, "MEMORY LEAK", ha='center', fontsize=8, fontweight='bold', color='white', bbox=dict(facecolor='#e74c3c', edgecolor='none', boxstyle='round,pad=0.2'))
+    ax.text(25, 60, "MEMORY LEAK", ha='center', fontsize=10, fontweight='bold', color='white', bbox=dict(facecolor='#e74c3c', edgecolor='none', boxstyle='round,pad=0.3'))
 
     # MedImages Pipeline (Right)
     ax.add_patch(FancyBboxPatch((55, 45), 40, 40, boxstyle="round,pad=2", ec="#27ae60", fc="#f2fdf5", lw=3))
     ax.text(75, 82, "MedImages.jl Pipeline", ha='center', fontsize=14, fontweight='bold')
     ax.text(75, 75, "Native Fused Kernels\n~90 ms / subject", ha='center', fontsize=12, color='#27ae60', fontweight='bold')
     ax.text(75, 68, "High-Throughput Biobank Ingestion", ha='center', fontsize=10, color='#7f8c8d')
-    ax.text(75, 62, "ZERO-SERIALIZATION", ha='center', fontsize=10, fontweight='bold', color='white', bbox=dict(facecolor='#27ae60', edgecolor='none', boxstyle='round,pad=0.3'))
+    ax.text(75, 60, "ZERO-SERIALIZATION", ha='center', fontsize=10, fontweight='bold', color='white', bbox=dict(facecolor='#27ae60', edgecolor='none', boxstyle='round,pad=0.3'))
 
     # Converging Arrows
     ax.annotate("", xy=(50, 30), xytext=(25, 45), arrowprops=dict(arrowstyle="->", lw=5, ls='--', color="#e74c3c", connectionstyle="arc3,rad=-0.2"))
@@ -39,14 +39,6 @@ def create_challenge_1():
     ax.add_patch(FancyBboxPatch((30, 5), 40, 25, boxstyle="round,pad=2", ec="#2c3e50", fc="#f1f2f6", lw=4))
     ax.text(50, 15, "7.2× Speedup,\nUnlocking Thousands of Studies", ha='center', va='center', fontsize=16, fontweight='bold', color='#27ae60')
     
-    # Load MIP
-    mip_path = 'elsarticle/figures_new/clinical_assets/mip_wholebody.png'
-    if os.path.exists(mip_path):
-        mip_img = mpimg.imread(mip_path)
-        newax = fig.add_axes([0.45, 0.22, 0.1, 0.12])
-        newax.imshow(mip_img)
-        newax.axis('off')
-
     save_fig_precise('elsarticle/figures_new/challenge_1.png')
 
 def create_challenge_2():
@@ -60,28 +52,18 @@ def create_challenge_2():
     # Python Panel
     ax.add_patch(FancyBboxPatch((5, 55), 90, 30, boxstyle="round,pad=2", ec="#e74c3c", fc="#fdf2f2", lw=2))
     ax.text(10, 83, "Python Ecosystem: Wrapping C++", fontweight='bold', color='white', bbox=dict(facecolor='#333', boxstyle='round'))
-    ax.text(25, 70, "Python (High-Level) + C++ (SimpleITK)", ha='center', fontweight='bold')
-    ax.text(50, 70, "->", fontsize=30)
-    ax.text(60, 70, "[BRICK WALL]", fontsize=12, fontweight='bold', bbox=dict(facecolor='#7f8c8d'))
-    ax.text(75, 70, "BLOCKED GPU", fontsize=14, color='#666', fontweight='bold')
-    ax.text(90, 70, "6.69 ms\nCPU Bottleneck", ha='center', color='#e74c3c', fontweight='bold')
+    ax.text(22, 70, "Python + C++\n(SimpleITK)", ha='center', fontweight='bold')
+    ax.text(42, 70, "→", ha='center', fontsize=28)
+    ax.text(60, 70, "BLOCKED GPU", ha='center', fontsize=13, fontweight='bold', color='white', bbox=dict(facecolor='#7f8c8d', boxstyle='round,pad=0.3'))
+    ax.text(84, 70, "6.69 ms\nCPU bottleneck", ha='center', color='#e74c3c', fontweight='bold')
 
     # Julia Panel
     ax.add_patch(FancyBboxPatch((5, 15), 90, 30, boxstyle="round,pad=2", ec="#27ae60", fc="#f2fdf5", lw=2))
     ax.text(10, 43, "MedImages.jl: Pure Julia / LLVM JIT", fontweight='bold', color='white', bbox=dict(facecolor='#333', boxstyle='round'))
-    ax.text(25, 30, "Unified Engine", ha='center', fontweight='bold', color='#27ae60')
-    ax.text(45, 30, "->", fontsize=30, color='#27ae60')
-    ax.text(55, 30, "ACTIVE GPU", fontsize=14, color='#d4ac0d', fontweight='bold')
-    
-    res_path = 'elsarticle/figures_new/clinical_assets/resampling_ct.png'
-    if os.path.exists(res_path):
-        res_img = mpimg.imread(res_path)
-        for i in range(3):
-            newax = fig.add_axes([0.65 + i*0.04, 0.25, 0.06, 0.1])
-            newax.imshow(res_img)
-            newax.axis('off')
-
-    ax.text(90, 30, "0.83 ms\nDirect Execution", ha='center', color='#27ae60', fontweight='bold')
+    ax.text(22, 30, "Unified Engine\n(pure Julia)", ha='center', fontweight='bold', color='#27ae60')
+    ax.text(42, 30, "→", ha='center', fontsize=28, color='#27ae60')
+    ax.text(60, 30, "ACTIVE GPU", ha='center', fontsize=13, color='#d4ac0d', fontweight='bold')
+    ax.text(84, 30, "0.83 ms\nDirect Execution", ha='center', color='#27ae60', fontweight='bold')
 
     ax.text(30, 5, "135× Fused Affine Speedup", ha='center', fontweight='bold', color='#27ae60', fontsize=14)
     ax.text(70, 5, "115× Resampling Speedup", ha='center', fontweight='bold', color='#27ae60', fontsize=14)
@@ -120,14 +102,7 @@ def create_challenge_3():
 
     ax.annotate("", xy=(95, 25), xytext=(80, 45), arrowprops=dict(arrowstyle="->", lw=4, color='#27ae60'))
     
-    dose_path = 'elsarticle/figures_new/clinical_assets/dose_overlay_ct.png'
-    if os.path.exists(dose_path):
-        dose_img = mpimg.imread(dose_path)
-        newax = fig.add_axes([0.45, 0.1, 0.1, 0.15])
-        newax.imshow(dose_img)
-        newax.axis('off')
-
-    ax.text(75, 15, "Pearson r = 0.957", fontweight='bold', color='white', fontsize=16, bbox=dict(facecolor='#27ae60', boxstyle='round,pad=0.5'))
+    ax.text(50, 15, "Fully Differentiable Pipeline  →  Pearson r = 0.957", ha='center', fontweight='bold', color='white', fontsize=16, bbox=dict(facecolor='#27ae60', boxstyle='round,pad=0.5'))
 
     save_fig_precise('elsarticle/figures_new/challenge_3.png')
 
@@ -146,32 +121,17 @@ def create_challenge_4():
     ax.text(22, 65, "Spatial Mapping Lost", ha='center', color='#e74c3c', fontweight='bold')
 
     # Protected Tensor
-    ax.add_patch(Rectangle((50, 60), 45, 30, ec="#27ae60", fc="#f2fdf5", lw=3))
-    ax.text(72, 85, "Protected BatchedMedImage", ha='center', fontweight='bold', fontsize=12)
-    
-    slices = ['ct_slice.png', 'dosemap_slice.png', 'spect_nac_slice.png', 'spect_ac_slice.png']
-    for i, s in enumerate(slices):
-        s_path = f'elsarticle/figures_new/clinical_assets/{s}'
-        if os.path.exists(s_path):
-            img = mpimg.imread(s_path)
-            newax = fig.add_axes([0.55, 0.65 + i*0.03, 0.15, 0.05])
-            newax.imshow(img)
-            newax.axis('off')
-    
-    ax.text(85, 75, "Metadata\nCoupled", ha='center', fontweight='bold', color='#27ae60')
-    ax.text(50, 50, "⬇ 45° ROTATION", ha='center', fontweight='bold', fontsize=14)
+    ax.add_patch(Rectangle((50, 60), 45, 25, ec="#27ae60", fc="#f2fdf5", lw=3))
+    ax.text(72, 80, "Protected BatchedMedImage", ha='center', fontweight='bold', fontsize=12)
+    ax.text(72, 73, "CT · Dosemap · SPECT(NAC) · SPECT(AC)", ha='center', fontsize=10, color='#2c3e50')
+    ax.text(72, 66, "Spatial + temporal metadata bound to voxels", ha='center', fontsize=9, color='#27ae60', fontweight='bold')
 
-    ax.add_patch(Rectangle((10, 10), 80, 35, ec="#2c3e50", fc="#f8f9fa", lw=2))
-    for i, s in enumerate(slices):
-        s_path = f'elsarticle/figures_new/clinical_assets/{s.replace(".png", "_rot.png")}'
-        if os.path.exists(s_path):
-            img = mpimg.imread(s_path)
-            newax = fig.add_axes([0.2, 0.15 + i*0.03, 0.15, 0.05])
-            newax.imshow(img)
-            newax.axis('off')
+    ax.text(50, 52, "↓  45° ROTATION + 2 mm RESAMPLE", ha='center', fontweight='bold', fontsize=14)
 
-    ax.text(55, 30, "SUV Consistency < 1.5% Deviation", fontweight='bold', color='#27ae60', fontsize=14)
-    ax.text(55, 20, "Clinical Metadata Perfectly Synchronized", color='#2c3e50', fontsize=12)
+    ax.add_patch(Rectangle((10, 12), 80, 33, ec="#2c3e50", fc="#f8f9fa", lw=2))
+    ax.text(50, 38, "All four modalities transform in lock-step", ha='center', fontsize=11, color='#2c3e50')
+    ax.text(50, 29, "SUV Consistency < 1.5% Deviation", ha='center', fontweight='bold', color='#27ae60', fontsize=15)
+    ax.text(50, 20, "Clinical Metadata Perfectly Synchronized", ha='center', color='#2c3e50', fontsize=12)
 
     save_fig_precise('elsarticle/figures_new/challenge_4.png')
 
@@ -188,12 +148,6 @@ def create_dosimetry_experiment():
     ax.text(19, 82, "Pure Deep Learning\n(3D U-Net)", ha='center', fontweight='bold')
     ax.text(19, 72, "Black Box", ha='center', color='white', bbox=dict(facecolor='#333'))
     
-    img_path = 'elsarticle/figures_new/clinical_assets/dl_artifacts.png'
-    if os.path.exists(img_path):
-        img = mpimg.imread(img_path)
-        newax = fig.add_axes([0.08, 0.35, 0.1, 0.25])
-        newax.imshow(img)
-        newax.axis('off')
     
     ax.text(19, 28, "Pearson r = 0.557", ha='center', fontweight='bold', color='white', bbox=dict(facecolor='#e74c3c'))
 
@@ -202,12 +156,6 @@ def create_dosimetry_experiment():
     ax.text(50, 82, "VSV Convolution\n(Analytical)", ha='center', fontweight='bold')
     ax.text(50, 72, "PyTheranostics", ha='center', color='#333')
 
-    img_path = 'elsarticle/figures_new/clinical_assets/vsv_homo.png'
-    if os.path.exists(img_path):
-        img = mpimg.imread(img_path)
-        newax = fig.add_axes([0.39, 0.35, 0.1, 0.25])
-        newax.imshow(img)
-        newax.axis('off')
 
     ax.text(50, 28, "Pearson r = 0.912", ha='center', fontweight='bold', color='white', bbox=dict(facecolor='#f39c12'))
 
@@ -216,12 +164,6 @@ def create_dosimetry_experiment():
     ax.text(81, 82, "SciML UDE / Julia\n(Champion)", ha='center', fontweight='bold')
     ax.text(81, 72, "S_homo + N_θ", ha='center', fontweight='bold', color='#d4ac0d')
 
-    img_path = 'elsarticle/figures_new/clinical_assets/ude_highfi.png'
-    if os.path.exists(img_path):
-        img = mpimg.imread(img_path)
-        newax = fig.add_axes([0.7, 0.35, 0.1, 0.25])
-        newax.imshow(img)
-        newax.axis('off')
 
     ax.text(81, 28, "Pearson r = 0.957\nState-of-the-Art", ha='center', fontweight='bold', color='white', bbox=dict(facecolor='#27ae60'))
 

@@ -111,7 +111,7 @@ function main()
     # Resample both to 2.0mm spacing. (Original 1.0mm)
     # Output size should be 32x32x32 -> 16x16x16
     spacings = [(2.0, 2.0, 2.0), (2.0, 2.0, 2.0)]
-    batch_space = resample_to_spacing(batch, spacings, Linear_en)
+    batch_space = Spatial_metadata_change.resample_to_spacing(batch, spacings, Linear_en)
     res_space = unbatch_medimage(batch_space)
     create_nii_from_medimage(res_space[1], joinpath(OUTPUT_DIR, "resample_spacing_2mm_1"))
     create_nii_from_medimage(res_space[2], joinpath(OUTPUT_DIR, "resample_spacing_2mm_2"))
@@ -123,7 +123,7 @@ function main()
     ref_img2 = MedImage(voxel_data=zeros(Float32, 32, 32, 32), origin=(-10.0,-10.0,-10.0), spacing=(1.0,1.0,1.0), direction=img2.direction, image_type=MedImages.MedImage_data_struct.MRI_type, image_subtype=MedImages.MedImage_data_struct.T1_subtype, patient_id="ref2")
     ref_batch = create_batched_medimage([ref_img1, ref_img2])
 
-    batch_res_img = resample_to_image(ref_batch, batch, Linear_en)
+    batch_res_img = Resample_to_target.resample_to_image(ref_batch, batch, Linear_en)
     res_img = unbatch_medimage(batch_res_img)
     create_nii_from_medimage(res_img[1], joinpath(OUTPUT_DIR, "resample_to_img_1"))
     create_nii_from_medimage(res_img[2], joinpath(OUTPUT_DIR, "resample_to_img_2"))
