@@ -12,6 +12,7 @@ All figures reproduced on Julia 1.11 from `jakubMitura14/MedImages.jl`.
 | `fig3_rotation_vs_simpleitk.png` | **Rotation correctness vs SimpleITK — pixel-perfect, Pearson = 1.0000** (MedImages +45° CCW; SimpleITK's Resample maps output→input so its +θ transform = −θ image) | `make_paper_figures.py` |
 | `fig14_medimages_vs_simpleitk_allops.png` | **MedImages vs SimpleITK across ALL operations on a real CT** — rotate / scale / resample / crop / pad, each as MedImages \| SimpleITK \| \|diff\|. Pearson: rotate 1.0000, scale 1.0000, resample 0.9939, crop 1.0000, pad 1.0000 | `cmp_ct_transforms.jl` + `make_comparison_grid.py` |
 | `fig4_dosimetry_vs_dpk.png` | **MedImages dose vs F-18 dose-point-kernel** on real TCIA FDG PET/CT (body-masked Pearson 0.97; local over-estimates peaks ~5.6%) | `medimages_dose.jl` + `build_dpk_reference.py` → `make_paper_figures.py` |
+| `fig15_rotation_sign_convention.png` | **Why MedImages and SimpleITK *looked* like they disagreed on rotation** — SimpleITK's Resample maps output→input, so a +θ transform spins the image −θ; MedImages `rotate_mi` uses the standard +θ = CCW. Shows SimpleITK ±45° spinning opposite ways next to the actual MedImages render, with the verified equivalence `rotate_mi(+45°) ≡ SimpleITK(−45°)`, Pearson = 1.0000 (see `fig3`) | `rotation_sign_proof.py` |
 
 ## Cleaned challenge infographics (matplotlib, overlaps fixed)
 
