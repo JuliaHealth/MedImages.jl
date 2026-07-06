@@ -63,3 +63,6 @@ diff_logs*.txt
 *.log
 article/images/*.png
 docs/src/experiments/viz/*.png
+
+# TCIA PET/CT patient data (raw DICOM + derived volumes) — not redistributed
+test_data/tcia_pet/
