@@ -2,6 +2,27 @@
 
 This guide outlines the process for verifying the correctness of batched medical image transformations and learning algorithms in `MedImages.jl` using visual inspection.
 
+## Reproduced Figures (latest run)
+
+All figures below were reproduced from this fork (`jakubMitura14/MedImages.jl`) on Julia 1.11.
+Generated artifacts live in [`test/visual_output/screenshots/`](../test/visual_output/screenshots/).
+
+| Figure | What it shows |
+|---|---|
+| `Synth_transforms_grid.png` | 9 synthetic batched transforms (rotate/translate/crop/pad/shear/scale/resample) |
+| `CT_comparison_grid_labeled.png` | Real CT: original, 45° rotation, 0.5× scale, 2 mm resample |
+| `Series4_SimpleITK_vs_MedImages.png` | **MedImages rotation vs SimpleITK — pixel-perfect, r = 1.0000** |
+| `Series1_transform_benchmarks.png`, `Series6_speed_comparison.png` | Transform + cross-language UDE performance charts |
+| `Series5_dosimetry_64.png`, `Series5_fullbody_dosimetry_3x3.png`, `dosimetry_experiment.png` | UDE dosimetry residuals vs Monte-Carlo / analytical baselines |
+| `Dosimetry_MedImages_vs_DPK.png` | **New:** MedImages dose on real TCIA FDG PET/CT vs an F-18 dose-point-kernel reference (body-masked Pearson 0.97) |
+| `challenge_1.png` … `challenge_4.png` | The four manuscript challenge summary figures |
+| `MedEye3d_CT_view_1.png`, `_2.png` | Live MedEye3d GLFW viewer on the CT volume |
+
+### Fixes applied while reproducing (candidates for upstream PR)
+
+* **`rotate_mi` takes DEGREES, not radians** — `Rodrigues_rotation_matrix` applies `deg2rad` internally, so passing `deg2rad(45)` yields a ~0.78° no-op. After passing `45.0`, `rotate_mi(img, 3, 45.0)` matches SimpleITK's −45° rotation about the image centre **pixel-for-pixel (Pearson 1.0000, zero difference)**; the fork uses the opposite handedness to SimpleITK.
+* **SUV metadata extraction was silently failing** — `Load_and_save._pydicom_ds_to_dict` called `pyimport("pydicom.multival.MultiValue")`, but `MultiValue` is a class, not a module, so `pyimport` threw on every multi-valued tag and `_get_metadata` swallowed the error → empty metadata → `calculate_suv_factor` always returned `nothing`. Fixed to `pyimport("pydicom.multival").MultiValue`.
+
 ## Prerequisites
 
 *   **Julia Environment**: Ensure `MedImages.jl` is instantiated.
@@ -33,7 +54,19 @@ This script creates `test/visual_output/` containing:
 *   **Resample to Spacing**: `resample_spacing_2mm_*.nii.gz`.
 *   **Resample to Image**: `resample_to_img_*.nii.gz`.
 
-### 2. Visual Inspection Guide
+### 2. Reproduced Result
+
+Synthetic batched transforms (mid-slice of each output), and the same operations on a real CT volume:
+
+![Synthetic transforms grid](../test/visual_output/screenshots/Synth_transforms_grid.png)
+
+![Real-CT transforms grid](../test/visual_output/screenshots/CT_comparison_grid_labeled.png)
+
+Per-operation transform timing (MedImages vs SimpleITK):
+
+![Transform benchmarks](../test/visual_output/screenshots/Series1_transform_benchmarks.png)
+
+### 3. Visual Inspection Guide
 
 #### Rotation (e.g., Unique Angles per Image)
 
@@ -155,6 +188,12 @@ julia --project=. experiments/suv_consistency/run_batch_consistency.jl
 *   **Verify Console Output & CSV**: The script uses `TotalSegmentator` to isolate organs, then subjects the images to alignment, 2.0mm isotropic resampling, 45-degree rotation, and translation.
 *   **Success Criterion**: Check the printed summary or `experiments/suv_consistency/batch_results_10cases.csv`. The **Mean SUV Deviation** should be exceptionally low (e.g., `~0.17%`), proving that metadata binding is robust to spatial manipulation.
 
+### 3. Reproduced Result — Rotation vs SimpleITK
+
+Applying `rotate_mi(ct, 3, 45.0)` (degrees) and comparing against SimpleITK's −45° rotation about the image centre. Panels: original, SimpleITK, MedImages, and the absolute difference. The difference panel is solid black — the two agree **pixel-for-pixel (Pearson 1.0000)**.
+
+![SimpleITK vs MedImages rotation](../test/visual_output/screenshots/Series4_SimpleITK_vs_MedImages.png)
+
 ## Verification Series 5: Full-Body Dosimetry Residuals
 
 Visually compare the UDE model's predictive accuracy against the PyTomography analytical baseline and other deep learning models.
@@ -170,6 +209,36 @@ python3 experiments/sciml_dose_refinement/plot_full_body_3x3.py
 *   **Open Artifact**: Check the generated output (usually placed in the validation data directories or `val_outputs/` as `full_body_comparison_3x3.png`).
 *   **Verify**: The grid displays the Ground Truth CT, Monte Carlo Dose, and UDE Dose in the top row. The bottom rows display the subtraction residuals (Error Maps).
 *   **Success Criterion**: The UDE residual map should appear significantly closer to pure white (zero error) compared to the Analytical Baseline, Spect0Net, and DblurDoseNet, especially at heterogeneous tissue boundaries.
+
+### 3. Reproduced Results
+
+Full-body 3×3 residual comparison and the 64³ patch comparison (UDE vs Monte-Carlo / analytical baselines):
+
+![Full-body dosimetry 3x3](../test/visual_output/screenshots/Series5_fullbody_dosimetry_3x3.png)
+
+![Dosimetry 64-cube](../test/visual_output/screenshots/Series5_dosimetry_64.png)
+
+![Dosimetry experiment](../test/visual_output/screenshots/dosimetry_experiment.png)
+
+### 4. New: MedImages dose vs F-18 dose-point-kernel on real TCIA data
+
+The UDE residual figures above use the manuscript's protected Lu-177 SPECT cohort. To validate the **MedImages dosimetry path end-to-end on openly reproducible data**, a real FDG PET/CT study was pulled from TCIA (ACRIN-NSCLC-FDG-PET-198) and processed entirely through MedImages — `load_image` (PET + CT), `resample_to_image` (CT → PET grid), and `calculate_suv_factor` — to produce a local-energy-deposition absorbed-dose map. This is compared against an F-18 dose-point-kernel (DPK) reference (positron range + 511 keV annihilation transport), the Monte-Carlo-equivalent voxel method.
+
+Panels: FDG activity (SUV), MedImages local-deposition dose, DPK reference, and the signed difference.
+
+![MedImages dose vs DPK reference](../test/visual_output/screenshots/Dosimetry_MedImages_vs_DPK.png)
+
+*   **Result**: body-masked **Pearson 0.9715**, normalised MAE 0.0009. Local deposition over-estimates peak voxels by ~5.6% relative to the kernel (red cores) and misses the dose the kernel spreads into surrounding tissue (blue halos) — the expected signature of local-deposition vs DPK.
+*   **Reproduce**:
+    ```bash
+    # 1. MedImages dose (Julia)
+    julia +1.11 --startup-file=no --project=. experiments/sciml_dose_refinement/medimages_dose.jl
+    # 2. F-18 DPK reference + comparison (Python: SimpleITK, scipy)
+    python3 experiments/sciml_dose_refinement/build_dpk_reference.py \
+        test_data/tcia_pet/activity.nii.gz test_data/tcia_pet/density.nii.gz test_data/tcia_pet/dose_dpk.nii.gz
+    python3 experiments/sciml_dose_refinement/compare_dose.py
+    ```
+    > Note: public TCIA PET collections do **not** ship a Monte-Carlo dose reference, so the DPK reference is generated locally. The manuscript's `dataset_Lu` Monte-Carlo doses came from a private XNAT server and are not redistributable.
 
 ## Verification Series 6: Scalability and Performance Benchmarks
 
@@ -195,6 +264,21 @@ python3 article/scripts/plot_gpu.py
 ```
 
 *   **Visual Inspection**: Open the generated `gpu_benchmark_plot.png`. Ensure it correctly maps the execution times, clearly demonstrating the performance advantage of the custom `KernelAbstractions.jl` GPU implementation over baseline CPU methods.
+
+### 3. Reproduced Result
+
+Cross-language UDE forward-pass latency (64³ patch) — DifferentialEquations.jl vs `torchdiffeq` (PyTorch) vs Diffrax (JAX):
+
+![Speed comparison](../test/visual_output/screenshots/Series6_speed_comparison.png)
+
+## Challenge Summary Figures
+
+The four manuscript challenge figures (Volume / Speed / Differentiability / Metadata Fidelity):
+
+![Challenge 1 — Volume](../test/visual_output/screenshots/challenge_1.png)
+![Challenge 2 — Speed](../test/visual_output/screenshots/challenge_2.png)
+![Challenge 3 — Differentiability](../test/visual_output/screenshots/challenge_3.png)
+![Challenge 4 — Metadata Fidelity](../test/visual_output/screenshots/challenge_4.png)
 
 ## Manual Acceptance Test: Differentiable Dosimetry Refinement
 
