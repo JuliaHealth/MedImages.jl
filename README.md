@@ -51,11 +51,43 @@ save_med_image(ct, "scan.h5")                    # Save HDF5
 All transforms preserve spatial metadata and are differentiable.
 
 ```julia
-rotated    = rotate_mi(im, 1, 45.0, Linear_en)
+rotated    = rotate_mi(im, 3, 45.0, Linear_en)          # axis 3 (Z), 45 degrees
 cropped    = crop_mi(im, (10,10,5), (100,100,50), Linear_en)
 padded     = pad_mi(im, (5,5,5), (5,5,5), 0.0, Linear_en)
 translated = translate_mi(im, 10, 2, Linear_en)
 ```
+
+> **Note:** `rotate_mi` takes the axis as an `Int` (`1`=X, `2`=Y, `3`=Z) and the angle in **degrees** (not radians). `rotate_mi(ct, 3, 45.0, Linear_en)` matches SimpleITK's −45° rotation about the image centre pixel-for-pixel (Pearson `1.0000`); the two use opposite handedness.
+
+Synthetic batched transforms (mid-slice of each output) and the same operations on a real CT volume:
+
+![Synthetic transforms grid](test/visual_output/screenshots/Synth_transforms_grid.png)
+
+![Real-CT transforms grid](test/visual_output/screenshots/CT_comparison_grid_labeled.png)
+
+---
+
+## Fused Affine Kernel
+
+Rotation, scaling, shearing, and translation compose into a single 4×4 homogeneous matrix that is applied in **one interpolation pass**. Fusing the composition avoids the compounding blur and edge artifacts of chaining separate resamples, and maps directly onto a single GPU kernel launch.
+
+```julia
+# Build a combined transform: rotate 30° about Z, scale 0.8×, translate (+5, -2, 0)
+mat = create_affine_matrix(
+    rotation    = (0.0, 0.0, 30.0),   # degrees, applied as Rz * Ry * Rx
+    scale       = (0.8, 0.8, 0.8),
+    translation = (5.0, -2.0, 0.0),
+)
+
+# Single fused interpolation pass (about the image centre by default)
+fused = affine_transform_mi(im, mat, Linear_en)
+
+# Compose several matrices into one, or apply a unique matrix per batch element
+combined = compose_affine_matrices(mat_a, mat_b)          # applies mat_b, then mat_a
+batched  = affine_transform_mi(batch, [mat_a, mat_b], Linear_en)
+```
+
+`create_affine_matrix` combines the components in the order `T * R * Sh * S` (points transformed as `M * p`). The fused result (30° Z rotation + 0.8× scale + translation, in a single pass) is the bottom-right panel of the synthetic transforms grid above. Full verification of every operation — including the fused affine composition — is in [`docs/VISUAL_VERIFICATION.md`](docs/VISUAL_VERIFICATION.md).
 
 ---
 
@@ -93,10 +125,13 @@ Backend selection is automatic via KernelAbstractions.jl. The same functions wor
 
 ```julia
 using CUDA
-gpu_ct = deepcopy(ct)
-gpu_ct.voxel_data = CuArray(Float32.(ct.voxel_data))
-rotated = rotate_mi(gpu_ct, :z, 45.0, Linear_en)
+gpu_ct = update_voxel_data(ct, CuArray(Float32.(ct.voxel_data)))
+rotated = rotate_mi(gpu_ct, 3, 45.0, Linear_en)
 ```
+
+Per-operation transform timing (MedImages vs SimpleITK):
+
+![Transform benchmarks](test/visual_output/screenshots/Series1_transform_benchmarks.png)
 
 ---
 
@@ -113,6 +148,35 @@ grads = Zygote.gradient(data) do x
     sum(resample_to_spacing(make_medimage(x), (2.0,2.0,2.0), Linear_en).voxel_data)
 end
 ```
+
+---
+
+## Visual Verification & Reproduced Results
+
+Every claim below is reproduced from the scripts in this repository; full instructions live in [`docs/VISUAL_VERIFICATION.md`](docs/VISUAL_VERIFICATION.md). Generated artifacts are in [`test/visual_output/screenshots/`](test/visual_output/screenshots/).
+
+**Rotation vs SimpleITK — pixel-perfect (Pearson 1.0000).** Panels: original, SimpleITK, MedImages, and the absolute difference (solid black).
+
+![SimpleITK vs MedImages rotation](test/visual_output/screenshots/Series4_SimpleITK_vs_MedImages.png)
+
+**All spatial operations vs SimpleITK** on a real CT (axial mid-slice, soft-tissue window) — rotate 45°, scale 0.5×, resample 2 mm, crop, and pad. Left: MedImages.jl; middle: SimpleITK on the same grid; right: the absolute difference (Pearson `1.0000` for every op except resample at `0.9939`).
+
+![MedImages vs SimpleITK across all spatial operations](paper_figures/fig14_medimages_vs_simpleitk_allops.png)
+
+**Cross-language UDE forward-pass latency** (64³ patch) — DifferentialEquations.jl vs `torchdiffeq` (PyTorch) vs Diffrax (JAX):
+
+![Speed comparison](test/visual_output/screenshots/Series6_speed_comparison.png)
+
+**MedImages dose vs F-18 dose-point-kernel** on real TCIA FDG PET/CT (body-masked Pearson 0.97). Panels: FDG activity (SUV), MedImages local-deposition dose, DPK reference, signed difference:
+
+![MedImages dose vs DPK reference](test/visual_output/screenshots/Dosimetry_MedImages_vs_DPK.png)
+
+The four manuscript challenge figures (Volume / Speed / Differentiability / Metadata Fidelity):
+
+![Challenge 1 — Volume](test/visual_output/screenshots/challenge_1.png)
+![Challenge 2 — Speed](test/visual_output/screenshots/challenge_2.png)
+![Challenge 3 — Differentiability](test/visual_output/screenshots/challenge_3.png)
+![Challenge 4 — Metadata Fidelity](test/visual_output/screenshots/challenge_4.png)
 
 ---
 
@@ -144,3 +208,4 @@ Contributions are welcome, particularly from those with medical imaging or ultra
 ## References
 
 [1] Gorgolewski et al. The brain imaging data structure. Sci Data 3, 160044 (2016). https://www.nature.com/articles/sdata201644
+</content>
