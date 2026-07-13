@@ -159,6 +159,10 @@ Every claim below is reproduced from the scripts in this repository; full instru
 
 ![SimpleITK vs MedImages rotation](test/visual_output/screenshots/Series4_SimpleITK_vs_MedImages.png)
 
+**All spatial operations vs SimpleITK** on a real CT (axial mid-slice, soft-tissue window) — rotate 45°, scale 0.5×, resample 2 mm, crop, and pad. Left: MedImages.jl; middle: SimpleITK on the same grid; right: the absolute difference (Pearson `1.0000` for every op except resample at `0.9939`).
+
+![MedImages vs SimpleITK across all spatial operations](paper_figures/fig14_medimages_vs_simpleitk_allops.png)
+
 **Cross-language UDE forward-pass latency** (64³ patch) — DifferentialEquations.jl vs `torchdiffeq` (PyTorch) vs Diffrax (JAX):
 
 ![Speed comparison](test/visual_output/screenshots/Series6_speed_comparison.png)
