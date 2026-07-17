@@ -24,6 +24,7 @@ plt.rcParams.update({
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 VIS = os.path.join(ROOT, "test", "visual_output")
+RCT = os.path.join(VIS, "real_ct")           # from make_real_ct_samples.jl
 TCIA = os.path.join(ROOT, "test_data", "tcia_pet")
 OUT = os.path.join(ROOT, "paper_figures")
 os.makedirs(OUT, exist_ok=True)
@@ -87,10 +88,10 @@ def fig1():
 # ---------------- Figure 2: real CT transforms ----------------
 def fig2():
     items = [
-        ("/tmp/real_ct_original.nii.gz", "Original"),
-        ("/tmp/real_ct_rotated_45.nii.gz", "Rotate 45°"),
-        ("/tmp/real_ct_scaled_half.nii.gz", "Scale 0.5×"),
-        ("/tmp/real_ct_resampled_2mm.nii.gz", "Resample 2 mm"),
+        (os.path.join(RCT, "ct_original.nii.gz"), "Original"),
+        (os.path.join(RCT, "ct_rotate45.nii.gz"), "Rotate 45°"),
+        (os.path.join(RCT, "ct_scale05.nii.gz"), "Scale 0.5×"),
+        (os.path.join(RCT, "ct_resample2mm.nii.gz"), "Resample 2 mm"),
     ]
     fig, axes = plt.subplots(1, 4, figsize=(14, 4.2), constrained_layout=True)
     for ax, (p, title) in zip(axes, items):
@@ -110,8 +111,8 @@ def fig2():
 
 # ---------------- Figure 3: rotation vs SimpleITK ----------------
 def fig3():
-    ct = sitk.ReadImage("/tmp/real_ct_original.nii.gz")
-    med = arr("/tmp/real_ct_rotated_45.nii.gz")
+    ct = sitk.ReadImage(os.path.join(RCT, "ct_original.nii.gz"))
+    med = arr(os.path.join(RCT, "ct_rotate45.nii.gz"))
     a_o = sitk.GetArrayFromImage(ct)
     Z = int(np.argmax([np.sum(a_o[z] > -200) for z in range(a_o.shape[0])]))
     c = ct.GetSize()
@@ -193,5 +194,11 @@ def fig4():
 
 
 if __name__ == "__main__":
-    fig1(); fig2(); fig3(); fig4()
-    print("ALL PAPER FIGURES DONE ->", OUT)
+    # Each figure is independent; a missing input (e.g. the external TCIA PET/CT
+    # for fig4) skips just that figure instead of aborting the rest.
+    for name, fn in [("fig1", fig1), ("fig2", fig2), ("fig3", fig3), ("fig4", fig4)]:
+        try:
+            fn()
+        except Exception as e:
+            print(f"SKIP {name}: {e}")
+    print("PAPER FIGURES DONE ->", OUT)

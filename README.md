@@ -63,7 +63,19 @@ Synthetic batched transforms (mid-slice of each output) and the same operations 
 
 ![Synthetic transforms grid](test/visual_output/screenshots/Synth_transforms_grid.png)
 
+```bash
+# Reproduce: generate the NIfTI samples, then render the labelled grid
+julia --startup-file=no --project=. test/generate_visual_samples.jl
+python3 test/render_screenshots.py
+```
+
 ![Real-CT transforms grid](test/visual_output/screenshots/CT_comparison_grid_labeled.png)
+
+```bash
+# Reproduce: apply the same operations to a real CT (test_data/volume-0.nii.gz)
+julia --startup-file=no --project=. experiments/make_real_ct_samples.jl
+python3 experiments/render_real_ct_grid.py
+```
 
 ---
 
@@ -87,7 +99,15 @@ combined = compose_affine_matrices(mat_a, mat_b)          # applies mat_b, then 
 batched  = affine_transform_mi(batch, [mat_a, mat_b], Linear_en)
 ```
 
-`create_affine_matrix` combines the components in the order `T * R * Sh * S` (points transformed as `M * p`). The fused result (30° Z rotation + 0.8× scale + translation, in a single pass) is the bottom-right panel of the synthetic transforms grid above. Full verification of every operation — including the fused affine composition — is in [`docs/VISUAL_VERIFICATION.md`](docs/VISUAL_VERIFICATION.md).
+`create_affine_matrix` combines the components in the order `T * R * Sh * S` (points transformed as `M * p`). The fused result (30° Z rotation + 0.8× scale + translation, in a single interpolation pass) is shown as the **Fused affine** panel in both the synthetic and real-CT grids above. Full verification of every operation is in [`docs/VISUAL_VERIFICATION.md`](docs/VISUAL_VERIFICATION.md).
+
+```bash
+# Reproduce the fused-affine panels (synthetic + real CT)
+julia --startup-file=no --project=. test/generate_visual_samples.jl   # fused_transform_*.nii.gz
+julia --startup-file=no --project=. experiments/make_real_ct_samples.jl # ct_fused.nii.gz
+python3 test/render_screenshots.py
+python3 experiments/render_real_ct_grid.py
+```
 
 ---
 
@@ -133,6 +153,11 @@ Per-operation transform timing (MedImages vs SimpleITK):
 
 ![Transform benchmarks](test/visual_output/screenshots/Series1_transform_benchmarks.png)
 
+```bash
+# Underlying timings (the plot itself is a saved artifact)
+julia --startup-file=no --project=. experiments/benchmark/run_gpu_benchmarks.jl
+```
+
 ---
 
 ## Differentiability
@@ -155,28 +180,45 @@ end
 
 Every claim below is reproduced from the scripts in this repository; full instructions live in [`docs/VISUAL_VERIFICATION.md`](docs/VISUAL_VERIFICATION.md). Generated artifacts are in [`test/visual_output/screenshots/`](test/visual_output/screenshots/).
 
-**Rotation vs SimpleITK — pixel-perfect (Pearson 1.0000).** Panels: original, SimpleITK, MedImages, and the absolute difference (solid black).
+**Rotation vs SimpleITK — pixel-perfect (Pearson 1.0000).** Panels: original, SimpleITK reference, MedImages, and the absolute difference.
 
-![SimpleITK vs MedImages rotation](test/visual_output/screenshots/Series4_SimpleITK_vs_MedImages.png)
+![SimpleITK vs MedImages rotation](paper_figures/fig3_rotation_vs_simpleitk.png)
+
+```bash
+julia --startup-file=no --project=. experiments/make_real_ct_samples.jl
+python3 experiments/make_paper_figures.py      # writes paper_figures/fig3_rotation_vs_simpleitk.png
+```
 
 **All spatial operations vs SimpleITK** on a real CT (axial mid-slice, soft-tissue window) — rotate 45°, scale 0.5×, resample 2 mm, crop, and pad. Left: MedImages.jl; middle: SimpleITK on the same grid; right: the absolute difference (Pearson `1.0000` for every op except resample at `0.9939`).
 
 ![MedImages vs SimpleITK across all spatial operations](paper_figures/fig14_medimages_vs_simpleitk_allops.png)
 
+```bash
+julia --startup-file=no --project=. experiments/make_real_ct_samples.jl
+python3 experiments/make_comparison_grid.py    # writes paper_figures/fig14_medimages_vs_simpleitk_allops.png
+```
+
 **Cross-language UDE forward-pass latency** (64³ patch) — DifferentialEquations.jl vs `torchdiffeq` (PyTorch) vs Diffrax (JAX):
 
 ![Speed comparison](test/visual_output/screenshots/Series6_speed_comparison.png)
+
+```bash
+# Underlying timings (the plot itself is a saved artifact)
+julia --project=experiments/sciml_dose_refinement/ experiments/sciml_dose_refinement/benchmark_speed.jl
+python3 experiments/sciml_dose_refinement/benchmark_python_speed.py
+```
 
 **MedImages dose vs F-18 dose-point-kernel** on real TCIA FDG PET/CT (body-masked Pearson 0.97). Panels: FDG activity (SUV), MedImages local-deposition dose, DPK reference, signed difference:
 
 ![MedImages dose vs DPK reference](test/visual_output/screenshots/Dosimetry_MedImages_vs_DPK.png)
 
-The four manuscript challenge figures (Volume / Speed / Differentiability / Metadata Fidelity):
-
-![Challenge 1 — Volume](test/visual_output/screenshots/challenge_1.png)
-![Challenge 2 — Speed](test/visual_output/screenshots/challenge_2.png)
-![Challenge 3 — Differentiability](test/visual_output/screenshots/challenge_3.png)
-![Challenge 4 — Metadata Fidelity](test/visual_output/screenshots/challenge_4.png)
+```bash
+# MedImages dose (Julia) + F-18 DPK reference (Python) + comparison
+julia --startup-file=no --project=. experiments/sciml_dose_refinement/medimages_dose.jl
+python3 experiments/sciml_dose_refinement/build_dpk_reference.py \
+    test_data/tcia_pet/activity.nii.gz test_data/tcia_pet/density.nii.gz test_data/tcia_pet/dose_dpk.nii.gz
+python3 experiments/sciml_dose_refinement/compare_dose.py
+```
 
 ---
 
