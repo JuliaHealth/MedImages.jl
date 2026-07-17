@@ -66,3 +66,8 @@ docs/src/experiments/viz/*.png
 
 # TCIA PET/CT patient data (raw DICOM + derived volumes) — not redistributed
 test_data/tcia_pet/
+
+# Manifest.toml is resolved per Julia version — committing it pins stdlib versions
+# (e.g. a 1.12-generated manifest breaks the 1.10/1.11 CI at Pkg.instantiate).
+# A registered package should let CI resolve deps fresh instead.
+/Manifest.toml
