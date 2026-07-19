@@ -64,17 +64,15 @@ Synthetic batched transforms (mid-slice of each output) and the same operations 
 ![Synthetic transforms grid](test/visual_output/screenshots/Synth_transforms_grid.png)
 
 ```bash
-# Reproduce: generate the NIfTI samples, then render the labelled grid
+# Reproduce the MedImages transform outputs (NIfTI)
 julia --startup-file=no --project=. test/generate_visual_samples.jl
-python3 test/render_screenshots.py
 ```
 
 ![Real-CT transforms grid](test/visual_output/screenshots/CT_comparison_grid_labeled.png)
 
 ```bash
-# Reproduce: apply the same operations to a real CT (test_data/volume-0.nii.gz)
+# Apply the same operations to a real CT (test_data/volume-0.nii.gz)
 julia --startup-file=no --project=. experiments/make_real_ct_samples.jl
-python3 experiments/render_real_ct_grid.py
 ```
 
 ---
@@ -102,11 +100,9 @@ batched  = affine_transform_mi(batch, [mat_a, mat_b], Linear_en)
 `create_affine_matrix` combines the components in the order `T * R * Sh * S` (points transformed as `M * p`). The fused result (30° Z rotation + 0.8× scale + translation, in a single interpolation pass) is shown as the **Fused affine** panel in both the synthetic and real-CT grids above. Full verification of every operation is in [`docs/VISUAL_VERIFICATION.md`](docs/VISUAL_VERIFICATION.md).
 
 ```bash
-# Reproduce the fused-affine panels (synthetic + real CT)
+# Reproduce the fused-affine outputs (synthetic + real CT)
 julia --startup-file=no --project=. test/generate_visual_samples.jl   # fused_transform_*.nii.gz
 julia --startup-file=no --project=. experiments/make_real_ct_samples.jl # ct_fused.nii.gz
-python3 test/render_screenshots.py
-python3 experiments/render_real_ct_grid.py
 ```
 
 ---
@@ -184,28 +180,17 @@ Every claim below is reproduced from the scripts in this repository; full instru
 
 ![SimpleITK vs MedImages rotation](paper_figures/fig3_rotation_vs_simpleitk.png)
 
-```bash
-julia --startup-file=no --project=. experiments/make_real_ct_samples.jl
-python3 experiments/make_paper_figures.py      # writes paper_figures/fig3_rotation_vs_simpleitk.png
-```
-
 **All spatial operations vs SimpleITK** on a real CT (axial mid-slice, soft-tissue window) — rotate 45°, scale 0.5×, resample 2 mm, crop, pad, and the fused affine (rotate 30° · scale 0.8× · translate). Left: MedImages.jl; middle: SimpleITK on the same grid; right: the absolute difference (Pearson `1.0000` for rotate/scale/crop/pad; `0.9939` resample; `0.9836` fused affine — the small residuals are sub-voxel interpolation differences at edges).
 
 ![MedImages vs SimpleITK across all spatial operations](paper_figures/fig14_medimages_vs_simpleitk_allops.png)
-
-```bash
-julia --startup-file=no --project=. experiments/make_real_ct_samples.jl
-python3 experiments/make_comparison_grid.py    # writes paper_figures/fig14_medimages_vs_simpleitk_allops.png
-```
 
 **Cross-language UDE forward-pass latency** (64³ patch) — DifferentialEquations.jl vs `torchdiffeq` (PyTorch) vs Diffrax (JAX):
 
 ![Speed comparison](test/visual_output/screenshots/Series6_speed_comparison.png)
 
 ```bash
-# Underlying timings (the plot itself is a saved artifact)
+# Julia timings (the plot itself is a saved artifact)
 julia --project=experiments/sciml_dose_refinement/ experiments/sciml_dose_refinement/benchmark_speed.jl
-python3 experiments/sciml_dose_refinement/benchmark_python_speed.py
 ```
 
 **MedImages dose vs F-18 dose-point-kernel** on real TCIA FDG PET/CT (body-masked Pearson 0.97). Panels: FDG activity (SUV), MedImages local-deposition dose, DPK reference, signed difference:
@@ -213,11 +198,8 @@ python3 experiments/sciml_dose_refinement/benchmark_python_speed.py
 ![MedImages dose vs DPK reference](test/visual_output/screenshots/Dosimetry_MedImages_vs_DPK.png)
 
 ```bash
-# MedImages dose (Julia) + F-18 DPK reference (Python) + comparison
+# MedImages local-deposition dose (Julia)
 julia --startup-file=no --project=. experiments/sciml_dose_refinement/medimages_dose.jl
-python3 experiments/sciml_dose_refinement/build_dpk_reference.py \
-    test_data/tcia_pet/activity.nii.gz test_data/tcia_pet/density.nii.gz test_data/tcia_pet/dose_dpk.nii.gz
-python3 experiments/sciml_dose_refinement/compare_dose.py
 ```
 
 ---
