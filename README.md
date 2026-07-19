@@ -189,7 +189,7 @@ julia --startup-file=no --project=. experiments/make_real_ct_samples.jl
 python3 experiments/make_paper_figures.py      # writes paper_figures/fig3_rotation_vs_simpleitk.png
 ```
 
-**All spatial operations vs SimpleITK** on a real CT (axial mid-slice, soft-tissue window) — rotate 45°, scale 0.5×, resample 2 mm, crop, and pad. Left: MedImages.jl; middle: SimpleITK on the same grid; right: the absolute difference (Pearson `1.0000` for every op except resample at `0.9939`).
+**All spatial operations vs SimpleITK** on a real CT (axial mid-slice, soft-tissue window) — rotate 45°, scale 0.5×, resample 2 mm, crop, pad, and the fused affine (rotate 30° · scale 0.8× · translate). Left: MedImages.jl; middle: SimpleITK on the same grid; right: the absolute difference (Pearson `1.0000` for rotate/scale/crop/pad; `0.9939` resample; `0.9836` fused affine — the small residuals are sub-voxel interpolation differences at edges).
 
 ![MedImages vs SimpleITK across all spatial operations](paper_figures/fig14_medimages_vs_simpleitk_allops.png)
 
