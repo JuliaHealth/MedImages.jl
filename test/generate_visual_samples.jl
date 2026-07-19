@@ -141,6 +141,18 @@ function main()
     create_nii_from_medimage(res_fused[1], joinpath(OUTPUT_DIR, "fused_transform_1"))
     create_nii_from_medimage(res_fused[2], joinpath(OUTPUT_DIR, "fused_transform_2"))
 
+    # 10. Block versions of the geometric transforms (for the visual grid).
+    # The asymmetric block (img1, with its axis marker) makes rotation / scale /
+    # shear geometry obvious: a rotated square is a diamond, a sheared square is
+    # a parallelogram. The sphere (img2) is rotation-invariant and looks round
+    # under every transform, which is misleading in the grid, so those panels
+    # should use the block instead. (scaled_0.5x_1 is already produced above.)
+    println("Saving BLOCK versions of rotate/shear for the visual grid...")
+    create_nii_from_medimage(rotate_mi(img1, 3, 45.0, Linear_en),
+        joinpath(OUTPUT_DIR, "rotated_45deg_1"))
+    create_nii_from_medimage(affine_transform_mi(img1, mat_shear, Linear_en),
+        joinpath(OUTPUT_DIR, "sheared_xy_0.5_1"))
+
     println("Done! Check $OUTPUT_DIR for results.")
 end
 
