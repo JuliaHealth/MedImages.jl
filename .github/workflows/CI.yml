@@ -34,6 +34,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          lfs: true   # test_data/*.nii.gz are LFS-tracked; tests read them
 
       - name: Setup Julia
         uses: julia-actions/setup-julia@v2

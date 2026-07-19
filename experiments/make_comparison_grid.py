@@ -16,9 +16,11 @@ import matplotlib.pyplot as plt
 plt.rcParams.update({"figure.dpi": 300, "savefig.dpi": 300,
                      "font.family": "DejaVu Sans", "savefig.bbox": "tight"})
 
-OUT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "paper_figures"))
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+OUT = os.path.join(ROOT, "paper_figures")
+SRC = os.path.join(ROOT, "test", "visual_output", "real_ct")  # from make_real_ct_samples.jl
 os.makedirs(OUT, exist_ok=True)
-ORIG = "/tmp/cmp_original.nii.gz"
+ORIG = os.path.join(SRC, "ct_original.nii.gz")
 AIR = -1000.0
 
 
@@ -48,11 +50,11 @@ def main():
     scl.SetCenter(original.GetOrigin())
 
     ops = [
-        ("Rotate 45°",      "/tmp/cmp_rotate.nii.gz",   rot),
-        ("Scale 0.5×",      "/tmp/cmp_scale.nii.gz",     scl),
-        ("Resample 2 mm",   "/tmp/cmp_resample.nii.gz",  sitk.Transform()),
-        ("Crop 256×256×40", "/tmp/cmp_crop.nii.gz",      sitk.Transform()),
-        ("Pad +40/+5",      "/tmp/cmp_pad.nii.gz",       sitk.Transform()),
+        ("Rotate 45°",      os.path.join(SRC, "ct_rotate45.nii.gz"),    rot),
+        ("Scale 0.5×",      os.path.join(SRC, "ct_scale05.nii.gz"),     scl),
+        ("Resample 2 mm",   os.path.join(SRC, "ct_resample2mm.nii.gz"), sitk.Transform()),
+        ("Crop 256×256×40", os.path.join(SRC, "ct_crop.nii.gz"),        sitk.Transform()),
+        ("Pad +40/+5",      os.path.join(SRC, "ct_pad.nii.gz"),         sitk.Transform()),
     ]
 
     n = len(ops)
