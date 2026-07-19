@@ -211,7 +211,6 @@ function establish_orginn_transformation(medim, sitk_image2, new_orientation, pe
         # print("\n tttttttttttt $(re_im.origin)  origin2 $(origin2)\n ")
 
         if (isapprox(collect(re_im.origin), collect(origin2); atol=0.1))
-            print("ffffffffffffff")
             # Convert vector of vectors to tuple of tuples for type consistency
             res_tuple = (Tuple(res[1]), Tuple(res[2]), Tuple(res[3]))
             return res_tuple
@@ -226,8 +225,6 @@ function establish_orginn_transformation(medim, sitk_image2, new_orientation, pe
 
     # # print("jjjj $(opts) origin2 $(origin2) ")
     # if(length(res[1])==0 || length(res[2])==0 || length(res[3])==0)
-    println("\n Not found sizz $(collect(sizz).*collect(spacing1)) diff $(collect(origin1)-collect(origin2)) origin1 $(origin1) origin2 $(origin2) spacing1 $(spacing1) spacing2 $(spacing2) \n")
-
     diff = collect(origin1) - collect(origin2)
     # print("\n ooooo origin1 $(origin1) origin2 $(origin2) spacing1 $(spacing1) spacing2 $(spacing2) diff $(diff)  sizzz $(sizzz) \n")
     # end

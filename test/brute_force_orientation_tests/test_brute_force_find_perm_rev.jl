@@ -70,13 +70,17 @@ end
     with_temp_output_dir("brute_force_orientation", "find_from_sitk") do output_dir
 
         @testset "Find all orientation operations" begin
-            if !isfile(TEST_NIFTI_FILE)
+            # Use the small 32^3 phantom: brute_force_find_from_sitk searches every
+            # orientation pair with a 531k-combination origin search per pair, so on
+            # the full 512^3 clinical volume it takes hours. The 32^3 image exercises
+            # the same logic in seconds.
+            if !isfile(TEST_SYNTHETIC_FILE)
                 @test_skip "Test file not found"
                 return
             end
 
             try
-                result = MedImages.Brute_force_orientation.brute_force_find_from_sitk(TEST_NIFTI_FILE)
+                result = MedImages.Brute_force_orientation.brute_force_find_from_sitk(TEST_SYNTHETIC_FILE)
                 @test result isa Dict || result isa AbstractVector
             catch e
                 @test_broken false
