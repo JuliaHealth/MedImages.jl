@@ -78,6 +78,3 @@ MedImages.jl on GPU achieved massive speedups due to `KernelAbstractions.jl`:
 *   **Fused Affine Transformation:** 135x speedup vs MedImages CPU.
 
 For the 100-subject pipeline resampled to a $512^3$ grid, per-subject GPU kernel times were strictly under 200ms.
-
-![GPU Acceleration Benchmarks](viz/gpu_acceleration.png)
-*Figure 1: Performance speedup factor achieved by natively compiling Julia code to PTX kernels vs standard CPU execution.*
