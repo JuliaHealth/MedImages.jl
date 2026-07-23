@@ -59,14 +59,8 @@ By seamlessly combining `Zygote.jl` for the CNN and `Enzyme.jl` for the geometri
 
 This sustained and deeper optimization enabled the model to reduce the mean squared reconstruction error by **over 60%** and reliably converge to an extremely high-fidelity inverse rotation on held-out test data. This proves that end-to-end differentiable augmentation and learned geometric preprocessing are fully natively supported and highly scalable for complex 3D tasks.
 
-![Differentiability Proof Results](viz/differentiability_results.png)
-*Figure 1: Middle slices showing the gold standard unrotated image, the randomly rotated input, and the reconstructed output after applying the learned inverse rotation.*
-
 ### 3D Visualization of the Spatial Transformation Over Time
 
 To better understand how the 3D geometric transformations learned by the network evolve, we extracted and saved the initial and end points of the reconstructed volume's principal axis at *each epoch* during training. 
 
 By tracking these coordinate endpoints across the entire training lifecycle, we generated a sequential 3D visualization. We selected representative epochs (from the start, through four intermediate stages of convergence, to the final epoch) to illustrate the neural network gradually "pulling" the uncorrected rotated structure back into perfect alignment with the Gold Standard:
-
-![3D Spatial Lines Visualization](viz/differentiability_3d_lines.png)
-*Figure 2: A 3D spatial progression mapping the Uncorrected rotated input (Red), the true unrotated Gold Standard (Green, dashed), and the network's evolving Reconstructed inverse spanning from the early epochs (light blue) to the near-perfect final epoch (dark blue/black).*
