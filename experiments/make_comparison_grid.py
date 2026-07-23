@@ -28,6 +28,41 @@ def ctwin(a, lo=-160, hi=240):
     return np.clip((a.astype(np.float32) - lo) / (hi - lo), 0, 1)
 
 
+def _affine_matrix(translation=(0, 0, 0), rotation=(0, 0, 0), scale=(1, 1, 1),
+                   shear=(0, 0, 0)):
+    """Replica of MedImages.create_affine_matrix: M = T * R * Sh * S (deg, Rz*Ry*Rx)."""
+    tx, ty, tz = translation
+    T = np.array([[1, 0, 0, tx], [0, 1, 0, ty], [0, 0, 1, tz], [0, 0, 0, 1]], float)
+    rx, ry, rz = np.deg2rad(rotation)
+    Rx = np.array([[1, 0, 0], [0, np.cos(rx), -np.sin(rx)], [0, np.sin(rx), np.cos(rx)]])
+    Ry = np.array([[np.cos(ry), 0, np.sin(ry)], [0, 1, 0], [-np.sin(ry), 0, np.cos(ry)]])
+    Rz = np.array([[np.cos(rz), -np.sin(rz), 0], [np.sin(rz), np.cos(rz), 0], [0, 0, 1]])
+    R = np.eye(4); R[:3, :3] = Rz @ Ry @ Rx
+    S = np.diag([*scale, 1.0])
+    sxy, sxz, syz = shear
+    Sh = np.array([[1, sxy, sxz, 0], [0, 1, syz, 0], [0, 0, 1, 0], [0, 0, 0, 1]], float)
+    return T @ R @ Sh @ S
+
+
+def fused_affine_transform(ref, M):
+    """SITK transform (output_phys -> input_phys) reproducing MedImages'
+    affine_transform_mi, which applies M in INDEX space about c = size/2 (1-based)
+    and ignores spacing/origin/direction. create_nii permutes [x,y,z]->[z,y,x],
+    so MedImages array dims map 1:1 to SITK (x,y,z)."""
+    size = np.array(ref.GetSize(), float)
+    O = np.array(ref.GetOrigin(), float)
+    L = np.array(ref.GetDirection(), float).reshape(3, 3) @ np.diag(ref.GetSpacing())
+    Minv = np.linalg.inv(M)
+    A, tinv = Minv[:3, :3], Minv[:3, 3]
+    cc = size / 2.0 - 1.0                       # 0-based center matching size/2 (1-based)
+    t_idx = cc - A @ cc + tinv
+    aff = sitk.AffineTransform(3)
+    aff.SetMatrix((L @ A @ np.linalg.inv(L)).flatten().tolist())
+    aff.SetCenter(O.tolist())
+    aff.SetTranslation((L @ t_idx).tolist())
+    return aff
+
+
 def sitk_ref(original, med_img, transform):
     """Resample original onto med_img's geometry with the given transform."""
     rs = sitk.ResampleImageFilter()
@@ -49,12 +84,18 @@ def main():
     scl = sitk.ScaleTransform(3, [2.0, 2.0, 1.0])
     scl.SetCenter(original.GetOrigin())
 
+    # Fused affine: rotate 30° about Z, scale 0.8×, translate (+5, -2, 0) — the
+    # same single-pass transform shown in the synthetic/real-CT grids.
+    fused = fused_affine_transform(original, _affine_matrix(
+        rotation=(0, 0, 30), scale=(0.8, 0.8, 0.8), translation=(5, -2, 0)))
+
     ops = [
         ("Rotate 45°",      os.path.join(SRC, "ct_rotate45.nii.gz"),    rot),
         ("Scale 0.5×",      os.path.join(SRC, "ct_scale05.nii.gz"),     scl),
         ("Resample 2 mm",   os.path.join(SRC, "ct_resample2mm.nii.gz"), sitk.Transform()),
         ("Crop 256×256×40", os.path.join(SRC, "ct_crop.nii.gz"),        sitk.Transform()),
         ("Pad +40/+5",      os.path.join(SRC, "ct_pad.nii.gz"),         sitk.Transform()),
+        ("Fused affine\n(rot 30°·0.8×·+5/−2)", os.path.join(SRC, "ct_fused.nii.gz"), fused),
     ]
 
     n = len(ops)
