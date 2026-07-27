@@ -145,14 +145,6 @@ gpu_ct = update_voxel_data(ct, CuArray(Float32.(ct.voxel_data)))
 rotated = rotate_mi(gpu_ct, 3, 45.0, Linear_en)
 ```
 
-Per-operation transform timing (MedImages vs SimpleITK):
-
-![Transform benchmarks](test/visual_output/screenshots/Series1_transform_benchmarks.png)
-
-```bash
-# Underlying timings (the plot itself is a saved artifact)
-julia --startup-file=no --project=. experiments/benchmark/run_gpu_benchmarks.jl
-```
 
 ---
 
