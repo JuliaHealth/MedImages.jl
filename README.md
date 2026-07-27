@@ -176,16 +176,13 @@ Every claim below is reproduced from the scripts in this repository; full instru
 
 ![MedImages vs SimpleITK across all spatial operations](paper_figures/fig14_medimages_vs_simpleitk_allops.png)
 
-**Cross-language UDE forward-pass latency** (64³ patch) — DifferentialEquations.jl vs `torchdiffeq` (PyTorch) vs Diffrax (JAX):
-
-![Speed comparison](test/visual_output/screenshots/Series6_speed_comparison.png)
 
 ```bash
 # Julia timings (the plot itself is a saved artifact)
 julia --project=experiments/sciml_dose_refinement/ experiments/sciml_dose_refinement/benchmark_speed.jl
 ```
 
-**MedImages dose vs F-18 dose-point-kernel** on real TCIA FDG PET/CT (body-masked Pearson 0.97). Panels: FDG activity (SUV), MedImages local-deposition dose, DPK reference, signed difference:
+**MedImages dose vs F-18 dose-point-kernel** on real TCIA FDG PET/CT FDG PET CT was used just to show that code compiles as we can not publish Lu PSMA dataset (body-masked Pearson 0.97). Panels: FDG activity (SUV), MedImages local-deposition dose, DPK reference, signed difference:
 
 ![MedImages dose vs DPK reference](test/visual_output/screenshots/Dosimetry_MedImages_vs_DPK.png)
 
