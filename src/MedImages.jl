@@ -12,7 +12,7 @@ export SUV_calc
 export Normalization
 
 # Export key functions that tests need
-export load_image, update_voxel_data, update_voxel_and_spatial_data, create_nii_from_medimage
+export load_image, load_mrb, update_voxel_data, update_voxel_and_spatial_data, create_nii_from_medimage
 export calculate_suv_factor, calculate_suv_statistics
 export save_med_image, load_med_image
 export resample_to_spacing, change_orientation
@@ -49,7 +49,7 @@ include("Normalization.jl")
 # Re-export functions from submodules
 using .Utils
 using .SUV_calc: calculate_suv_factor, calculate_suv_statistics
-using .Load_and_save: load_image, update_voxel_data, update_voxel_and_spatial_data, create_nii_from_medimage
+using .Load_and_save: load_image, load_mrb, update_voxel_data, update_voxel_and_spatial_data, create_nii_from_medimage
 using .MedImage_data_struct: MedImage, BatchedMedImage, Image_type, Image_subtype, current_device_enum
 using .MedImage_data_struct: Interpolator_enum, Mode_mi, Orientation_code
 using .MedImage_data_struct: Nearest_neighbour_en, Linear_en, B_spline_en

@@ -1,6 +1,6 @@
 module Load_and_save
 using Dictionaries, Dates, PyCall
-using Accessors, UUIDs
+using Accessors, UUIDs, LinearAlgebra
 using ..MedImage_data_struct
 using ..MedImage_data_struct: MedImage, BatchedMedImage
 using ..Utils
@@ -175,6 +175,193 @@ function _pydicom_ds_to_dict(ds)
         end
     end
     return d
+end
+
+export load_mrb
+
+"""
+    load_mrb(path::String)
+
+Load an MRB file or an extracted MRB directory, parse the MRML file,
+and load all Volume and Segmentation nodes. Transforms are parsed and
+applied to the MedImage metadata (origin, spacing, direction).
+
+Returns a Dict{String, MedImage} where keys are the node names.
+"""
+function load_mrb(path::String)
+    pyzip = pyimport("zipfile")
+    pytemp = pyimport("tempfile")
+    pyos = pyimport("os")
+    pyxml = pyimport("xml.etree.ElementTree")
+    
+    is_mrb = endswith(lowercase(path), ".mrb") || endswith(lowercase(path), ".zip")
+    
+    temp_dir = ""
+    target_dir = path
+    
+    if is_mrb
+        temp_dir = pytemp.mkdtemp()
+        with(pyzip.ZipFile(path, "r")) do zip_ref
+            zip_ref.extractall(temp_dir)
+        end
+        target_dir = temp_dir
+    end
+    
+    # Find .mrml file
+    mrml_file = ""
+    for (root, dirs, files) in pyos.walk(target_dir)
+        for f in files
+            if endswith(lowercase(f), ".mrml")
+                mrml_file = pyos.path.join(root, f)
+                break
+            end
+        end
+        if mrml_file != ""
+            break
+        end
+    end
+    
+    if mrml_file == ""
+        if temp_dir != ""
+            pyimport("shutil").rmtree(temp_dir)
+        end
+        error("No .mrml file found in the provided path/archive.")
+    end
+    
+    tree = pyxml.parse(mrml_file)
+    root_node = tree.getroot()
+    
+    # 1. Parse transforms
+    transforms = Dict{String, Dict}()
+    for tnode in root_node.findall("LinearTransform")
+        id = tnode.attrib["id"]
+        matrix_str = get(tnode.attrib, "matrixTransformToParent", "")
+        if matrix_str != ""
+            vals = parse.(Float64, split(matrix_str))
+            # Slicer matrix is row-major 16-element array. Reshape to 4x4.
+            # Julia reshape is column-major, so we transpose.
+            matrix = transpose(reshape(vals, 4, 4))
+            
+            # Check for parent transform
+            parent_id = ""
+            if haskey(tnode.attrib, "references")
+                refs = split(tnode.attrib["references"], ";")
+                for ref in refs
+                    if startswith(ref, "transform:")
+                        parent_id = split(ref, ":")[2]
+                    end
+                end
+            end
+            
+            transforms[id] = Dict("matrix" => matrix, "parent" => parent_id)
+        end
+    end
+    
+    # 2. Parse storages (for file names)
+    storages = Dict{String, String}()
+    for snode in root_node.findall("VolumeArchetypeStorage")
+        id = snode.attrib["id"]
+        if haskey(snode.attrib, "fileName")
+            storages[id] = snode.attrib["fileName"]
+        end
+    end
+    for snode in root_node.findall("SegmentationStorage")
+        id = snode.attrib["id"]
+        if haskey(snode.attrib, "fileName")
+            storages[id] = snode.attrib["fileName"]
+        end
+    end
+    
+    # 3. Parse Volumes and Segmentations
+    results = Dict{String, Any}()
+    
+    nodes_to_process = [root_node.findall("Volume"); root_node.findall("Segmentation")]
+    
+    mrml_dir = pyos.path.dirname(mrml_file)
+    
+    for vnode in nodes_to_process
+        name = get(vnode.attrib, "name", "")
+        if !haskey(vnode.attrib, "references")
+            continue
+        end
+        
+        refs = split(vnode.attrib["references"], ";")
+        storage_id = ""
+        transform_id = ""
+        
+        for ref in refs
+            if startswith(ref, "storage:")
+                storage_id = split(ref, ":")[2]
+            elseif startswith(ref, "transform:")
+                transform_id = split(ref, ":")[2]
+            end
+        end
+        
+        if storage_id != "" && haskey(storages, storage_id)
+            rel_file = storages[storage_id]
+            full_file = pyos.path.join(mrml_dir, rel_file)
+            
+            if pyos.path.exists(full_file)
+                # Load the raw MedImage
+                itype = occursin(r"(?i)pet", name) ? "PET" : "CT"
+                img = load_image(full_file, itype)
+                
+                # Resolve transform chain
+                current_tid = transform_id
+                T_RAS = Matrix{Float64}(LinearAlgebra.I, 4, 4)
+                
+                while current_tid != "" && haskey(transforms, current_tid)
+                    t_info = transforms[current_tid]
+                    # Post-multiply since parent transform is applied after child
+                    T_RAS = t_info["matrix"] * T_RAS
+                    current_tid = t_info["parent"]
+                end
+                
+                if T_RAS != LinearAlgebra.I
+                    # Apply transform. MedImage is in LPS. T_RAS is in RAS.
+                    L = LinearAlgebra.Diagonal([-1.0, -1.0, 1.0, 1.0])
+                    T_LPS = L * T_RAS * L
+                    
+                    # Construct current LPS affine
+                    old_spacing = img.spacing
+                    old_dir = reshape(collect(img.direction), 3, 3)
+                    old_orig = img.origin
+                    
+                    M_old = zeros(Float64, 4, 4)
+                    for i in 1:3, j in 1:3
+                        M_old[i, j] = old_dir[i, j] * old_spacing[j]
+                    end
+                    for i in 1:3
+                        M_old[i, 4] = old_orig[i]
+                    end
+                    M_old[4, 4] = 1.0
+                    
+                    M_new = T_LPS * M_old
+                    
+                    new_orig = (M_new[1, 4], M_new[2, 4], M_new[3, 4])
+                    new_spacing = zeros(Float64, 3)
+                    new_dir = zeros(Float64, 3, 3)
+                    
+                    for j in 1:3
+                        col = M_new[1:3, j]
+                        s = LinearAlgebra.norm(col)
+                        new_spacing[j] = s
+                        new_dir[:, j] = col / s
+                    end
+                    
+                    img = update_voxel_and_spatial_data(img, img.voxel_data, new_orig, Tuple(new_spacing), Tuple(new_dir))
+                end
+                
+                results[name] = img
+            end
+        end
+    end
+    
+    if temp_dir != ""
+        pyimport("shutil").rmtree(temp_dir)
+    end
+    
+    return results
 end
 
 end
