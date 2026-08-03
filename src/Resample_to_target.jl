@@ -57,8 +57,8 @@ function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator
 
     # Calculate the affine transform from Fixed Index (I_f) -> Moving Index (I_m)
     # Physical = Origin + Direction * diag(Spacing) * (Index - 1)
-    Df = Float64.(reshape(collect(im_fixed.direction), 3, 3))
-    Dm = Float64.(reshape(collect(im_moving.direction), 3, 3))
+    Df = copy(transpose(Float64.(reshape(collect(im_fixed.direction), 3, 3))))
+    Dm = copy(transpose(Float64.(reshape(collect(im_moving.direction), 3, 3))))
     
     Sf = Diagonal(Float64.(collect(im_fixed.spacing)))
     Sm = Diagonal(Float64.(collect(im_moving.spacing)))
@@ -120,8 +120,8 @@ function resample_to_image(im_fixed::BatchedMedImage, im_moving::BatchedMedImage
     
     M_batch = zeros(Float32, 4, 4, batch_size)
     for b in 1:batch_size
-        Df = Float64.(reshape(collect(im_fixed.direction[b]), 3, 3))
-        Dm = Float64.(reshape(collect(im_moving.direction[b]), 3, 3))
+        Df = copy(transpose(Float64.(reshape(collect(im_fixed.direction[b]), 3, 3))))
+        Dm = copy(transpose(Float64.(reshape(collect(im_moving.direction[b]), 3, 3))))
         Sf = Diagonal(Float64.(collect(im_fixed.spacing[b])))
         Sm = Diagonal(Float64.(collect(im_moving.spacing[b])))
         Of = Float64.(collect(im_fixed.origin[b]))
