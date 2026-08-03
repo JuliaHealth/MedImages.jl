@@ -71,3 +71,13 @@ test_data/tcia_pet/
 # (e.g. a 1.12-generated manifest breaks the 1.10/1.11 CI at Pkg.instantiate).
 # A registered package should let CI resolve deps fresh instead.
 /Manifest.toml
+
+# Ignore generated test comparisons
+test_data/resampled_Linear_mi.nii.gz
+test_data/resampled_Linear_sitk.nii.gz
+
+# Ignore affine comparison suite outputs
+test_data/affine_comparisons/*.nii.gz
+test_data/affine_comparisons/*.png
+*.nii
+*.nii.gz
