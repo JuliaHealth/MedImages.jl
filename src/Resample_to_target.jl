@@ -4,6 +4,7 @@ using Statistics
 using CUDA
 using KernelAbstractions
 using ChainRulesCore
+using LinearAlgebra
 
 using ..MedImage_data_struct, ..Utils, ..Orientation_dicts, ..Spatial_metadata_change, ..Load_and_save
 export resample_to_image, scale, resample_to_spacing
@@ -54,39 +55,44 @@ function resample_to_image(im_fixed::MedImage, im_moving::MedImage, interpolator
     end
 
 
-    # get direction from one and set it to other
-    im_moving = Spatial_metadata_change.change_orientation(im_moving, Orientation_dicts.number_to_enum_orientation_dict[im_fixed.direction])
+    # Calculate the affine transform from Fixed Index (I_f) -> Moving Index (I_m)
+    # Physical = Origin + Direction * diag(Spacing) * (Index - 1)
+    Df = Float64.(reshape(collect(im_fixed.direction), 3, 3))
+    Dm = Float64.(reshape(collect(im_moving.direction), 3, 3))
+    
+    Sf = Diagonal(Float64.(collect(im_fixed.spacing)))
+    Sm = Diagonal(Float64.(collect(im_moving.spacing)))
+    
+    Of = Float64.(collect(im_fixed.origin))
+    Om = Float64.(collect(im_moving.origin))
 
-    # Calculate the transformation from moving image space to fixed image space
-    old_spacing = im_moving.spacing
-    new_spacing = im_fixed.spacing
+    # M_rot_scale = inv(Dm * Sm) * (Df * Sf)
+    M_rot_scale = inv(Dm * Sm) * (Df * Sf)
+    
+    # M_trans = inv(Dm * Sm) * (Of - Om)
+    M_trans = inv(Dm * Sm) * (Of - Om)
+
+    # I_m = M_rot_scale * I_f - M_rot_scale * 1 + M_trans + 1
+    # Build 4x4 matrix mapping 1-based I_f -> 1-based I_m
+    M = zeros(Float32, 4, 4, 1)
+    M[1:3, 1:3, 1] .= Float32.(M_rot_scale)
+    M[1:3, 4, 1] .= Float32.(M_trans .- M_rot_scale * [1.0, 1.0, 1.0] .+ [1.0, 1.0, 1.0])
+    M[4, 4, 1] = 1.0f0
+
     new_size = size(im_fixed.voxel_data)
     
-    # Check current device
     backend = try KernelAbstractions.get_backend(im_fixed.voxel_data) catch; KernelAbstractions.CPU() end
+    device_M = backend isa KernelAbstractions.GPU ? CuArray(M) : M
     
-    points_to_interpolate = get_base_indicies_arr(new_size)
-    points_to_interpolate = Float32.(points_to_interpolate) .- 1.0f0
-    points_to_interpolate = points_to_interpolate .* Float32.(new_spacing)
-    points_to_interpolate = points_to_interpolate .+ 1.0f0
+    resampled_flat = Utils.interpolate_fused_affine(im_moving.voxel_data, device_M, new_size, interpolator_enum, false, Float32(value_to_extrapolate), (0.0, 0.0, 0.0))
 
-    # adding difference in origin
-    origin_diff = Float32.(collect(im_fixed.origin) - collect(im_moving.origin))
-    points_to_interpolate = points_to_interpolate .+ origin_diff
+    new_voxel_data = reshape(resampled_flat, new_size)
 
-    # Move to GPU if needed
-    if backend isa KernelAbstractions.GPU
-        points_to_interpolate = CuArray(points_to_interpolate)
+    if eltype(im_moving.voxel_data) != Float32
+        new_voxel_data = Utils.cast_to_array_b_type(new_voxel_data, im_moving.voxel_data)
     end
 
-    interpolated_points = interpolate_my(points_to_interpolate, im_moving.voxel_data, old_spacing, interpolator_enum, false, Float32(value_to_extrapolate))
-
-    new_voxel_data = reshape(interpolated_points, (new_size[1], new_size[2], new_size[3]))
-    # new_voxel_data=cast_to_array_b_type(new_voxel_data,im_fixed.voxel_data)
-
-
-    new_im = Load_and_save.update_voxel_and_spatial_data(im_moving, new_voxel_data, im_fixed.origin, new_spacing, im_fixed.direction)
-
+    new_im = Load_and_save.update_voxel_and_spatial_data(im_moving, new_voxel_data, im_fixed.origin, im_fixed.spacing, im_fixed.direction)
 
     return new_im
 end
@@ -114,27 +120,25 @@ function resample_to_image(im_fixed::BatchedMedImage, im_moving::BatchedMedImage
     
     M_batch = zeros(Float32, 4, 4, batch_size)
     for b in 1:batch_size
-        sf = im_fixed.spacing[b]
-        sm = im_moving.spacing[b]
-        of = im_fixed.origin[b]
-        om = im_moving.origin[b]
-        
-        m11 = sf[1] / sm[1]
-        m22 = sf[2] / sm[2]
-        m33 = sf[3] / sm[3]
-        
-        m14 = 1.0f0 - m11 + (of[1] - om[1]) / sm[1]
-        m24 = 1.0f0 - m22 + (of[2] - om[2]) / sm[2]
-        m34 = 1.0f0 - m33 + (of[3] - om[3]) / sm[3]
-        
-        M_batch[1, 1, b] = m11; M_batch[2, 2, b] = m22; M_batch[3, 3, b] = m33
-        M_batch[1, 4, b] = m14; M_batch[2, 4, b] = m24; M_batch[3, 4, b] = m34
+        Df = Float64.(reshape(collect(im_fixed.direction[b]), 3, 3))
+        Dm = Float64.(reshape(collect(im_moving.direction[b]), 3, 3))
+        Sf = Diagonal(Float64.(collect(im_fixed.spacing[b])))
+        Sm = Diagonal(Float64.(collect(im_moving.spacing[b])))
+        Of = Float64.(collect(im_fixed.origin[b]))
+        Om = Float64.(collect(im_moving.origin[b]))
+
+        M_rot_scale = inv(Dm * Sm) * (Df * Sf)
+        M_trans = inv(Dm * Sm) * (Of - Om)
+
+        M_batch[1:3, 1:3, b] .= Float32.(M_rot_scale)
+        M_batch[1:3, 4, b] .= Float32.(M_trans .- M_rot_scale * [1.0, 1.0, 1.0] .+ [1.0, 1.0, 1.0])
         M_batch[4, 4, b] = 1.0f0
     end
     
-    device_M = is_cuda_array(im_moving.voxel_data) ? CuArray(M_batch) : M_batch
+    backend = try KernelAbstractions.get_backend(im_fixed.voxel_data) catch; KernelAbstractions.CPU() end
+    device_M = backend isa KernelAbstractions.GPU ? CuArray(M_batch) : M_batch
     val_ext = (value_to_extrapolate == Nothing) ? 0.0f0 : Float32(value_to_extrapolate)
-    resampled_flat = interpolate_fused_affine(im_moving.voxel_data, device_M, new_size, interpolator_enum, false, 0.0, nothing)
+    resampled_flat = Utils.interpolate_fused_affine(im_moving.voxel_data, device_M, new_size, interpolator_enum, false, val_ext, (0.0, 0.0, 0.0))
 
     batch_size = size(im_moving.voxel_data, 4)
     new_data = reshape(resampled_flat, new_size..., batch_size)
