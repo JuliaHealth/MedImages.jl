@@ -1,8 +1,8 @@
 module Load_and_save
-using Dictionaries, Dates, PyCall
-using Accessors, UUIDs, LinearAlgebra
-using ..MedImage_data_struct
+using Dictionaries, Dates, ZipFile, EzXML
+using Accessors, UUIDs, LinearAlgebra, ITKIOWrapper, NIfTI
 using ..MedImage_data_struct: MedImage, BatchedMedImage
+import ..MedImage_data_struct
 using ..Utils
 export load_image
 export update_voxel_and_spatial_data
@@ -26,23 +26,26 @@ end
 """
     create_nii_from_medimage(med_image, file_path, extension=".nii.gz")
 
-Save a MedImage object to a NIfTI file using SimpleITK via PyCall.
+Save a MedImage object to a NIfTI file natively using ITKIOWrapper.
 """
 function create_nii_from_medimage(med_image::MedImage, file_path::String, extension::String=".nii.gz")
-  sitk = pyimport("SimpleITK")
-  np = pyimport("numpy")
-  
+  # Ensure path has extension if not already present
   full_path = endswith(file_path, extension) ? file_path : file_path * extension
 
-  # Permute from [x, y, z] to [z, y, x] for SimpleITK
-  voxel_arr = permutedims(Float32.(med_image.voxel_data), (3, 2, 1))
-  img = sitk.GetImageFromArray(np.array(voxel_arr))
-  
-  img.SetOrigin(collect(Float64.(med_image.origin)))
-  img.SetSpacing(collect(Float64.(med_image.spacing)))
-  img.SetDirection(collect(Float64.(med_image.direction)))
+  # Prepare VoxelData (requires Float32 for ITKIOWrapper)
+  voxel_f32 = Array{Float32, 3}(med_image.voxel_data)
+  vd = ITKIOWrapper.DataStructs.VoxelData(voxel_f32)
 
-  sitk.WriteImage(img, full_path)
+  # Prepare SpatialMetaData
+  origin = NTuple{3, Float64}(med_image.origin)
+  spacing = NTuple{3, Float64}(med_image.spacing)
+  sz = NTuple{3, Int64}(size(med_image.voxel_data))
+  direction = NTuple{9, Float64}(med_image.direction)
+  
+  meta = ITKIOWrapper.DataStructs.SpatialMetaData(origin, spacing, sz, direction)
+
+  # Save using native ITK wrapper
+  ITKIOWrapper.save_image(vd, meta, full_path, false)
 end
 
 """
@@ -73,109 +76,96 @@ end
 """
     load_image(path, type)
 
-Load a medical image from file using SimpleITK via PyCall.
+Load a medical image from file. Uses NIfTI.jl for NIfTI files (.nii, .nii.gz)
+and ITKIOWrapper for DICOM directories. NIfTI.jl reads raw voxel data without
+any internal caching or spatial resampling, which is critical for binary mask
+files that are repeatedly overwritten at the same path.
 """
-function load_image(path::String, type::String)::MedImage
-  sitk = pyimport("SimpleITK")
+function load_image(path::String, type::String="CT")::MedImage
+  is_nifti = endswith(lowercase(path), ".nii.gz") || endswith(lowercase(path), ".nii")
   
-  img = nothing
-  if isdir(path)
-      # Assume DICOM series
-      reader = sitk.ImageSeriesReader()
-      dicom_names = reader.GetGDCMSeriesFileNames(path)
-      reader.SetFileNames(dicom_names)
-      img = reader.Execute()
+  if is_nifti
+    # Use NIfTI.jl for NIfTI files — avoids ITK's internal file caching
+    # which can return stale data when a file at the same path is overwritten
+    nii = NIfTI.niread(path)
+    voxel_arr = Array{Float32}(nii.raw)
+    
+    # Extract spatial metadata from NIfTI header
+    # NIfTI.jl stores the 4x4 affine (sform or qform) in nii.header
+    hdr = nii.header
+    
+    # Get voxel dimensions from pixdim
+    pixdim = hdr.pixdim
+    spacing = (Float64(abs(pixdim[2])), Float64(abs(pixdim[3])), Float64(abs(pixdim[4])))
+    
+    # Compute affine matrix from sform rows (srow_x, srow_y, srow_z)
+    # NIfTI stores the affine as srow_x/y/z which are 4-element vectors
+    sform_code = hdr.sform_code
+    qform_code = hdr.qform_code
+    
+    if sform_code > 0
+      # Use sform
+      sx = hdr.srow_x
+      sy = hdr.srow_y
+      sz = hdr.srow_z
+      
+      origin = (Float64(sx[4]), Float64(sy[4]), Float64(sz[4]))
+      
+      # Direction is the 3x3 rotation/scale matrix normalized by spacing
+      dir = zeros(Float64, 9)
+      for i in 1:3
+        row = i == 1 ? sx : (i == 2 ? sy : sz)
+        for j in 1:3
+          dir[(i-1)*3 + j] = Float64(row[j]) / spacing[j]
+        end
+      end
+      direction = NTuple{9, Float64}(dir)
+    elseif qform_code > 0
+      # Use qform — fall back to ITKIOWrapper for proper quaternion handling
+      imaging_study = ITKIOWrapper.load_image(path)
+      spatial_meta = ITKIOWrapper.load_spatial_metadata(imaging_study)
+      # But use NIfTI.jl voxel data (no caching issues)
+      origin = spatial_meta.origin
+      direction = spatial_meta.direction
+      spacing = spatial_meta.spacing
+    else
+      # No transform info — use identity
+      origin = (0.0, 0.0, 0.0)
+      direction = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+    end
+    
+    # Convert NIfTI RAS to ITK LPS convention
+    # NIfTI sform maps voxels to RAS world. ITK uses LPS world.
+    # LPS flips X and Y world axes, so negate the first two ROWS entirely.
+    lps_origin = (-origin[1], -origin[2], origin[3])
+    lps_dir = (
+      -direction[1], -direction[2], -direction[3],
+      -direction[4], -direction[5], -direction[6],
+      direction[7], direction[8], direction[9]
+    )
+    
   else
-      img = sitk.ReadImage(path)
+    # DICOM or other format — use ITKIOWrapper (no caching issues for DICOM dirs)
+    imaging_study = ITKIOWrapper.load_image(path)
+    spatial_meta = ITKIOWrapper.load_spatial_metadata(imaging_study)
+    voxel_arr_struct = ITKIOWrapper.load_voxel_data(imaging_study, spatial_meta)
+    voxel_arr = collect(voxel_arr_struct.dat)
+    lps_origin = spatial_meta.origin
+    spacing = spatial_meta.spacing
+    lps_dir = spatial_meta.direction
   end
-  
-  # SimpleITK image to array returns [z, y, x]
-  voxel_arr_np = sitk.GetArrayFromImage(img)
-  # Permute to [x, y, z] for MedImages.jl consistency
-  voxel_arr = permutedims(Float32.(voxel_arr_np), (3, 2, 1))
-  
-  origin = Tuple(Float64.(img.GetOrigin()))
-  spacing = Tuple(Float64.(img.GetSpacing()))
-  direction = Tuple(Float64.(img.GetDirection()))
   
   study_type = type == "CT" ? MedImage_data_struct.CT_type : MedImage_data_struct.PET_type
   subtype = type == "CT" ? MedImage_data_struct.CT_subtype : MedImage_data_struct.FDG_subtype
   legacy_file_name_field = string(split(path, "/")[length(split(path, "/"))])
 
   metadata_dict = Dict{Any, Any}()
-  try
-      metadata_dict = _get_metadata(path)
-  catch e
-      @warn "Could not extract DICOM metadata using pydicom: $e"
-  end
 
-  return MedImage(voxel_data=voxel_arr, origin=origin, spacing=spacing, direction=direction, patient_id="test_id", image_type=study_type, image_subtype=subtype, legacy_file_name=legacy_file_name_field, metadata=metadata_dict)
+  return MedImage(voxel_data=voxel_arr, origin=lps_origin, spacing=spacing, direction=lps_dir, patient_id="test_id", image_type=study_type, image_subtype=subtype, legacy_file_name=legacy_file_name_field, metadata=metadata_dict)
 end
 
-function _get_metadata(path::String)
-    pydicom = pyimport("pydicom")
-    os = pyimport("os")
-
-    target_path = path
-    if isdir(path)
-        # Find first DICOM file in directory
-        files = readdir(path)
-        # Try to find .dcm extension
-        dcm_files = filter(f -> endswith(lowercase(f), ".dcm"), files)
-        if !isempty(dcm_files)
-            target_path = joinpath(path, dcm_files[1])
-        else
-            # If no .dcm, try first file that is not a directory
-            for f in files
-                full_p = joinpath(path, f)
-                if isfile(full_p)
-                    target_path = full_p
-                    break
-                end
-            end
-        end
-    end
-
-    if !isfile(target_path)
-        return Dict{Any, Any}()
-    end
-
-    try
-        ds = pydicom.dcmread(target_path, stop_before_pixels=true)
-        return _pydicom_ds_to_dict(ds)
-    catch e
-        # If not a DICOM file or other error
-        return Dict{Any, Any}()
-    end
-end
-
-function _pydicom_ds_to_dict(ds)
-    d = Dict{Any, Any}()
-    for elem in ds
-        key = elem.keyword
-        if isempty(key)
-            # Use tag if keyword is empty (e.g. private tags)
-            key = string(elem.tag)
-        end
-
-        val = elem.value
-
-        # Handle Sequences
-        if elem.VR == "SQ"
-            seq_list = []
-            for item in val
-                push!(seq_list, _pydicom_ds_to_dict(item))
-            end
-            d[key] = seq_list
-        # Handle MultiValue
-        elseif typeof(val) <: PyObject && pybuiltin("isinstance")(val, pyimport("pydicom.multival").MultiValue)
-             d[key] = collect(val)
-        else
-             d[key] = val
-        end
-    end
-    return d
-end
+# DICOM metadata extraction is currently deferred to ITKIOWrapper which is expected
+# to be updated in the future to extract full DICOM dictionaries along with spatial metadata.
 
 export load_mrb
 
@@ -189,30 +179,34 @@ applied to the MedImage metadata (origin, spacing, direction).
 Returns a Dict{String, MedImage} where keys are the node names.
 """
 function load_mrb(path::String)
-    pyzip = pyimport("zipfile")
-    pytemp = pyimport("tempfile")
-    pyos = pyimport("os")
-    pyxml = pyimport("xml.etree.ElementTree")
-    
     is_mrb = endswith(lowercase(path), ".mrb") || endswith(lowercase(path), ".zip")
     
     temp_dir = ""
     target_dir = path
     
     if is_mrb
-        temp_dir = pytemp.mkdtemp()
-        with(pyzip.ZipFile(path, "r")) do zip_ref
-            zip_ref.extractall(temp_dir)
+        temp_dir = mktempdir()
+        r = ZipFile.Reader(path)
+        for f in r.files
+            out_path = joinpath(temp_dir, f.name)
+            if endswith(f.name, "/")
+                mkpath(out_path)
+            else
+                mkpath(dirname(out_path))
+                open(out_path, "w") do io
+                    write(io, read(f))
+                end
+            end
         end
+        close(r)
         target_dir = temp_dir
     end
     
-    # Find .mrml file
     mrml_file = ""
-    for (root, dirs, files) in pyos.walk(target_dir)
+    for (root, dirs, files) in walkdir(target_dir)
         for f in files
             if endswith(lowercase(f), ".mrml")
-                mrml_file = pyos.path.join(root, f)
+                mrml_file = joinpath(root, f)
                 break
             end
         end
@@ -223,29 +217,25 @@ function load_mrb(path::String)
     
     if mrml_file == ""
         if temp_dir != ""
-            pyimport("shutil").rmtree(temp_dir)
+            rm(temp_dir, force=true, recursive=true)
         end
         error("No .mrml file found in the provided path/archive.")
     end
     
-    tree = pyxml.parse(mrml_file)
-    root_node = tree.getroot()
+    doc = readxml(mrml_file)
+    root_node = root(doc)
     
-    # 1. Parse transforms
     transforms = Dict{String, Dict}()
-    for tnode in root_node.findall("LinearTransform")
-        id = tnode.attrib["id"]
-        matrix_str = get(tnode.attrib, "matrixTransformToParent", "")
+    for tnode in findall("//LinearTransform", root_node)
+        id = tnode["id"]
+        matrix_str = haskey(tnode, "matrixTransformToParent") ? tnode["matrixTransformToParent"] : ""
         if matrix_str != ""
             vals = parse.(Float64, split(matrix_str))
-            # Slicer matrix is row-major 16-element array. Reshape to 4x4.
-            # Julia reshape is column-major, so we transpose.
             matrix = transpose(reshape(vals, 4, 4))
             
-            # Check for parent transform
             parent_id = ""
-            if haskey(tnode.attrib, "references")
-                refs = split(tnode.attrib["references"], ";")
+            if haskey(tnode, "references")
+                refs = split(tnode["references"], ";")
                 for ref in refs
                     if startswith(ref, "transform:")
                         parent_id = split(ref, ":")[2]
@@ -257,35 +247,31 @@ function load_mrb(path::String)
         end
     end
     
-    # 2. Parse storages (for file names)
     storages = Dict{String, String}()
-    for snode in root_node.findall("VolumeArchetypeStorage")
-        id = snode.attrib["id"]
-        if haskey(snode.attrib, "fileName")
-            storages[id] = snode.attrib["fileName"]
+    for snode in findall("//VolumeArchetypeStorage", root_node)
+        id = snode["id"]
+        if haskey(snode, "fileName")
+            storages[id] = snode["fileName"]
         end
     end
-    for snode in root_node.findall("SegmentationStorage")
-        id = snode.attrib["id"]
-        if haskey(snode.attrib, "fileName")
-            storages[id] = snode.attrib["fileName"]
+    for snode in findall("//SegmentationStorage", root_node)
+        id = snode["id"]
+        if haskey(snode, "fileName")
+            storages[id] = snode["fileName"]
         end
     end
     
-    # 3. Parse Volumes and Segmentations
     results = Dict{String, Any}()
-    
-    nodes_to_process = [root_node.findall("Volume"); root_node.findall("Segmentation")]
-    
-    mrml_dir = pyos.path.dirname(mrml_file)
+    nodes_to_process = [findall("//Volume", root_node); findall("//Segmentation", root_node)]
+    mrml_dir = dirname(mrml_file)
     
     for vnode in nodes_to_process
-        name = get(vnode.attrib, "name", "")
-        if !haskey(vnode.attrib, "references")
+        name = haskey(vnode, "name") ? vnode["name"] : ""
+        if !haskey(vnode, "references")
             continue
         end
         
-        refs = split(vnode.attrib["references"], ";")
+        refs = split(vnode["references"], ";")
         storage_id = ""
         transform_id = ""
         
@@ -299,32 +285,27 @@ function load_mrb(path::String)
         
         if storage_id != "" && haskey(storages, storage_id)
             rel_file = storages[storage_id]
-            full_file = pyos.path.join(mrml_dir, rel_file)
+            full_file = joinpath(mrml_dir, rel_file)
             
-            if pyos.path.exists(full_file)
-                # Load the raw MedImage
+            if isfile(full_file)
                 itype = occursin(r"(?i)pet", name) ? "PET" : "CT"
                 img = load_image(full_file, itype)
                 
-                # Resolve transform chain
                 current_tid = transform_id
                 T_RAS = Matrix{Float64}(LinearAlgebra.I, 4, 4)
                 
                 while current_tid != "" && haskey(transforms, current_tid)
                     t_info = transforms[current_tid]
-                    # Post-multiply since parent transform is applied after child
                     T_RAS = t_info["matrix"] * T_RAS
                     current_tid = t_info["parent"]
                 end
                 
                 if T_RAS != LinearAlgebra.I
-                    # Apply transform. MedImage is in LPS. T_RAS is in RAS.
                     L = LinearAlgebra.Diagonal([-1.0, -1.0, 1.0, 1.0])
                     T_LPS = L * T_RAS * L
                     
-                    # Construct current LPS affine
                     old_spacing = img.spacing
-                    old_dir = reshape(collect(img.direction), 3, 3)
+                    old_dir = transpose(reshape(collect(img.direction), 3, 3))
                     old_orig = img.origin
                     
                     M_old = zeros(Float64, 4, 4)
@@ -349,7 +330,8 @@ function load_mrb(path::String)
                         new_dir[:, j] = col / s
                     end
                     
-                    img = update_voxel_and_spatial_data(img, img.voxel_data, new_orig, Tuple(new_spacing), Tuple(new_dir))
+                    new_dir_tuple = Tuple(transpose(new_dir))
+                    img = update_voxel_and_spatial_data(img, img.voxel_data, new_orig, Tuple(new_spacing), new_dir_tuple)
                 end
                 
                 results[name] = img
@@ -358,10 +340,11 @@ function load_mrb(path::String)
     end
     
     if temp_dir != ""
-        pyimport("shutil").rmtree(temp_dir)
+        rm(temp_dir, force=true, recursive=true)
     end
     
     return results
 end
+
 
 end
